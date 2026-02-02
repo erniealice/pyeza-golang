@@ -1,6 +1,6 @@
-# @calcglob/ui
+# @leapfor.xyz/pyeza-golang
 
-Shared design system for CalcGlob applications. Provides CSS component styles, design tokens, and theme support.
+Shared design system for Leapfor applications. Provides CSS component styles, design tokens, and theme support.
 
 ## Quick Start
 

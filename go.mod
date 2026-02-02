@@ -1,4 +1,4 @@
-module calc.global/ui
+module leapfor.xyz/pyeza-golang
 
 go 1.25
 

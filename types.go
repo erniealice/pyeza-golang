@@ -1,6 +1,6 @@
 package ui
 
-import "calc.global/ui/types"
+import "leapfor.xyz/pyeza-golang/types"
 
 // Re-export all types for backwards compatibility
 
