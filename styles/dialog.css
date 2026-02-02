@@ -1,0 +1,193 @@
+/* ==========================================================================
+   DIALOG COMPONENT
+   ==========================================================================
+   Modal confirmation dialogs with overlay backdrop and animations.
+   Supports multiple button variants: default, danger, primary.
+
+   Usage:
+   - Dialog shell should be placed in app shell (hidden by default)
+   - Content is loaded via HTMX from /ui/dialog/confirm endpoint
+   - Close on ESC key or clicking outside the dialog
+   ========================================================================== */
+
+/* ==========================================================================
+   DIALOG OVERLAY
+   ========================================================================== */
+.dialog-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--bg-overlay, rgba(0, 0, 0, 0.5));
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.dialog-overlay:not([hidden]) {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+/* Fade in/out animation via class */
+.dialog-overlay.visible {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+/* ==========================================================================
+   DIALOG CONTAINER
+   ========================================================================== */
+.dialog-container {
+	background: var(--bg-card);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-float, 0 12px 40px rgba(0, 0, 0, 0.15));
+	max-width: 420px;
+	width: 90%;
+	/* Start with hidden state */
+	transform: scale(0.95) translateY(-10px);
+	opacity: 0;
+	transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Visible state - animated in */
+.dialog-overlay.visible .dialog-container {
+	transform: scale(1) translateY(0);
+	opacity: 1;
+}
+
+/* ==========================================================================
+   DIALOG HEADER
+   ========================================================================== */
+.dialog-header {
+	padding: 1.25rem 1.5rem 0;
+}
+
+.dialog-title {
+	font-family: var(--font-display);
+	font-size: 1.125rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin: 0;
+}
+
+/* ==========================================================================
+   DIALOG BODY
+   ========================================================================== */
+.dialog-body {
+	padding: 1rem 1.5rem 1.5rem;
+}
+
+.dialog-message {
+	font-size: 0.9375rem;
+	color: var(--text-secondary);
+	margin: 0;
+	line-height: 1.6;
+}
+
+/* ==========================================================================
+   DIALOG FOOTER
+   ========================================================================== */
+.dialog-footer {
+	padding: 1rem 1.5rem;
+	border-top: 1px solid var(--border-light, var(--border));
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.75rem;
+	background: var(--bg-base);
+	border-radius: 0 0 var(--radius-lg, 1rem) var(--radius-lg, 1rem);
+}
+
+/* ==========================================================================
+   DIALOG BUTTONS
+   ========================================================================== */
+.dialog-btn {
+	padding: 0.625rem 1.25rem;
+	border-radius: var(--radius-md);
+	font-family: var(--font-body);
+	font-size: 0.875rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all var(--transition-fast, 0.15s ease);
+	border: 1px solid transparent;
+}
+
+/* Cancel button */
+.dialog-btn-cancel {
+	background: var(--bg-card);
+	border-color: var(--border);
+	color: var(--text-secondary);
+}
+
+.dialog-btn-cancel:hover {
+	border-color: var(--text-muted);
+	color: var(--text-primary);
+}
+
+/* Confirm button - default variant */
+.dialog-btn-confirm {
+	background: var(--accent-terracotta, var(--accent-primary));
+	border-color: var(--accent-terracotta, var(--accent-primary));
+	color: var(--text-inverse, white);
+}
+
+.dialog-btn-confirm:hover {
+	background: var(--accent-terracotta-dark, var(--accent-primary-dark));
+	border-color: var(--accent-terracotta-dark, var(--accent-primary-dark));
+}
+
+/* Danger variant */
+.dialog-btn-danger {
+	background: var(--status-error, var(--accent-terracotta));
+	border-color: var(--status-error, var(--accent-terracotta));
+	color: var(--text-inverse, white);
+}
+
+.dialog-btn-danger:hover {
+	background: var(--status-error-dark, var(--accent-terracotta-dark));
+	border-color: var(--status-error-dark, var(--accent-terracotta-dark));
+}
+
+/* Primary variant */
+.dialog-btn-primary {
+	background: var(--accent-navy, var(--accent-primary));
+	border-color: var(--accent-navy, var(--accent-primary));
+	color: var(--text-inverse, white);
+}
+
+.dialog-btn-primary:hover {
+	background: var(--accent-navy-dark, var(--accent-primary-dark));
+	border-color: var(--accent-navy-dark, var(--accent-primary-dark));
+}
+
+/* ==========================================================================
+   DENSITY SCALING
+   ========================================================================== */
+/* All dimensions use rem and CSS variables, so they scale automatically
+   with the data-density attribute on the html element. */
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+/* Focus styles for keyboard navigation */
+.dialog-btn:focus-visible {
+	outline: 2px solid var(--border-focus, var(--accent-primary));
+	outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+	.dialog-overlay,
+	.dialog-container,
+	.dialog-btn {
+		transition: none;
+	}
+}

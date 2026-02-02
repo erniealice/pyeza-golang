@@ -1,0 +1,67 @@
+/*
+ * ==========================================================================
+ * THEME: FOREST NIGHT
+ * A nature-inspired dark green theme
+ * ==========================================================================
+ */
+[data-theme="forest-night"] {
+    /* Backgrounds */
+    --bg-base: #0D1512;
+    --bg-sidebar: #131F1A;
+    --bg-card: #1A2922;
+    --bg-hover: #22352C;
+    --bg-input: #1A2922;
+    --bg-overlay: rgba(13, 21, 18, 0.8);
+
+    /* Text */
+    --text-primary: #E8F0EC;
+    --text-secondary: #9DB5A8;
+    --text-muted: #6B8578;
+    --text-inverse: #0D1512;
+
+    /* Primary Accent */
+    --accent-primary: #4ADE80;
+    --accent-primary-light: rgba(74, 222, 128, 0.15);
+    --accent-primary-dark: #22C55E;
+
+    /* Secondary Accents */
+    --accent-terracotta: #FB923C;
+    --accent-terracotta-light: rgba(251, 146, 60, 0.15);
+    --accent-terracotta-dark: #EA580C;
+    --accent-sage: #4ADE80;
+    --accent-sage-light: rgba(74, 222, 128, 0.15);
+    --accent-navy: #38BDF8;
+    --accent-navy-light: rgba(56, 189, 248, 0.15);
+    --accent-navy-dark: #0EA5E9;
+    --accent-amber: #FACC15;
+    --accent-amber-light: rgba(250, 204, 21, 0.15);
+    --accent-plum: #C084FC;
+    --accent-slate: #9DB5A8;
+
+    /* Status Colors */
+    --status-success: #4ADE80;
+    --status-success-light: rgba(74, 222, 128, 0.15);
+    --status-warning: #FACC15;
+    --status-warning-light: rgba(250, 204, 21, 0.15);
+    --status-error: #F87171;
+    --status-error-light: rgba(248, 113, 113, 0.15);
+    --status-info: #38BDF8;
+    --status-info-light: rgba(56, 189, 248, 0.15);
+
+    /* Borders & Shadows */
+    --border: #2D4038;
+    --border-light: #3D5248;
+    --border-focus: var(--accent-primary);
+    --border-default: #2D4038;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+    /* Theme Meta */
+    --theme-name: "Forest Night";
+    --theme-icon-bg: linear-gradient(135deg, #1A2922 0%, #0D1512 100%);
+    --theme-icon-accent: #4ADE80;
+}

@@ -1,0 +1,67 @@
+/*
+ * ==========================================================================
+ * THEME: MINIMAL LIGHT
+ * Ultra-clean, bright and airy design
+ * ==========================================================================
+ */
+[data-theme="minimal-light"] {
+    /* Backgrounds */
+    --bg-base: #FFFFFF;
+    --bg-sidebar: #FAFAFA;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F5F5F5;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(0, 0, 0, 0.4);
+
+    /* Text */
+    --text-primary: #171717;
+    --text-secondary: #525252;
+    --text-muted: #A3A3A3;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent */
+    --accent-primary: #171717;
+    --accent-primary-light: #F5F5F5;
+    --accent-primary-dark: #000000;
+
+    /* Secondary Accents */
+    --accent-terracotta: #DC2626;
+    --accent-terracotta-light: #FEF2F2;
+    --accent-terracotta-dark: #B91C1C;
+    --accent-sage: #16A34A;
+    --accent-sage-light: #F0FDF4;
+    --accent-navy: #2563EB;
+    --accent-navy-light: #EFF6FF;
+    --accent-navy-dark: #1D4ED8;
+    --accent-amber: #CA8A04;
+    --accent-amber-light: #FEFCE8;
+    --accent-plum: #9333EA;
+    --accent-slate: #64748B;
+
+    /* Status Colors */
+    --status-success: #16A34A;
+    --status-success-light: #F0FDF4;
+    --status-warning: #CA8A04;
+    --status-warning-light: #FEFCE8;
+    --status-error: #DC2626;
+    --status-error-light: #FEF2F2;
+    --status-info: #2563EB;
+    --status-info-light: #EFF6FF;
+
+    /* Borders & Shadows */
+    --border: #E5E5E5;
+    --border-light: #F5F5F5;
+    --border-focus: var(--accent-primary);
+    --border-default: #E5E5E5;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
+
+    /* Theme Meta */
+    --theme-name: "Minimal Light";
+    --theme-icon-bg: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+    --theme-icon-accent: #171717;
+}

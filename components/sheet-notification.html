@@ -1,0 +1,318 @@
+{{/*
+================================================================================
+SHEET-NOTIFICATION COMPONENT
+================================================================================
+
+Slide-in sheet for displaying notifications.
+Replaces the old notification-drawer component.
+
+Usage:
+    {{template "sheet-notification" dict "CommonLabels" .CommonLabels}}
+
+Features:
+    - Filter tabs (All, Unread, Alerts)
+    - Mark all read button
+    - Loading and empty states
+    - Notification cards with dismiss buttons
+    - View all link in footer
+
+Classes:
+    - .sheet: Container
+    - .sheet-notification: Notification variant modifier
+    - .sheet-panel-sm: Small width (23.75rem)
+
+JavaScript:
+    Sheet.open('notification') - Open the notification sheet
+    Sheet.close() - Close the sheet
+
+HTMX Events:
+    - Tab clicks filter notifications
+    - Mark all read button marks all as read
+    - Dismiss button removes individual notification
+================================================================================
+*/}}
+
+{{define "sheet-notification"}}
+<div class="sheet sheet-notification" id="notificationSheet">
+    <div class="sheet-overlay" id="notificationSheetOverlay"></div>
+    <div class="sheet-panel sheet-panel-sm">
+        <div class="sheet-header">
+            <h2 class="sheet-title">{{.CommonLabels.Notifications.Title}}</h2>
+            <div class="sheet-header-actions">
+                <button class="sheet-mark-all" id="markAllRead" title="{{.CommonLabels.Notifications.MarkAllRead}}">
+                    {{template "icon-check-square"}}
+                    <span>{{.CommonLabels.Notifications.MarkAllRead}}</span>
+                </button>
+                <button class="sheet-close" id="notificationSheetClose" aria-label="{{.CommonLabels.Notifications.Close}}">
+                    {{template "icon-x"}}
+                </button>
+            </div>
+        </div>
+
+        <div class="sheet-tabs">
+            <button class="sheet-tab active" data-filter="all">{{.CommonLabels.Notifications.Tabs.All}}</button>
+            <button class="sheet-tab" data-filter="unread">{{.CommonLabels.Notifications.Tabs.Unread}}</button>
+            <button class="sheet-tab" data-filter="alert">{{.CommonLabels.Notifications.Tabs.Alerts}}</button>
+        </div>
+
+        <div class="sheet-content">
+            <div class="sheet-list" id="notificationList">
+                <!-- Loading state -->
+                <div class="sheet-list-loading" id="notificationLoading">
+                    <div class="sheet-spinner"></div>
+                    <span>{{.CommonLabels.Notifications.Loading}}</span>
+                </div>
+
+                <!-- Empty state (hidden by default) -->
+                <div class="sheet-empty" id="notificationEmpty" style="display: none;">
+                    <div class="sheet-empty-icon">
+                        {{template "icon-bell"}}
+                    </div>
+                    <h3>{{.CommonLabels.Notifications.Empty.Title}}</h3>
+                    <p>{{.CommonLabels.Notifications.Empty.Message}}</p>
+                </div>
+
+                <!-- Notifications will be rendered here -->
+                <div id="notificationItems"></div>
+            </div>
+        </div>
+
+        <div class="sheet-footer">
+            <a href="/notifications" class="sheet-view-all">
+                {{.CommonLabels.Notifications.ViewAll}}
+                {{template "icon-arrow-right"}}
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Sheet Script -->
+<script>
+(function() {
+    'use strict';
+
+    const sheet = document.getElementById('notificationSheet');
+    const overlay = document.getElementById('notificationSheetOverlay');
+    const closeBtn = document.getElementById('notificationSheetClose');
+    const bellBtn = document.getElementById('notificationBtn');
+    const loadingEl = document.getElementById('notificationLoading');
+    const emptyEl = document.getElementById('notificationEmpty');
+    const itemsEl = document.getElementById('notificationItems');
+
+    if (!sheet || !bellBtn) return;
+
+    let notifications = [];
+
+    function open() {
+        sheet.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        fetchNotifications();
+    }
+
+    function close() {
+        sheet.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function updateBadge() {
+        const unreadCount = notifications.filter(n => !n.read).length;
+        let badge = bellBtn.querySelector('.count-badge');
+        const indicator = bellBtn.querySelector('.notification-indicator');
+
+        if (!badge && unreadCount > 0) {
+            badge = document.createElement('span');
+            badge.className = 'count-badge';
+            bellBtn.appendChild(badge);
+        }
+
+        if (badge) {
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                badge.style.display = '';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        if (indicator) {
+            indicator.style.display = unreadCount > 0 ? 'block' : 'none';
+        }
+    }
+
+    function formatTime(timestamp) {
+        const now = new Date();
+        const date = new Date(timestamp);
+        const diffMin = Math.floor((now - date) / 60000);
+        if (diffMin < 1) return 'Just now';
+        if (diffMin < 60) return diffMin + ' min ago';
+        const diffHour = Math.floor(diffMin / 60);
+        if (diffHour < 24) return diffHour + ' hour' + (diffHour > 1 ? 's' : '') + ' ago';
+        const diffDay = Math.floor(diffHour / 24);
+        if (diffDay < 7) return diffDay + ' day' + (diffDay > 1 ? 's' : '') + ' ago';
+        return date.toLocaleDateString();
+    }
+
+    function renderNotifications() {
+        if (!itemsEl) return;
+
+        if (notifications.length === 0) {
+            itemsEl.innerHTML = '';
+            if (emptyEl) emptyEl.style.display = 'flex';
+        } else {
+            if (emptyEl) emptyEl.style.display = 'none';
+            itemsEl.innerHTML = notifications.map(n => `
+                <a href="${n.actionUrl || '#'}" class="sheet-card${n.read ? '' : ' unread'}">
+                    <div class="sheet-card-icon ${n.type || 'info'}">
+                        {{template "icon-bell"}}
+                    </div>
+                    <div class="sheet-card-content">
+                        <h4 class="sheet-card-title">${n.title || ''}</h4>
+                        <p class="sheet-card-message">${n.message || ''}</p>
+                        <span class="sheet-card-time">${formatTime(n.timestamp)}</span>
+                    </div>
+                </a>
+            `).join('');
+        }
+        updateBadge();
+    }
+
+    async function fetchNotifications() {
+        if (loadingEl) loadingEl.style.display = 'flex';
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (itemsEl) itemsEl.innerHTML = '';
+
+        try {
+            const response = await fetch('/api/notifications');
+            if (response.ok) {
+                const data = await response.json();
+                notifications = data.notifications || [];
+            }
+        } catch (e) {
+            console.error('Failed to fetch notifications:', e);
+            notifications = [];
+        } finally {
+            if (loadingEl) loadingEl.style.display = 'none';
+            renderNotifications();
+        }
+    }
+
+    // Bell button click
+    bellBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (sheet.classList.contains('open')) {
+            close();
+        } else {
+            open();
+        }
+    });
+
+    // Close button click
+    if (closeBtn) {
+        closeBtn.addEventListener('click', close);
+    }
+
+    // Overlay click
+    if (overlay) {
+        overlay.addEventListener('click', close);
+    }
+
+    // Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sheet.classList.contains('open')) {
+            close();
+        }
+    });
+
+    // Fetch initial badge count on page load
+    fetch('/api/notifications')
+        .then(r => r.json())
+        .then(data => {
+            notifications = data.notifications || [];
+            updateBadge();
+        })
+        .catch(() => {});
+
+    // Expose API
+    window.NotificationSheet = { open, close, refresh: fetchNotifications };
+})();
+</script>
+{{end}}
+
+{{/*
+================================================================================
+NOTIFICATION CARD COMPONENT
+================================================================================
+
+Individual notification card for use in notification lists.
+
+Usage:
+    {{template "notification-card" dict
+        "ID" "notif-123"
+        "Type" "alert"
+        "Title" "Attention required"
+        "Message" "Please review this item"
+        "Time" "2 minutes ago"
+        "Unread" true
+        "Link" "/items/123"
+    }}
+
+Types:
+    - alert: Red/terracotta styling
+    - success: Green/sage styling
+    - info: Blue/navy styling
+    - warning: Yellow/amber styling
+    - client: Teal styling
+    - quote: Green/sage styling
+    - system: Purple/plum styling
+================================================================================
+*/}}
+
+{{define "notification-card"}}
+{{$type := .Type}}
+{{if $type}}{{else}}{{$type = "info"}}{{end}}
+{{$iconClass := printf "sheet-card-icon %s" $type}}
+
+<a href="{{.Link}}" class="sheet-card{{if .Unread}} unread{{end}}" id="{{.ID}}">
+    <div class="{{$iconClass}}">
+        {{if eq $type "alert"}}
+        {{template "icon-alert-triangle"}}
+        {{else if eq $type "success"}}
+        {{template "icon-check-circle"}}
+        {{else if eq $type "info"}}
+        {{template "icon-info"}}
+        {{else if eq $type "warning"}}
+        {{template "icon-alert-triangle"}}
+        {{else}}
+        {{template "icon-bell"}}
+        {{end}}
+    </div>
+    <div class="sheet-card-content">
+        <h4 class="sheet-card-title">{{.Title}}</h4>
+        <p class="sheet-card-message">{{.Message}}</p>
+        <span class="sheet-card-time">{{.Time}}</span>
+    </div>
+    {{if .Unread}}
+    <button class="sheet-card-dismiss" data-dismiss-notification="{{.ID}}" aria-label="Dismiss">
+        {{template "icon-x"}}
+    </button>
+    {{end}}
+</a>
+{{end}}
+
+{{/*
+================================================================================
+NOTIFICATION BADGE COMPONENT
+================================================================================
+
+Badge for notification bell icon showing unread count.
+
+Usage:
+    {{template "notification-badge" .Count}}
+
+If count is 0 or empty, badge will be hidden (via .hidden class)
+================================================================================
+*/}}
+
+{{define "notification-badge"}}
+<span class="sheet-badge{{if .}}{{if eq . 0}} hidden{{end}}{{else}} hidden{{end}}">{{.}}</span>
+{{end}}

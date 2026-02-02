@@ -1,0 +1,16 @@
+{{define "form-sheet"}}
+<div id="formSheet" class="form-sheet">
+    <div class="form-sheet-overlay" id="formSheetOverlay"></div>
+    <div class="form-sheet-panel">
+        <div class="form-sheet-header">
+            <h2 id="formSheetTitle">Add</h2>
+            <button type="button" class="form-sheet-close" id="formSheetClose">
+                {{template "icon-x" .}}
+            </button>
+        </div>
+        <div class="form-sheet-content" id="formSheetContent">
+            <!-- HTMX loads form here -->
+        </div>
+    </div>
+</div>
+{{end}}

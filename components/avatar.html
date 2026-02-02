@@ -1,0 +1,93 @@
+{{/*
+    Avatar Component
+    ================
+    User/client profile images with initials fallback, async image loading,
+    and flexible sizing (presets or custom rem values).
+
+    Styles: avatar.css
+
+    Usage:
+        {{/* Basic with image */}}
+        {{template "avatar" dict "Src" "/img/user.jpg" "Name" "Jane Doe"}}
+
+        {{/* Fallback text (initials) */}}
+        {{template "avatar" dict "Fallback" "JD"}}
+
+        {{/* Size presets */}}
+        {{template "avatar" dict "Name" "Jane Doe" "Size" "xs"}}
+        {{template "avatar" dict "Name" "Jane Doe" "Size" "sm"}}
+        {{template "avatar" dict "Name" "Jane Doe" "Size" "md"}}
+        {{template "avatar" dict "Name" "Jane Doe" "Size" "lg"}}
+        {{template "avatar" dict "Name" "Jane Doe" "Size" "xl"}}
+
+        {{/* Custom size in rem */}}
+        {{template "avatar" dict "Name" "Jane Doe" "SizeRem" "5"}}
+
+        {{/* With status dot */}}
+        {{template "avatar" dict "Name" "Jane Doe" "Src" "/img/user.jpg" "Status" "online"}}
+
+        {{/* Avatar group (stacked) */}}
+        {{template "avatar-group"}}
+            {{template "avatar" dict "Name" "Alice" "Src" "/img/a.jpg" "Size" "sm"}}
+            {{template "avatar" dict "Name" "Bob" "Src" "/img/b.jpg" "Size" "sm"}}
+            {{template "avatar" dict "Fallback" "+3" "Size" "sm"}}
+        {{template "avatar-group-end"}}
+
+    Parameters:
+        Name        - Full name (used for alt text)
+        Fallback    - Fallback text shown when no image (e.g., initials "JD")
+        Src         - Image URL. Image loads async; fallback shows until loaded
+        Size        - xs | sm | md | lg | xl (default: md)
+        SizeRem     - Custom size in rem (e.g., "5" for 5rem). Overrides Size preset
+        Status      - online | offline | busy | away — shows status dot
+        Color       - terracotta | sage | navy | amber | plum — fallback bg color. Auto-assigned from Name if omitted
+        Class       - Additional CSS classes
+        ID          - Element ID
+*/}}
+
+{{define "avatar"}}
+{{- $size := or .Size "md" -}}
+{{- $hasImage := false -}}
+{{- if .Src }}{{- $hasImage = true -}}{{- end -}}
+
+{{- $fallback := or .Fallback "?" -}}
+
+{{- /* Build class list */ -}}
+{{- $classes := printf "avatar avatar-%s" $size -}}
+{{- if .Color }}{{- $classes = printf "%s avatar-%s" $classes .Color -}}{{- end -}}
+{{- if .Class }}{{- $classes = printf "%s %s" $classes .Class -}}{{- end -}}
+
+<div class="{{$classes}}"
+    {{- if .ID }} id="{{.ID}}"{{end}}
+    {{- if .SizeRem }} style="--avatar-size: {{.SizeRem}}rem;"{{end}}
+    role="img"
+    aria-label="{{or .Name .Fallback "Avatar"}}"
+>
+    <span class="avatar-fallback" aria-hidden="true">{{$fallback}}</span>
+    {{- if $hasImage }}
+    <img class="avatar-img"
+         src="{{.Src}}"
+         alt="{{or .Name ""}}"
+         loading="lazy"
+         onerror="this.style.display='none'"
+    />
+    {{- end }}
+    {{- if .Status }}
+    <span class="avatar-status avatar-status-{{.Status}}" aria-label="{{.Status}}"></span>
+    {{- end }}
+</div>
+{{end}}
+
+{{/* ============================================================
+    Avatar Group (Stacked)
+    ============================================================
+    Overlapping avatar stack with negative margins.
+    ============================================================ */}}
+
+{{define "avatar-group"}}
+<div class="avatar-group">
+{{end}}
+
+{{define "avatar-group-end"}}
+</div>
+{{end}}

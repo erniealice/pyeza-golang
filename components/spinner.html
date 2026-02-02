@@ -1,0 +1,89 @@
+{{/*
+    Spinner Component
+    =================
+    Standardized loading indicator with optional label text.
+    Wraps the existing .spinner CSS from loading-indicator.css.
+
+    Styles: loading-indicator.css (existing), spinner.css (additions)
+
+    Usage:
+        {{/* Basic spinner */}}
+        {{template "spinner" dict}}
+
+        {{/* With size */}}
+        {{template "spinner" dict "Size" "sm"}}
+        {{template "spinner" dict "Size" "lg"}}
+
+        {{/* With label */}}
+        {{template "spinner" dict "Label" "Loading..."}}
+
+        {{/* Inline (for inside buttons, text, etc.) */}}
+        {{template "spinner" dict "Inline" true "Size" "sm"}}
+
+        {{/* Centered full-area (for page/section loading) */}}
+        {{template "spinner" dict "Centered" true "Label" "Loading data..."}}
+
+        {{/* As HTMX indicator */}}
+        {{template "spinner-indicator" dict "ID" "my-loading"}}
+
+    Parameters:
+        Size        - sm | md | lg (default: md — uses existing .spinner sizes)
+        Label       - Optional text beside/below the spinner
+        Inline      - true | false (default: false) — inline-flex for use inside text
+        Centered    - true | false (default: false) — centered in parent container
+        Color       - primary | muted | inverse (default: primary)
+        Class       - Additional CSS classes
+        ID          - Element ID
+*/}}
+
+{{define "spinner"}}
+{{- $size := or .Size "md" -}}
+{{- $inline := false -}}
+{{- if eq .Inline true }}{{- $inline = true -}}{{- end -}}
+{{- $centered := false -}}
+{{- if eq .Centered true }}{{- $centered = true -}}{{- end -}}
+{{- $color := or .Color "primary" -}}
+
+{{- /* Build wrapper class */ -}}
+{{- $wrapClass := "spinner-wrap" -}}
+{{- if $inline }}{{- $wrapClass = "spinner-wrap spinner-inline" -}}{{- end -}}
+{{- if $centered }}{{- $wrapClass = "spinner-wrap spinner-centered" -}}{{- end -}}
+{{- if .Class }}{{- $wrapClass = printf "%s %s" $wrapClass .Class -}}{{- end -}}
+
+{{- /* Build spinner class */ -}}
+{{- $spinClass := printf "spinner %s" $size -}}
+{{- if ne $color "primary" }}{{- $spinClass = printf "%s spinner-%s" $spinClass $color -}}{{- end -}}
+
+<div class="{{$wrapClass}}"
+    {{- if .ID }} id="{{.ID}}"{{end}}
+    role="status"
+    aria-label="{{or .Label "Loading"}}"
+>
+    <div class="{{$spinClass}}"></div>
+    {{- if .Label }}
+    <span class="spinner-label">{{.Label}}</span>
+    {{- end }}
+</div>
+{{end}}
+
+{{/* ============================================================
+    Spinner as HTMX Indicator
+    ============================================================
+    Hidden by default, shown when parent triggers an HTMX request.
+    Usage:
+        <div hx-get="/data" hx-indicator="#my-loading">...</div>
+        {{template "spinner-indicator" dict "ID" "my-loading"}}
+    ============================================================ */}}
+
+{{define "spinner-indicator"}}
+<div class="htmx-indicator spinner-wrap spinner-centered"
+    {{- if .ID }} id="{{.ID}}"{{end}}
+    role="status"
+    aria-label="Loading"
+>
+    <div class="spinner {{or .Size "md"}}"></div>
+    {{- if .Label }}
+    <span class="spinner-label">{{.Label}}</span>
+    {{- end }}
+</div>
+{{end}}

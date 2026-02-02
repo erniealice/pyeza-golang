@@ -1,0 +1,54 @@
+{{define "notification-sheet"}}
+<!-- Notification Sheet -->
+<div class="notification-overlay" id="notificationOverlay"></div>
+<aside class="notification-sheet" id="notificationSheet">
+    <div class="notification-drawer-header">
+        <h2 class="notification-drawer-title">{{.CommonLabels.Notifications.Title}}</h2>
+        <div class="notification-drawer-actions">
+            <button class="notification-mark-all" id="markAllRead" title="{{.CommonLabels.Notifications.MarkAllRead}}">
+                {{template "icon-check-square"}}
+                <span>{{.CommonLabels.Notifications.MarkAllRead}}</span>
+            </button>
+            <button class="notification-close-btn" id="notificationCloseBtn" aria-label="{{.CommonLabels.Notifications.Close}}">
+                {{template "icon-x"}}
+            </button>
+        </div>
+    </div>
+
+    <div class="notification-tabs">
+        <button class="notification-tab active" data-filter="all">{{.CommonLabels.Notifications.Tabs.All}}</button>
+        <button class="notification-tab" data-filter="unread">{{.CommonLabels.Notifications.Tabs.Unread}}</button>
+        <button class="notification-tab" data-filter="alert">{{.CommonLabels.Notifications.Tabs.Alerts}}</button>
+    </div>
+
+    <div class="notification-list" id="notificationList">
+        <!-- Loading state -->
+        <div class="notification-loading" id="notificationLoading">
+            <div class="notification-spinner"></div>
+            <span>{{.CommonLabels.Notifications.Loading}}</span>
+        </div>
+
+        <!-- Empty state (hidden by default) -->
+        <div class="notification-empty" id="notificationEmpty" style="display: none;">
+            <div class="notification-empty-icon">
+                {{template "icon-bell"}}
+            </div>
+            <h3>{{.CommonLabels.Notifications.Empty.Title}}</h3>
+            <p>{{.CommonLabels.Notifications.Empty.Message}}</p>
+        </div>
+
+        <!-- Notifications will be rendered here -->
+        <div id="notificationItems"></div>
+    </div>
+
+    <div class="notification-sheet-footer">
+        <a href="/notifications" class="notification-view-all">
+            {{.CommonLabels.Notifications.ViewAll}}
+            {{template "icon-arrow-right"}}
+        </a>
+    </div>
+</aside>
+
+<!-- Notification Sheet Script -->
+<script src="/assets/js/components/notification-sheet.js"></script>
+{{end}}

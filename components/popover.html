@@ -1,0 +1,341 @@
+{{/*
+================================================================================
+POPOVER COMPONENT — Behavioral Initializer
+================================================================================
+Auto-initializes all [data-popover] elements on the page as floating panels.
+Teleports panel to <body> with position:fixed to escape overflow/transform
+clipping from ancestor containers (drawers, sheets, modals).
+
+Include once per page:
+    {{template "popover-init"}}
+
+Data attributes (on wrapper element):
+    data-popover                         Marks element for auto-init
+    data-popover-position="bottom"       top | bottom | left | right
+    data-popover-align="start"           start | end (horizontal alignment for top/bottom)
+    data-popover-width="auto"            auto | match | {N}px
+    data-popover-trigger="click"         hover | click | focus (space-separated)
+    data-popover-offset="10"             Gap in px between anchor and panel
+    data-popover-external="#selector"    External element that also triggers on focus
+
+Required children:
+    .popover-trigger    — The button/element that opens the panel
+    .popover-panel      — The floating content panel
+    .popover-arrow      — (Optional) Decorative arrow inside .popover-panel
+
+Events emitted on wrapper:
+    popover:show        — Fired after panel opens
+    popover:hide        — Fired after panel closes
+
+JS API:
+    el._popover.show()  / .hide() / .toggle()
+================================================================================
+*/}}
+
+{{define "popover-init"}}
+<script>
+(function() {
+    'use strict';
+    if (window.__popoverInit) return;
+    window.__popoverInit = true;
+
+    /* ======================================================================
+       Popover Class
+       ====================================================================== */
+    function Popover(el) {
+        this.el = el;
+        this.trigger = el.querySelector('.popover-trigger');
+        this.panel = el.querySelector('.popover-panel');
+        this.arrow = this.panel ? this.panel.querySelector('.popover-arrow') : null;
+
+        if (!this.trigger || !this.panel) return;
+
+        // Config from data attributes
+        this.position     = el.dataset.popoverPosition || 'bottom';
+        this.align        = el.dataset.popoverAlign    || 'start'; // start | end
+        this.widthMode    = el.dataset.popoverWidth    || 'auto';
+        this.triggerModes = (el.dataset.popoverTrigger || 'click').split(/\s+/);
+        this.offset       = parseInt(el.dataset.popoverOffset) || 10;
+        this.extSelector  = el.dataset.popoverExternal || null;
+
+        // State
+        this.isOpen       = false;
+        this._hideTimer   = null;
+        this._origParent  = this.panel.parentElement;
+        this._origSibling = this.panel.nextSibling;
+        this._scrollEl    = null;
+        this._extEl       = null;
+
+        // Pre-bound handlers
+        this._bReposition    = this._reposition.bind(this);
+        this._bOutsideClick  = this._outsideClick.bind(this);
+        this._bEscape        = this._escapeKey.bind(this);
+
+        this._bind();
+    }
+
+    /* ------------------------------------------------------------------
+       Event binding
+       ------------------------------------------------------------------ */
+    Popover.prototype._bind = function() {
+        var self = this;
+
+        if (this.triggerModes.indexOf('click') !== -1) {
+            this.trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self.toggle();
+            });
+        }
+
+        if (this.triggerModes.indexOf('hover') !== -1) {
+            this.trigger.addEventListener('mouseenter', function() {
+                self._cancelHide(); self.show();
+            });
+            this.trigger.addEventListener('mouseleave', function() {
+                self._deferHide();
+            });
+        }
+
+        if (this.triggerModes.indexOf('focus') !== -1) {
+            this.trigger.addEventListener('focus', function() {
+                self._cancelHide(); self.show();
+            });
+            this.trigger.addEventListener('blur', function() {
+                self._deferHide();
+            });
+        }
+
+        // External trigger (focus/blur on another element)
+        if (this.extSelector) {
+            this._extEl = document.querySelector(this.extSelector);
+            if (this._extEl) {
+                this._extEl.addEventListener('focus', function() {
+                    self._cancelHide(); self.show();
+                });
+                this._extEl.addEventListener('blur', function() {
+                    self._deferHide();
+                });
+            }
+        }
+
+        // Keep open while hovering the panel itself
+        this.panel.addEventListener('mouseenter', function() { self._cancelHide(); });
+        this.panel.addEventListener('mouseleave', function() { self._deferHide(); });
+
+        // ARIA
+        this.trigger.setAttribute('aria-expanded', 'false');
+    };
+
+    /* ------------------------------------------------------------------
+       Show / Hide / Toggle
+       ------------------------------------------------------------------ */
+    Popover.prototype.show = function() {
+        if (this.isOpen) return;
+        this.isOpen = true;
+
+        document.body.appendChild(this.panel);
+        this.panel.classList.add('popover-open');
+        this._reposition();
+        this._bindGlobal();
+
+        this.trigger.setAttribute('aria-expanded', 'true');
+        this.el.dispatchEvent(new CustomEvent('popover:show', { bubbles: true }));
+    };
+
+    Popover.prototype.hide = function() {
+        if (!this.isOpen) return;
+        this.isOpen = false;
+
+        this.panel.classList.remove('popover-open');
+
+        // Return panel to original DOM position
+        if (this._origSibling) {
+            this._origParent.insertBefore(this.panel, this._origSibling);
+        } else {
+            this._origParent.appendChild(this.panel);
+        }
+
+        this._unbindGlobal();
+        this.trigger.setAttribute('aria-expanded', 'false');
+        this.el.dispatchEvent(new CustomEvent('popover:hide', { bubbles: true }));
+    };
+
+    Popover.prototype.toggle = function() {
+        this.isOpen ? this.hide() : this.show();
+    };
+
+    /* ------------------------------------------------------------------
+       Positioning
+       ------------------------------------------------------------------ */
+    Popover.prototype._reposition = function() {
+        if (!this.isOpen) return;
+
+        var rect   = this.el.getBoundingClientRect();
+        var panel  = this.panel;
+        var offset = this.offset;
+
+        // Width
+        if (this.widthMode === 'match') {
+            panel.style.width = rect.width + 'px';
+        } else if (this.widthMode !== 'auto') {
+            panel.style.width = this.widthMode;
+        } else {
+            panel.style.width = '';
+        }
+
+        // Reset
+        panel.style.top = '';
+        panel.style.bottom = '';
+        panel.style.left = '';
+        panel.style.right = '';
+
+        var alignEnd = this.align === 'end';
+
+        switch (this.position) {
+            case 'top':
+                panel.style.bottom = (window.innerHeight - rect.top + offset) + 'px';
+                if (alignEnd) {
+                    panel.style.right = (window.innerWidth - rect.right) + 'px';
+                } else {
+                    panel.style.left = rect.left + 'px';
+                }
+                break;
+            case 'left':
+                panel.style.top = rect.top + 'px';
+                panel.style.right = (window.innerWidth - rect.left + offset) + 'px';
+                break;
+            case 'right':
+                panel.style.top = rect.top + 'px';
+                panel.style.left = (rect.right + offset) + 'px';
+                break;
+            default: // bottom
+                panel.style.top = (rect.bottom + offset) + 'px';
+                if (alignEnd) {
+                    panel.style.right = (window.innerWidth - rect.right) + 'px';
+                } else {
+                    panel.style.left = rect.left + 'px';
+                }
+        }
+
+        panel.setAttribute('data-position', this.position);
+
+        // Arrow — point towards trigger center
+        if (this.arrow) this._positionArrow();
+    };
+
+    Popover.prototype._positionArrow = function() {
+        var arrow = this.arrow;
+        arrow.setAttribute('data-direction', this.position);
+
+        arrow.style.top = '';
+        arrow.style.bottom = '';
+        arrow.style.left = '';
+        arrow.style.right = '';
+
+        var tRect = this.trigger.getBoundingClientRect();
+        var pRect = this.panel.getBoundingClientRect();
+
+        switch (this.position) {
+            case 'bottom':
+            case 'top':
+                var cx = tRect.left + tRect.width / 2 - pRect.left - 5;
+                arrow.style.left = Math.max(8, Math.min(cx, pRect.width - 18)) + 'px';
+                break;
+            case 'left':
+            case 'right':
+                var cy = tRect.top + tRect.height / 2 - pRect.top - 5;
+                arrow.style.top = Math.max(8, Math.min(cy, pRect.height - 18)) + 'px';
+                break;
+        }
+    };
+
+    /* ------------------------------------------------------------------
+       Deferred hide (200 ms grace period)
+       ------------------------------------------------------------------ */
+    Popover.prototype._deferHide = function() {
+        var self = this;
+        this._cancelHide();
+        this._hideTimer = setTimeout(function() {
+            if (self.trigger.matches(':hover') || self.panel.matches(':hover')) return;
+            if (document.activeElement === self.trigger) return;
+            if (self._extEl && document.activeElement === self._extEl) return;
+            self.hide();
+        }, 200);
+    };
+
+    Popover.prototype._cancelHide = function() {
+        if (this._hideTimer) {
+            clearTimeout(this._hideTimer);
+            this._hideTimer = null;
+        }
+    };
+
+    /* ------------------------------------------------------------------
+       Global listeners (added on show, removed on hide)
+       ------------------------------------------------------------------ */
+    Popover.prototype._outsideClick = function(e) {
+        if (!this.isOpen) return;
+        if (this.el.contains(e.target) || this.panel.contains(e.target)) return;
+        if (this._extEl && this._extEl.contains(e.target)) return;
+        this.hide();
+    };
+
+    Popover.prototype._escapeKey = function(e) {
+        if (e.key === 'Escape' && this.isOpen) this.hide();
+    };
+
+    Popover.prototype._bindGlobal = function() {
+        document.addEventListener('click', this._bOutsideClick);
+        document.addEventListener('keydown', this._bEscape);
+        window.addEventListener('resize', this._bReposition);
+
+        // Find nearest scrollable ancestor for scroll tracking
+        var el = this.el;
+        while (el && el !== document.body) {
+            var s = window.getComputedStyle(el);
+            if (s.overflow === 'auto' || s.overflow === 'scroll' ||
+                s.overflowY === 'auto' || s.overflowY === 'scroll') {
+                this._scrollEl = el;
+                el.addEventListener('scroll', this._bReposition);
+                break;
+            }
+            el = el.parentElement;
+        }
+    };
+
+    Popover.prototype._unbindGlobal = function() {
+        document.removeEventListener('click', this._bOutsideClick);
+        document.removeEventListener('keydown', this._bEscape);
+        window.removeEventListener('resize', this._bReposition);
+
+        if (this._scrollEl) {
+            this._scrollEl.removeEventListener('scroll', this._bReposition);
+            this._scrollEl = null;
+        }
+    };
+
+    /* ------------------------------------------------------------------
+       Expose + Auto-init
+       ------------------------------------------------------------------ */
+    window.Popover = Popover;
+
+    function initPopovers() {
+        document.querySelectorAll('[data-popover]').forEach(function(el) {
+            if (!el._popover) {
+                el._popover = new Popover(el);
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPopovers);
+    } else {
+        initPopovers();
+    }
+
+    // Re-initialize after htmx content swaps
+    document.addEventListener('htmx:afterSettle', initPopovers);
+})();
+</script>
+{{end}}

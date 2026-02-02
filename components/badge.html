@@ -1,0 +1,164 @@
+{{/*
+    Badge Component
+    ===============
+    A reusable badge component for status indicators, categories, counts, and type labels.
+
+    Styles: badge.css
+
+    Usage:
+        {{template "badge" dict "Label" "Active" "Variant" "status" "Status" "active"}}
+        {{template "badge" dict "Label" "12" "Variant" "count"}}
+        {{template "badge" dict "Label" "Award" "Variant" "type" "Type" "award"}}
+        {{template "badge" dict "Label" "Integration" "Variant" "category"}}
+        {{template "badge" dict "Label" "Popular" "Variant" "tag" "Tag" "popular"}}
+
+    Parameters:
+        Label       - Badge text content (required)
+        Variant     - status | count | type | category | tag | nav (default: status)
+        Status      - For status variant: active | inactive | prospect | draft | archived | pending | success | warning | error
+        Type        - For type variant: award | eba | contractor
+        Tag         - For tag variant: popular | connected | new
+        ShowDot     - true | false - Shows status dot (default: true for status variant)
+        Size        - sm | md (default: md)
+        Class       - Additional CSS classes
+        ID          - Element ID
+*/}}
+
+{{define "badge"}}
+{{- $variant := or .Variant "status" -}}
+{{- $size := or .Size "md" -}}
+{{- $showDot := true -}}
+{{- if eq .ShowDot false }}{{- $showDot = false -}}{{- end -}}
+
+{{- /* Base class */ -}}
+{{- $baseClass := "badge" -}}
+
+{{- /* Variant-specific class */ -}}
+{{- if eq $variant "status" }}{{- $baseClass = "status-badge" -}}{{- end -}}
+{{- if eq $variant "count" }}{{- $baseClass = "count-badge" -}}{{- end -}}
+{{- if eq $variant "type" }}{{- $baseClass = "type-badge" -}}{{- end -}}
+{{- if eq $variant "category" }}{{- $baseClass = "badge badge-category" -}}{{- end -}}
+{{- if eq $variant "tag" }}{{- $baseClass = "badge" -}}{{- end -}}
+{{- if eq $variant "nav" }}{{- $baseClass = "nav-badge" -}}{{- end -}}
+{{- if eq $variant "tab" }}{{- $baseClass = "tab-badge" -}}{{- end -}}
+{{- if eq $variant "section" }}{{- $baseClass = "section-badge" -}}{{- end -}}
+
+{{- /* Status modifier */ -}}
+{{- $statusClass := "" -}}
+{{- if and (eq $variant "status") .Status -}}
+    {{- $statusClass = .Status -}}
+{{- end -}}
+
+{{- /* Type modifier */ -}}
+{{- $typeClass := "" -}}
+{{- if and (eq $variant "type") .Type -}}
+    {{- $typeClass = .Type -}}
+{{- end -}}
+
+{{- /* Tag modifier */ -}}
+{{- $tagClass := "" -}}
+{{- if and (eq $variant "tag") .Tag -}}
+    {{- $tagClass = .Tag -}}
+{{- end -}}
+
+{{- /* Nav modifier */ -}}
+{{- $navClass := "" -}}
+{{- if and (eq $variant "nav") .NavType -}}
+    {{- $navClass = .NavType -}}
+{{- end -}}
+
+{{- /* Size class */ -}}
+{{- $sizeClass := "" -}}
+{{- if eq $size "sm" }}{{- $sizeClass = "badge-sm" -}}{{- end -}}
+
+{{- /* Combine classes */ -}}
+{{- $classes := $baseClass -}}
+{{- if $statusClass }}{{- $classes = printf "%s %s" $classes $statusClass -}}{{- end -}}
+{{- if $typeClass }}{{- $classes = printf "%s %s" $classes $typeClass -}}{{- end -}}
+{{- if $tagClass }}{{- $classes = printf "%s %s" $classes $tagClass -}}{{- end -}}
+{{- if $navClass }}{{- $classes = printf "%s %s" $classes $navClass -}}{{- end -}}
+{{- if $sizeClass }}{{- $classes = printf "%s %s" $classes $sizeClass -}}{{- end -}}
+{{- if .Class }}{{- $classes = printf "%s %s" $classes .Class -}}{{- end -}}
+
+<span class="{{$classes}}"
+    {{- if .ID }} id="{{.ID}}"{{end -}}
+>
+    {{- if and (eq $variant "status") $showDot -}}
+    <span class="status-dot"></span>
+    {{- end -}}
+    {{- .Label -}}
+</span>
+{{end}}
+
+{{/*
+    Status Badge Component (shorthand)
+    ===================================
+    Shorthand for status badges with dot indicator.
+
+    Usage:
+        {{template "status-badge" dict "Label" "Active" "Status" "active"}}
+*/}}
+
+{{define "status-badge"}}
+{{- $status := or .Status "active" -}}
+<span class="status-badge {{$status}}"{{if .ID}} id="{{.ID}}"{{end}}{{if .Class}} class="{{.Class}}"{{end}}>
+    <span class="status-dot"></span>
+    {{- .Label -}}
+</span>
+{{end}}
+
+{{/*
+    Type Badge Component (shorthand)
+    =================================
+    Shorthand for calc type badges (Award, EBA, Contractor).
+
+    Usage:
+        {{template "type-badge" dict "Label" "Award" "Type" "award"}}
+        {{template "type-badge" dict "Label" "EBA" "Type" "eba"}}
+        {{template "type-badge" dict "Label" "Contractor" "Type" "contractor"}}
+*/}}
+
+{{define "type-badge"}}
+{{- $type := or .Type "award" -}}
+<span class="type-badge {{$type}}"{{if .ID}} id="{{.ID}}"{{end}}>
+    {{- .Label -}}
+</span>
+{{end}}
+
+{{/*
+    Count Badge Component (shorthand)
+    ==================================
+    Shorthand for count badges (used in tabs, nav items).
+
+    Usage:
+        {{template "count-badge" dict "Count" 12}}
+        {{template "count-badge" dict "Count" .TotalItems "Variant" "tab"}}
+*/}}
+
+{{define "count-badge"}}
+{{- $variant := or .Variant "count" -}}
+{{- $class := "count-badge" -}}
+{{- if eq $variant "tab" }}{{- $class = "tab-badge" -}}{{- end -}}
+{{- if eq $variant "nav" }}{{- $class = "nav-badge" -}}{{- end -}}
+<span class="{{$class}}"{{if .ID}} id="{{.ID}}"{{end}}>
+    {{- .Count -}}
+</span>
+{{end}}
+
+{{/*
+    Tag Badge Component (shorthand)
+    ================================
+    Shorthand for tag badges (Popular, Connected, New).
+
+    Usage:
+        {{template "tag-badge" dict "Label" "Popular" "Tag" "popular"}}
+        {{template "tag-badge" dict "Label" "Connected" "Tag" "connected"}}
+        {{template "tag-badge" dict "Label" "New" "Tag" "new"}}
+*/}}
+
+{{define "tag-badge"}}
+{{- $tag := or .Tag "popular" -}}
+<span class="badge {{$tag}}"{{if .ID}} id="{{.ID}}"{{end}}>
+    {{- .Label -}}
+</span>
+{{end}}

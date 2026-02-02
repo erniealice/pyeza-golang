@@ -1,0 +1,38 @@
+{{define "header-content"}}
+    <div class="greeting">
+        <div class="greeting-icon{{if .ActiveNav}} app-icon--{{.ActiveNav}}{{end}}">
+            {{if .HeaderIconHTML}}{{.HeaderIconHTML}}
+            {{else}}{{template "icon-dashboard" .}}{{end}}
+        </div>
+        <div class="greeting-text">
+            <div class="greeting-title-row">
+                <h1>{{if .HeaderTitle}}{{.HeaderTitle}}{{else}}{{.Title}}{{end}}</h1>
+                {{if .HasHelp}}
+                <button class="help-toggle-btn" id="helpToggleBtn" aria-label="Toggle help pane" title="{{.CommonLabels.Header.ShowHelp}}">
+                    {{template "icon-help" .}}
+                </button>
+                {{end}}
+            </div>
+            <p>{{if .HeaderSubtitle}}{{.HeaderSubtitle}}{{else}}{{.CommonLabels.Header.WelcomeBack}}{{end}}</p>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <div class="search-bar">
+            {{template "icon-search" .}}
+            <input type="text" placeholder="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}">
+            <span class="search-shortcut">{{.CommonLabels.Header.SearchShortcut}}</span>
+        </div>
+        <button class="header-btn" id="notificationBtn" aria-label="{{.CommonLabels.Header.Notifications}}">
+            {{template "icon-bell" .}}
+            {{if .HasNotifications}}<span class="notification-indicator"></span>{{end}}
+        </button>
+        {{template "theme-switcher-popover" .}}
+    </div>
+{{end}}
+
+{{define "header"}}
+<header id="page-header" class="header">
+    {{template "header-content" .}}
+</header>
+{{end}}

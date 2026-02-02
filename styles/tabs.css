@@ -1,0 +1,699 @@
+/*
+ * ==========================================================================
+ * TABS.CSS - Unified Tab Navigation Component Styles
+ * ==========================================================================
+ * This file contains all tab variants used across the application:
+ * - Default (pill-style)
+ * - Main (large icon+text with underline)
+ * - Sub (compact secondary navigation)
+ * - Client (horizontal sticky with icons)
+ * - Help (rounded pills with counts)
+ * - Category (minimal filter tabs)
+ * ==========================================================================
+ */
+
+/* ========================================
+   BASE TAB STYLES
+   Common properties shared across variants
+   ======================================== */
+
+.tabs,
+.main-tabs,
+.sub-tabs,
+.client-tabs,
+.help-tabs,
+.category-tabs {
+    display: flex;
+    align-items: center;
+}
+
+.tab,
+.main-tab,
+.sub-tab,
+.client-tab,
+.help-tab,
+.category-tab {
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    background: transparent;
+}
+
+.tab:focus-visible,
+.main-tab:focus-visible,
+.sub-tab:focus-visible,
+.client-tab:focus-visible,
+.help-tab:focus-visible,
+.category-tab:focus-visible {
+    outline: 2px solid var(--accent-terracotta);
+    outline-offset: 0.125rem;
+}
+
+/* Disabled state */
+.tab.disabled,
+.main-tab.disabled,
+.sub-tab.disabled,
+.client-tab.disabled,
+.help-tab.disabled,
+.category-tab.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ========================================
+   DEFAULT VARIANT - Pill-Style Tabs
+   Used: clients.html (Active/Prospect/Inactive)
+   ======================================== */
+
+.tabs {
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+    background: var(--bg-sidebar);
+    padding: 0.25rem;
+    border-radius: var(--radius-md);
+    width: fit-content;
+}
+
+.tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.tab:hover {
+    color: var(--text-primary);
+}
+
+.tab.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.tab svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+/* Tab Badge */
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.375rem;
+    margin-left: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+
+.tab.active .tab-badge {
+    background: var(--accent-terracotta);
+    color: white;
+}
+
+/* ========================================
+   MAIN VARIANT - Large Icon+Text Tabs
+   Used: regulations.html (Awards/Agreements/WIC/Super/Payroll)
+   ======================================== */
+
+.main-tabs {
+    gap: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.main-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.main-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 1rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    position: relative;
+}
+
+.main-tab::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: transparent;
+    border-radius: 0.125rem 0.125rem 0 0;
+    transition: background 0.2s ease;
+}
+
+.main-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.main-tab.active {
+    color: var(--accent-terracotta);
+}
+
+.main-tab.active::after {
+    background: var(--accent-terracotta);
+}
+
+.main-tab svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.main-tab:hover svg,
+.main-tab.active svg {
+    opacity: 1;
+}
+
+.main-tab .tab-badge {
+    margin-left: 0;
+}
+
+/* ========================================
+   SUB VARIANT - Compact Secondary Tabs
+   Used: regulations.html (Current/Expired agreements)
+   ======================================== */
+
+.sub-tabs {
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.sub-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.sub-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.sub-tab.active {
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+
+.sub-tab svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+}
+
+.sub-tab .count {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+.sub-tab.active .count {
+    color: var(--accent-terracotta);
+    opacity: 0.8;
+}
+
+/* ========================================
+   CLIENT VARIANT - Horizontal Sticky Tabs
+   Used: client-detail.html (Profile/Rates/Contacts/Divisions/Notes)
+   ======================================== */
+
+.client-tabs {
+    gap: 0.25rem;
+    padding: 0 1.75rem;
+    background: var(--bg-card);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.client-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.client-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.125rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    position: relative;
+    border-radius: 0;
+}
+
+.client-tab svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.client-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1.125rem;
+    right: 1.125rem;
+    height: 2px;
+    background: transparent;
+    border-radius: 0.125rem 0.125rem 0 0;
+    transition: all 0.2s ease;
+}
+
+.client-tab:hover {
+    color: var(--text-secondary);
+}
+
+.client-tab:hover svg {
+    opacity: 1;
+}
+
+.client-tab.active {
+    color: var(--accent-terracotta);
+}
+
+.client-tab.active svg {
+    opacity: 1;
+}
+
+.client-tab.active::after {
+    background: var(--accent-terracotta);
+}
+
+/* Client tab badge */
+.client-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.125rem;
+    height: 1.125rem;
+    padding: 0 0.3125rem;
+    margin-left: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+
+.client-tab.active .client-tab-badge {
+    background: var(--accent-terracotta);
+    color: white;
+}
+
+/* ========================================
+   HELP VARIANT - Rounded Pill Tabs
+   Used: helpdesk.html (All/Definitions/Calculation Types/etc.)
+   ======================================== */
+
+.help-tabs {
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: wrap;
+}
+
+.help-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.help-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-sidebar);
+    border: 1px solid transparent;
+}
+
+.help-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+    border-color: var(--border);
+}
+
+.help-tab.active {
+    background: var(--accent-terracotta);
+    color: white;
+    border-color: var(--accent-terracotta);
+}
+
+.help-tab svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.help-tab .count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.375rem;
+    height: 1.375rem;
+    padding: 0 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.help-tab.active .count {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* ========================================
+   CATEGORY VARIANT - Minimal Filter Tabs
+   Used: marketplace.html (All/CRM/RMS/Payroll/Accounting)
+   ======================================== */
+
+.category-tabs {
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.category-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+}
+
+.category-tab:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-terracotta);
+    background: var(--accent-terracotta-light);
+}
+
+.category-tab.active {
+    background: var(--accent-terracotta);
+    color: white;
+    border-color: var(--accent-terracotta);
+}
+
+.category-tab svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+}
+
+.category-tab .count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.3125rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+
+.category-tab:hover .count {
+    background: var(--accent-terracotta);
+    color: white;
+}
+
+.category-tab.active .count {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
+/* ========================================
+   TAB CONTENT PANELS
+   For client-side tab switching
+   ======================================== */
+
+.tab-content {
+    display: none;
+    animation: tabContentFadeIn 0.25s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Help content (specific to helpdesk) */
+.help-content {
+    display: none;
+    animation: tabContentFadeIn 0.25s ease;
+}
+
+.help-content.active {
+    display: block;
+}
+
+@keyframes tabContentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE BEHAVIOR
+   ======================================== */
+
+@media (max-width: 1024px) {
+    /* Main tabs become scrollable on medium screens */
+    .main-tabs {
+        padding-bottom: 0;
+    }
+
+    .main-tab {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Default tabs - full width on mobile */
+    .tabs {
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    /* Main tabs - compact on mobile */
+    .main-tab {
+        padding: 0.75rem 1rem;
+        font-size: 0.8125rem;
+        gap: 0.5rem;
+    }
+
+    .main-tab span {
+        display: none;
+    }
+
+    .main-tab svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    /* Show icon-only on very small screens */
+    .main-tab .tab-badge {
+        display: none;
+    }
+
+    /* Sub tabs */
+    .sub-tabs {
+        gap: 0.25rem;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    .sub-tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    /* Client tabs */
+    .client-tabs {
+        padding: 0 1rem;
+        gap: 0;
+    }
+
+    .client-tab {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+
+    .client-tab svg {
+        display: none;
+    }
+
+    /* Help tabs - wrap on mobile */
+    .help-tabs {
+        gap: 0.375rem;
+    }
+
+    .help-tab {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+
+    /* Category tabs */
+    .category-tabs {
+        gap: 0.375rem;
+    }
+
+    .category-tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens - minimal styling */
+    .tabs {
+        border-radius: var(--radius-md);
+        padding: 0.1875rem;
+    }
+
+    .tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    .tab svg {
+        display: none;
+    }
+
+    .tab-badge {
+        min-width: 1.125rem;
+        height: 1.125rem;
+        font-size: 0.6875rem;
+    }
+
+    /* Help tabs - scrollable single row */
+    .help-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .help-tab {
+        flex-shrink: 0;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY - Reduced Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .tab,
+    .main-tab,
+    .sub-tab,
+    .client-tab,
+    .help-tab,
+    .category-tab,
+    .tab-content,
+    .help-content {
+        transition: none;
+        animation: none;
+    }
+
+    .tab-content.active,
+    .help-content.active {
+        animation: none;
+    }
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+   ======================================== */
+
+@media (prefers-contrast: high) {
+    .tab.active,
+    .main-tab.active,
+    .sub-tab.active,
+    .client-tab.active,
+    .help-tab.active,
+    .category-tab.active {
+        outline: 2px solid currentColor;
+        outline-offset: -0.125rem;
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .tabs,
+    .main-tabs,
+    .sub-tabs,
+    .client-tabs,
+    .help-tabs,
+    .category-tabs {
+        display: none;
+    }
+
+    .tab-content,
+    .help-content {
+        display: block !important;
+        page-break-inside: avoid;
+    }
+}

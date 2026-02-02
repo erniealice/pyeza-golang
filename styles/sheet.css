@@ -1,0 +1,817 @@
+/*
+ * ==========================================================================
+ * SHEET COMPONENT - Unified Slide-in Panel
+ * ==========================================================================
+ * A reusable slide-in panel component from the right side.
+ * Supports multiple variants: forms, notifications, and custom content.
+ *
+ * Architecture:
+ * - Base sheet styles (overlay, panel, animation)
+ * - Structural sections (header, content, footer)
+ * - Variant-specific styles (form, notification)
+ *
+ * Usage:
+ *   <div class="sheet">
+ *     <div class="sheet-overlay"></div>
+ *     <div class="sheet-panel">
+ *       <div class="sheet-header">...</div>
+ *       <div class="sheet-content">...</div>
+ *       <div class="sheet-footer">...</div>
+ *     </div>
+ *   </div>
+ * ==========================================================================
+ */
+
+/* ========================================
+   SHEET CONTAINER
+   Base container with visibility control
+   ======================================== */
+
+.sheet {
+    visibility: hidden;
+    pointer-events: none;
+    /* Delay visibility:hidden until after slide-out animation (0.3s) */
+    transition: visibility 0s linear 0.3s;
+}
+
+.sheet.active,
+.sheet.open {
+    visibility: visible;
+    pointer-events: auto;
+    /* When opening, show immediately (no delay) */
+    transition: visibility 0s linear 0s;
+}
+
+/* ========================================
+   OVERLAY / BACKDROP
+   Shared overlay for all sheet variants
+   ======================================== */
+
+.sheet-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-overlay, rgba(44, 40, 37, 0.4));
+    backdrop-filter: blur(0.25rem);
+    -webkit-backdrop-filter: blur(0.25rem);
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sheet.active .sheet-overlay,
+.sheet.open .sheet-overlay {
+    opacity: 1;
+}
+
+/* ========================================
+   SHEET PANEL
+   Main sliding panel - base styles
+   ======================================== */
+
+.sheet-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    background: var(--bg-card);
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sheet.active .sheet-panel,
+.sheet.open .sheet-panel {
+    transform: translateX(0);
+}
+
+/* Panel width variants */
+.sheet-panel-sm {
+    width: 23.75rem;
+    max-width: 100vw;
+}
+
+.sheet-panel-md {
+    width: 28.125rem;
+    max-width: 100vw;
+}
+
+.sheet-panel-lg {
+    width: 37.5rem;
+    max-width: 100vw;
+}
+
+/* Panel shadow */
+.sheet.active .sheet-panel,
+.sheet.open .sheet-panel {
+    box-shadow: -0.5rem 0 2rem rgba(44, 40, 37, 0.12);
+}
+
+/* Border for form variant */
+.sheet-form .sheet-panel {
+    border-left: 1px solid var(--border);
+}
+
+/* ========================================
+   SHEET HEADER
+   Consistent header across all variants
+   ======================================== */
+
+.sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    min-height: 4rem;
+}
+
+/* Header background variants */
+.sheet-form .sheet-header {
+    background: var(--bg-base);
+}
+
+.sheet-notification .sheet-header {
+    background: var(--bg-card);
+}
+
+/* Header title */
+.sheet-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Header actions area (right side) */
+.sheet-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Close button - shared across variants */
+.sheet-close {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sheet-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.sheet-close:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 0.125rem;
+}
+
+.sheet-close svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* ========================================
+   SHEET CONTENT
+   Scrollable content area
+   ======================================== */
+
+.sheet-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+/* Form variant: extra padding bottom for fixed footer */
+.sheet-form .sheet-content {
+    padding-bottom: 6.25rem;
+}
+
+/* Notification variant: minimal padding */
+.sheet-notification .sheet-content {
+    padding: 0.5rem;
+}
+
+/* Scrollbar styling */
+.sheet-content::-webkit-scrollbar {
+    width: 0.375rem;
+}
+
+.sheet-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sheet-content::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 0.1875rem;
+}
+
+.sheet-content::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ========================================
+   SHEET FOOTER
+   Optional footer for actions
+   ======================================== */
+
+.sheet-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+/* Footer background variants */
+.sheet-form .sheet-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-base);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* When footer is inside content (within forms) - fixed at bottom */
+.sheet-form .sheet-content .sheet-footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 28.125rem;
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-base);
+    border-top: 1px solid var(--border);
+    z-index: 202;
+    box-sizing: border-box;
+}
+
+.sheet-notification .sheet-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-card);
+}
+
+/* ==========================================================================
+   FORM VARIANT STYLES
+   Specific to form sheets
+   ========================================================================== */
+
+/* Form groups within sheet */
+.sheet-form .sheet-content .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.sheet-form .sheet-content .form-group:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Form section divider */
+.sheet-form .sheet-content .form-divider {
+    margin: 1.5rem 0;
+    border: none;
+    border-top: 1px solid var(--border-light);
+}
+
+/* Form section title */
+.sheet-form .sheet-content .form-section-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+/* Error state */
+.sheet-error {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    background: var(--status-error-light);
+    border: 1px solid var(--status-error);
+    border-radius: var(--radius-md);
+    color: var(--status-error);
+    font-size: 0.875rem;
+    display: none;
+}
+
+.sheet-error.visible {
+    display: block;
+}
+
+.sheet-error svg {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Loading state */
+.sheet-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3.75rem 1.5rem;
+    color: var(--text-muted);
+}
+
+.sheet-loading::after {
+    content: '';
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent-primary);
+    border-radius: var(--radius-round);
+    animation: sheet-spin 0.6s linear infinite;
+}
+
+@keyframes sheet-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   NOTIFICATION VARIANT STYLES
+   Specific to notification sheets
+   ========================================================================== */
+
+/* Filter tabs in header area */
+.sheet-tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-base);
+    flex-shrink: 0;
+}
+
+.sheet-tab {
+    flex: 1;
+    padding: 0.625rem 1rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sheet-tab:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.sheet-tab.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Mark all read button */
+.sheet-mark-all {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sheet-mark-all:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.sheet-mark-all svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Notification list */
+.sheet-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Loading state for notifications */
+.sheet-list-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.sheet-list-loading .sheet-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent-terracotta);
+    border-radius: var(--radius-round);
+    animation: sheet-spin 0.8s linear infinite;
+}
+
+/* Empty state */
+.sheet-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem;
+    text-align: center;
+}
+
+.sheet-empty-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-round);
+    background: var(--bg-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+}
+
+.sheet-empty-icon svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+.sheet-empty h3 {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem;
+}
+
+.sheet-empty p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Notification card */
+.sheet-card {
+    display: flex;
+    gap: 0.875rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 0.25rem;
+}
+
+.sheet-card:hover {
+    background: var(--bg-base);
+}
+
+.sheet-card:last-child {
+    margin-bottom: 0;
+}
+
+/* Unread indicator */
+.sheet-card.unread::before {
+    content: '';
+    position: absolute;
+    left: 0.375rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.375rem;
+    height: 0.375rem;
+    background: var(--accent-terracotta);
+    border-radius: var(--radius-round);
+}
+
+.sheet-card.unread {
+    background: var(--accent-terracotta-light);
+}
+
+.sheet-card.unread:hover {
+    background: rgba(196, 101, 74, 0.08);
+}
+
+/* Notification icon */
+.sheet-card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sheet-card-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Icon variants */
+.sheet-card-icon.alert {
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+
+.sheet-card-icon.success {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+
+.sheet-card-icon.info {
+    background: var(--accent-navy-light);
+    color: var(--accent-navy);
+}
+
+.sheet-card-icon.warning {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+.sheet-card-icon.client {
+    background: #E8F4F4;
+    color: #0D6B6E;
+}
+
+.sheet-card-icon.quote {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+
+.sheet-card-icon.system {
+    background: #F3EEF6;
+    color: var(--accent-plum);
+}
+
+/* Card content */
+.sheet-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.sheet-card-title {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem;
+    line-height: 1.3;
+}
+
+.sheet-card-message {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sheet-card-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+/* Dismiss button */
+.sheet-card-dismiss {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.sheet-card:hover .sheet-card-dismiss {
+    opacity: 1;
+}
+
+.sheet-card-dismiss:hover {
+    background: var(--border);
+    color: var(--text-primary);
+}
+
+.sheet-card-dismiss svg {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+/* View all link in footer */
+.sheet-view-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sheet-view-all:hover {
+    background: var(--bg-base);
+    color: var(--text-primary);
+}
+
+.sheet-view-all svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Bell badge (for trigger button) */
+.sheet-badge {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    min-width: 1.125rem;
+    height: 1.125rem;
+    padding: 0 0.3125rem;
+    border-radius: var(--radius-full);
+    background: var(--accent-terracotta);
+    color: white;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg-card);
+    line-height: 1;
+}
+
+.sheet-badge.hidden {
+    display: none;
+}
+
+/* ==========================================================================
+   RESPONSIVE - MOBILE
+   ========================================================================== */
+
+@media (max-width: 480px) {
+    /* Full width on mobile */
+    .sheet-panel-sm,
+    .sheet-panel-md,
+    .sheet-panel-lg {
+        width: 100vw;
+    }
+
+    .sheet-form .sheet-panel {
+        border-left: none;
+    }
+
+    /* Compact header */
+    .sheet-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .sheet-title {
+        font-size: 1.125rem;
+    }
+
+    /* Compact content */
+    .sheet-content {
+        padding: 1.25rem;
+    }
+
+    /* Footer adjustments */
+    .sheet-form .sheet-content .sheet-footer {
+        width: 100vw;
+        margin: 1.25rem -1.25rem -1.25rem -1.25rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .sheet-footer {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Stack buttons vertically on mobile */
+    .sheet-form .sheet-footer {
+        flex-direction: column-reverse;
+    }
+
+    .sheet-form .sheet-footer .btn,
+    .sheet-form .sheet-footer .btn-primary,
+    .sheet-form .sheet-footer .btn-secondary {
+        width: 100%;
+    }
+
+    /* Notification specific mobile adjustments */
+    .sheet-tabs {
+        padding: 0.75rem 1rem;
+    }
+
+    .sheet-list {
+        padding: 0.25rem;
+    }
+
+    .sheet-card {
+        padding: 0.75rem;
+    }
+
+    .sheet-footer {
+        padding: 0.75rem 1rem;
+    }
+
+    .sheet-mark-all span {
+        display: none;
+    }
+
+    .sheet-mark-all {
+        padding: 0.5rem;
+    }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+
+/* Focus visible for keyboard navigation */
+.sheet-close:focus-visible,
+.sheet-tab:focus-visible,
+.sheet-card:focus-visible,
+.sheet-mark-all:focus-visible,
+.sheet-card-dismiss:focus-visible,
+.sheet-view-all:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 0.125rem;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .sheet-overlay,
+    .sheet-panel,
+    .sheet-card,
+    .sheet-spinner,
+    .sheet-loading::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .sheet-form .sheet-panel {
+        border-left-width: 2px;
+    }
+
+    .sheet-header,
+    .sheet-footer {
+        border-width: 2px;
+    }
+
+    .sheet-card.unread::before {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+}

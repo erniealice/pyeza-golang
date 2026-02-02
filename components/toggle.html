@@ -1,0 +1,132 @@
+{{/*
+================================================================================
+TOGGLE SWITCH COMPONENT
+================================================================================
+An accessible toggle switch component with optional label text.
+
+USAGE:
+------
+{{template "toggle" (dict
+    "Name" "toggleName"     // Field name for form submission
+    "ID" "toggleId"         // Optional: element ID (defaults to Name)
+    "Label" "Toggle Label"  // Optional: label text
+    "LabelPosition" "left"  // Optional: left (default) or right
+    "Checked" false         // Optional: initial state
+    "Disabled" false        // Optional: disable toggle
+    "Value" "1"             // Optional: value when checked (default "1")
+    "Class" ""              // Optional: additional CSS classes
+    "Size" "default"        // Optional: default, small
+)}}
+
+TOGGLE LIST:
+------------
+For multiple toggles in a list, wrap with .toggle-list:
+
+<div class="toggle-list">
+    <div class="toggle-item">
+        {{template "toggle" (dict "Name" "toggle1" "Label" "Option 1")}}
+    </div>
+    <div class="toggle-item">
+        {{template "toggle" (dict "Name" "toggle2" "Label" "Option 2" "Checked" true)}}
+    </div>
+</div>
+
+ACCESSIBILITY:
+--------------
+- Uses role="switch" for screen reader compatibility
+- aria-checked reflects the current state
+- Hidden checkbox maintains form compatibility
+================================================================================
+*/}}
+
+{{define "toggle"}}
+<div class="toggle-wrapper{{if .Class}} {{.Class}}{{end}}{{if eq .Size "small"}} toggle-small{{end}}">
+    {{/* Hidden checkbox for form submission */}}
+    <input
+        type="checkbox"
+        class="toggle-checkbox visually-hidden"
+        {{if or .ID .Name}}id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
+        {{if .Name}}name="{{.Name}}"{{end}}
+        {{if .Value}}value="{{.Value}}"{{else}}value="1"{{end}}
+        {{if .Checked}}checked{{end}}
+        {{if .Disabled}}disabled{{end}}
+    >
+
+    {{/* Label wraps the visual toggle for click handling */}}
+    <label
+        class="toggle-container{{if ne .LabelPosition "right"}} label-left{{else}} label-right{{end}}"
+        {{if or .ID .Name}}for="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
+    >
+        {{if and .Label (ne .LabelPosition "right")}}
+        <span class="toggle-label">{{.Label}}</span>
+        {{end}}
+
+        <span
+            class="toggle-switch{{if .Checked}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="switch"
+            aria-checked="{{if .Checked}}true{{else}}false{{end}}"
+            {{if .Disabled}}aria-disabled="true"{{end}}
+            tabindex="{{if .Disabled}}-1{{else}}0{{end}}"
+        >
+            <span class="toggle-knob"></span>
+        </span>
+
+        {{if and .Label (eq .LabelPosition "right")}}
+        <span class="toggle-label">{{.Label}}</span>
+        {{end}}
+    </label>
+</div>
+{{end}}
+
+{{/*
+================================================================================
+TOGGLE ITEM COMPONENT
+================================================================================
+A toggle wrapped with description text, ideal for settings lists.
+
+USAGE:
+------
+{{template "toggle-item" (dict
+    "Name" "settingName"
+    "Label" "Setting Label"
+    "Description" "Optional description text"
+    "Checked" false
+    "Disabled" false
+)}}
+================================================================================
+*/}}
+
+{{define "toggle-item"}}
+<div class="toggle-item{{if .Disabled}} disabled{{end}}">
+    <div class="toggle-item-content">
+        <span class="toggle-label">{{.Label}}</span>
+        {{if .Description}}
+        <span class="toggle-description">{{.Description}}</span>
+        {{end}}
+    </div>
+
+    <input
+        type="checkbox"
+        class="toggle-checkbox visually-hidden"
+        {{if or .ID .Name}}id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
+        {{if .Name}}name="{{.Name}}"{{end}}
+        {{if .Value}}value="{{.Value}}"{{else}}value="1"{{end}}
+        {{if .Checked}}checked{{end}}
+        {{if .Disabled}}disabled{{end}}
+    >
+
+    <label
+        class="toggle-switch-label"
+        {{if or .ID .Name}}for="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
+    >
+        <span
+            class="toggle-switch{{if .Checked}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="switch"
+            aria-checked="{{if .Checked}}true{{else}}false{{end}}"
+            {{if .Disabled}}aria-disabled="true"{{end}}
+        >
+            <span class="toggle-knob"></span>
+        </span>
+    </label>
+</div>
+{{end}}

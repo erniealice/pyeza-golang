@@ -1,0 +1,112 @@
+/* ==========================================================================
+   POPOVER COMPONENT
+   Reusable floating panel with configurable anchor, position, width & trigger
+
+   Markup:
+   <div data-popover
+        data-popover-position="bottom"
+        data-popover-width="match"
+        data-popover-trigger="hover click"
+        data-popover-offset="10"
+        data-popover-external="#otherId">
+       <button class="popover-trigger">...</button>
+       <div class="popover-panel">
+           <div class="popover-arrow"></div>
+           ...content...
+       </div>
+   </div>
+
+   Options:
+   - position: top | bottom | left | right  (default: bottom)
+   - width:    auto | match | {N}px          (default: auto)
+   - trigger:  hover | click | focus          (default: click, space-separated)
+   - offset:   gap in px                      (default: 10)
+   - external: CSS selector for additional focus/blur trigger element
+   ========================================================================== */
+
+/* Panel — hidden by default, teleported to <body> when open */
+.popover-panel {
+    display: none;
+    position: fixed;
+    background: var(--surface-elevated, #ffffff);
+    border: 1px solid var(--border-primary, #e2e8f0);
+    border-radius: var(--radius-lg);
+    padding: 0.875rem 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08),
+                0 2px 8px rgba(0, 0, 0, 0.04);
+    z-index: 10000;
+}
+
+.popover-panel.popover-open {
+    display: block;
+    animation: popover-in-bottom 0.15s ease-out;
+}
+
+/* ---------- Direction-specific slide-in ---------- */
+
+@keyframes popover-in-bottom {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.popover-panel.popover-open[data-position="top"] {
+    animation-name: popover-in-top;
+}
+@keyframes popover-in-top {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.popover-panel.popover-open[data-position="left"] {
+    animation-name: popover-in-left;
+}
+@keyframes popover-in-left {
+    from { opacity: 0; transform: translateX(4px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.popover-panel.popover-open[data-position="right"] {
+    animation-name: popover-in-right;
+}
+@keyframes popover-in-right {
+    from { opacity: 0; transform: translateX(-4px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ---------- Arrow ---------- */
+
+.popover-arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--surface-elevated, #ffffff);
+    transform: rotate(45deg);
+}
+
+/* Panel below anchor → arrow points up */
+.popover-arrow[data-direction="bottom"] {
+    top: -6px;
+    border-left: 1px solid var(--border-primary, #e2e8f0);
+    border-top: 1px solid var(--border-primary, #e2e8f0);
+}
+
+/* Panel above anchor → arrow points down */
+.popover-arrow[data-direction="top"] {
+    bottom: -6px;
+    border-right: 1px solid var(--border-primary, #e2e8f0);
+    border-bottom: 1px solid var(--border-primary, #e2e8f0);
+}
+
+/* Panel left of anchor → arrow points right */
+.popover-arrow[data-direction="left"] {
+    right: -6px;
+    border-right: 1px solid var(--border-primary, #e2e8f0);
+    border-top: 1px solid var(--border-primary, #e2e8f0);
+}
+
+/* Panel right of anchor → arrow points left */
+.popover-arrow[data-direction="right"] {
+    left: -6px;
+    border-left: 1px solid var(--border-primary, #e2e8f0);
+    border-bottom: 1px solid var(--border-primary, #e2e8f0);
+}

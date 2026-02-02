@@ -1,0 +1,132 @@
+/*
+ * ==========================================================================
+ * DESIGN TOKENS - Radii, borders, transitions, z-index
+ * ==========================================================================
+ * Shared visual language tokens used across all apps. Themes control
+ * colors and shadows; these tokens control structural styling.
+ *
+ * Included in generated main.css before theme variables so themes can
+ * override individual values if needed (e.g., a theme with larger radii).
+ *
+ * App-specific layout dimensions (sidebar width, header height, etc.)
+ * belong in each app's own css/app/layout.css, not here.
+ *
+ * CONFIGURABLE AXES (set via data attributes on <html>):
+ *   data-density   → controls root font-size (see main-base.css)
+ *   data-radius    → controls border-radius scale (none|sm|default|lg|full)
+ *   data-border    → controls border weight (none|default|heavy)
+ *   data-theme     → controls colors & shadows (see themes/*.css)
+ *   data-font      → controls font family (see main-base.css)
+ * ==========================================================================
+ */
+
+/* ==========================================================================
+   RADIUS SCALE
+   ==========================================================================
+   Controls the corner rounding of all components. --radius-full and
+   --radius-round are FUNCTIONAL shapes (pills, circles) and stay fixed
+   regardless of the radius config.
+
+   Usage: <html data-radius="default">
+   ========================================================================== */
+
+/* Default radius scale */
+:root,
+[data-radius="default"] {
+    --radius-sm: 0.375rem;   /* 6px  — badges, small controls */
+    --radius-md: 0.625rem;   /* 10px — buttons, inputs, chips */
+    --radius-lg: 1rem;       /* 16px — cards, dialogs, panels */
+    --radius-xl: 1.5rem;     /* 24px — large containers */
+}
+
+/* None: sharp corners */
+[data-radius="none"] {
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0.125rem;   /* 2px  — subtle softening */
+    --radius-xl: 0.25rem;    /* 4px  — slight rounding */
+}
+
+/* Small: subtle rounding */
+[data-radius="sm"] {
+    --radius-sm: 0.1875rem;  /* 3px */
+    --radius-md: 0.375rem;   /* 6px */
+    --radius-lg: 0.5rem;     /* 8px */
+    --radius-xl: 0.75rem;    /* 12px */
+}
+
+/* Large: more rounded */
+[data-radius="lg"] {
+    --radius-sm: 0.5rem;     /* 8px */
+    --radius-md: 0.875rem;   /* 14px */
+    --radius-lg: 1.25rem;    /* 20px */
+    --radius-xl: 2rem;       /* 32px */
+}
+
+/* Full: pill-shaped everything */
+[data-radius="full"] {
+    --radius-sm: 9999px;
+    --radius-md: 9999px;
+    --radius-lg: 9999px;
+    --radius-xl: 9999px;
+}
+
+/* Functional shapes — always fixed regardless of radius config */
+:root {
+    --radius-full: 9999px;   /* Pill shape */
+    --radius-round: 50%;     /* Circle */
+}
+
+/* ==========================================================================
+   BORDER WEIGHT
+   ==========================================================================
+   Controls the thickness of borders across all components.
+
+   Usage: <html data-border="default">
+   ========================================================================== */
+
+/* Default border weight */
+:root,
+[data-border="default"] {
+    --border-width: 1px;
+    --border-width-thick: 2px;
+    --border-width-focus: 2px;
+}
+
+/* None: borderless (shadow-driven depth) */
+[data-border="none"] {
+    --border-width: 0;
+    --border-width-thick: 1px;
+    --border-width-focus: 2px;
+}
+
+/* Heavy: more defined edges */
+[data-border="heavy"] {
+    --border-width: 2px;
+    --border-width-thick: 3px;
+    --border-width-focus: 3px;
+}
+
+/* ==========================================================================
+   TRANSITIONS & ANIMATION
+   ========================================================================== */
+:root {
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.25s ease;
+    --transition-slow: 0.4s ease;
+    --transition-speed: 0.3s;
+
+    /* Duration (for component animations) */
+    --duration-fast: 0.15s;
+    --duration-base: 0.25s;
+    --duration-slow: 0.4s;
+
+    /* Easing Functions */
+    --ease-default: ease;
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Z-index layers */
+    --z-modal-backdrop: 9998;
+    --z-modal: 9999;
+}

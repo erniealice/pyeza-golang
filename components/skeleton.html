@@ -1,0 +1,171 @@
+{{/*
+    Skeleton Component
+    ==================
+    Animated loading placeholders shown while content loads via HTMX.
+    Provides preset shapes for common UI patterns: text, avatars, cards, tables.
+
+    Styles: skeleton.css
+
+    Usage:
+        {{/* Basic shapes */}}
+        {{template "skeleton" dict "Variant" "text"}}
+        {{template "skeleton" dict "Variant" "text" "Lines" 3}}
+        {{template "skeleton" dict "Variant" "circle"}}
+        {{template "skeleton" dict "Variant" "rect" "Width" "100%" "Height" "12rem"}}
+
+        {{/* Preset composites */}}
+        {{template "skeleton-card" .}}
+        {{template "skeleton-table" dict "Rows" 5 "Cols" 4}}
+        {{template "skeleton-stat" .}}
+
+    Parameters (skeleton):
+        Variant     - text | circle | rect (default: text)
+        Lines       - Number of text lines 1–10 (default: 1). Only for text variant
+        Width       - CSS width (default: 100%). Only for rect variant
+        Height      - CSS height (default: 1rem). Only for rect variant
+        Size        - sm | md | lg — for circle variant (default: md)
+        Class       - Additional CSS classes
+        ID          - Element ID
+
+    Parameters (skeleton-table):
+        Rows        - Number of data rows 1–8 (default: 5)
+        Cols        - Number of columns 1–6 (default: 4)
+
+    Parameters (skeleton-card):
+        (no params — renders a standard card placeholder)
+
+    Parameters (skeleton-stat):
+        (no params — renders a stat-card placeholder)
+*/}}
+
+{{/* ============================================================
+    Base Skeleton Shape
+    ============================================================ */}}
+
+{{define "skeleton"}}
+{{- $variant := or .Variant "text" -}}
+
+{{- if eq $variant "text" -}}
+    {{- $lines := or .Lines 1 -}}
+    <div class="skeleton-text{{if .Class}} {{.Class}}{{end}}"
+        {{- if .ID }} id="{{.ID}}"{{end}}
+        aria-hidden="true"
+    >
+        {{- if ge $lines 1 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 2 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 3 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 4 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 5 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 6 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 7 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 8 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 9 }}<div class="skeleton-line"></div>{{end}}
+        {{- if ge $lines 10 }}<div class="skeleton-line"></div>{{end}}
+    </div>
+
+{{- else if eq $variant "circle" -}}
+    {{- $size := or .Size "md" -}}
+    <div class="skeleton-circle skeleton-circle-{{$size}}{{if .Class}} {{.Class}}{{end}}"
+        {{- if .ID }} id="{{.ID}}"{{end}}
+        aria-hidden="true"
+    ></div>
+
+{{- else if eq $variant "rect" -}}
+    {{- $width := or .Width "100%" -}}
+    {{- $height := or .Height "1rem" -}}
+    <div class="skeleton-rect{{if .Class}} {{.Class}}{{end}}"
+        style="width: {{$width}}; height: {{$height}};"
+        {{- if .ID }} id="{{.ID}}"{{end}}
+        aria-hidden="true"
+    ></div>
+
+{{- end -}}
+{{end}}
+
+{{/* ============================================================
+    Skeleton Card
+    ============================================================
+    Mimics a standard card with header area + body lines.
+    ============================================================ */}}
+
+{{define "skeleton-card"}}
+<div class="skeleton-card{{if .Class}} {{.Class}}{{end}}" aria-hidden="true">
+    <div class="skeleton-card-header">
+        <div class="skeleton-circle skeleton-circle-sm"></div>
+        <div class="skeleton-card-header-text">
+            <div class="skeleton-line" style="width: 60%;"></div>
+            <div class="skeleton-line skeleton-line-short" style="width: 40%;"></div>
+        </div>
+    </div>
+    <div class="skeleton-card-body">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line" style="width: 75%;"></div>
+    </div>
+</div>
+{{end}}
+
+{{/* ============================================================
+    Skeleton Table Row (internal helper)
+    ============================================================ */}}
+
+{{define "skeleton-table-cells"}}
+{{- $cols := 4 -}}
+{{- if .Cols }}{{- $cols = .Cols -}}{{- end -}}
+{{- if ge $cols 1 }}<div class="skeleton-table-cell"><div class="skeleton-line"></div></div>{{end}}
+{{- if ge $cols 2 }}<div class="skeleton-table-cell"><div class="skeleton-line"></div></div>{{end}}
+{{- if ge $cols 3 }}<div class="skeleton-table-cell"><div class="skeleton-line"></div></div>{{end}}
+{{- if ge $cols 4 }}<div class="skeleton-table-cell"><div class="skeleton-line"></div></div>{{end}}
+{{- if ge $cols 5 }}<div class="skeleton-table-cell"><div class="skeleton-line"></div></div>{{end}}
+{{- if ge $cols 6 }}<div class="skeleton-table-cell"><div class="skeleton-line"></div></div>{{end}}
+{{end}}
+
+{{define "skeleton-table-header-cells"}}
+{{- $cols := 4 -}}
+{{- if .Cols }}{{- $cols = .Cols -}}{{- end -}}
+{{- if ge $cols 1 }}<div class="skeleton-table-cell"><div class="skeleton-line skeleton-line-short"></div></div>{{end}}
+{{- if ge $cols 2 }}<div class="skeleton-table-cell"><div class="skeleton-line skeleton-line-short"></div></div>{{end}}
+{{- if ge $cols 3 }}<div class="skeleton-table-cell"><div class="skeleton-line skeleton-line-short"></div></div>{{end}}
+{{- if ge $cols 4 }}<div class="skeleton-table-cell"><div class="skeleton-line skeleton-line-short"></div></div>{{end}}
+{{- if ge $cols 5 }}<div class="skeleton-table-cell"><div class="skeleton-line skeleton-line-short"></div></div>{{end}}
+{{- if ge $cols 6 }}<div class="skeleton-table-cell"><div class="skeleton-line skeleton-line-short"></div></div>{{end}}
+{{end}}
+
+{{/* ============================================================
+    Skeleton Table
+    ============================================================
+    Mimics a data table with header row and data rows.
+    Pass Rows (1–8) and Cols (1–6).
+    ============================================================ */}}
+
+{{define "skeleton-table"}}
+{{- $rows := 5 -}}
+{{- if .Rows }}{{- $rows = .Rows -}}{{- end -}}
+<div class="skeleton-table{{if .Class}} {{.Class}}{{end}}" aria-hidden="true">
+    <div class="skeleton-table-row skeleton-table-header">
+        {{- template "skeleton-table-header-cells" . -}}
+    </div>
+    {{- if ge $rows 1 }}<div class="skeleton-table-row">{{template "skeleton-table-cells" .}}</div>{{end}}
+    {{- if ge $rows 2 }}<div class="skeleton-table-row">{{template "skeleton-table-cells" .}}</div>{{end}}
+    {{- if ge $rows 3 }}<div class="skeleton-table-row">{{template "skeleton-table-cells" .}}</div>{{end}}
+    {{- if ge $rows 4 }}<div class="skeleton-table-row">{{template "skeleton-table-cells" .}}</div>{{end}}
+    {{- if ge $rows 5 }}<div class="skeleton-table-row">{{template "skeleton-table-cells" .}}</div>{{end}}
+    {{- if ge $rows 6 }}<div class="skeleton-table-row">{{template "skeleton-table-cells" .}}</div>{{end}}
+    {{- if ge $rows 7 }}<div class="skeleton-table-row">{{template "skeleton-table-cells" .}}</div>{{end}}
+    {{- if ge $rows 8 }}<div class="skeleton-table-row">{{template "skeleton-table-cells" .}}</div>{{end}}
+</div>
+{{end}}
+
+{{/* ============================================================
+    Skeleton Stat Card
+    ============================================================
+    Mimics a stat-card with value + label.
+    ============================================================ */}}
+
+{{define "skeleton-stat"}}
+<div class="skeleton-stat{{if .Class}} {{.Class}}{{end}}" aria-hidden="true">
+    <div class="skeleton-line skeleton-line-short" style="width: 40%; height: 0.75rem;"></div>
+    <div class="skeleton-line" style="width: 60%; height: 1.75rem; margin: 0.5rem 0;"></div>
+    <div class="skeleton-line skeleton-line-short" style="width: 50%; height: 0.625rem;"></div>
+</div>
+{{end}}

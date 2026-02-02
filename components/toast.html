@@ -1,0 +1,165 @@
+{{/*
+    Toast Component
+    ===============
+    Transient auto-dismissing notification messages for action confirmations
+    and system feedback. Supports state variants like badge.
+
+    Styles: toast.css
+
+    Usage:
+        {{/* Container — place once in app shell */}}
+        {{template "toast-container" .}}
+
+        {{/* Individual toast — inject via HTMX OOB or JS */}}
+        {{template "toast" dict "Message" "Record saved successfully." "State" "success"}}
+        {{template "toast" dict "Message" "Something went wrong." "State" "error" "Title" "Error"}}
+        {{template "toast" dict "Message" "Check your input." "State" "warning" "Duration" "6000"}}
+        {{template "toast" dict "Message" "New version available." "State" "info" "Delay" "1000"}}
+
+    Parameters:
+        Message     - Toast body text (required)
+        State       - success | error | warning | info (default: info)
+        Title       - Optional bold heading above the message
+        Duration    - Auto-close time in ms (default: 4000). Set "0" to disable auto-close
+        Delay       - Delay before showing in ms (default: 0)
+        ID          - Element ID
+        Class       - Additional CSS classes
+        Dismissible - true | false (default: true) — shows close button
+*/}}
+
+{{/* ============================================================
+    Toast Container
+    ============================================================
+    Static container in app shell. Toasts are appended here.
+    Place once in your base layout.
+    ============================================================ */}}
+
+{{define "toast-container"}}
+<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+{{end}}
+
+{{/* ============================================================
+    Toast Container (OOB target)
+    ============================================================
+    Use this when injecting toasts via HTMX out-of-band swap.
+    The server response includes:
+        <div id="toast-container" hx-swap-oob="afterbegin">
+            {{template "toast" dict "Message" "Saved!" "State" "success"}}
+        </div>
+    ============================================================ */}}
+
+{{define "toast-oob"}}
+<div id="toast-container" hx-swap-oob="afterbegin">
+    {{template "toast" .}}
+</div>
+{{end}}
+
+{{/* ============================================================
+    Individual Toast
+    ============================================================ */}}
+
+{{define "toast"}}
+{{- $state := or .State "info" -}}
+{{- $duration := or .Duration "4000" -}}
+{{- $delay := or .Delay "0" -}}
+{{- $dismissible := true -}}
+{{- if eq .Dismissible false }}{{- $dismissible = false -}}{{- end -}}
+
+{{- /* Build class list */ -}}
+{{- $classes := printf "toast toast-%s" $state -}}
+{{- if .Class }}{{- $classes = printf "%s %s" $classes .Class -}}{{- end -}}
+
+<div class="{{$classes}}"
+    {{- if .ID }} id="{{.ID}}"{{end}}
+    role="alert"
+    aria-live="assertive"
+    data-duration="{{$duration}}"
+    data-delay="{{$delay}}"
+>
+    <div class="toast-icon">
+        {{- if eq $state "success" -}}
+            {{template "icon-check-circle"}}
+        {{- else if eq $state "error" -}}
+            {{template "icon-x-circle"}}
+        {{- else if eq $state "warning" -}}
+            {{template "icon-alert-triangle"}}
+        {{- else -}}
+            {{template "icon-info"}}
+        {{- end -}}
+    </div>
+    <div class="toast-body">
+        {{- if .Title -}}
+        <div class="toast-title">{{.Title}}</div>
+        {{- end -}}
+        <div class="toast-message">{{.Message}}</div>
+    </div>
+    {{- if $dismissible }}
+    <button class="toast-close" aria-label="Dismiss notification" onclick="this.closest('.toast').classList.add('toast-exit')">
+        {{template "icon-x"}}
+    </button>
+    {{- end }}
+    {{- if ne $duration "0" }}
+    <div class="toast-progress" style="animation-duration: {{$duration}}ms; animation-delay: {{$delay}}ms;"></div>
+    {{- end }}
+</div>
+{{end}}
+
+{{/* ============================================================
+    Toast Init Script
+    ============================================================
+    Include once in your base layout after toast-container.
+    Handles auto-dismiss timers, exit animations, and cleanup.
+    ============================================================ */}}
+
+{{define "toast-init"}}
+<script>
+(function() {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    function initToast(toast) {
+        const duration = parseInt(toast.dataset.duration || '4000', 10);
+        const delay = parseInt(toast.dataset.delay || '0', 10);
+
+        // Delay before showing
+        if (delay > 0) {
+            toast.style.opacity = '0';
+            toast.style.pointerEvents = 'none';
+            setTimeout(function() {
+                toast.style.opacity = '';
+                toast.style.pointerEvents = '';
+            }, delay);
+        }
+
+        // Auto-dismiss
+        if (duration > 0) {
+            setTimeout(function() {
+                toast.classList.add('toast-exit');
+            }, duration + delay);
+        }
+
+        // Remove from DOM after exit animation
+        toast.addEventListener('animationend', function(e) {
+            if (e.animationName === 'toastSlideOut') {
+                toast.remove();
+            }
+        });
+    }
+
+    // Init existing toasts
+    container.querySelectorAll('.toast').forEach(initToast);
+
+    // Watch for new toasts (HTMX OOB swaps)
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+            m.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1 && node.classList.contains('toast')) {
+                    initToast(node);
+                }
+            });
+        });
+    });
+    observer.observe(container, { childList: true });
+})();
+</script>
+{{end}}

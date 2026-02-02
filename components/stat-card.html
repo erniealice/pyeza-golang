@@ -1,0 +1,133 @@
+{{/*
+================================================================================
+STAT CARD COMPONENT
+================================================================================
+Displays key metrics with icons, values, labels, and optional trend indicators.
+
+VARIANTS:
+- stat-card: Full-size stat card with trends (dashboard style)
+- stat-mini: Compact stat display (templates page style)
+
+COLOR VARIANTS:
+- terracotta: Primary accent color
+- sage: Success/positive color
+- navy: Info/secondary color
+- amber: Warning/attention color
+
+USAGE:
+{{template "stat-card" dict "Icon" "icon-clients" "Value" "248" "Label" "Total Clients" "Trend" "+12%" "TrendUp" true "Color" "terracotta"}}
+{{template "stat-mini" dict "Icon" "icon-templates" "Value" "15" "Label" "Total Templates" "Color" "total"}}
+================================================================================
+*/}}
+
+{{/* ========================================
+    STAT CARD (Full Size)
+    Used in: index3.html dashboard
+======================================== */}}
+{{define "stat-card"}}
+<div class="stat-card stat-card--{{.Color}}">
+    <div class="stat-header">
+        <div class="stat-icon" data-icon="{{.Icon}}"></div>
+        {{if .Trend}}
+        <div class="stat-trend {{if .TrendUp}}up{{else}}down{{end}}">
+            {{if .TrendUp}}
+            {{template "icon-trending-up" $}}
+            {{else}}
+            {{template "icon-trending-down" $}}
+            {{end}}
+            {{.Trend}}
+        </div>
+        {{end}}
+    </div>
+    <div class="stat-value">{{.Value}}</div>
+    <div class="stat-label">{{.Label}}</div>
+</div>
+{{end}}
+
+{{/* ========================================
+    STAT CARD (Full Size) - Inline Version
+    For use when iterating over data
+======================================== */}}
+{{define "stat-card-inline"}}
+<div class="stat-card">
+    <div class="stat-header">
+        <div class="stat-icon">
+            {{.IconHTML}}
+        </div>
+        {{if .Trend}}
+        <div class="stat-trend {{if .TrendUp}}up{{else}}down{{end}}">
+            {{if .TrendUp}}{{.TrendUpIcon}}{{else}}{{.TrendDownIcon}}{{end}}
+            {{.Trend}}
+        </div>
+        {{end}}
+    </div>
+    <div class="stat-value">{{.Value}}</div>
+    <div class="stat-label">{{.Label}}</div>
+</div>
+{{end}}
+
+{{/* ========================================
+    STAT MINI (Compact)
+    Used in: templates.html stats summary
+======================================== */}}
+{{define "stat-mini"}}
+<div class="stat-mini">
+    <div class="stat-mini-icon {{.Color}}">
+        <!-- icon: {{.Icon}} -->
+    </div>
+    <div class="stat-mini-content">
+        <div class="stat-mini-value">{{.Value}}</div>
+        <div class="stat-mini-label">{{.Label}}</div>
+    </div>
+</div>
+{{end}}
+
+{{/* ========================================
+    STAT MINI - Inline Version
+    For use when iterating over data
+======================================== */}}
+{{define "stat-mini-inline"}}
+<div class="stat-mini">
+    <div class="stat-mini-icon {{.Color}}">
+        {{.IconHTML}}
+    </div>
+    <div class="stat-mini-content">
+        <div class="stat-mini-value">{{.Value}}</div>
+        <div class="stat-mini-label">{{.Label}}</div>
+    </div>
+</div>
+{{end}}
+
+{{/* ========================================
+    STATS ROW CONTAINER
+    Container for a row of stat cards
+======================================== */}}
+{{define "stats-row"}}
+<div class="stats-row">
+    {{.Content}}
+</div>
+{{end}}
+
+{{/* ========================================
+    STATS SUMMARY CONTAINER
+    Container for stat-mini cards
+======================================== */}}
+{{define "stats-summary"}}
+<div class="stats-summary">
+    {{.Content}}
+</div>
+{{end}}
+
+{{/* ========================================
+    CONNECTED STATS
+    Shows integration connection status
+    Used in: marketplace.html
+======================================== */}}
+{{define "connected-stats"}}
+{{if gt .Count 0}}
+<div class="connected-stats">
+    {{template "icon-check-circle" $}}
+    <span>{{.Prefix}} <strong>{{.Count}}</strong> {{if eq .Count 1}}{{.Singular}}{{else}}{{.Plural}}{{end}}</span>
+</div>
+{{end}}
+{{end}}

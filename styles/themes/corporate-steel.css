@@ -1,0 +1,68 @@
+/*
+ * ==========================================================================
+ * THEME: CORPORATE STEEL
+ * Authoritative, polished business palette with steel blue accents
+ * Think: quarterly reports, boardrooms, investor decks
+ * ==========================================================================
+ */
+[data-theme="corporate-steel"] {
+    /* Backgrounds */
+    --bg-base: #F4F6F9;
+    --bg-sidebar: #EDF0F5;
+    --bg-card: #FFFFFF;
+    --bg-hover: #E8ECF2;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(25, 35, 55, 0.5);
+
+    /* Text */
+    --text-primary: #1B2537;
+    --text-secondary: #4A5568;
+    --text-muted: #8895A7;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — authoritative steel blue */
+    --accent-primary: #2E5C8A;
+    --accent-primary-light: #EDF3F9;
+    --accent-primary-dark: #1E4470;
+
+    /* Secondary Accents */
+    --accent-terracotta: #C0392B;
+    --accent-terracotta-light: #FBEAE8;
+    --accent-terracotta-dark: #962D22;
+    --accent-sage: #27896D;
+    --accent-sage-light: #E8F5F0;
+    --accent-navy: #2E5C8A;
+    --accent-navy-light: #EDF3F9;
+    --accent-navy-dark: #1E4470;
+    --accent-amber: #B8860B;
+    --accent-amber-light: #FBF5E6;
+    --accent-plum: #6C5B7B;
+    --accent-slate: #5A6978;
+
+    /* Status Colors */
+    --status-success: #27896D;
+    --status-success-light: #E8F5F0;
+    --status-warning: #B8860B;
+    --status-warning-light: #FBF5E6;
+    --status-error: #C0392B;
+    --status-error-light: #FBEAE8;
+    --status-info: #2E5C8A;
+    --status-info-light: #EDF3F9;
+
+    /* Borders & Shadows — crisp, structured */
+    --border: #D5DBE4;
+    --border-light: #E4E9F0;
+    --border-focus: var(--accent-primary);
+    --border-default: #D5DBE4;
+    --shadow-sm: 0 1px 2px rgba(25, 35, 55, 0.05);
+    --shadow-md: 0 4px 12px rgba(25, 35, 55, 0.07);
+    --shadow-lg: 0 8px 24px rgba(25, 35, 55, 0.10);
+    --shadow-card: 0 1px 4px rgba(25, 35, 55, 0.06), 0 1px 2px rgba(25, 35, 55, 0.04);
+    --shadow-float: 0 12px 40px rgba(25, 35, 55, 0.15);
+    --shadow-xl: 0 20px 50px rgba(25, 35, 55, 0.14);
+
+    /* Theme Meta */
+    --theme-name: "Corporate Steel";
+    --theme-icon-bg: linear-gradient(135deg, #F4F6F9 0%, #D5DBE4 100%);
+    --theme-icon-accent: #2E5C8A;
+}

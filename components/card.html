@@ -1,0 +1,213 @@
+{{/*
+================================================================================
+CARD COMPONENT
+================================================================================
+A flexible card component with multiple variants for different use cases.
+
+VARIANTS:
+- default: Standard card with header and body
+- integration: Integration/service cards (marketplace style)
+- quick-link: Horizontal card with icon (helpdesk quick links)
+- article: Content/article preview card
+
+SUB-TEMPLATES:
+- card-header: Card header with title and optional actions
+- card-body: Card body content area
+- card-actions: Card action buttons area
+
+USAGE:
+{{template "card" dict "Title" "Card Title" "Variant" "default"}}
+{{template "card-header" dict "Title" "Header" "Actions" true}}
+{{template "card-body"}}
+{{template "integration-card" .Integration}}
+{{template "quick-link-card" dict "Title" "Title" "Description" "Desc" "Icon" "icon-name" "Color" "terracotta" "Href" "/path"}}
+{{template "article-card" dict "Title" "Title" "Summary" "Summary" "Badge" "How-To" "BadgeType" "how-to"}}
+================================================================================
+*/}}
+
+{{/* ========================================
+    DEFAULT CARD
+======================================== */}}
+{{define "card"}}
+<div class="card{{if .Class}} {{.Class}}{{end}}">
+    {{if .Title}}
+    <div class="card-header">
+        {{if .Icon}}
+        <div class="card-header-left">
+            <div class="card-icon {{.IconColor}}">
+                <!-- icon: {{.Icon}} -->
+            </div>
+            <h2 class="card-title">{{.Title}}</h2>
+        </div>
+        {{else}}
+        <h2 class="card-title">{{.Title}}</h2>
+        {{end}}
+        {{if .Actions}}
+        <div class="card-actions">
+            {{.Actions}}
+        </div>
+        {{end}}
+    </div>
+    {{end}}
+    {{if .Body}}
+    <div class="card-body">
+        {{.Body}}
+    </div>
+    {{end}}
+</div>
+{{end}}
+
+{{/* ========================================
+    CARD HEADER
+======================================== */}}
+{{define "card-header"}}
+<div class="card-header">
+    {{if .Icon}}
+    <div class="card-header-left">
+        <div class="card-icon {{.IconColor}}">
+            <!-- icon: {{.Icon}} -->
+        </div>
+        <h2 class="card-title">{{.Title}}</h2>
+    </div>
+    {{else}}
+    <h2 class="card-title">{{.Title}}</h2>
+    {{end}}
+    {{if .Actions}}
+    <div class="card-actions">
+        {{.Actions}}
+    </div>
+    {{end}}
+</div>
+{{end}}
+
+{{/* ========================================
+    CARD BODY
+======================================== */}}
+{{define "card-body"}}
+<div class="card-body">
+    {{.Content}}
+</div>
+{{end}}
+
+{{/* ========================================
+    CARD ACTIONS (Button Group)
+======================================== */}}
+{{define "card-actions"}}
+<div class="card-actions">
+    {{range .Buttons}}
+    <button class="card-btn{{if .Primary}} primary{{end}}">{{.Label}}</button>
+    {{end}}
+</div>
+{{end}}
+
+{{/* ========================================
+    INTEGRATION CARD
+    Used in: marketplace.html
+======================================== */}}
+{{define "integration-card"}}
+<div class="integration-card{{if .Connected}} connected{{end}}" data-name="{{.Name}}" data-category="{{.Category}}" data-description="{{.Description}}">
+    <div class="integration-card-header">
+        <div class="integration-logo">
+            {{if .Logo}}
+            <img src="{{.Logo}}" alt="{{.Name}} logo">
+            {{else if eq .Icon "users"}}{{template "icon-users" $}}
+            {{else if eq .Icon "clipboard"}}{{template "icon-clipboard" $}}
+            {{else if eq .Icon "dollar-sign"}}{{template "icon-dollar-sign" $}}
+            {{else if eq .Icon "monitor"}}{{template "icon-monitor" $}}
+            {{else}}{{template "icon-grid-2x2" $}}
+            {{end}}
+        </div>
+        <div class="integration-badges">
+            {{if .Popular}}<span class="badge popular">{{.PopularLabel}}</span>{{end}}
+            {{if .Connected}}<span class="badge connected">{{.ConnectedLabel}}</span>{{end}}
+            {{if .Category}}<span class="badge category">{{.Category}}</span>{{end}}
+        </div>
+    </div>
+    <h3 class="integration-name">{{.Name}}</h3>
+    <p class="integration-description">{{.Description}}</p>
+    <div class="integration-actions">
+        {{if .Connected}}
+        <button class="btn btn-success btn-full">
+            {{template "icon-settings-cog" $}}
+            {{.SettingsLabel}}
+        </button>
+        {{else}}
+        <button class="btn btn-primary btn-full">
+            {{template "icon-external-link" $}}
+            {{.ConnectLabel}}
+        </button>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/* ========================================
+    QUICK LINK CARD
+    Used in: helpdesk.html
+======================================== */}}
+{{define "quick-link-card"}}
+<a href="{{.Href}}" class="quick-link-card">
+    <div class="quick-link-icon {{.Color}}">
+        {{if eq .Icon "phone"}}{{template "icon-phone" $}}
+        {{else if eq .Icon "play"}}{{template "icon-play" $}}
+        {{else if eq .Icon "message-square"}}{{template "icon-message-square" $}}
+        {{else if eq .Icon "mail"}}{{template "icon-mail" $}}
+        {{else if eq .Icon "help"}}{{template "icon-help" $}}
+        {{else if eq .Icon "book"}}{{template "icon-book" $}}
+        {{else if eq .Icon "file"}}{{template "icon-file" $}}
+        {{else if eq .Icon "users"}}{{template "icon-users" $}}
+        {{end}}
+    </div>
+    <div class="quick-link-content">
+        <h3>{{.Title}}</h3>
+        <p>{{.Description}}</p>
+    </div>
+</a>
+{{end}}
+
+{{/* ========================================
+    ARTICLE CARD
+    Used in: helpdesk.html
+======================================== */}}
+{{define "article-card"}}
+<div class="article-card">
+    {{if .Badge}}
+    <span class="article-badge {{.BadgeType}}">{{.Badge}}</span>
+    {{end}}
+    <h3>{{.Title}}</h3>
+    <p>{{.Summary}}</p>
+    {{if .ShowReadMore}}
+    <span class="read-more">
+        {{.ReadMoreLabel}}
+        {{template "icon-arrow-right" $}}
+    </span>
+    {{end}}
+</div>
+{{end}}
+
+{{/* ========================================
+    CALC TYPE CARD
+    Used in: helpdesk.html calculation types
+======================================== */}}
+{{define "calc-type-card"}}
+<div class="calc-type-card">
+    <div class="calc-type-icon">
+        {{if eq .Icon "clock"}}{{template "icon-clock" $}}
+        {{else if eq .Icon "user-check"}}{{template "icon-user-check" $}}
+        {{else if eq .Icon "calendar"}}{{template "icon-calendar" $}}
+        {{else if eq .Icon "briefcase"}}{{template "icon-briefcase" $}}
+        {{else if eq .Icon "graduation-cap"}}{{template "icon-graduation-cap" $}}
+        {{else if eq .Icon "users"}}{{template "icon-users" $}}
+        {{else}}{{template "icon-monitor" $}}
+        {{end}}
+    </div>
+    <h3>{{.Name}}</h3>
+    <p>{{.Description}}</p>
+    {{if .VideoURL}}
+    <a href="{{.VideoURL}}" class="btn btn-primary">
+        {{template "icon-play" $}}
+        {{.VideoLabel}}
+    </a>
+    {{end}}
+</div>
+{{end}}

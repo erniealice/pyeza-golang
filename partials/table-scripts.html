@@ -1,0 +1,47 @@
+{{define "table-scripts"}}
+{{/*
+    Table Scripts Partial
+    =====================
+    Include this at the end of any page that uses table functionality.
+
+    Usage:
+        {{template "table-scripts" .}}
+
+    Load order is important - modules depend on each other:
+    1. table-core.js (shared utilities and state)
+    2. table-server.js (server-side pagination utilities)
+    3. table-dropdowns.js (dropdown management)
+    4. table-search.js (search functionality)
+    5. table-sort.js (sort functionality)
+    6. table-columns.js (column visibility)
+    7. table-filters.js (filter functionality)
+    8. table-export.js (export functionality)
+    9. table-density.js (density functionality)
+    10. table-pagination.js (pagination functionality)
+    11. table-selection.js (bulk selection functionality)
+    12. table-actions.js (row actions and navigation - uses global dialog.js)
+    13. bulk-action.js (unified bulk action handler)
+    14. table.js (main entry point - initializes all modules)
+
+    Note: Confirmation dialogs are now handled by dialog.js (loaded in app-shell)
+    which serves dialog content via HTMX from /ui/dialog/confirm
+*/}}
+
+<!-- Table Core Modules -->
+<script src="/assets/js/components/table/table-core.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-server.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-dropdowns.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-search.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-sort.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-columns.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-filters.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-export.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-density.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-pagination.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-selection.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/table-actions.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/components/table/bulk-action.js?v={{.CacheVersion}}"></script>
+
+<!-- Table Main Entry Point -->
+<script src="/assets/js/components/table/table.js?v={{.CacheVersion}}"></script>
+{{end}}

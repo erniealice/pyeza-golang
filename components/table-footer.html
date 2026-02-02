@@ -1,0 +1,62 @@
+{{/*
+================================================================================
+TABLE FOOTER COMPONENT
+================================================================================
+A reusable table footer with pagination info and navigation controls.
+Designed for client-side JS pagination - provides the structure with
+configurable IDs that JavaScript can manipulate.
+
+Usage (default English labels):
+    {{template "table-footer" dict "ID" "awards" "Total" (len .Awards)}}
+    {{template "table-footer" dict "ID" "wic" "Total" (len .WICCodes)}}
+    {{template "table-footer" dict "Total" 0}}
+
+Usage (custom labels):
+    {{template "table-footer" dict "Showing" .Labels.Table.Showing "To" .Labels.Table.To "Of" .Labels.Table.Of "Entries" .Labels.Table.EntriesLabel "Prev" .Labels.Buttons.Prev "Next" .Labels.Buttons.Next}}
+
+Parameters:
+    - ID: (optional) Prefix for element IDs (e.g., "awards" -> "awardsShowingStart")
+          If empty, uses default IDs (showingStart, pagination, etc.)
+    - Total: (optional) Initial total count to display (default: 0)
+    - Showing: (optional) "Showing" label text (default: "Showing")
+    - To: (optional) "to" label text (default: "to")
+    - Of: (optional) "of" label text (default: "of")
+    - Entries: (optional) "entries" label text (default: "entries")
+    - Prev: (optional) "Prev" button text (default: "Prev")
+    - Next: (optional) "Next" button text (default: "Next")
+
+Element IDs generated (with prefix "awards"):
+    - awardsShowingStart, awardsShowingEnd, awardsTotalEntries
+    - awardsPagination
+
+Element IDs generated (without prefix):
+    - showingStart, showingEnd, totalEntries
+    - pagination
+================================================================================
+*/}}
+
+{{define "table-footer"}}
+<div class="table-footer">
+    {{/* Entries selector - left */}}
+    <div class="footer-entries">
+        <span>{{if .Show}}{{.Show}}{{else}}Show{{end}}</span>
+        <select id="{{if .ID}}{{.ID}}-entries{{else}}entries{{end}}" class="entries-selector" data-table="{{.ID}}">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span>{{if .EntriesLabel}}{{.EntriesLabel}}{{else}}entries{{end}}</span>
+    </div>
+    {{/* Info - center */}}
+    <div class="footer-info">
+        {{if .Showing}}{{.Showing}}{{else}}Showing{{end}} <strong><span id="{{if .ID}}{{.ID}}ShowingStart{{else}}showingStart{{end}}">1</span></strong> {{if .To}}{{.To}}{{else}}to{{end}} <strong><span id="{{if .ID}}{{.ID}}ShowingEnd{{else}}showingEnd{{end}}">25</span></strong> {{if .Of}}{{.Of}}{{else}}of{{end}} <strong><span id="{{if .ID}}{{.ID}}TotalEntries{{else}}totalEntries{{end}}">{{if .Total}}{{.Total}}{{else}}0{{end}}</span></strong> {{if .Entries}}{{.Entries}}{{else}}entries{{end}}
+    </div>
+    {{/* Pagination - right */}}
+    <div class="footer-pagination" id="{{if .ID}}{{.ID}}Pagination{{else}}pagination{{end}}">
+        <button class="pagination-btn pagination-prev" disabled data-table="{{.ID}}">&laquo; {{if .Prev}}{{.Prev}}{{else}}Prev{{end}}</button>
+        <button class="pagination-page active" data-page="1" data-table="{{.ID}}">1</button>
+        <button class="pagination-btn pagination-next" data-table="{{.ID}}">{{if .Next}}{{.Next}}{{else}}Next{{end}} &raquo;</button>
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,221 @@
+{{/*
+================================================================================
+TABS COMPONENT - Unified Tab Navigation System
+================================================================================
+A flexible, accessible tabs component supporting multiple visual variants
+and interaction patterns.
+
+USAGE:
+    {{template "tabs" (dict
+        "Items" .TabItems
+        "ActiveTab" .ActiveTab
+        "Variant" "default"
+        "ID" "my-tabs"
+    )}}
+
+PARAMETERS:
+    Items     - Array of tab items, each with:
+                  - Key      : Unique identifier (used for URL/data-tab)
+                  - Label    : Display text
+                  - Href     : Link URL (optional, for link-based tabs)
+                  - Icon     : Icon template name (optional)
+                  - Count    : Badge count (optional)
+                  - Disabled : Boolean (optional)
+    ActiveTab - String matching the Key of the active tab
+    Variant   - Visual variant: "default", "main", "sub", "client", "help", "category"
+    ID        - Optional ID for the tabs container
+
+VARIANTS:
+    default  - Pill-style tabs with background container (clients page)
+    main     - Large icon+text tabs with underline indicator (regulations)
+    sub      - Compact inline tabs for secondary navigation
+    client   - Horizontal sticky tabs with icons (client-detail)
+    help     - Rounded pill tabs with counts (helpdesk)
+    category - Minimal category filter tabs (marketplace)
+
+ACCESSIBILITY:
+    - Uses role="tablist" and role="tab"
+    - Proper aria-selected state
+    - Keyboard navigation support via JS
+================================================================================
+*/}}
+
+{{define "tabs"}}
+{{$variant := .Variant}}
+{{$activeTab := .ActiveTab}}
+{{$id := .ID}}
+
+{{/* Default variant - Pill-style tabs */}}
+{{if or (eq $variant "default") (eq $variant "")}}
+<div class="tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+    {{range .Items}}
+    {{if .Href}}
+    <a href="{{.Href}}"
+       class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+       role="tab"
+       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       data-tab="{{.Key}}"
+       {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="tab-badge">{{.Count}}</span>{{end}}
+    </a>
+    {{else}}
+    <button type="button"
+            class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="tab"
+            aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            data-tab="{{.Key}}"
+            {{if .Disabled}}aria-disabled="true" disabled{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="tab-badge">{{.Count}}</span>{{end}}
+    </button>
+    {{end}}
+    {{end}}
+</div>
+{{end}}
+
+{{/* Main variant - Large icon+text with underline (regulations page) */}}
+{{if eq $variant "main"}}
+<div class="main-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+    {{range .Items}}
+    {{if .Href}}
+    <a href="{{.Href}}"
+       class="main-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+       role="tab"
+       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       data-tab="{{.Key}}"
+       {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        <span>{{.Label}}</span>
+        {{if .Count}}<span class="tab-badge">{{.Count}}</span>{{end}}
+    </a>
+    {{else}}
+    <button type="button"
+            class="main-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="tab"
+            aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            data-tab="{{.Key}}"
+            {{if .Disabled}}aria-disabled="true" disabled{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        <span>{{.Label}}</span>
+        {{if .Count}}<span class="tab-badge">{{.Count}}</span>{{end}}
+    </button>
+    {{end}}
+    {{end}}
+</div>
+{{end}}
+
+{{/* Sub variant - Compact secondary tabs */}}
+{{if eq $variant "sub"}}
+<div class="sub-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+    {{range .Items}}
+    {{if .Href}}
+    <a href="{{.Href}}"
+       class="sub-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+       role="tab"
+       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       data-tab="{{.Key}}"
+       {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="count">({{.Count}})</span>{{end}}
+    </a>
+    {{else}}
+    <button type="button"
+            class="sub-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="tab"
+            aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            data-tab="{{.Key}}"
+            {{if .Disabled}}aria-disabled="true" disabled{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="count">({{.Count}})</span>{{end}}
+    </button>
+    {{end}}
+    {{end}}
+</div>
+{{end}}
+
+{{/* Client variant - Horizontal sticky tabs with icons */}}
+{{if eq $variant "client"}}
+<nav class="client-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+    {{range .Items}}
+    <button type="button"
+            class="client-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="tab"
+            aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            data-tab="{{.Key}}"
+            {{if .Disabled}}aria-disabled="true" disabled{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="client-tab-badge">{{.Count}}</span>{{end}}
+    </button>
+    {{end}}
+</nav>
+{{end}}
+
+{{/* Help variant - Rounded pill tabs with counts (helpdesk) */}}
+{{if eq $variant "help"}}
+<div class="help-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+    {{range .Items}}
+    {{if .Href}}
+    <a href="{{.Href}}"
+       class="help-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+       role="tab"
+       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       data-tab="{{.Key}}"
+       {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="count">{{.Count}}</span>{{end}}
+    </a>
+    {{else}}
+    <button type="button"
+            class="help-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="tab"
+            aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            data-tab="{{.Key}}"
+            {{if .Disabled}}aria-disabled="true" disabled{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="count">{{.Count}}</span>{{end}}
+    </button>
+    {{end}}
+    {{end}}
+</div>
+{{end}}
+
+{{/* Category variant - Minimal filter tabs (marketplace) */}}
+{{if eq $variant "category"}}
+<div class="category-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+    {{range .Items}}
+    {{if .Href}}
+    <a href="{{.Href}}"
+       class="category-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+       role="tab"
+       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       data-tab="{{.Key}}"
+       {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="count">{{.Count}}</span>{{end}}
+    </a>
+    {{else}}
+    <button type="button"
+            class="category-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="tab"
+            aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            data-tab="{{.Key}}"
+            {{if .Disabled}}aria-disabled="true" disabled{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="count">{{.Count}}</span>{{end}}
+    </button>
+    {{end}}
+    {{end}}
+</div>
+{{end}}
+
+{{end}}

@@ -1,0 +1,349 @@
+/*
+ * ==========================================================================
+ * FORM DRAWER COMPONENT
+ * ==========================================================================
+ * A slide-in drawer from the right side for displaying forms.
+ * Used for add/edit operations without navigating away from the page.
+ * ==========================================================================
+ */
+
+/* ========================================
+   DRAWER CONTAINER
+   ======================================== */
+
+.form-drawer {
+    visibility: hidden;
+    pointer-events: none;
+    /* Delay visibility:hidden until after slide-out animation (0.3s) */
+    transition: visibility 0s linear 0.3s;
+}
+
+.form-drawer.active {
+    visibility: visible;
+    pointer-events: auto;
+    /* When opening, show immediately (no delay) */
+    transition: visibility 0s linear 0s;
+}
+
+/* ========================================
+   OVERLAY / BACKDROP
+   ======================================== */
+
+.form-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-overlay);
+    backdrop-filter: blur(0.25rem);
+    -webkit-backdrop-filter: blur(0.25rem);
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.form-drawer.active .form-drawer-overlay {
+    opacity: 1;
+}
+
+/* ========================================
+   DRAWER PANEL
+   ======================================== */
+
+.form-drawer-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 28.125rem;
+    height: 100vh;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+}
+
+.form-drawer.active .form-drawer-panel,
+.form-drawer.open .form-drawer-panel {
+    transform: translateX(0);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   DRAWER HEADER
+   ======================================== */
+
+.form-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-base);
+    min-height: 4rem;
+    flex-shrink: 0;
+}
+
+.form-drawer-header h2,
+#formDrawerTitle {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.form-drawer-close {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.form-drawer-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.form-drawer-close:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 0.125rem;
+}
+
+.form-drawer-close svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* ========================================
+   DRAWER CONTENT
+   ======================================== */
+
+.form-drawer-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    padding-bottom: 6.25rem; /* Space for fixed footer */
+}
+
+/* Scrollbar styling for content area */
+.form-drawer-content::-webkit-scrollbar {
+    width: 0.375rem;
+}
+
+.form-drawer-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.form-drawer-content::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 0.1875rem;
+}
+
+.form-drawer-content::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ========================================
+   DRAWER FOOTER
+   ======================================== */
+
+.form-drawer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-base);
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+/* When footer is inside the content area (within a form) - fixed at bottom */
+.form-drawer-content .form-drawer-footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 28.125rem;
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-base);
+    border-top: 1px solid var(--border);
+    z-index: 202;
+    box-sizing: border-box;
+}
+
+/* Mobile: full width footer */
+@media (max-width: 480px) {
+    .form-drawer-content .form-drawer-footer {
+        width: 100vw;
+    }
+}
+
+/* ========================================
+   FORM STYLES WITHIN DRAWER
+   ======================================== */
+
+.form-drawer-content .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-drawer-content .form-group:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Form section divider */
+.form-drawer-content .form-divider {
+    margin: 1.5rem 0;
+    border: none;
+    border-top: 1px solid var(--border-light);
+}
+
+/* Form section title */
+.form-drawer-content .form-section-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+/* ========================================
+   ERROR STATE
+   ======================================== */
+
+.form-drawer-error {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    background: var(--status-error-light);
+    border: 1px solid var(--status-error);
+    border-radius: var(--radius-md);
+    color: var(--status-error);
+    font-size: 0.875rem;
+    display: none;
+}
+
+.form-drawer-error.visible {
+    display: block;
+}
+
+.form-drawer-error svg {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+
+.form-drawer-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3.75rem 1.5rem;
+    color: var(--text-muted);
+}
+
+.form-drawer-loading::after {
+    content: '';
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: form-drawer-spin 0.6s linear infinite;
+}
+
+@keyframes form-drawer-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE
+   ======================================== */
+
+@media (max-width: 480px) {
+    .form-drawer-panel {
+        width: 100vw;
+        border-left: none;
+    }
+
+    .form-drawer-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .form-drawer-header h2,
+    #formDrawerTitle {
+        font-size: 1.125rem;
+    }
+
+    .form-drawer-content {
+        padding: 1.25rem;
+    }
+
+    .form-drawer-content .form-drawer-footer {
+        margin: 1.25rem -1.25rem -1.25rem -1.25rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .form-drawer-footer {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Stack buttons on very small screens */
+    .form-drawer-footer {
+        flex-direction: column-reverse;
+    }
+
+    .form-drawer-footer .btn,
+    .form-drawer-footer .btn-primary,
+    .form-drawer-footer .btn-secondary {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .form-drawer-overlay,
+    .form-drawer-panel {
+        transition: none;
+    }
+
+    .form-drawer-loading::after {
+        animation: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .form-drawer-panel {
+        border-left-width: 2px;
+    }
+
+    .form-drawer-header,
+    .form-drawer-footer {
+        border-width: 2px;
+    }
+}

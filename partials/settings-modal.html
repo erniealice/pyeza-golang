@@ -1,0 +1,71 @@
+{{define "settings-modal"}}
+{{/*
+    Settings Modal
+    ==============
+    Full-page popup modal for account settings.
+    Content is loaded via fetch into the content area.
+*/}}
+
+<!-- Settings Modal Overlay -->
+<div class="settings-modal-overlay" id="settingsOverlay"></div>
+
+<!-- Settings Modal Container -->
+<div class="settings-modal" id="settingsModal" role="dialog" aria-labelledby="settingsTitle" aria-modal="true">
+    <!-- Settings Sidebar -->
+    <aside class="settings-modal-sidebar">
+        <div class="settings-modal-header">
+            <h2 class="settings-modal-title" id="settingsTitle">{{.CommonLabels.Settings.Title}}</h2>
+            <button class="settings-modal-close" id="settingsCloseBtn" aria-label="{{.CommonLabels.Settings.Close}}">
+                {{template "icon-x" .}}
+            </button>
+        </div>
+
+        <nav class="settings-modal-nav">
+            <div class="settings-nav-section">
+                <div class="settings-nav-section-title">{{.CommonLabels.Settings.Account.Title}}</div>
+                <button class="settings-nav-item active" data-section="profile">
+                    <span class="settings-nav-icon">{{template "icon-user" .}}</span>
+                    <span class="settings-nav-text">{{.CommonLabels.Settings.Account.Profile}}</span>
+                </button>
+                <button class="settings-nav-item" data-section="security">
+                    <span class="settings-nav-icon">{{template "icon-shield" .}}</span>
+                    <span class="settings-nav-text">{{.CommonLabels.Settings.Account.Security}}</span>
+                </button>
+            </div>
+
+            <div class="settings-nav-section">
+                <div class="settings-nav-section-title">{{.CommonLabels.Settings.Billing.Title}}</div>
+                <button class="settings-nav-item" data-section="billing">
+                    <span class="settings-nav-icon">{{template "icon-credit-card" .}}</span>
+                    <span class="settings-nav-text">{{.CommonLabels.Settings.Billing.Billing}}</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="settings-modal-footer">
+            <div class="settings-user-card">
+                <div class="settings-user-avatar">JD</div>
+                <div class="settings-user-info">
+                    <div class="settings-user-name">John Doe</div>
+                    <div class="settings-user-email">john.doe@company.com</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Settings Content Area -->
+    <main class="settings-modal-content" id="settingsContent">
+        <!-- Content loaded via fetch -->
+        <div class="settings-loading">
+            <div class="settings-loading-spinner"></div>
+            <p>{{.CommonLabels.Settings.Loading}}</p>
+        </div>
+    </main>
+</div>
+
+<!-- Settings Modal Stylesheet -->
+<link rel="stylesheet" href="/assets/css/app/account-modal.css?v={{.CacheVersion}}">
+
+<!-- Settings Modal Script -->
+<script src="/assets/js/settings-modal.js?v={{.CacheVersion}}"></script>
+{{end}}

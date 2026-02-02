@@ -1,0 +1,284 @@
+/*
+ * ==========================================================================
+ * TOAST COMPONENT STYLES (rem-based)
+ * ==========================================================================
+ * Transient auto-dismissing notifications for action feedback.
+ * Supports state variants: success, error, warning, info.
+ * ==========================================================================
+ */
+
+/* ========================================
+   TOAST CONTAINER
+   ======================================== */
+
+.toast-container {
+    position: fixed;
+    top: 1.25rem; /* 20px */
+    right: 1.25rem;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem; /* 10px */
+    pointer-events: none;
+    max-width: 25rem; /* 400px */
+    width: 100%;
+}
+
+/* ========================================
+   BASE TOAST
+   ======================================== */
+
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem; /* 12px */
+    padding: 0.875rem 1rem; /* 14px 16px */
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    box-shadow: var(--shadow-lg);
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+    animation: toastSlideIn var(--duration-slow) var(--ease-bounce) forwards;
+}
+
+/* ========================================
+   STATE VARIANTS
+   ======================================== */
+
+/* Success */
+.toast-success {
+    border-left: 0.1875rem solid var(--status-success); /* 3px */
+}
+
+.toast-success .toast-icon {
+    color: var(--status-success);
+}
+
+.toast-success .toast-progress {
+    background: var(--status-success);
+}
+
+/* Error */
+.toast-error {
+    border-left: 0.1875rem solid var(--status-error);
+}
+
+.toast-error .toast-icon {
+    color: var(--status-error);
+}
+
+.toast-error .toast-progress {
+    background: var(--status-error);
+}
+
+/* Warning */
+.toast-warning {
+    border-left: 0.1875rem solid var(--status-warning);
+}
+
+.toast-warning .toast-icon {
+    color: var(--status-warning);
+}
+
+.toast-warning .toast-progress {
+    background: var(--status-warning);
+}
+
+/* Info */
+.toast-info {
+    border-left: 0.1875rem solid var(--status-info);
+}
+
+.toast-info .toast-icon {
+    color: var(--status-info);
+}
+
+.toast-info .toast-progress {
+    background: var(--status-info);
+}
+
+/* ========================================
+   TOAST ICON
+   ======================================== */
+
+.toast-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+    margin-top: 0.0625rem; /* 1px — align with text */
+}
+
+.toast-icon svg {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+}
+
+/* ========================================
+   TOAST BODY
+   ======================================== */
+
+.toast-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-family: var(--font-body);
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin-bottom: 0.125rem; /* 2px */
+}
+
+.toast-message {
+    font-size: 0.8125rem; /* 13px */
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* When no title, make message slightly larger */
+.toast-body > .toast-message:first-child {
+    font-size: 0.875rem; /* 14px */
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* ========================================
+   TOAST CLOSE BUTTON
+   ======================================== */
+
+.toast-close {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem; /* 24px */
+    height: 1.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast) var(--ease-default);
+    padding: 0;
+}
+
+.toast-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.toast-close svg {
+    width: 0.875rem; /* 14px */
+    height: 0.875rem;
+}
+
+/* ========================================
+   TOAST PROGRESS BAR
+   ======================================== */
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 0.125rem; /* 2px */
+    width: 100%;
+    opacity: 0.4;
+    transform-origin: left;
+    animation: toastProgress linear forwards;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(1.5rem); /* 24px */
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+        max-height: 6.25rem; /* 100px */
+        margin-bottom: 0;
+    }
+    to {
+        opacity: 0;
+        transform: translateX(1.5rem);
+        max-height: 0;
+        margin-bottom: -0.625rem; /* -10px — collapse gap */
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
+
+.toast-exit {
+    animation: toastSlideOut var(--duration-slow) var(--ease-default) forwards;
+}
+
+@keyframes toastProgress {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .toast-container {
+        top: auto;
+        bottom: 1rem; /* 16px */
+        right: 1rem;
+        left: 1rem;
+        max-width: none;
+    }
+
+    .toast {
+        padding: 0.75rem; /* 12px */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .toast {
+        animation: none;
+        opacity: 1;
+    }
+
+    .toast-exit {
+        animation: none;
+        display: none;
+    }
+
+    .toast-progress {
+        animation: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .toast {
+        border-width: var(--border-width-thick);
+    }
+}

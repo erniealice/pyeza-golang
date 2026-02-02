@@ -1,0 +1,128 @@
+{{/*
+================================================================================
+SHEET-FORM COMPONENT
+================================================================================
+
+Slide-in sheet for displaying forms without navigating away from the page.
+Replaces the old form-drawer component.
+
+Usage - Basic:
+    {{template "sheet-form" dict
+        "CommonLabels" .CommonLabels
+        "Title" "Add Item"
+    }}
+
+Usage - With custom ID:
+    {{template "sheet-form" dict
+        "CommonLabels" .CommonLabels
+        "ID" "addClientSheet"
+        "Title" "Add Client"
+    }}
+
+Usage - Edit mode:
+    {{template "sheet-form" dict
+        "CommonLabels" .CommonLabels
+        "Title" "Edit Client"
+        "IsEdit" true
+    }}
+
+HTMX Loading:
+    Content is loaded into #sheetContent via HTMX.
+
+Classes:
+    - .sheet: Container
+    - .sheet-form: Form variant modifier
+    - .sheet-panel-md: Medium width (28.125rem)
+
+JavaScript:
+    Sheet.open('form') - Open the form sheet
+    Sheet.close() - Close the sheet
+    Sheet.setTitle('Title') - Update title
+================================================================================
+*/}}
+
+{{define "sheet-form"}}
+<div id="sheet" class="sheet sheet-form">
+    <div class="sheet-overlay" id="sheetOverlay"></div>
+    <div class="sheet-panel sheet-panel-md">
+        <div class="sheet-header">
+            <h2 id="sheetTitle" class="sheet-title">{{if .Title}}{{.Title}}{{else}}{{if .IsEdit}}{{.CommonLabels.Buttons.Edit}}{{else}}{{.CommonLabels.Buttons.Add}}{{end}}{{end}}</h2>
+            <div class="sheet-header-actions">
+                <button type="button" class="sheet-close" id="sheetClose" aria-label="Close">
+                    {{template "icon-x" .}}
+                </button>
+            </div>
+        </div>
+        <div class="sheet-content" id="sheetContent">
+            <!-- HTMX loads form here -->
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{/*
+================================================================================
+SHEET-FORM-FOOTER - Reusable footer for form sheets
+================================================================================
+
+Usage - Basic (Save button only):
+    {{template "sheet-form-footer" dict "CommonLabels" .CommonLabels}}
+
+Usage - With Cancel:
+    {{template "sheet-form-footer" dict "CommonLabels" .CommonLabels "ShowCancel" true}}
+
+Usage - Edit mode (Update button):
+    {{template "sheet-form-footer" dict "CommonLabels" .CommonLabels "ShowCancel" true "IsEdit" true}}
+
+Usage - Custom Submit Label:
+    {{template "sheet-form-footer" dict
+        "CommonLabels" .CommonLabels
+        "ShowCancel" true
+        "SubmitLabel" "Create"
+    }}
+
+Usage - Custom buttons (full control):
+    {{template "sheet-form-footer" dict
+        "CommonLabels" .CommonLabels
+        "ShowCancel" true
+        "SubmitLabel" "Send"
+        "CancelLabel" "Discard"
+        "SubmitIcon" "icon-send"
+    }}
+================================================================================
+*/}}
+
+{{define "sheet-form-footer"}}
+<div class="sheet-footer">
+    {{if .ShowCancel}}
+    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{if .CancelLabel}}{{.CancelLabel}}{{else}}{{.CommonLabels.Buttons.Cancel}}{{end}}</button>
+    {{end}}
+    <button type="submit" class="btn btn-primary">
+        {{if .SubmitLabel}}{{.SubmitLabel}}{{else if .IsEdit}}{{.CommonLabels.Buttons.Update}}{{else}}{{.CommonLabels.Buttons.Save}}{{end}}
+    </button>
+</div>
+{{end}}
+
+{{/*
+Variants for convenience:
+*/}}
+
+{{define "sheet-form-footer-save"}}
+<div class="sheet-footer">
+    <button type="submit" class="btn btn-primary">{{.CommonLabels.Buttons.Save}}</button>
+</div>
+{{end}}
+
+{{define "sheet-form-footer-cancel-save"}}
+<div class="sheet-footer">
+    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{.CommonLabels.Buttons.Cancel}}</button>
+    <button type="submit" class="btn btn-primary">{{.CommonLabels.Buttons.Save}}</button>
+</div>
+{{end}}
+
+{{define "sheet-form-footer-cancel-update"}}
+<div class="sheet-footer">
+    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{.CommonLabels.Buttons.Cancel}}</button>
+    <button type="submit" class="btn btn-primary">{{.CommonLabels.Buttons.Update}}</button>
+</div>
+{{end}}

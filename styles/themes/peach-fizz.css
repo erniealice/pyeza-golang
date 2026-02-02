@@ -1,0 +1,68 @@
+/*
+ * ==========================================================================
+ * THEME: PEACH FIZZ
+ * Friendly, approachable, informal — warm peach and soft coral tones
+ * Think: casual team apps, startup dashboards, Friday vibes
+ * ==========================================================================
+ */
+[data-theme="peach-fizz"] {
+    /* Backgrounds — soft, warm, inviting */
+    --bg-base: #FEF8F4;
+    --bg-sidebar: #FAF0EA;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F6EBE3;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(70, 45, 30, 0.4);
+
+    /* Text — warm dark brown, not harsh black */
+    --text-primary: #3D2E24;
+    --text-secondary: #7A6558;
+    --text-muted: #B09D92;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — friendly peach-coral */
+    --accent-primary: #E87461;
+    --accent-primary-light: #FEF0ED;
+    --accent-primary-dark: #D4604E;
+
+    /* Secondary Accents — cheerful, varied */
+    --accent-terracotta: #E87461;
+    --accent-terracotta-light: #FEF0ED;
+    --accent-terracotta-dark: #D4604E;
+    --accent-sage: #5DAE8B;
+    --accent-sage-light: #EBF7F1;
+    --accent-navy: #5B8DB8;
+    --accent-navy-light: #EDF4FA;
+    --accent-navy-dark: #4A78A0;
+    --accent-amber: #E2A64B;
+    --accent-amber-light: #FDF5E7;
+    --accent-plum: #B07BAD;
+    --accent-slate: #8A7E78;
+
+    /* Status Colors — softer, friendlier */
+    --status-success: #5DAE8B;
+    --status-success-light: #EBF7F1;
+    --status-warning: #E2A64B;
+    --status-warning-light: #FDF5E7;
+    --status-error: #E87461;
+    --status-error-light: #FEF0ED;
+    --status-info: #5B8DB8;
+    --status-info-light: #EDF4FA;
+
+    /* Borders & Shadows — soft, rounded feel */
+    --border: #EBE0D8;
+    --border-light: #F3ECE6;
+    --border-focus: var(--accent-primary);
+    --border-default: #EBE0D8;
+    --shadow-sm: 0 1px 3px rgba(70, 45, 30, 0.05);
+    --shadow-md: 0 4px 14px rgba(70, 45, 30, 0.07);
+    --shadow-lg: 0 8px 28px rgba(70, 45, 30, 0.09);
+    --shadow-card: 0 2px 10px rgba(70, 45, 30, 0.05), 0 1px 3px rgba(70, 45, 30, 0.04);
+    --shadow-float: 0 14px 44px rgba(70, 45, 30, 0.14);
+    --shadow-xl: 0 22px 56px rgba(70, 45, 30, 0.12);
+
+    /* Theme Meta */
+    --theme-name: "Peach Fizz";
+    --theme-icon-bg: linear-gradient(135deg, #FEF8F4 0%, #F6EBE3 100%);
+    --theme-icon-accent: #E87461;
+}

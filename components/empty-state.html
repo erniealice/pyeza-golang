@@ -1,0 +1,48 @@
+{{/*
+    Empty State Component
+
+    A centered placeholder component for empty views and states.
+
+    Usage:
+        {{template "empty-state" dict "Icon" "icon-users" "Title" "No Clients" "Desc" "Add your first client to get started." "BtnText" "Add Client" "BtnHref" "/clients/new"}}
+
+    Parameters:
+        - Icon: (optional) Icon template name to display (e.g., "icon-users", "icon-file-text")
+        - Title: (required) Main heading text
+        - Desc: (optional) Description/helper text below the title
+        - BtnText: (optional) Action button text - omit to hide button
+        - BtnHref: (optional) Action button link URL
+        - BtnIcon: (optional) Icon for the button (e.g., "icon-plus")
+        - Class: (optional) Additional CSS classes for the container
+
+    Example - Basic:
+        {{template "empty-state" dict "Title" "No results found"}}
+
+    Example - With icon and description:
+        {{template "empty-state" dict "Icon" "icon-user-minus" "Title" "No Active Clients" "Desc" "Your active clients will appear here."}}
+
+    Example - Full with action button:
+        {{template "empty-state" dict "Icon" "icon-dollar-sign" "Title" "Charge Rates" "Desc" "Configure billing rates for this client" "BtnText" "Add Rate" "BtnIcon" "icon-plus" "BtnHref" "#"}}
+*/}}
+
+{{define "empty-state"}}
+<div class="empty-state{{if .Class}} {{.Class}}{{end}}">
+    {{if .Icon}}
+    <div class="empty-icon" data-icon="{{.Icon}}"></div>
+    {{end}}
+
+    {{if .Title}}
+    <h3 class="empty-state-title">{{.Title}}</h3>
+    {{end}}
+
+    {{if .Desc}}
+    <p class="empty-state-desc">{{.Desc}}</p>
+    {{end}}
+
+    {{if .BtnText}}
+    <a href="{{if .BtnHref}}{{.BtnHref}}{{else}}#{{end}}" class="btn-primary empty-state-btn">
+        {{.BtnText}}
+    </a>
+    {{end}}
+</div>
+{{end}}

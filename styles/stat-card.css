@@ -1,0 +1,395 @@
+/*
+ * ==========================================================================
+ * STAT-CARD.CSS - Stat Card Component Styles
+ * ==========================================================================
+ * Styles for statistical display cards showing metrics, KPIs, and summaries.
+ *
+ * VARIANTS INCLUDED:
+ * - .stat-card: Full-size stat card with trends (dashboard)
+ * - .stat-mini: Compact stat display (page summaries)
+ * - .connected-stats: Integration connection status indicator
+ *
+ * COLOR VARIANTS:
+ * - terracotta: Primary accent
+ * - sage: Success/positive
+ * - navy: Info/secondary
+ * - amber: Warning/attention
+ * ==========================================================================
+ */
+
+/* ========================================
+   STATS ROW CONTAINER
+   ======================================== */
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+/* ========================================
+   STAT CARD (Full Size)
+   Used in: index3.html dashboard
+   ======================================== */
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative gradient circle */
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background: var(--stat-gradient);
+    border-radius: var(--radius-round);
+    transform: translate(40%, -40%);
+    opacity: 0.08;
+    pointer-events: none;
+}
+
+/* Color variants */
+.stat-card:nth-child(1),
+.stat-card--terracotta { --stat-gradient: var(--accent-terracotta); }
+.stat-card:nth-child(2),
+.stat-card--sage { --stat-gradient: var(--accent-sage); }
+.stat-card:nth-child(3),
+.stat-card--navy { --stat-gradient: var(--accent-navy); }
+.stat-card:nth-child(4),
+.stat-card--amber { --stat-gradient: var(--accent-amber); }
+
+.stat-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+/* Stat Header */
+.stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+/* Stat Icon */
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* Icon color variants by position */
+.stat-card:nth-child(1) .stat-icon {
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+.stat-card:nth-child(2) .stat-icon {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+.stat-card:nth-child(3) .stat-icon {
+    background: var(--accent-navy-light);
+    color: var(--accent-navy);
+}
+.stat-card:nth-child(4) .stat-icon {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+/* Explicit color classes */
+.stat-icon.terracotta {
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+.stat-icon.sage {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+.stat-icon.navy {
+    background: var(--accent-navy-light);
+    color: var(--accent-navy);
+}
+.stat-icon.amber {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+/* Trend Indicator */
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+}
+
+.stat-trend svg {
+    width: 14px;
+    height: 14px;
+}
+
+.stat-trend.up {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+
+.stat-trend.down {
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+
+.stat-trend.neutral {
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+
+/* Stat Value */
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+/* Stat Label */
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* ========================================
+   STAT MINI (Compact)
+   Used in: templates.html stats summary
+   ======================================== */
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-mini {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.stat-mini:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--accent-terracotta-light);
+}
+
+/* Mini Icon */
+.stat-mini-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-mini-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Mini icon color variants */
+.stat-mini-icon.total {
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+.stat-mini-icon.active {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+.stat-mini-icon.draft {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+.stat-mini-icon.archived {
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+
+/* Explicit color classes for stat-mini-icon */
+.stat-mini-icon.terracotta {
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+.stat-mini-icon.sage {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+.stat-mini-icon.navy {
+    background: var(--accent-navy-light);
+    color: var(--accent-navy);
+}
+.stat-mini-icon.amber {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+/* Mini Content */
+.stat-mini-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-mini-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.stat-mini-label {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+/* ========================================
+   CONNECTED STATS
+   Used in: marketplace.html
+   ======================================== */
+
+.connected-stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--accent-sage-light);
+    border-radius: var(--radius-md);
+    margin-bottom: 32px;
+}
+
+.connected-stats svg {
+    width: 20px;
+    height: 20px;
+    color: var(--accent-sage);
+    flex-shrink: 0;
+}
+
+.connected-stats span {
+    font-size: 0.9375rem;
+    color: var(--accent-sage);
+    font-weight: 500;
+}
+
+.connected-stats strong {
+    font-weight: 700;
+}
+
+/* ========================================
+   STAT CARD ANIMATIONS
+   ======================================== */
+
+.stat-card:nth-child(1) { animation: statFadeIn 0.5s ease-out 0.15s both; }
+.stat-card:nth-child(2) { animation: statFadeIn 0.5s ease-out 0.2s both; }
+.stat-card:nth-child(3) { animation: statFadeIn 0.5s ease-out 0.25s both; }
+.stat-card:nth-child(4) { animation: statFadeIn 0.5s ease-out 0.3s both; }
+
+@keyframes statFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mini stats animation */
+.stat-mini:nth-child(1) { animation: statFadeIn 0.4s ease-out 0.1s both; }
+.stat-mini:nth-child(2) { animation: statFadeIn 0.4s ease-out 0.15s both; }
+.stat-mini:nth-child(3) { animation: statFadeIn 0.4s ease-out 0.2s both; }
+.stat-mini:nth-child(4) { animation: statFadeIn 0.4s ease-out 0.25s both; }
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1200px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stats-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+
+    .stat-mini {
+        padding: 14px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .stat-card,
+    .stat-mini {
+        animation: none;
+        transition: none;
+    }
+
+    .stat-card:hover {
+        transform: none;
+    }
+}

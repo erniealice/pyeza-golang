@@ -1,0 +1,164 @@
+{{/*
+================================================================================
+DROPDOWN COMPONENT
+================================================================================
+A versatile dropdown component supporting filter dropdowns (with checkmarks)
+and action menus.
+
+FILTER DROPDOWN USAGE:
+----------------------
+{{template "dropdown-filter" (dict
+    "ID" "filterDropdown"           // Unique ID for the dropdown
+    "Label" "All Types"             // Current selection label
+    "Header" "Filter by Type"       // Optional: menu header text
+    "Icon" "filter"                 // Optional: icon name (filter, chevron-down)
+    "Options" .FilterOptions        // Slice of filter options
+    "Class" ""                      // Optional: additional CSS classes
+)}}
+
+FILTER OPTIONS FORMAT:
+----------------------
+[
+    {"Value": "all", "Label": "All Types", "Active": true},
+    {"Value": "award", "Label": "Award Based", "Active": false},
+    {"Value": "eba", "Label": "EBA Based", "Active": false}
+]
+
+ACTION DROPDOWN USAGE:
+----------------------
+{{template "dropdown-action" (dict
+    "ID" "actionDropdown"
+    "Label" "Actions"               // Button label
+    "Items" .ActionItems            // Slice of action items
+    "Position" "right"              // Optional: left or right alignment
+    "Class" ""                      // Optional: additional CSS classes
+)}}
+
+ACTION ITEMS FORMAT:
+--------------------
+[
+    {"Action": "view", "Label": "View", "Icon": "eye"},
+    {"Action": "edit", "Label": "Edit", "Icon": "edit"},
+    {"Action": "delete", "Label": "Delete", "Icon": "trash", "Danger": true},
+    {"Divider": true}               // Adds a separator line
+]
+================================================================================
+*/}}
+
+{{/*
+================================================================================
+FILTER DROPDOWN
+================================================================================
+Dropdown with checkmark indicators for single-select filtering.
+*/}}
+
+{{define "dropdown-filter"}}
+<div class="filter-dropdown{{if .Class}} {{.Class}}{{end}}" id="{{.ID}}">
+    <button type="button" class="filter-btn" id="{{.ID}}Btn" aria-haspopup="listbox" aria-expanded="false">
+        {{if eq .Icon "filter"}}
+        {{template "icon-filter"}}
+        {{end}}
+        <span id="{{.ID}}Label">{{.Label}}</span>
+        {{template "icon-chevron-down"}}
+    </button>
+
+    <div class="filter-menu" role="listbox" aria-labelledby="{{.ID}}Btn">
+        {{if .Header}}
+        <div class="filter-menu-header">{{.Header}}</div>
+        {{end}}
+
+        {{range .Options}}
+        <div class="filter-option{{if .Active}} active{{end}}"
+             data-filter="{{.Value}}"
+             role="option"
+             aria-selected="{{if .Active}}true{{else}}false{{end}}"
+             tabindex="0">
+            <span class="filter-check" aria-hidden="true">
+                {{template "icon-check"}}
+            </span>
+            <span>{{.Label}}</span>
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/*
+================================================================================
+ACTION DROPDOWN
+================================================================================
+Dropdown menu for contextual actions.
+*/}}
+
+{{define "dropdown-action"}}
+<div class="action-dropdown{{if .Class}} {{.Class}}{{end}}{{if eq .Position "left"}} position-left{{end}}" id="{{.ID}}">
+    <button type="button" class="action-dropdown-btn" id="{{.ID}}Btn" aria-haspopup="menu" aria-expanded="false">
+        {{.Label}}
+        {{template "icon-chevron-down"}}
+    </button>
+
+    <div class="action-dropdown-menu" role="menu" aria-labelledby="{{.ID}}Btn">
+        {{range .Items}}
+        {{if .Divider}}
+        <div class="action-dropdown-divider" role="separator"></div>
+        {{else}}
+        <div class="action-dropdown-item{{if .Danger}} danger{{end}}"
+             data-action="{{.Action}}"
+             role="menuitem"
+             tabindex="0">
+            {{if eq .Icon "eye"}}
+            {{template "icon-eye"}}
+            {{else if eq .Icon "edit"}}
+            {{template "icon-edit"}}
+            {{else if eq .Icon "copy"}}
+            {{template "icon-copy"}}
+            {{else if eq .Icon "trash"}}
+            {{template "icon-trash-2"}}
+            {{else if eq .Icon "download"}}
+            {{template "icon-download"}}
+            {{else if eq .Icon "upload"}}
+            {{template "icon-upload"}}
+            {{else if eq .Icon "archive"}}
+            {{template "icon-archive"}}
+            {{else if eq .Icon "settings"}}
+            {{template "icon-settings"}}
+            {{else if eq .Icon "plus"}}
+            {{template "icon-plus"}}
+            {{end}}
+            {{.Label}}
+        </div>
+        {{end}}
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/*
+================================================================================
+SIMPLE DROPDOWN (Icon Button)
+================================================================================
+A minimal dropdown triggered by an icon button, ideal for table row actions.
+*/}}
+
+{{define "dropdown-icon"}}
+<div class="icon-dropdown{{if .Class}} {{.Class}}{{end}}" id="{{.ID}}">
+    <button type="button" class="icon-dropdown-btn" id="{{.ID}}Btn" aria-haspopup="menu" aria-expanded="false" title="{{if .Title}}{{.Title}}{{else}}More options{{end}}">
+        {{template "icon-more-vertical"}}
+    </button>
+
+    <div class="icon-dropdown-menu" role="menu" aria-labelledby="{{.ID}}Btn">
+        {{range .Items}}
+        {{if .Divider}}
+        <div class="icon-dropdown-divider" role="separator"></div>
+        {{else}}
+        <div class="icon-dropdown-item{{if .Danger}} danger{{end}}"
+             data-action="{{.Action}}"
+             role="menuitem"
+             tabindex="0">
+            {{.Label}}
+        </div>
+        {{end}}
+        {{end}}
+    </div>
+</div>
+{{end}}

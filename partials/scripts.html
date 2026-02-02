@@ -1,0 +1,16 @@
+{{define "scripts"}}
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+(function() {
+    // Keyboard shortcut for search (Ctrl+K)
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            const searchInput = document.querySelector('.search-bar input');
+            if (searchInput) searchInput.focus();
+        }
+    });
+})();
+</script>
+{{end}}

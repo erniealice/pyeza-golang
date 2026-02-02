@@ -1,0 +1,133 @@
+{{/*
+================================================================================
+SHEET COMPONENT - Unified slide-in panel
+================================================================================
+
+Base sheet component with header, content, and footer sections.
+
+Usage - Basic:
+    {{template "sheet" dict
+        "ID" "mySheet"
+        "Variant" "form"
+        "Title" "My Sheet"
+        "Content" .MyContent
+        "Footer" .MyFooter
+    }}
+
+Usage - Form variant:
+    {{template "sheet-form" dict
+        "CommonLabels" .CommonLabels
+        "Title" "Add Item"
+    }}
+
+Usage - Notification variant:
+    {{template "sheet-notification" dict
+        "CommonLabels" .CommonLabels
+    }}
+
+Variants:
+    - "form": Medium width (28.125rem), form-specific styling
+    - "notification": Small width (23.75rem), notification-specific styling
+    - "lg": Large width (37.5rem)
+
+Width modifiers (via PanelWidth):
+    - "sm": 23.75rem
+    - "md": 28.125rem (default for forms)
+    - "lg": 37.5rem
+
+Classes automatically applied:
+    - .sheet: Container
+    - .sheet--{Variant}: Variant modifier
+    - .sheet-panel--{PanelWidth}: Width modifier
+================================================================================
+*/}}
+
+{{define "sheet"}}
+{{$variant := .Variant}}
+{{if $variant}}{{else}}
+{{$variant = "form"}}
+{{end}}
+{{$panelWidth := .PanelWidth}}
+{{if $panelWidth}}{{else}}
+{{if eq $variant "notification"}}
+{{$panelWidth = "sm"}}
+{{else}}
+{{$panelWidth = "md"}}
+{{end}}
+{{end}}
+{{$id := .ID}}
+{{if $id}}{{else}}
+{{$id = "sheet"}}
+{{end}}
+
+<div id="{{$id}}" class="sheet sheet--{{$variant}}">
+    <div class="sheet-overlay"></div>
+    <div class="sheet-panel sheet-panel--{{$panelWidth}}">
+        {{if .Header}}
+        <div class="sheet-header">
+            {{if .Title}}
+            <h2 class="sheet-title">{{.Title}}</h2>
+            {{end}}
+            <div class="sheet-header-actions">
+                {{if .HeaderActions}}
+                {{.HeaderActions}}
+                {{end}}
+                <button type="button" class="sheet-close" data-sheet-close="{{$id}}" aria-label="Close">
+                    {{template "icon-x" .}}
+                </button>
+            </div>
+        </div>
+        {{end}}
+
+        <div class="sheet-content">
+            {{.Content}}
+        </div>
+
+        {{if .Footer}}
+        <div class="sheet-footer">
+            {{.Footer}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/*
+SHEET HEADER COMPONENT
+Standalone header for custom sheet layouts
+*/}}
+{{define "sheet-header"}}
+<div class="sheet-header">
+    {{if .Title}}
+    <h2 class="sheet-title">{{.Title}}</h2>
+    {{end}}
+    <div class="sheet-header-actions">
+        {{if .Actions}}
+        {{.Actions}}
+        {{end}}
+        <button type="button" class="sheet-close" aria-label="Close">
+            {{template "icon-x" .}}
+        </button>
+    </div>
+</div>
+{{end}}
+
+{{/*
+SHEET FOOTER COMPONENT
+Standalone footer for custom sheet layouts
+*/}}
+{{define "sheet-footer"}}
+<div class="sheet-footer">
+    {{.}}
+</div>
+{{end}}
+
+{{/*
+SHEET CONTENT COMPONENT
+Standalone content wrapper for custom sheet layouts
+*/}}
+{{define "sheet-content"}}
+<div class="sheet-content">
+    {{.}}
+</div>
+{{end}}

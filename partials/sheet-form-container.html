@@ -1,0 +1,52 @@
+{{/*
+================================================================================
+SHEET FORM CONTAINER
+================================================================================
+
+Static container for form sheets used by Sheet.js.
+
+This provides the DOM structure that Sheet.js expects:
+- #sheet: Main drawer element
+- #sheetOverlay: Clickable overlay to close
+- #sheetTitle: Title element (updated dynamically)
+- #sheetContent: Content area where HTMX loads forms
+- #sheetClose: Close button
+
+The Sheet.js JavaScript (assets/js/components/sheet.js) manages:
+- Opening/closing the sheet
+- Setting the title dynamically
+- Handling form submissions
+- Focus management
+
+Usage:
+    Include this in page-end.html or app-shell.html
+    Buttons should use:
+        hx-target="#sheetContent"
+        hx-swap="innerHTML"
+        onclick="Sheet.open('Title')"
+
+================================================================================
+*/}}
+
+{{define "sheet-form-container"}}
+<div id="sheet" class="sheet sheet-form">
+    <div id="sheetOverlay" class="sheet-overlay"></div>
+    <div class="sheet-panel sheet-panel-md">
+        <div class="sheet-header">
+            <h2 id="sheetTitle" class="sheet-title"></h2>
+            <div class="sheet-header-actions">
+                <button id="sheetClose" type="button" class="sheet-close" aria-label="Close">
+                    {{template "icon-x"}}
+                </button>
+            </div>
+        </div>
+
+        <div id="sheetContent" class="sheet-content">
+            <!-- Form content will be loaded here by HTMX -->
+        </div>
+    </div>
+</div>
+
+<!-- Sheet.js Form Drawer Script -->
+<script src="/assets/js/components/sheet.js?v={{.CacheVersion}}"></script>
+{{end}}

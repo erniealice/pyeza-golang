@@ -1,0 +1,20 @@
+{{define "help-pane-oob"}}
+{{if .HasHelp}}
+<aside class="help-pane" id="helpPane" hx-swap-oob="true" aria-label="Help content">
+    <div class="help-pane-header">
+        <div class="help-pane-title">
+            {{template "icon-help" .}}
+            <span>{{.CommonLabels.HelpPane.Title}}</span>
+        </div>
+        <button class="help-pane-close" id="helpPaneClose" aria-label="{{.CommonLabels.HelpPane.Close}}">
+            {{template "icon-x" .}}
+        </button>
+    </div>
+    <div class="help-pane-content markdown-content">
+        {{.HelpContent}}
+    </div>
+</aside>
+{{else}}
+<aside class="help-pane" id="helpPane" hx-swap-oob="true" aria-label="Help content" style="display: none;"></aside>
+{{end}}
+{{end}}

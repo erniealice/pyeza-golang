@@ -1,0 +1,174 @@
+{{/*
+================================================================================
+FORM GROUP COMPONENT
+================================================================================
+A comprehensive form group component supporting multiple input types with
+consistent styling, validation states, and layout options.
+
+USAGE:
+------
+{{template "form-group" (dict
+    "Type" "text"           // text, email, tel, select, textarea, date, number, password, url
+    "Name" "fieldName"      // Field name for form submission
+    "ID" "fieldId"          // Optional: element ID (defaults to Name)
+    "Label" "Field Label"   // Label text
+    "Placeholder" ""        // Optional: placeholder text
+    "Value" ""              // Optional: current value
+    "Hint" ""               // Optional: help text below input
+    "Required" false        // Optional: mark as required
+    "Disabled" false        // Optional: disable input
+    "Readonly" false        // Optional: readonly input
+    "Error" ""              // Optional: error message (triggers error state)
+    "Options" nil           // Required for select: slice of option maps
+    "Rows" 4                // Optional: textarea rows (default 4)
+    "Min" ""                // Optional: min value for number/date
+    "Max" ""                // Optional: max value for number/date
+    "Step" ""               // Optional: step for number input
+    "Pattern" ""            // Optional: validation pattern
+    "Autocomplete" ""       // Optional: autocomplete attribute
+    "Class" ""              // Optional: additional CSS classes
+)}}
+
+SELECT OPTIONS FORMAT:
+----------------------
+Options should be a slice of maps:
+[
+    {"Value": "val1", "Label": "Label 1", "Selected": false},
+    {"Value": "val2", "Label": "Label 2", "Selected": true}
+]
+
+FORM ROW LAYOUTS:
+-----------------
+Wrap form-groups in div.form-row for multi-column layouts:
+- .form-row              : 2 columns (default)
+- .form-row.single       : 1 column (full width)
+- .form-row.form-row-thirds : 3 columns
+================================================================================
+*/}}
+
+{{define "form-group"}}
+<div class="form-group{{if .Error}} has-error{{end}}{{if .Class}} {{.Class}}{{end}}">
+    {{if .Label}}
+    <label class="form-label" {{if or .ID .Name}}for="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}>
+        {{.Label}}{{if .Required}} <span class="form-required" aria-hidden="true">*</span>{{end}}
+    </label>
+    {{end}}
+
+    {{if eq .Type "textarea"}}
+    {{/* ===== TEXTAREA ===== */}}
+    <textarea
+        class="form-textarea{{if .Error}} is-invalid{{end}}"
+        {{if or .ID .Name}}id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
+        {{if .Name}}name="{{.Name}}"{{end}}
+        {{if .Placeholder}}placeholder="{{.Placeholder}}"{{end}}
+        {{if .Required}}required aria-required="true"{{end}}
+        {{if .Disabled}}disabled{{end}}
+        {{if .Readonly}}readonly{{end}}
+        {{if .Rows}}rows="{{.Rows}}"{{else}}rows="4"{{end}}
+        {{if .Error}}aria-invalid="true" aria-describedby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-error"{{end}}
+    >{{.Value}}</textarea>
+
+    {{else if eq .Type "select"}}
+    {{/* ===== SELECT ===== */}}
+    <select
+        class="form-select{{if .Error}} is-invalid{{end}}"
+        {{if or .ID .Name}}id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
+        {{if .Name}}name="{{.Name}}"{{end}}
+        {{if .Required}}required aria-required="true"{{end}}
+        {{if .Disabled}}disabled{{end}}
+        {{if .Error}}aria-invalid="true" aria-describedby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-error"{{end}}
+    >
+        {{if .Placeholder}}
+        <option value="" disabled {{if not .Value}}selected{{end}}>{{.Placeholder}}</option>
+        {{end}}
+        {{range .Options}}
+        <option value="{{.Value}}" {{if .Selected}}selected{{end}}>{{.Label}}</option>
+        {{end}}
+    </select>
+
+    {{else}}
+    {{/* ===== INPUT (text, email, tel, date, number, password, url) ===== */}}
+    <input
+        type="{{if .Type}}{{.Type}}{{else}}text{{end}}"
+        class="form-input{{if .Error}} is-invalid{{end}}"
+        {{if or .ID .Name}}id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
+        {{if .Name}}name="{{.Name}}"{{end}}
+        {{if .Value}}value="{{.Value}}"{{end}}
+        {{if .Placeholder}}placeholder="{{.Placeholder}}"{{end}}
+        {{if .Required}}required aria-required="true"{{end}}
+        {{if .Disabled}}disabled{{end}}
+        {{if .Readonly}}readonly{{end}}
+        {{if .Min}}min="{{.Min}}"{{end}}
+        {{if .Max}}max="{{.Max}}"{{end}}
+        {{if .Step}}step="{{.Step}}"{{end}}
+        {{if .Pattern}}pattern="{{.Pattern}}"{{end}}
+        {{if .Autocomplete}}autocomplete="{{.Autocomplete}}"{{end}}
+        {{if .Error}}aria-invalid="true" aria-describedby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-error"{{end}}
+    >
+    {{end}}
+
+    {{/* ===== HINT TEXT ===== */}}
+    {{if and .Hint (not .Error)}}
+    <span class="form-hint" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-hint">{{.Hint}}</span>
+    {{end}}
+
+    {{/* ===== ERROR MESSAGE ===== */}}
+    {{if .Error}}
+    <span class="form-error" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-error" role="alert">
+        {{template "icon-alert-circle"}}
+        {{.Error}}
+    </span>
+    {{end}}
+</div>
+{{end}}
+
+{{/*
+================================================================================
+FORM ROW COMPONENT
+================================================================================
+A wrapper for creating multi-column form layouts.
+
+USAGE:
+------
+{{template "form-row" (dict
+    "Layout" "double"       // single, double, thirds
+    "Class" ""              // Optional: additional CSS classes
+    "Content" .Content      // Inner HTML content (form groups)
+)}}
+
+Note: In Go templates, you typically wrap form-groups manually:
+<div class="form-row">
+    {{template "form-group" (dict "Type" "text" ...)}}
+    {{template "form-group" (dict "Type" "text" ...)}}
+</div>
+================================================================================
+*/}}
+
+{{define "form-row"}}
+<div class="form-row{{if eq .Layout "single"}} single{{else if eq .Layout "thirds"}} form-row-thirds{{end}}{{if .Class}} {{.Class}}{{end}}">
+    {{.Content}}
+</div>
+{{end}}
+
+{{/*
+================================================================================
+FORM SECTION COMPONENT
+================================================================================
+A section divider with title for organizing form content.
+
+USAGE:
+------
+{{template "form-section" (dict
+    "Title" "Section Title"
+    "Class" ""              // Optional: additional CSS classes
+)}}
+================================================================================
+*/}}
+
+{{define "form-section"}}
+<div class="form-section{{if .Class}} {{.Class}}{{end}}">
+    {{if .Title}}
+    <h3 class="form-section-title">{{.Title}}</h3>
+    {{end}}
+</div>
+{{end}}

@@ -1,0 +1,241 @@
+/*
+ * ==========================================================================
+ * ALERT COMPONENT STYLES (rem-based)
+ * ==========================================================================
+ * Inline persistent banners for contextual feedback.
+ * State variants: success, error, warning, info.
+ * Style variants: subtle (default), filled, outlined.
+ * ==========================================================================
+ */
+
+/* ========================================
+   BASE ALERT
+   ======================================== */
+
+.alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem; /* 12px */
+    padding: 0.875rem 1rem; /* 14px 16px */
+    border-radius: var(--radius-md);
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+    border: var(--border-width) solid transparent;
+}
+
+/* ========================================
+   ALERT ICON
+   ======================================== */
+
+.alert > .alert-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+    margin-top: 0.0625rem; /* 1px — align with text */
+}
+
+.alert > .alert-icon svg {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+}
+
+/* ========================================
+   ALERT BODY
+   ======================================== */
+
+.alert-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.alert-title {
+    font-weight: 600;
+    color: inherit;
+    margin-bottom: 0.125rem; /* 2px */
+}
+
+.alert-message {
+    color: inherit;
+    opacity: 0.85;
+}
+
+/* When no title, make the message full opacity */
+.alert-body > .alert-message:first-child {
+    opacity: 1;
+}
+
+/* ========================================
+   DISMISS BUTTON
+   ======================================== */
+
+.alert-dismiss {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem; /* 24px */
+    height: 1.5rem;
+    border: none;
+    background: transparent;
+    color: inherit;
+    opacity: 0.5;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: opacity var(--duration-fast) var(--ease-default);
+    padding: 0;
+}
+
+.alert-dismiss:hover {
+    opacity: 1;
+}
+
+.alert-dismiss svg {
+    width: 0.875rem; /* 14px */
+    height: 0.875rem;
+}
+
+/* ========================================
+   SUBTLE VARIANT (default)
+   ========================================
+   Light background tint with state color text.
+   ======================================== */
+
+/* Success — subtle */
+.alert-success.alert-subtle {
+    background: var(--status-success-light);
+    color: var(--status-success);
+    border-color: transparent;
+}
+
+/* Error — subtle */
+.alert-error.alert-subtle {
+    background: var(--status-error-light);
+    color: var(--status-error);
+    border-color: transparent;
+}
+
+/* Warning — subtle */
+.alert-warning.alert-subtle {
+    background: var(--status-warning-light);
+    color: var(--status-warning);
+    border-color: transparent;
+}
+
+/* Info — subtle */
+.alert-info.alert-subtle {
+    background: var(--status-info-light);
+    color: var(--status-info);
+    border-color: transparent;
+}
+
+/* ========================================
+   FILLED VARIANT
+   ========================================
+   Solid background with inverse text.
+   ======================================== */
+
+/* Success — filled */
+.alert-success.alert-filled {
+    background: var(--status-success);
+    color: var(--text-inverse);
+}
+
+/* Error — filled */
+.alert-error.alert-filled {
+    background: var(--status-error);
+    color: var(--text-inverse);
+}
+
+/* Warning — filled */
+.alert-warning.alert-filled {
+    background: var(--status-warning);
+    color: var(--text-inverse);
+}
+
+/* Info — filled */
+.alert-info.alert-filled {
+    background: var(--status-info);
+    color: var(--text-inverse);
+}
+
+.alert.alert-filled .alert-message {
+    opacity: 0.9;
+}
+
+/* ========================================
+   OUTLINED VARIANT
+   ========================================
+   Transparent background with colored border.
+   ======================================== */
+
+/* Success — outlined */
+.alert-success.alert-outlined {
+    background: transparent;
+    color: var(--status-success);
+    border-color: var(--status-success);
+}
+
+/* Error — outlined */
+.alert-error.alert-outlined {
+    background: transparent;
+    color: var(--status-error);
+    border-color: var(--status-error);
+}
+
+/* Warning — outlined */
+.alert-warning.alert-outlined {
+    background: transparent;
+    color: var(--status-warning);
+    border-color: var(--status-warning);
+}
+
+/* Info — outlined */
+.alert-info.alert-outlined {
+    background: transparent;
+    color: var(--status-info);
+    border-color: var(--status-info);
+}
+
+/* ========================================
+   ALERT GROUP
+   ======================================== */
+
+.alert-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* 8px */
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .alert {
+        padding: 0.75rem; /* 12px */
+        font-size: 0.8125rem; /* 13px */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .alert {
+        transition: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .alert {
+        border-width: var(--border-width-thick);
+    }
+
+    .alert.alert-subtle {
+        border-color: currentColor;
+    }
+}

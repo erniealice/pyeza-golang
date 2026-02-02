@@ -1,0 +1,825 @@
+{{/*
+================================================================================
+TABLE COMPONENT
+================================================================================
+A reusable data table component with toolbar (search, filters, sort, columns,
+export), sortable columns, pagination, and row selection capabilities.
+
+Usage:
+    {{template "table-card" .Table}}
+
+Required data structure (use shared.TableConfig):
+    .Table = TableConfig{
+        ID: "myTable",
+        CardClass: "my-table-card",
+        Columns: []TableColumn{
+            {Key: "name", Label: "Name", Sortable: true, MinWidth: "150px"},
+            {Key: "status", Label: "Status", Sortable: false, MinWidth: "100px"},
+            {Key: "amount", Label: "Amount", Align: "right", Width: "120px"},  // Fixed width
+        },
+        Rows: []TableRow{
+            {
+                ID: "1",
+                DataAttrs: map[string]string{"name": "John"},
+                Cells: []TableCell{
+                    {Type: "name", Value: "John", Alert: false},
+                    {Type: "badge", Value: "Active", Variant: "success"},
+                    {Type: "text", Value: "$100.00"},
+                },
+            },
+        },
+        ShowCheckbox: true,
+        ShowSearch: true,      // Show search input in toolbar
+        ShowFilters: true,     // Show advanced filter builder
+        ShowSort: true,        // Show sort dropdown
+        ShowColumns: true,     // Show column visibility toggle
+        ShowExport: true,      // Show export dropdown (CSV/Excel)
+        ShowEntries: true,     // Show entries selector in footer
+        Labels: TableLabels{
+            SearchPlaceholder: "Search...",
+            Filters: "Filters",
+            Sort: "Sort",
+            Columns: "Columns",
+            Export: "Export",
+            Show: "Show",
+            Entries: "entries",
+            ...
+        },
+        EmptyState: TableEmptyState{...},
+    }
+
+Cell Types:
+    - "text": Plain text (default)
+    - "name": Name with optional alert icon (for templates/clients)
+    - "badge": Badge with variant class
+    - "link": Clickable link
+    - "html": Custom HTML content
+    - "author": Author cell showing name on first line and date below
+    - "input": Editable text/number input with optional prefix (e.g., "$") or suffix (e.g., "%")
+    - "select": Dropdown select with options
+
+Minimal Mode:
+    Set Minimal: true to render the table without toolbar and footer.
+    Useful for embedded settings/configuration tables.
+
+Nested Column Groups:
+    Use ColumnGroups instead of Columns for multi-level headers:
+    ColumnGroups: []ColumnGroup{
+        {Label: "Job Rates", Columns: []TableColumn{
+            {Key: "jobDefault", Label: "Default"},
+            {Key: "jobMinimum", Label: "Minimum"},
+        }},
+    }
+
+JavaScript:
+    Include table scripts partial for full toolbar functionality:
+    {{template "table-scripts" .}}
+================================================================================
+*/}}
+
+{{/* TABLE CARD - Complete table with toolbar and footer */}}
+{{define "table-card"}}
+<div class="table-card{{if .CardClass}} {{.CardClass}}{{end}}{{if .Minimal}} table-card-minimal{{end}}" id="{{.ID}}-card"{{if .RefreshURL}} data-refresh-url="{{.RefreshURL}}"{{end}}{{if .BulkActions}}{{if .BulkActions.Enabled}} data-bulk-enabled="true"{{end}}{{end}}{{if .ServerPagination}}{{if .ServerPagination.Enabled}} data-server-pagination="true" hx-push-url="false" data-pagination-mode="{{.ServerPagination.Mode}}" data-pagination-url="{{.ServerPagination.PaginationURL}}" data-current-page="{{.ServerPagination.CurrentPage}}" data-page-size="{{.ServerPagination.PageSize}}" data-total-rows="{{.ServerPagination.TotalRows}}"{{if .ServerPagination.SearchQuery}} data-search="{{.ServerPagination.SearchQuery}}"{{end}}{{if .ServerPagination.SortColumn}} data-sort-column="{{.ServerPagination.SortColumn}}"{{end}}{{if .ServerPagination.SortDirection}} data-sort-direction="{{.ServerPagination.SortDirection}}"{{end}}{{if eq .ServerPagination.Mode "cursor"}}{{if .ServerPagination.NextCursor}} data-next-cursor="{{.ServerPagination.NextCursor}}"{{end}}{{if .ServerPagination.PrevCursor}} data-prev-cursor="{{.ServerPagination.PrevCursor}}"{{end}} data-has-next="{{.ServerPagination.HasNextPage}}" data-has-prev="{{.ServerPagination.HasPrevPage}}"{{end}}{{if .ServerPagination.PaginationBodyURL}} data-pagination-body-url="{{.ServerPagination.PaginationBodyURL}}"{{end}}{{end}}{{end}}>
+    {{if not .Minimal}}
+    {{if .BulkActions}}{{if .BulkActions.Enabled}}
+    {{template "table-bulk-toolbar" .}}
+    {{end}}{{end}}
+    {{template "table-toolbar" .}}
+    {{end}}
+    {{template "table-content" .}}
+    {{if not .Minimal}}
+    <div id="{{.ID}}-footer">
+    {{if .ServerPagination}}{{if .ServerPagination.Enabled}}
+    {{template "table-footer-server" .}}
+    {{else}}
+    {{template "table-footer-full" .}}
+    {{end}}
+    {{else}}
+    {{template "table-footer-full" .}}
+    {{end}}
+    </div>
+    <div id="{{.ID}}-meta" hidden></div>
+    {{end}}
+</div>
+{{end}}
+
+{{/* TABLE BULK TOOLBAR - Shown when rows are selected */}}
+{{define "table-bulk-toolbar"}}
+<div class="table-bulk-toolbar hidden" data-table="{{.ID}}">
+    <div class="bulk-toolbar-left">
+        <button type="button" class="bulk-cancel-btn" data-action="cancel-selection">
+            {{template "icon-x" .}}
+        </button>
+        <span class="bulk-selected-count">
+            <strong><span class="selected-count">0</span></strong>
+            {{if .BulkActions.SelectedLabel}}{{.BulkActions.SelectedLabel}}{{else}}selected{{end}}
+        </span>
+        <button type="button" class="bulk-select-all-btn" data-action="select-all">
+            {{if .BulkActions.SelectAllLabel}}{{.BulkActions.SelectAllLabel}}{{else}}Select all{{end}}
+        </button>
+    </div>
+    <div class="bulk-toolbar-actions">
+        {{range .BulkActions.Actions}}
+        <button type="button" class="bulk-action-btn{{if eq .Variant "danger"}} bulk-action-danger{{else if eq .Variant "primary"}} bulk-action-primary{{else if eq .Variant "warning"}} bulk-action-warning{{end}}" data-bulk-action="{{.Key}}"{{if .Endpoint}} data-endpoint="{{.Endpoint}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}{{if .ExtraParamsJSON}} data-extra-params="{{.ExtraParamsJSON}}"{{end}}{{if .RequiresDataAttr}} data-requires-attr="{{.RequiresDataAttr}}"{{end}}>
+            {{if eq .Icon "icon-trash"}}{{template "icon-trash" $}}{{end}}
+            {{if eq .Icon "icon-archive"}}{{template "icon-archive" $}}{{end}}
+            {{if eq .Icon "icon-download"}}{{template "icon-download" $}}{{end}}
+            {{if eq .Icon "icon-copy"}}{{template "icon-copy" $}}{{end}}
+            {{if eq .Icon "icon-edit"}}{{template "icon-edit" $}}{{end}}
+            {{if eq .Icon "icon-eye"}}{{template "icon-eye" $}}{{end}}
+            {{if eq .Icon "icon-check"}}{{template "icon-check" $}}{{end}}
+            {{if eq .Icon "icon-user"}}{{template "icon-user" $}}{{end}}
+            {{if eq .Icon "icon-user-minus"}}{{template "icon-user-minus" $}}{{end}}
+            {{if eq .Icon "icon-user-plus"}}{{template "icon-user-plus" $}}{{end}}
+            {{if eq .Icon "icon-user-check"}}{{template "icon-user-check" $}}{{end}}
+            {{if eq .Icon "icon-user-search"}}{{template "icon-user-search" $}}{{end}}
+            {{if eq .Icon "icon-shield"}}{{template "icon-shield" $}}{{end}}
+            <span>{{.Label}}</span>
+        </button>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/* TABLE TOOLBAR - Search, Filters, Sort, Columns, Export */}}
+{{define "table-toolbar"}}
+<div class="table-toolbar" data-table="{{.ID}}">
+    {{/* Search Input */}}
+    {{if .ShowSearch}}
+    <div class="toolbar-search">
+        {{template "icon-search" .}}
+        <input type="text"
+               id="{{.ID}}-search"
+               class="toolbar-search-input"
+               data-table="{{.ID}}"
+               placeholder="{{if .Labels.SearchPlaceholder}}{{.Labels.SearchPlaceholder}}{{else}}Search...{{end}}"
+               {{if .ServerPagination}}{{if .ServerPagination.SearchQuery}} value="{{.ServerPagination.SearchQuery}}"{{end}}{{end}}>
+    </div>
+    {{end}}
+
+    {{/* Toolbar Actions */}}
+    <div class="toolbar-actions">
+        {{/* Filters Button */}}
+        {{if .ShowFilters}}
+        <div class="toolbar-dropdown" data-dropdown="filters">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
+                {{template "icon-filter" .}}
+                <span>{{if .Labels.Filters}}{{.Labels.Filters}}{{else}}Filters{{end}}</span>
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-panel filter-panel">
+                <div class="filter-panel-header">
+                    <span class="filter-panel-title">{{if .Labels.FilterConditions}}{{.Labels.FilterConditions}}{{else}}Filter Conditions{{end}}</span>
+                    <button type="button" class="filter-clear-all">{{if .Labels.ClearAll}}{{.Labels.ClearAll}}{{else}}Clear All{{end}}</button>
+                </div>
+                <div class="filter-conditions" id="{{.ID}}-filter-conditions">
+                    {{/* Filter rows will be added dynamically by JS */}}
+                </div>
+                <button type="button" class="filter-add-condition" data-table="{{.ID}}">
+                    {{template "icon-plus" .}}
+                    <span>{{if .Labels.AddCondition}}{{.Labels.AddCondition}}{{else}}Add condition{{end}}</span>
+                </button>
+                <div class="filter-panel-footer">
+                    <button type="button" class="btn btn-secondary filter-clear">{{if .Labels.Clear}}{{.Labels.Clear}}{{else}}Clear{{end}}</button>
+                    <button type="button" class="btn btn-primary filter-apply">{{if .Labels.ApplyFilters}}{{.Labels.ApplyFilters}}{{else}}Apply Filters{{end}}</button>
+                </div>
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Sort Button */}}
+        {{if .ShowSort}}
+        <div class="toolbar-dropdown" data-dropdown="sort">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
+                {{template "icon-arrow-up-down" .}}
+                <span>{{if .Labels.Sort}}{{.Labels.Sort}}{{else}}Sort{{end}}</span>
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-menu sort-menu">
+                {{range .Columns}}
+                {{if .Sortable}}
+                <div class="sort-option" data-sort="{{.Key}}">
+                    <span class="sort-option-label">{{.Label}}</span>
+                    <div class="sort-option-direction">
+                        <button type="button" class="sort-dir-btn" data-direction="asc" title="Ascending">
+                            {{template "icon-arrow-up" $}}
+                        </button>
+                        <button type="button" class="sort-dir-btn" data-direction="desc" title="Descending">
+                            {{template "icon-arrow-down" $}}
+                        </button>
+                    </div>
+                </div>
+                {{end}}
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Columns Button */}}
+        {{if .ShowColumns}}
+        <div class="toolbar-dropdown" data-dropdown="columns">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
+                {{template "icon-columns" .}}
+                <span>{{if .Labels.Columns}}{{.Labels.Columns}}{{else}}Columns{{end}}</span>
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-menu columns-menu">
+                {{range $index, $col := .Columns}}
+                <label class="column-toggle">
+                    <input type="checkbox" checked data-column="{{$col.Key}}" data-index="{{$index}}">
+                    <span>{{$col.Label}}</span>
+                </label>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Export Button */}}
+        {{if .ShowExport}}
+        <div class="toolbar-dropdown" data-dropdown="export">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
+                {{template "icon-download" .}}
+                <span>{{if .Labels.Export}}{{.Labels.Export}}{{else}}Export{{end}}</span>
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-menu export-menu">
+                <button type="button" class="export-option" data-format="csv">
+                    {{template "icon-file-text" .}}
+                    <span>Export as CSV</span>
+                </button>
+                <button type="button" class="export-option" data-format="excel">
+                    {{template "icon-file-spreadsheet" .}}
+                    <span>Export as Excel</span>
+                </button>
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Density Button */}}
+        {{if .ShowDensity}}
+        <div class="toolbar-dropdown" data-dropdown="density">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true" title="Row density">
+                {{template "icon-density" .}}
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-menu density-menu">
+                <div class="density-option active" data-density="default" data-table="{{.ID}}">
+                    <span class="density-preview density-preview--default"></span>
+                    <span class="density-label">{{if .Labels.DensityDefault}}{{.Labels.DensityDefault}}{{else}}Default{{end}}</span>
+                </div>
+                <div class="density-option" data-density="comfortable" data-table="{{.ID}}">
+                    <span class="density-preview density-preview--comfortable"></span>
+                    <span class="density-label">{{if .Labels.DensityComfortable}}{{.Labels.DensityComfortable}}{{else}}Comfortable{{end}}</span>
+                </div>
+                <div class="density-option" data-density="compact" data-table="{{.ID}}">
+                    <span class="density-preview density-preview--compact"></span>
+                    <span class="density-label">{{if .Labels.DensityCompact}}{{.Labels.DensityCompact}}{{else}}Compact{{end}}</span>
+                </div>
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Import Action Button */}}
+        {{if .ImportAction}}
+        {{if .ImportAction.ActionURL}}
+        <button type="button"
+                class="toolbar-btn toolbar-import-btn"
+                hx-get="{{.ImportAction.ActionURL}}"
+                hx-target="#sheetContent"
+                hx-swap="innerHTML"
+                hx-push-url="false"
+                onclick="Sheet.open('{{.ImportAction.Label}}')">
+            {{if eq .ImportAction.Icon "icon-upload"}}{{template "icon-upload" .}}{{end}}
+            {{.ImportAction.Label}}
+        </button>
+        {{else}}
+        <a href="{{.ImportAction.Href}}" class="toolbar-btn toolbar-import-btn">
+            {{template "icon-upload" .}}
+            {{.ImportAction.Label}}
+        </a>
+        {{end}}
+        {{end}}
+
+        {{/* Primary Action Button */}}
+        {{if .PrimaryAction}}
+        {{if .PrimaryAction.ActionURL}}
+        <button type="button"
+                class="btn-primary toolbar-primary-action"
+                hx-get="{{.PrimaryAction.ActionURL}}"
+                hx-target="#sheetContent"
+                hx-swap="innerHTML"
+                hx-push-url="false"
+                onclick="Sheet.open('{{.PrimaryAction.Label}}')">
+            {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
+            {{.PrimaryAction.Label}}
+        </button>
+        {{else}}
+        <a href="{{.PrimaryAction.Href}}" class="btn-primary toolbar-primary-action">
+            {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
+            {{.PrimaryAction.Label}}
+        </a>
+        {{end}}
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/* TABLE HEADER (Legacy - kept for backwards compatibility) */}}
+{{define "table-header"}}
+{{template "table-toolbar" .}}
+{{end}}
+
+{{/* TABLE CONTENT - The actual table element with thead and tbody */}}
+{{define "table-content"}}
+<div class="table-scroll-wrapper">
+<table class="data-table{{if .ColumnGroups}} data-table-grouped{{end}}{{if .FixedLayout}} data-table-fixed{{end}}" id="{{.ID}}"{{if .DefaultSortColumn}} data-default-sort="{{.DefaultSortColumn}}" data-default-direction="{{if .DefaultSortDirection}}{{.DefaultSortDirection}}{{else}}asc{{end}}"{{end}}>
+    {{if .ColumnGroups}}
+    {{/* Multi-level headers with column groups */}}
+    <thead>
+        <tr class="column-group-header">
+            <th class="column-group-spacer" rowspan="2"></th>
+            {{range .ColumnGroups}}
+            <th class="column-group-label" colspan="{{len .Columns}}">{{.Label}}</th>
+            {{end}}
+        </tr>
+        <tr class="column-sub-header">
+            {{range .ColumnGroups}}
+            {{range .Columns}}
+            {{$isActive := false}}
+            {{$activeDirection := ""}}
+            {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
+            <th {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
+                <span class="column-label">{{.Label}}</span>
+                {{if .Sortable}}
+                <span class="sort-indicator">
+                    <span class="sort-asc{{if and $isActive (eq $activeDirection "asc")}} active{{end}}">{{template "icon-arrow-up" $}}</span>
+                    <span class="sort-desc{{if and $isActive (eq $activeDirection "desc")}} active{{end}}">{{template "icon-arrow-down" $}}</span>
+                </span>
+                {{end}}
+            </th>
+            {{end}}
+            {{end}}
+        </tr>
+    </thead>
+    {{else}}
+    {{/* Standard single-level headers */}}
+    <thead>
+        <tr>
+            {{if .ShowCheckbox}}
+            <th class="row-checkbox">
+                <input type="checkbox"
+                       id="{{.ID}}-select-all"
+                       class="select-all-checkbox"
+                       data-table="{{.ID}}"
+                       aria-label="{{.Labels.SelectAll}}">
+            </th>
+            {{end}}
+            {{range .Columns}}
+            {{$isActive := false}}
+            {{$activeDirection := ""}}
+            {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
+            <th {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
+                <span class="column-label">{{.Label}}</span>
+                {{if .Sortable}}
+                <span class="sort-indicator">
+                    <span class="sort-asc{{if and $isActive (eq $activeDirection "asc")}} active{{end}}">{{template "icon-arrow-up"}}</span>
+                    <span class="sort-desc{{if and $isActive (eq $activeDirection "desc")}} active{{end}}">{{template "icon-arrow-down"}}</span>
+                </span>
+                {{end}}
+            </th>
+            {{end}}
+            {{if .ShowActions}}
+            <th class="actions-column">{{.Labels.Actions}}</th>
+            {{end}}
+        </tr>
+    </thead>
+    {{end}}
+    <tbody id="{{.ID}}-body">
+        {{if .Groups}}
+            {{range .Groups}}
+            {{template "table-row-group" .}}
+            {{end}}
+        {{else if .Rows}}
+            {{range .Rows}}
+            {{template "table-data-row" .}}
+            {{end}}
+        {{else}}
+            {{template "table-empty-row" $}}
+        {{end}}
+    </tbody>
+</table>
+</div>
+{{end}}
+
+{{/* TABLE DATA ROW - Renders a single data row */}}
+{{define "table-data-row"}}
+{{$rowVAlign := "top"}}{{if .VAlign}}{{$rowVAlign = .VAlign}}{{end}}
+<tr{{if .ID}} data-id="{{.ID}}"{{end}}{{if .Href}} data-href="{{.Href}}"{{end}}{{range $key, $val := .DataAttrs}} data-{{$key}}="{{$val}}"{{end}}{{if .Href}} class="clickable-row"{{end}}>
+    {{if .ShowCheckbox}}
+    <td class="row-checkbox" style="vertical-align: {{$rowVAlign}}">
+        <input type="checkbox"
+               class="row-select-checkbox"
+               data-row-id="{{.ID}}"
+               aria-label="Select row">
+    </td>
+    {{end}}
+    {{range .Cells}}
+    <td style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}};{{end}}vertical-align: {{$rowVAlign}}">
+        {{if eq .Type "name"}}
+        {{if .Href}}<a href="{{.Href}}" class="item-name-link">{{.Value}}</a>{{else}}<span class="item-name">{{.Value}}</span>{{end}}
+        {{if .Alert}}<span class="alert-icon">{{template "icon-alert-triangle" .}}</span>{{end}}
+        {{else if eq .Type "badge"}}
+        {{$badgeClass := "status-badge"}}
+        {{if .BadgeType}}
+            {{- if eq .BadgeType "status" -}}
+            {{$badgeClass = "status-badge"}}
+            {{- else if eq .BadgeType "count" -}}
+            {{$badgeClass = "count-badge"}}
+            {{- else if eq .BadgeType "type" -}}
+            {{$badgeClass = "type-badge"}}
+            {{- end -}}
+        {{end}}
+        <span class="{{$badgeClass}} {{.Variant}}">{{.Value}}</span>
+        {{else if eq .Type "link"}}
+        <a href="{{.Href}}" class="table-link">{{.Value}}</a>
+        {{else if eq .Type "html"}}
+        {{.HTML}}
+        {{else if eq .Type "author"}}
+        <div class="author-cell">
+            <span class="author-name">{{.Value}}</span>
+            <span class="author-date">{{.Variant}}</span>
+        </div>
+        {{else if eq .Type "chips"}}
+        {{$chipCount := len .Chips}}
+        {{$maxVisible := 3}}
+        {{$hasOverflow := gt $chipCount $maxVisible}}
+        <div class="table-cell-chips"{{if $hasOverflow}} data-chip-expandable="true"{{end}}>
+            {{range $i, $chip := .Chips}}<span class="table-chip{{if ge $i $maxVisible}} chip-hidden{{end}}">{{$chip.Label}}</span>{{end}}
+            {{if $hasOverflow}}
+            <button type="button" class="chip-expand-toggle" onclick="this.parentElement.classList.toggle('expanded')" title="Show all {{$chipCount}} items">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span class="expand-text">+{{sub $chipCount $maxVisible}} more</span>
+                <span class="collapse-text">Less</span>
+            </button>
+            {{end}}
+        </div>
+        {{else if eq .Type "input"}}
+        <div class="table-cell-input">
+            {{if .InputPrefix}}<span class="input-prefix">{{.InputPrefix}}</span>{{end}}
+            <input type="{{if .InputType}}{{.InputType}}{{else}}text{{end}}"
+                   name="{{.InputName}}"
+                   value="{{.Value}}"
+                   class="matrix-input"
+                   step="any">
+            {{if .InputSuffix}}<span class="input-suffix">{{.InputSuffix}}</span>{{end}}
+        </div>
+        {{else if eq .Type "select"}}
+        <select name="{{.SelectName}}" class="matrix-select">
+            {{range .Options}}
+            <option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>
+            {{end}}
+        </select>
+        {{else}}
+        {{.Value}}
+        {{end}}
+    </td>
+    {{end}}
+    {{if .Actions}}
+    <td class="actions-cell" style="vertical-align: {{$rowVAlign}}">
+        <div class="action-buttons">
+            {{range .Actions}}
+            {{if .Href}}
+            <a href="{{.Href}}" class="action-btn {{.Type}}" title="{{.Label}}" data-action="{{.Action}}">
+                {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
+                {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
+                {{if eq .Type "clone"}}{{template "icon-copy" $}}{{end}}
+                {{if eq .Type "delete"}}{{template "icon-trash" $}}{{end}}
+                {{if eq .Type "download"}}{{template "icon-download" $}}{{end}}
+                {{if eq .Type "archive"}}{{template "icon-archive" $}}{{end}}
+                {{if eq .Type "check"}}{{template "icon-check" $}}{{end}}
+            </a>
+            {{else}}
+            <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}" title="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" data-action="{{.Action}}"{{if .Disabled}} disabled{{end}}{{if $.ID}} data-id="{{$.ID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{end}}{{end}}{{if .DrawerTitle}} data-drawer-title="{{.DrawerTitle}}"{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}>
+                {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
+                {{if eq .Type "preview"}}{{template "icon-eye" $}}{{end}}
+                {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
+                {{if eq .Type "clone"}}{{template "icon-copy" $}}{{end}}
+                {{if eq .Type "deactivate"}}{{template "icon-pause" $}}{{end}}
+                {{if eq .Type "activate"}}{{template "icon-play" $}}{{end}}
+                {{if eq .Type "delete"}}{{template "icon-trash" $}}{{end}}
+                {{if eq .Type "download"}}{{template "icon-download" $}}{{end}}
+                {{if eq .Type "archive"}}{{template "icon-archive" $}}{{end}}
+                {{if eq .Type "check"}}{{template "icon-check" $}}{{end}}
+            </button>
+            {{end}}
+            {{end}}
+        </div>
+    </td>
+    {{end}}
+</tr>
+{{end}}
+
+{{/* TABLE ROW GROUP - Renders a group of rows with collapsible header */}}
+{{define "table-row-group"}}
+{{$groupID := .ID}}
+{{$collapsed := .Collapsed}}
+{{$rowCount := len .Rows}}
+<tbody class="table-group{{if $collapsed}} collapsed{{end}}" data-group="{{.ID}}" data-row-count="{{$rowCount}}"{{range $key, $val := .DataAttrs}} data-{{$key}}="{{$val}}"{{end}}>
+    <tr class="table-group-header" data-group-toggle="{{.ID}}">
+        <td colspan="99">
+            <div class="table-group-header-row">
+                <button type="button" class="table-group-toggle" aria-expanded="{{if $collapsed}}false{{else}}true{{end}}" aria-controls="group-{{.ID}}">
+                    <span class="table-group-toggle-icon">
+                        {{template "icon-chevron-down" $}}
+                    </span>
+                    <span class="table-group-title">{{.Title}}</span>
+                    <span class="table-group-counter">
+                        <span class="group-selected-count">0</span>/{{$rowCount}}
+                    </span>
+                </button>
+                <div class="table-group-selection">
+                    <button type="button" class="group-select-btn" data-action="select-group" title="Select all">
+                        {{template "icon-check" $}}
+                    </button>
+                    <button type="button" class="group-select-btn group-select-btn--clear" data-action="clear-group" title="Clear selection">
+                        {{template "icon-x" $}}
+                    </button>
+                </div>
+            </div>
+        </td>
+    </tr>
+</tbody>
+<tbody class="table-group-rows" id="group-{{.ID}}"{{if $collapsed}} style="display: none;"{{end}}>
+    {{range .Rows}}
+    {{template "table-data-row" .}}
+    {{end}}
+</tbody>
+{{end}}
+
+{{/* TABLE EMPTY ROW - Renders empty state */}}
+{{define "table-empty-row"}}
+<tr>
+    <td colspan="99">
+        {{template "empty-state" dict "Icon" .EmptyState.Icon "Title" .EmptyState.Title "Desc" .EmptyState.Message}}
+    </td>
+</tr>
+{{end}}
+
+{{/* TABLE FOOTER FULL - Entries selector, info, and pagination (client-side) */}}
+{{define "table-footer-full"}}
+<div class="table-footer">
+    {{/* Entries selector - left */}}
+    {{if .ShowEntries}}
+    <div class="footer-entries">
+        <span>{{if .Labels.Show}}{{.Labels.Show}}{{else}}Show{{end}}</span>
+        <select id="{{.ID}}-entries" class="entries-selector" data-table="{{.ID}}">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span>{{if .Labels.Entries}}{{.Labels.Entries}}{{else}}entries{{end}}</span>
+    </div>
+    {{end}}
+    {{/* Info - center */}}
+    <div class="footer-info">
+        {{if .Labels.Showing}}{{.Labels.Showing}}{{else}}Showing{{end}}
+        <strong><span id="{{.ID}}-start">1</span></strong>
+        {{if .Labels.To}}{{.Labels.To}}{{else}}to{{end}}
+        <strong><span id="{{.ID}}-end">25</span></strong>
+        {{if .Labels.Of}}{{.Labels.Of}}{{else}}of{{end}}
+        <strong><span id="{{.ID}}-total">{{len .Rows}}</span></strong>
+        {{if .Labels.EntriesLabel}}{{.Labels.EntriesLabel}}{{else}}entries{{end}}
+    </div>
+    {{/* Pagination - right */}}
+    <div class="footer-pagination" id="{{.ID}}-pagination">
+        <button class="pagination-btn pagination-prev" disabled data-table="{{.ID}}">
+            &laquo; {{if .Labels.Prev}}{{.Labels.Prev}}{{else}}Prev{{end}}
+        </button>
+        <button class="pagination-page active" data-page="1" data-table="{{.ID}}">1</button>
+        <button class="pagination-btn pagination-next" data-table="{{.ID}}">
+            {{if .Labels.Next}}{{.Labels.Next}}{{else}}Next{{end}} &raquo;
+        </button>
+    </div>
+</div>
+{{end}}
+
+{{/* TABLE FOOTER SERVER - Server-side pagination with HTMX */}}
+{{/* All display values (StartRow, EndRow, PageNumbers, URLs) are pre-computed by Go. */}}
+{{/* Call ServerPagination.BuildDisplay() before rendering to populate these fields. */}}
+{{define "table-footer-server"}}
+{{$sp := .ServerPagination}}
+{{$pageSize := $sp.PageSize}}
+{{$mode := $sp.Mode}}
+
+<div class="table-footer">
+    {{/* Entries selector - left (server-mode) */}}
+    {{if .ShowEntries}}
+    <div class="footer-entries">
+        <span>{{if .Labels.Show}}{{.Labels.Show}}{{else}}Show{{end}}</span>
+        <select id="{{.ID}}-entries" class="entries-selector server-entries-selector" data-table="{{.ID}}">
+            <option value="10"{{if eq $pageSize 10}} selected{{end}}>10</option>
+            <option value="25"{{if eq $pageSize 25}} selected{{end}}>25</option>
+            <option value="50"{{if eq $pageSize 50}} selected{{end}}>50</option>
+            <option value="100"{{if eq $pageSize 100}} selected{{end}}>100</option>
+        </select>
+        <span>{{if .Labels.Entries}}{{.Labels.Entries}}{{else}}entries{{end}}</span>
+    </div>
+    {{end}}
+
+    {{/* Info - center (offset mode: "Showing X to Y of Z entries") */}}
+    {{if eq $mode "offset"}}
+    <div class="footer-info">
+        {{if .Labels.Showing}}{{.Labels.Showing}}{{else}}Showing{{end}}
+        <strong>{{$sp.StartRow}}</strong>
+        {{if .Labels.To}}{{.Labels.To}}{{else}}to{{end}}
+        <strong>{{$sp.EndRow}}</strong>
+        {{if .Labels.Of}}{{.Labels.Of}}{{else}}of{{end}}
+        <strong>{{$sp.TotalRows}}</strong>
+        {{if .Labels.EntriesLabel}}{{.Labels.EntriesLabel}}{{else}}entries{{end}}
+    </div>
+    {{end}}
+
+    {{/* Pagination buttons - right */}}
+    <div class="footer-pagination" id="{{.ID}}-pagination">
+        {{if eq $mode "offset"}}
+            {{/* Offset mode: prev + page numbers + next */}}
+            {{/* Note: No hx-get on these buttons — JS (table-pagination.js) handles all
+                 server-side requests via executeServerRequest() which also manages the
+                 browser URL. Adding hx-get would cause double requests and URL conflicts
+                 with the inherited hx-push-url="true" on <body>. */}}
+
+            {{/* Previous button */}}
+            <button class="pagination-btn pagination-prev{{if not $sp.HasPrevPage}} disabled{{end}}"
+                    {{if not $sp.HasPrevPage}}disabled{{end}}
+                    data-table="{{.ID}}">
+                &laquo; {{if .Labels.Prev}}{{.Labels.Prev}}{{else}}Prev{{end}}
+            </button>
+
+            {{/* Pre-computed page number buttons */}}
+            {{range $sp.PageNumbers}}
+                {{if .Ellipsis}}
+                <span class="pagination-ellipsis">&hellip;</span>
+                {{else}}
+                <button class="pagination-page{{if .Active}} active{{end}}"
+                        data-page="{{.Number}}"
+                        data-table="{{$.ID}}">{{.Number}}</button>
+                {{end}}
+            {{end}}
+
+            {{/* Next button */}}
+            <button class="pagination-btn pagination-next{{if not $sp.HasNextPage}} disabled{{end}}"
+                    {{if not $sp.HasNextPage}}disabled{{end}}
+                    data-table="{{.ID}}">
+                {{if .Labels.Next}}{{.Labels.Next}}{{else}}Next{{end}} &raquo;
+            </button>
+        {{else}}
+            {{/* Cursor mode: only prev/next buttons */}}
+            <button class="pagination-btn pagination-prev{{if not $sp.HasPrevPage}} disabled{{end}}"
+                    {{if not $sp.HasPrevPage}}disabled{{end}}
+                    data-table="{{.ID}}">
+                &laquo; {{if .Labels.Prev}}{{.Labels.Prev}}{{else}}Prev{{end}}
+            </button>
+
+            <button class="pagination-btn pagination-next{{if not $sp.HasNextPage}} disabled{{end}}"
+                    {{if not $sp.HasNextPage}}disabled{{end}}
+                    data-table="{{.ID}}">
+                {{if .Labels.Next}}{{.Labels.Next}}{{else}}Next{{end}} &raquo;
+            </button>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/* TABLE ROW - Generic table row template */}}
+{{define "table-row"}}
+<tr data-id="{{.ID}}" {{range $key, $val := .DataAttrs}}data-{{$key}}="{{$val}}" {{end}}>
+    {{if .ShowCheckbox}}
+    <td class="row-checkbox">
+        <input type="checkbox"
+               class="row-select-checkbox"
+               data-row-id="{{.ID}}"
+               aria-label="Select row">
+    </td>
+    {{end}}
+    {{range .Cells}}
+    <td{{if .Class}} class="{{.Class}}"{{end}}>
+        {{if .HTML}}{{.HTML}}{{else}}{{.Value}}{{end}}
+    </td>
+    {{end}}
+    {{if .ShowActions}}
+    <td>
+        {{template "table-row-actions" .Actions}}
+    </td>
+    {{end}}
+</tr>
+{{end}}
+
+{{/* TABLE ROW ACTIONS - Action buttons for a row */}}
+{{define "table-row-actions"}}
+<div class="action-buttons">
+    {{range .}}
+    <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}"
+            title="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
+            data-action="{{.Action}}"
+            {{if .Disabled}}disabled{{end}}
+            {{if .DataID}}data-id="{{.DataID}}"{{end}}
+            {{if .URL}}{{if eq .Action "edit"}}data-edit-url="{{.URL}}"{{else if eq .Action "delete"}}data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}}data-activate-url="{{.URL}}"{{end}}{{end}}
+            {{if .DrawerTitle}}data-drawer-title="{{.DrawerTitle}}"{{end}}
+            {{if .ItemName}}data-item-name="{{.ItemName}}"{{end}}
+            {{if .ConfirmTitle}}data-confirm-title="{{.ConfirmTitle}}"{{end}}
+            {{if .ConfirmMessage}}data-confirm-message="{{.ConfirmMessage}}"{{end}}>
+        {{if eq .Type "view"}}{{template "icon-eye" $}}
+        {{else if eq .Type "preview"}}{{template "icon-eye" $}}
+        {{else if eq .Type "edit"}}{{template "icon-edit" $}}
+        {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+        {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
+        {{else if eq .Type "activate"}}{{template "icon-play" $}}
+        {{else if eq .Type "delete"}}{{template "icon-trash" $}}
+        {{else if eq .Type "download"}}{{template "icon-download" $}}
+        {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+        {{else if eq .Type "check"}}{{template "icon-check" $}}
+        {{end}}
+    </button>
+    {{end}}
+</div>
+{{/* Mobile dropdown version */}}
+<div class="action-dropdown">
+    <button class="action-dropdown-btn">
+        Actions
+        {{template "icon-chevron-down"}}
+    </button>
+    <div class="action-dropdown-menu">
+        {{range .}}
+        <div class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" data-action="{{.Action}}" {{if .Disabled}}title="{{.DisabledTooltip}}"{{end}} {{if .DataID}}data-id="{{.DataID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{end}}{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}>
+            {{if eq .Type "view"}}{{template "icon-eye" $}}
+            {{else if eq .Type "preview"}}{{template "icon-eye" $}}
+            {{else if eq .Type "edit"}}{{template "icon-edit" $}}
+            {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+            {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
+            {{else if eq .Type "activate"}}{{template "icon-play" $}}
+            {{else if eq .Type "delete"}}{{template "icon-trash" $}}
+            {{else if eq .Type "download"}}{{template "icon-download" $}}
+            {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+            {{else if eq .Type "check"}}{{template "icon-check" $}}
+            {{end}}
+            {{.Label}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/* EMPTY STATE - When table has no data */}}
+{{define "table-empty"}}
+<tr>
+    <td colspan="{{.ColSpan}}">
+        <div class="empty-state">
+            {{if .Icon}}
+            {{.Icon}}
+            {{else}}
+            {{template "icon-file-text"}}
+            {{end}}
+            <h3>{{.Title}}</h3>
+            <p>{{.Message}}</p>
+        </div>
+    </td>
+</tr>
+{{end}}
+
+{{/* TABLE BODY PARTIAL - Targeted swap: tbody (primary) + footer (OOB) + meta (OOB) */}}
+{{define "table-body-partial"}}
+<table id="{{.ID}}-swap-carrier" style="display:none">
+<tbody id="{{.ID}}-body">
+    {{if .Groups}}
+        {{range .Groups}}
+        {{template "table-row-group" .}}
+        {{end}}
+    {{else if .Rows}}
+        {{range .Rows}}
+        {{template "table-data-row" .}}
+        {{end}}
+    {{else}}
+        {{template "table-empty-row" $}}
+    {{end}}
+</tbody>
+</table>
+<div id="{{.ID}}-footer" hx-swap-oob="outerHTML">
+{{if .ServerPagination}}{{if .ServerPagination.Enabled}}
+{{template "table-footer-server" .}}
+{{end}}{{end}}
+</div>
+<div id="{{.ID}}-meta" hx-swap-oob="outerHTML" hidden
+    data-targeted-swap="true"
+    data-current-page="{{.ServerPagination.CurrentPage}}"
+    data-page-size="{{.ServerPagination.PageSize}}"
+    data-total-rows="{{.ServerPagination.TotalRows}}"
+    data-search="{{.ServerPagination.SearchQuery}}"
+    data-sort-column="{{.ServerPagination.SortColumn}}"
+    data-sort-direction="{{.ServerPagination.SortDirection}}"
+    data-has-next="{{.ServerPagination.HasNextPage}}"
+    data-has-prev="{{.ServerPagination.HasPrevPage}}"
+    data-next-cursor="{{.ServerPagination.NextCursor}}"
+    data-prev-cursor="{{.ServerPagination.PrevCursor}}">
+</div>
+{{end}}

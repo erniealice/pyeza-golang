@@ -1,0 +1,277 @@
+/*
+ * ==========================================================================
+ * TOGGLE SWITCH COMPONENT STYLES
+ * ==========================================================================
+ * Accessible toggle switch with multiple variants.
+ * ==========================================================================
+ */
+
+/* ========================================
+   VISUALLY HIDDEN (for accessibility)
+   ======================================== */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ========================================
+   TOGGLE WRAPPER
+   ======================================== */
+
+.toggle-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+.toggle-wrapper.toggle-small .toggle-switch {
+    width: 2.25rem;
+    height: 1.25rem;
+}
+
+.toggle-wrapper.toggle-small .toggle-knob {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+.toggle-wrapper.toggle-small .toggle-switch.active .toggle-knob {
+    transform: translateX(1rem);
+}
+
+/* ========================================
+   TOGGLE CONTAINER (Label wrapper)
+   ======================================== */
+
+.toggle-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.toggle-container.label-left {
+    flex-direction: row;
+}
+
+.toggle-container.label-right {
+    flex-direction: row-reverse;
+}
+
+/* ========================================
+   TOGGLE SWITCH
+   ======================================== */
+
+.toggle-switch {
+    display: inline-block;
+    position: relative;
+    width: 3rem;
+    height: 1.625rem;
+    background: var(--border);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.toggle-switch:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 0.125rem;
+}
+
+.toggle-switch.active {
+    background: var(--accent-sage);
+}
+
+.toggle-switch.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   TOGGLE KNOB
+   ======================================== */
+
+.toggle-knob {
+    position: absolute;
+    top: 0.1875rem;
+    left: 0.1875rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: white;
+    border-radius: var(--radius-round);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease;
+}
+
+.toggle-switch.active .toggle-knob {
+    transform: translateX(1.375rem);
+}
+
+/* ========================================
+   TOGGLE LABEL
+   ======================================== */
+
+.toggle-label {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    user-select: none;
+}
+
+/* ========================================
+   TOGGLE LIST (Multiple toggles)
+   ======================================== */
+
+.toggle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ========================================
+   TOGGLE ITEM (Settings-style toggle)
+   ======================================== */
+
+.toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.toggle-item:last-child {
+    border-bottom: none;
+}
+
+.toggle-item.disabled {
+    opacity: 0.5;
+}
+
+.toggle-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    padding-right: 1rem;
+}
+
+.toggle-item .toggle-label {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.toggle-description {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.toggle-switch-label {
+    cursor: pointer;
+}
+
+.toggle-item.disabled .toggle-switch-label {
+    cursor: not-allowed;
+}
+
+/* ========================================
+   TOGGLE GROUP (Legacy support)
+   ======================================== */
+
+.toggle-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.toggle-group:last-child {
+    border-bottom: none;
+}
+
+.toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.toggle-desc {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+/* ========================================
+   CHECKBOX SYNC (JavaScript handles this)
+   ======================================== */
+
+.toggle-checkbox:checked + .toggle-container .toggle-switch,
+.toggle-checkbox:checked ~ .toggle-switch-label .toggle-switch {
+    background: var(--accent-sage);
+}
+
+.toggle-checkbox:checked + .toggle-container .toggle-knob,
+.toggle-checkbox:checked ~ .toggle-switch-label .toggle-knob {
+    transform: translateX(1.375rem);
+}
+
+.toggle-checkbox:disabled + .toggle-container .toggle-switch,
+.toggle-checkbox:disabled ~ .toggle-switch-label .toggle-switch {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .toggle-item {
+        padding: 0.875rem 0;
+    }
+
+    .toggle-switch {
+        width: 2.75rem;
+        height: 1.5rem;
+    }
+
+    .toggle-knob {
+        width: 1.125rem;
+        height: 1.125rem;
+    }
+
+    .toggle-switch.active .toggle-knob {
+        transform: translateX(1.25rem);
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .toggle-switch,
+    .toggle-knob {
+        transition: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .toggle-switch {
+        border: 2px solid currentColor;
+    }
+
+    .toggle-switch.active {
+        border-color: var(--accent-sage);
+    }
+}

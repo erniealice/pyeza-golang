@@ -1,0 +1,108 @@
+{{/*
+    Chip Component
+
+    A selectable chip/tag component for multi-select interfaces.
+    Based on the WIC chip pattern used in client configuration.
+
+    Usage:
+        {{template "chip" dict "ID" "wic-001" "Code" "WIC001" "Selected" true}}
+
+    Parameters:
+        - ID: (required) Unique identifier for the chip, used in data-id attribute
+        - Code: (required) Display text/label for the chip
+        - Label: (optional) Alternative to Code - longer descriptive label
+        - Selected: (optional) Boolean - true if chip should be in selected state
+        - Name: (optional) Form input name for selection tracking
+        - Class: (optional) Additional CSS classes
+        - Disabled: (optional) Boolean - true to disable the chip
+
+    Example - Basic chip:
+        {{template "chip" dict "ID" "1" "Code" "NSW"}}
+
+    Example - Selected chip:
+        {{template "chip" dict "ID" "2" "Code" "VIC" "Selected" true}}
+
+    Example - With label instead of code:
+        {{template "chip" dict "ID" "3" "Label" "New South Wales" "Selected" false}}
+
+    CSS Classes:
+        .chip - Base chip styling
+        .chip.selected - Selected state
+        .chip.disabled - Disabled state
+        .chip-check - Checkmark indicator container
+        .chip-code - Short code display
+        .chip-label - Longer label display
+*/}}
+
+{{define "chip"}}
+<button
+    type="button"
+    class="chip{{if .Selected}} selected{{end}}{{if .Disabled}} disabled{{end}}{{if .Class}} {{.Class}}{{end}}"
+    data-id="{{.ID}}"
+    {{if .Name}}name="{{.Name}}"{{end}}
+    {{if .Disabled}}disabled{{end}}
+    role="checkbox"
+    aria-checked="{{if .Selected}}true{{else}}false{{end}}"
+>
+    <span class="chip-check">
+        {{template "icon-check" $}}
+    </span>
+    {{if .Code}}
+    <span class="chip-code">{{.Code}}</span>
+    {{else if .Label}}
+    <span class="chip-label">{{.Label}}</span>
+    {{end}}
+</button>
+{{end}}
+
+{{/*
+    Chip Group Component
+
+    Container for organizing multiple chips with optional header.
+
+    Usage:
+        {{template "chip-group" dict "Title" "System WICs" "Count" 5 "Chips" .SystemWICs}}
+
+    Parameters:
+        - Title: (optional) Section title for the chip group
+        - Count: (optional) Badge count to display next to title
+        - Chips: (required) Array of chip data objects
+        - ShowAdd: (optional) Boolean - show add button at the end
+        - Class: (optional) Additional CSS classes
+*/}}
+
+{{define "chip-group"}}
+<div class="chip-group{{if .Class}} {{.Class}}{{end}}">
+    {{if .Title}}
+    <div class="chip-group-header">
+        <span class="chip-group-title">{{.Title}}</span>
+        {{if .Count}}
+        <span class="chip-group-badge">{{.Count}}</span>
+        {{end}}
+    </div>
+    {{end}}
+
+    <div class="chip-group-content">
+        {{range $index, $chip := .Chips}}
+        <button
+            type="button"
+            class="wic-chip"
+            data-id="{{$index}}"
+            role="checkbox"
+            aria-checked="false"
+        >
+            <span class="chip-check">
+                {{template "icon-check" $}}
+            </span>
+            <span class="chip-code">{{$chip}}</span>
+        </button>
+        {{end}}
+
+        {{if .ShowAdd}}
+        <button type="button" class="chip-add-btn">
+            {{template "icon-plus" $}}
+        </button>
+        {{end}}
+    </div>
+</div>
+{{end}}

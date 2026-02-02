@@ -1,0 +1,67 @@
+/*
+ * ==========================================================================
+ * THEME: OCEAN DEEP
+ * A deep, professional blue theme with cyan accents
+ * ==========================================================================
+ */
+[data-theme="ocean-deep"] {
+    /* Backgrounds */
+    --bg-base: #0F1419;
+    --bg-sidebar: #15202B;
+    --bg-card: #192734;
+    --bg-hover: #22303C;
+    --bg-input: #192734;
+    --bg-overlay: rgba(15, 20, 25, 0.8);
+
+    /* Text */
+    --text-primary: #E7E9EA;
+    --text-secondary: #8B98A5;
+    --text-muted: #6E767D;
+    --text-inverse: #0F1419;
+
+    /* Primary Accent */
+    --accent-primary: #1D9BF0;
+    --accent-primary-light: rgba(29, 155, 240, 0.15);
+    --accent-primary-dark: #1A8CD8;
+
+    /* Secondary Accents */
+    --accent-terracotta: #F4212E;
+    --accent-terracotta-light: rgba(244, 33, 46, 0.15);
+    --accent-terracotta-dark: #DC1D28;
+    --accent-sage: #00BA7C;
+    --accent-sage-light: rgba(0, 186, 124, 0.15);
+    --accent-navy: #1D9BF0;
+    --accent-navy-light: rgba(29, 155, 240, 0.15);
+    --accent-navy-dark: #1A8CD8;
+    --accent-amber: #FFD400;
+    --accent-amber-light: rgba(255, 212, 0, 0.15);
+    --accent-plum: #7856FF;
+    --accent-slate: #8B98A5;
+
+    /* Status Colors */
+    --status-success: #00BA7C;
+    --status-success-light: rgba(0, 186, 124, 0.15);
+    --status-warning: #FFD400;
+    --status-warning-light: rgba(255, 212, 0, 0.15);
+    --status-error: #F4212E;
+    --status-error-light: rgba(244, 33, 46, 0.15);
+    --status-info: #1D9BF0;
+    --status-info-light: rgba(29, 155, 240, 0.15);
+
+    /* Borders & Shadows */
+    --border: #2F3336;
+    --border-light: #38444D;
+    --border-focus: var(--accent-primary);
+    --border-default: #2F3336;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+    /* Theme Meta */
+    --theme-name: "Ocean Deep";
+    --theme-icon-bg: linear-gradient(135deg, #15202B 0%, #0F1419 100%);
+    --theme-icon-accent: #1D9BF0;
+}

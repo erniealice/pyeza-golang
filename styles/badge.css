@@ -1,0 +1,569 @@
+/*
+ * ==========================================================================
+ * BADGE COMPONENT STYLES (rem-based)
+ * ==========================================================================
+ * Comprehensive badge styling for status indicators, categories, counts,
+ * and type labels.
+ * ==========================================================================
+ */
+
+/* ========================================
+   BASE BADGE
+   ======================================== */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem; /* 4px 10px */
+    font-size: 0.6875rem; /* 11px */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+/* Small size variant */
+.badge-sm {
+    padding: 0.125rem 0.5rem; /* 2px 8px */
+    font-size: 0.625rem; /* 10px */
+}
+
+/* ========================================
+   STATUS BADGE (with dot indicator)
+   ======================================== */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem; /* 6px */
+    padding: 0.25rem 0.625rem; /* 4px 10px */
+    border-radius: var(--radius-full);
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1.4;
+}
+
+/* Status dot */
+.status-badge .status-dot {
+    width: 0.375rem; /* 6px */
+    height: 0.375rem;
+    border-radius: var(--radius-round);
+    flex-shrink: 0;
+}
+
+/* Active status */
+.status-badge.active {
+    background: var(--status-success-light);
+    color: var(--status-success);
+}
+
+.status-badge.active .status-dot {
+    background: var(--status-success);
+}
+
+/* Success status (alias for active) */
+.status-badge.success {
+    background: var(--status-success-light);
+    color: var(--status-success);
+}
+
+.status-badge.success .status-dot {
+    background: var(--status-success);
+}
+
+/* Warning status */
+.status-badge.warning {
+    background: var(--status-warning-light);
+    color: var(--status-warning);
+}
+
+.status-badge.warning .status-dot {
+    background: var(--status-warning);
+}
+
+/* Draft status */
+.status-badge.draft {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+.status-badge.draft .status-dot {
+    background: var(--accent-amber);
+}
+
+/* Pending status */
+.status-badge.pending {
+    background: var(--accent-navy-light);
+    color: var(--accent-navy);
+}
+
+.status-badge.pending .status-dot {
+    background: var(--accent-navy);
+}
+
+/* Inactive status */
+.status-badge.inactive {
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+
+.status-badge.inactive .status-dot {
+    background: var(--text-muted);
+}
+
+/* Archived status */
+.status-badge.archived {
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+
+.status-badge.archived .status-dot {
+    background: var(--text-muted);
+}
+
+/* Error status */
+.status-badge.error {
+    background: var(--status-error-light);
+    color: var(--status-error);
+}
+
+.status-badge.error .status-dot {
+    background: var(--status-error);
+}
+
+/* Info status */
+.status-badge.info {
+    background: var(--status-info-light);
+    color: var(--status-info);
+}
+
+.status-badge.info .status-dot {
+    background: var(--status-info);
+}
+
+/* ========================================
+   COUNT BADGE
+   ======================================== */
+
+.count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem; /* 20px */
+    height: 1.25rem;
+    padding: 0 0.375rem; /* 6px */
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: var(--accent-primary-light);
+    color: var(--accent-primary);
+    line-height: 1;
+}
+
+/* Large count badge */
+.count-badge-lg {
+    min-width: 1.5rem; /* 24px */
+    height: 1.5rem;
+    padding: 0 0.5rem; /* 8px */
+    font-size: 0.8125rem; /* 13px */
+    border-radius: var(--radius-md);
+}
+
+/* Header button count badge (notification overlay) */
+.header-btn .count-badge {
+    position: absolute;
+    top: -0.25rem; /* -4px - slightly outside button */
+    right: -0.25rem;
+    min-width: 1.125rem; /* 18px - slightly smaller for header */
+    height: 1.125rem;
+    font-size: 0.6875rem; /* 11px */
+    border: var(--border-width-thick) solid var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ========================================
+   TAB BADGE
+   ======================================== */
+
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem; /* 20px */
+    height: 1.25rem;
+    padding: 0 0.375rem; /* 6px */
+    margin-left: 0.5rem; /* 8px */
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: var(--accent-primary-light);
+    color: var(--accent-primary);
+    line-height: 1;
+}
+
+/* Active tab badge styling */
+.tab.active .tab-badge {
+    background: var(--accent-primary);
+    color: var(--text-inverse);
+}
+
+/* ========================================
+   NAV BADGE (Sidebar Navigation)
+   ======================================== */
+
+.nav-badge {
+    margin-left: auto;
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    padding: 0.125rem 0.5rem; /* 2px 8px */
+    border-radius: var(--radius-full);
+    background: var(--accent-primary-light);
+    color: var(--accent-primary);
+    line-height: 1.4;
+}
+
+/* New badge variant */
+.nav-badge.new {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+
+/* Warning badge variant */
+.nav-badge.warning {
+    background: var(--status-warning-light);
+    color: var(--status-warning);
+}
+
+/* Error badge variant */
+.nav-badge.error {
+    background: var(--status-error-light);
+    color: var(--status-error);
+}
+
+/* ========================================
+   SECTION BADGE
+   ======================================== */
+
+.section-badge {
+    padding: 0.25rem 0.75rem; /* 4px 12px */
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+    line-height: 1.4;
+}
+
+/* ========================================
+   CATEGORY BADGE
+   ======================================== */
+
+.badge-category,
+.badge.category {
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+
+/* ========================================
+   COLOR VARIANT BADGES
+   ========================================
+   Generic color/status variants for badges.
+   Use these for any status, category, or label:
+   - success: Active, connected, completed, verified
+   - warning: Popular, featured, premium, important
+   - info: New, pending, draft, neutral
+   - error: Failed, error, rejected, critical
+   - primary: Featured, highlighted, special
+   - neutral: Default, inactive, archived
+   ======================================== */
+
+/* Success/Active badge (green/sage) */
+.badge-success {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+
+/* Warning badge (amber/orange) */
+.badge-warning {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+/* Info badge (navy/blue) */
+.badge-info {
+    background: var(--accent-navy-light);
+    color: var(--accent-navy);
+}
+
+/* Error badge (red/terracotta) */
+.badge-error {
+    background: var(--status-error-light);
+    color: var(--status-error);
+}
+
+/* Primary badge (purple/plum) */
+.badge-primary {
+    background: var(--accent-plum);
+    background: rgba(139, 107, 142, 0.15);
+    color: var(--accent-plum);
+}
+
+/* Neutral badge (gray) */
+.badge-neutral {
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+
+/* ========================================
+   LEGACY ALIASES (Deprecated)
+   ========================================
+   These are kept for backward compatibility but
+   should be replaced with generic variants above.
+   - badge.popular → badge-warning
+   - badge.connected → badge-success
+   - badge.new → badge-info
+   - badge.featured → badge-primary
+   - badge.premium → badge-warning
+======================================== */
+
+.badge.popular {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+.badge.connected {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+
+.badge.new {
+    background: var(--accent-navy-light);
+    color: var(--accent-navy);
+}
+
+.badge.featured {
+    background: var(--accent-plum);
+    background: rgba(139, 107, 142, 0.15);
+    color: var(--accent-plum);
+}
+
+.badge.premium {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+/* ========================================
+   NOTIFICATION INDICATOR (Dot only)
+   ======================================== */
+
+.notification-dot {
+    width: 0.5rem; /* 8px */
+    height: 0.5rem;
+    background: var(--accent-primary);
+    border-radius: var(--radius-round);
+    border: var(--border-width-thick) solid var(--bg-card);
+}
+
+.notification-indicator {
+    position: absolute;
+    top: 0.5rem; /* 8px */
+    right: 0.5rem;
+    width: 0.5rem; /* 8px */
+    height: 0.5rem;
+    background: var(--accent-primary);
+    border-radius: var(--radius-round);
+    border: var(--border-width-thick) solid var(--bg-card);
+}
+
+/* ========================================
+   ALERT BADGE (with icon)
+   ======================================== */
+
+.alert-icon {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+    color: var(--status-warning);
+    flex-shrink: 0;
+}
+
+.alert-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem; /* 6px */
+    padding: 0.25rem 0.625rem; /* 4px 10px */
+    border-radius: var(--radius-sm);
+    background: var(--status-warning-light);
+    color: var(--status-warning);
+    font-size: 0.75rem; /* 12px */
+    font-weight: 500;
+}
+
+.alert-badge svg {
+    width: 0.875rem; /* 14px */
+    height: 0.875rem;
+}
+
+/* ========================================
+   BADGE WITH BORDER
+   ======================================== */
+
+.badge-outlined {
+    background: transparent;
+    border: var(--border-width) solid currentColor;
+}
+
+.badge-outlined.active {
+    color: var(--status-success);
+    border-color: var(--status-success);
+}
+
+.badge-outlined.warning {
+    color: var(--status-warning);
+    border-color: var(--status-warning);
+}
+
+.badge-outlined.error {
+    color: var(--status-error);
+    border-color: var(--status-error);
+}
+
+/* ========================================
+   BADGE WITH ICON
+   ======================================== */
+
+.badge-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem; /* 4px */
+}
+
+.badge-with-icon svg {
+    width: 0.75rem; /* 12px */
+    height: 0.75rem;
+}
+
+/* ========================================
+   REMOVABLE BADGE (Tag style)
+   ======================================== */
+
+.badge-removable {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem; /* 6px */
+    padding: 0.25rem 0.375rem 0.25rem 0.625rem; /* 4px 6px 4px 10px */
+    border-radius: var(--radius-full);
+    background: var(--bg-sidebar);
+    color: var(--text-secondary);
+    font-size: 0.75rem; /* 12px */
+    font-weight: 500;
+}
+
+.badge-removable-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem; /* 16px */
+    height: 1rem;
+    border-radius: var(--radius-round);
+    background: var(--border);
+    border: none;
+    cursor: pointer;
+    transition: all var(--duration-base) var(--ease-default);
+}
+
+.badge-removable-btn:hover {
+    background: var(--status-error);
+    color: var(--text-inverse);
+}
+
+.badge-removable-btn svg {
+    width: 0.625rem; /* 10px */
+    height: 0.625rem;
+}
+
+/* ========================================
+   BADGE GROUPS
+   ======================================== */
+
+.badge-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem; /* 6px */
+}
+
+.badge-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem; /* 4px */
+}
+
+/* ========================================
+   ANIMATED DOT (Pulsing indicator)
+   ======================================== */
+
+.status-badge.live .status-dot,
+.status-badge.online .status-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .badge,
+    .status-badge {
+        font-size: 0.6875rem; /* 11px */
+        padding: 0.1875rem 0.5rem; /* 3px 8px */
+    }
+
+    .status-badge .status-dot {
+        width: 0.3125rem; /* 5px */
+        height: 0.3125rem;
+    }
+
+    .tab-badge,
+    .count-badge,
+    .nav-badge {
+        font-size: 0.6875rem; /* 11px */
+        min-width: 1.125rem; /* 18px */
+        height: 1.125rem;
+        padding: 0 0.3125rem; /* 5px */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .status-badge.live .status-dot,
+    .status-badge.online .status-dot {
+        animation: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .badge,
+    .status-badge,
+    .count-badge,
+    .tab-badge,
+    .nav-badge {
+        border: var(--border-width) solid currentColor;
+    }
+}

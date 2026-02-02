@@ -1,0 +1,88 @@
+{{/*
+    Alert Component
+    ===============
+    Inline persistent banner messages for contextual feedback.
+    Supports state variants like badge: success, error, warning, info.
+
+    Styles: alert.css
+
+    Usage:
+        {{template "alert" dict "Message" "Your changes have been saved." "State" "success"}}
+        {{template "alert" dict "Message" "Please check the highlighted fields." "State" "error" "Title" "Validation Error"}}
+        {{template "alert" dict "Message" "Your trial ends in 3 days." "State" "warning" "Dismissible" true}}
+        {{template "alert" dict "Message" "A new version is available." "State" "info" "Title" "Update" "Dismissible" true}}
+        {{template "alert" dict "Message" "Custom alert." "Variant" "outlined"}}
+
+    Parameters:
+        Message     - Alert body text (required)
+        State       - success | error | warning | info (default: info)
+        Title       - Optional bold heading
+        Dismissible - true | false (default: false) — shows close button
+        Variant     - filled | outlined | subtle (default: subtle)
+        Icon        - true | false (default: true) — shows state icon
+        Class       - Additional CSS classes
+        ID          - Element ID
+*/}}
+
+{{define "alert"}}
+{{- $state := or .State "info" -}}
+{{- $variant := or .Variant "subtle" -}}
+{{- $showIcon := true -}}
+{{- if eq .Icon false }}{{- $showIcon = false -}}{{- end -}}
+{{- $dismissible := false -}}
+{{- if eq .Dismissible true }}{{- $dismissible = true -}}{{- end -}}
+
+{{- /* Build class list */ -}}
+{{- $classes := printf "alert alert-%s alert-%s" $state $variant -}}
+{{- if .Class }}{{- $classes = printf "%s %s" $classes .Class -}}{{- end -}}
+
+<div class="{{$classes}}"
+    {{- if .ID }} id="{{.ID}}"{{end}}
+    role="alert"
+>
+    {{- if $showIcon }}
+    <div class="alert-icon">
+        {{- if eq $state "success" -}}
+            {{template "icon-check-circle"}}
+        {{- else if eq $state "error" -}}
+            {{template "icon-x-circle"}}
+        {{- else if eq $state "warning" -}}
+            {{template "icon-alert-triangle"}}
+        {{- else -}}
+            {{template "icon-info"}}
+        {{- end -}}
+    </div>
+    {{- end }}
+    <div class="alert-body">
+        {{- if .Title -}}
+        <div class="alert-title">{{.Title}}</div>
+        {{- end -}}
+        <div class="alert-message">{{.Message}}</div>
+    </div>
+    {{- if $dismissible }}
+    <button class="alert-dismiss" aria-label="Dismiss alert" onclick="this.closest('.alert').remove()">
+        {{template "icon-x"}}
+    </button>
+    {{- end }}
+</div>
+{{end}}
+
+{{/*
+    Alert Group
+    ===========
+    Stack multiple alerts vertically.
+
+    Usage:
+        {{template "alert-group"}}
+            {{template "alert" dict "Message" "First alert." "State" "info"}}
+            {{template "alert" dict "Message" "Second alert." "State" "warning"}}
+        {{template "alert-group-end"}}
+*/}}
+
+{{define "alert-group"}}
+<div class="alert-group">
+{{end}}
+
+{{define "alert-group-end"}}
+</div>
+{{end}}

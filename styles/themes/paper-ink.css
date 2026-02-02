@@ -1,0 +1,68 @@
+/*
+ * ==========================================================================
+ * THEME: PAPER & INK
+ * Ultra-minimal editorial palette — warm off-white paper, near-black ink
+ * Think: broadsheet newspapers, letterpress, typeset manuscripts
+ * ==========================================================================
+ */
+[data-theme="paper-ink"] {
+    /* Backgrounds — warm paper tones */
+    --bg-base: #F9F7F3;
+    --bg-sidebar: #F3F0EA;
+    --bg-card: #FEFDFB;
+    --bg-hover: #EDEBE5;
+    --bg-input: #FEFDFB;
+    --bg-overlay: rgba(30, 28, 25, 0.45);
+
+    /* Text — true ink black with warm undertone */
+    --text-primary: #1E1C19;
+    --text-secondary: #5C5850;
+    --text-muted: #9E9A92;
+    --text-inverse: #FEFDFB;
+
+    /* Primary Accent — near-black, ink-like */
+    --accent-primary: #2D2A25;
+    --accent-primary-light: #F0EEEA;
+    --accent-primary-dark: #1A1816;
+
+    /* Secondary Accents — muted, editorial palette */
+    --accent-terracotta: #A3543A;
+    --accent-terracotta-light: #F7EDE9;
+    --accent-terracotta-dark: #8A4530;
+    --accent-sage: #5E7F5E;
+    --accent-sage-light: #EDF3ED;
+    --accent-navy: #3B5068;
+    --accent-navy-light: #ECF0F4;
+    --accent-navy-dark: #2C3D50;
+    --accent-amber: #A68B3C;
+    --accent-amber-light: #F8F4E8;
+    --accent-plum: #6E5A72;
+    --accent-slate: #6B6862;
+
+    /* Status Colors — restrained, tasteful */
+    --status-success: #5E7F5E;
+    --status-success-light: #EDF3ED;
+    --status-warning: #A68B3C;
+    --status-warning-light: #F8F4E8;
+    --status-error: #A3543A;
+    --status-error-light: #F7EDE9;
+    --status-info: #3B5068;
+    --status-info-light: #ECF0F4;
+
+    /* Borders & Shadows — delicate, barely-there */
+    --border: #DDD9D2;
+    --border-light: #EAE7E1;
+    --border-focus: var(--accent-primary);
+    --border-default: #DDD9D2;
+    --shadow-sm: 0 1px 2px rgba(30, 28, 25, 0.03);
+    --shadow-md: 0 4px 12px rgba(30, 28, 25, 0.05);
+    --shadow-lg: 0 8px 24px rgba(30, 28, 25, 0.07);
+    --shadow-card: 0 1px 3px rgba(30, 28, 25, 0.04);
+    --shadow-float: 0 12px 40px rgba(30, 28, 25, 0.10);
+    --shadow-xl: 0 20px 50px rgba(30, 28, 25, 0.09);
+
+    /* Theme Meta */
+    --theme-name: "Paper & Ink";
+    --theme-icon-bg: linear-gradient(135deg, #F9F7F3 0%, #DDD9D2 100%);
+    --theme-icon-accent: #2D2A25;
+}

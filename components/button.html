@@ -1,0 +1,184 @@
+{{/*
+    Button Component
+    ================
+    A reusable button component with multiple variants and sizes.
+
+    All button variants now require the "btn" base class (modifier pattern).
+
+    Usage:
+        {{template "button" dict "Label" "Save" "Variant" "primary"}}
+        {{template "button" dict "Label" "Cancel" "Variant" "secondary" "Size" "sm"}}
+        {{template "button" dict "Label" "Delete" "Variant" "danger" "Icon" "trash-2"}}
+        {{template "button" dict "Variant" "icon" "Icon" "edit" "Title" "Edit"}}
+        {{template "button" dict "Label" "View" "Variant" "action" "Icon" "eye" "ActionType" "view"}}
+
+    Parameters:
+        Label       - Button text (optional for icon-only buttons)
+        Variant     - primary | secondary | ghost | white | outline | danger | success | icon | action (default: primary)
+        Size        - sm | md | lg | full (default: md)
+        Icon        - Icon name to render (e.g., "plus", "edit", "trash-2")
+        IconPos     - left | right (default: left)
+        Href        - If provided, renders as <a> instead of <button>
+        Type        - Button type: button | submit | reset (default: button)
+        Disabled    - true | false (default: false)
+        Title       - Tooltip/title attribute
+        ID          - Element ID
+        Class       - Additional CSS classes
+        ActionType  - For action variant: view | edit | clone | delete
+        Data        - Map of data-* attributes
+*/}}
+
+{{define "button"}}
+{{- $variant := or .Variant "primary" -}}
+{{- $size := or .Size "md" -}}
+{{- $type := or .Type "button" -}}
+{{- $iconPos := or .IconPos "left" -}}
+{{- $disabled := or .Disabled false -}}
+
+{{- /* Build CSS classes */ -}}
+{{- $baseClass := "btn" -}}
+{{- if eq $variant "primary" }}{{- $baseClass = "btn btn-primary" -}}{{- end -}}
+{{- if eq $variant "secondary" }}{{- $baseClass = "btn btn-secondary" -}}{{- end -}}
+{{- if eq $variant "white" }}{{- $baseClass = "btn btn-white" -}}{{- end -}}
+{{- if eq $variant "outline" }}{{- $baseClass = "btn btn-outline-white" -}}{{- end -}}
+{{- if eq $variant "danger" }}{{- $baseClass = "btn btn-danger" -}}{{- end -}}
+{{- if eq $variant "ghost" }}{{- $baseClass = "btn btn-ghost" -}}{{- end -}}
+{{- if eq $variant "success" }}{{- $baseClass = "btn btn-success" -}}{{- end -}}
+{{- if eq $variant "icon" }}{{- $baseClass = "btn-icon" -}}{{- end -}}
+{{- if eq $variant "action" }}{{- $baseClass = "action-btn" -}}{{- end -}}
+
+{{- /* Size classes */ -}}
+{{- $sizeClass := "" -}}
+{{- if eq $size "sm" }}{{- $sizeClass = "btn-sm" -}}{{- end -}}
+{{- if eq $size "lg" }}{{- $sizeClass = "btn-lg" -}}{{- end -}}
+{{- if eq $size "full" }}{{- $sizeClass = "btn-full" -}}{{- end -}}
+
+{{- /* Action type class */ -}}
+{{- $actionClass := "" -}}
+{{- if and (eq $variant "action") .ActionType }}{{- $actionClass = .ActionType -}}{{- end -}}
+
+{{- /* Combine classes */ -}}
+{{- $classes := $baseClass -}}
+{{- if $sizeClass }}{{- $classes = printf "%s %s" $classes $sizeClass -}}{{- end -}}
+{{- if $actionClass }}{{- $classes = printf "%s %s" $classes $actionClass -}}{{- end -}}
+{{- if .Class }}{{- $classes = printf "%s %s" $classes .Class -}}{{- end -}}
+
+{{- if .Href -}}
+<a href="{{.Href}}" class="{{$classes}}"
+    {{- if .ID }} id="{{.ID}}"{{end -}}
+    {{- if .Title }} title="{{.Title}}"{{end -}}
+    {{- if $disabled }} aria-disabled="true" tabindex="-1"{{end -}}
+    {{- range $key, $val := .Data }} data-{{$key}}="{{$val}}"{{end -}}
+>
+    {{- if and .Icon (eq $iconPos "left") -}}
+        {{- if eq .Icon "plus" }}{{template "icon-plus" .}}{{end -}}
+        {{- if eq .Icon "edit" }}{{template "icon-edit" .}}{{end -}}
+        {{- if eq .Icon "trash-2" }}{{template "icon-trash-2" .}}{{end -}}
+        {{- if eq .Icon "eye" }}{{template "icon-eye" .}}{{end -}}
+        {{- if eq .Icon "copy" }}{{template "icon-copy" .}}{{end -}}
+        {{- if eq .Icon "check" }}{{template "icon-check" .}}{{end -}}
+        {{- if eq .Icon "x" }}{{template "icon-x" .}}{{end -}}
+        {{- if eq .Icon "save" }}{{template "icon-save" .}}{{end -}}
+        {{- if eq .Icon "download" }}{{template "icon-download" .}}{{end -}}
+        {{- if eq .Icon "upload" }}{{template "icon-upload" .}}{{end -}}
+        {{- if eq .Icon "search" }}{{template "icon-search" .}}{{end -}}
+        {{- if eq .Icon "filter" }}{{template "icon-filter" .}}{{end -}}
+        {{- if eq .Icon "settings" }}{{template "icon-settings" .}}{{end -}}
+        {{- if eq .Icon "chevron-left" }}{{template "icon-chevron-left" .}}{{end -}}
+        {{- if eq .Icon "chevron-right" }}{{template "icon-chevron-right" .}}{{end -}}
+        {{- if eq .Icon "chevron-down" }}{{template "icon-chevron-down" .}}{{end -}}
+        {{- if eq .Icon "external-link" }}{{template "icon-external-link" .}}{{end -}}
+        {{- if eq .Icon "refresh" }}{{template "icon-refresh-cw" .}}{{end -}}
+        {{- if eq .Icon "archive" }}{{template "icon-archive" .}}{{end -}}
+    {{- end -}}
+    {{- if .Label }}{{.Label}}{{end -}}
+    {{- if and .Icon (eq $iconPos "right") -}}
+        {{- if eq .Icon "plus" }}{{template "icon-plus" .}}{{end -}}
+        {{- if eq .Icon "edit" }}{{template "icon-edit" .}}{{end -}}
+        {{- if eq .Icon "trash-2" }}{{template "icon-trash-2" .}}{{end -}}
+        {{- if eq .Icon "eye" }}{{template "icon-eye" .}}{{end -}}
+        {{- if eq .Icon "copy" }}{{template "icon-copy" .}}{{end -}}
+        {{- if eq .Icon "check" }}{{template "icon-check" .}}{{end -}}
+        {{- if eq .Icon "x" }}{{template "icon-x" .}}{{end -}}
+        {{- if eq .Icon "chevron-right" }}{{template "icon-chevron-right" .}}{{end -}}
+        {{- if eq .Icon "chevron-down" }}{{template "icon-chevron-down" .}}{{end -}}
+        {{- if eq .Icon "external-link" }}{{template "icon-external-link" .}}{{end -}}
+    {{- end -}}
+</a>
+{{- else -}}
+<button type="{{$type}}" class="{{$classes}}"
+    {{- if .ID }} id="{{.ID}}"{{end -}}
+    {{- if .Title }} title="{{.Title}}"{{end -}}
+    {{- if $disabled }} disabled{{end -}}
+    {{- range $key, $val := .Data }} data-{{$key}}="{{$val}}"{{end -}}
+>
+    {{- if and .Icon (eq $iconPos "left") -}}
+        {{- if eq .Icon "plus" }}{{template "icon-plus" .}}{{end -}}
+        {{- if eq .Icon "edit" }}{{template "icon-edit" .}}{{end -}}
+        {{- if eq .Icon "trash-2" }}{{template "icon-trash-2" .}}{{end -}}
+        {{- if eq .Icon "eye" }}{{template "icon-eye" .}}{{end -}}
+        {{- if eq .Icon "copy" }}{{template "icon-copy" .}}{{end -}}
+        {{- if eq .Icon "check" }}{{template "icon-check" .}}{{end -}}
+        {{- if eq .Icon "x" }}{{template "icon-x" .}}{{end -}}
+        {{- if eq .Icon "save" }}{{template "icon-save" .}}{{end -}}
+        {{- if eq .Icon "download" }}{{template "icon-download" .}}{{end -}}
+        {{- if eq .Icon "upload" }}{{template "icon-upload" .}}{{end -}}
+        {{- if eq .Icon "search" }}{{template "icon-search" .}}{{end -}}
+        {{- if eq .Icon "filter" }}{{template "icon-filter" .}}{{end -}}
+        {{- if eq .Icon "settings" }}{{template "icon-settings" .}}{{end -}}
+        {{- if eq .Icon "chevron-left" }}{{template "icon-chevron-left" .}}{{end -}}
+        {{- if eq .Icon "chevron-right" }}{{template "icon-chevron-right" .}}{{end -}}
+        {{- if eq .Icon "chevron-down" }}{{template "icon-chevron-down" .}}{{end -}}
+        {{- if eq .Icon "external-link" }}{{template "icon-external-link" .}}{{end -}}
+        {{- if eq .Icon "refresh" }}{{template "icon-refresh-cw" .}}{{end -}}
+        {{- if eq .Icon "archive" }}{{template "icon-archive" .}}{{end -}}
+    {{- end -}}
+    {{- if .Label }}{{.Label}}{{end -}}
+    {{- if and .Icon (eq $iconPos "right") -}}
+        {{- if eq .Icon "plus" }}{{template "icon-plus" .}}{{end -}}
+        {{- if eq .Icon "edit" }}{{template "icon-edit" .}}{{end -}}
+        {{- if eq .Icon "trash-2" }}{{template "icon-trash-2" .}}{{end -}}
+        {{- if eq .Icon "eye" }}{{template "icon-eye" .}}{{end -}}
+        {{- if eq .Icon "copy" }}{{template "icon-copy" .}}{{end -}}
+        {{- if eq .Icon "check" }}{{template "icon-check" .}}{{end -}}
+        {{- if eq .Icon "x" }}{{template "icon-x" .}}{{end -}}
+        {{- if eq .Icon "chevron-right" }}{{template "icon-chevron-right" .}}{{end -}}
+        {{- if eq .Icon "chevron-down" }}{{template "icon-chevron-down" .}}{{end -}}
+        {{- if eq .Icon "external-link" }}{{template "icon-external-link" .}}{{end -}}
+    {{- end -}}
+</button>
+{{- end -}}
+{{end}}
+
+{{/*
+    Button Group Component
+    ======================
+    Wraps multiple buttons in a flex container.
+
+    Usage:
+        {{template "button-group" dict "Align" "right"}}
+            ... buttons here ...
+        {{template "button-group-end"}}
+
+    Parameters:
+        Align   - left | center | right | between (default: left)
+        Gap     - sm | md | lg (default: md)
+        Class   - Additional CSS classes
+*/}}
+
+{{define "button-group"}}
+{{- $align := or .Align "left" -}}
+{{- $gap := or .Gap "md" -}}
+{{- $classes := "btn-group" -}}
+{{- if eq $align "right" }}{{- $classes = printf "%s btn-group-right" $classes -}}{{- end -}}
+{{- if eq $align "center" }}{{- $classes = printf "%s btn-group-center" $classes -}}{{- end -}}
+{{- if eq $align "between" }}{{- $classes = printf "%s btn-group-between" $classes -}}{{- end -}}
+{{- if eq $gap "sm" }}{{- $classes = printf "%s btn-group-gap-sm" $classes -}}{{- end -}}
+{{- if eq $gap "lg" }}{{- $classes = printf "%s btn-group-gap-lg" $classes -}}{{- end -}}
+{{- if .Class }}{{- $classes = printf "%s %s" $classes .Class -}}{{- end -}}
+<div class="{{$classes}}">
+{{end}}
+
+{{define "button-group-end"}}
+</div>
+{{end}}

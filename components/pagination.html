@@ -1,0 +1,137 @@
+{{/*
+================================================================================
+PAGINATION COMPONENT
+================================================================================
+A reusable pagination component with previous/next buttons and page numbers.
+
+Usage:
+    {{template "pagination" .Pagination}}
+
+Data structure:
+    .Pagination = {
+        CurrentPage: 1,
+        TotalPages: 10,
+        HasPrev: false,
+        HasNext: true,
+        Pages: []int{1, 2, 3, 0, 10}, // 0 represents ellipsis
+        Labels: PaginationLabels{
+            Prev: "Previous",
+            Next: "Next",
+        },
+    }
+================================================================================
+*/}}
+
+{{/* PAGINATION - Full pagination component */}}
+{{define "pagination"}}
+<nav class="pagination" role="navigation" aria-label="Pagination">
+    {{/* Previous Button */}}
+    <button class="pagination-btn pagination-prev"
+            {{if not .HasPrev}}disabled{{end}}
+            data-page="{{if .HasPrev}}{{sub .CurrentPage 1}}{{else}}1{{end}}"
+            aria-label="{{.Labels.Prev}}">
+        {{template "icon-chevron-left"}}
+        <span class="pagination-btn-text">{{.Labels.Prev}}</span>
+    </button>
+
+    {{/* Page Numbers */}}
+    <div class="pagination-pages">
+        {{range .Pages}}
+        {{if eq . 0}}
+        <span class="pagination-ellipsis">...</span>
+        {{else}}
+        <button class="pagination-page{{if eq . $.CurrentPage}} active{{end}}"
+                data-page="{{.}}"
+                {{if eq . $.CurrentPage}}aria-current="page"{{end}}>
+            {{.}}
+        </button>
+        {{end}}
+        {{end}}
+    </div>
+
+    {{/* Next Button */}}
+    <button class="pagination-btn pagination-next"
+            {{if not .HasNext}}disabled{{end}}
+            data-page="{{if .HasNext}}{{add .CurrentPage 1}}{{else}}{{.TotalPages}}{{end}}"
+            aria-label="{{.Labels.Next}}">
+        <span class="pagination-btn-text">{{.Labels.Next}}</span>
+        {{template "icon-chevron-right"}}
+    </button>
+</nav>
+{{end}}
+
+{{/* PAGINATION SIMPLE - Minimal prev/next only */}}
+{{define "pagination-simple"}}
+<nav class="pagination pagination-simple" role="navigation" aria-label="Pagination">
+    <button class="pagination-btn pagination-prev"
+            {{if not .HasPrev}}disabled{{end}}
+            data-page="{{if .HasPrev}}{{sub .CurrentPage 1}}{{else}}1{{end}}">
+        {{template "icon-chevron-left"}}
+        {{.Labels.Prev}}
+    </button>
+
+    <span class="pagination-info">
+        {{.Labels.Page}} <strong>{{.CurrentPage}}</strong> {{.Labels.Of}} <strong>{{.TotalPages}}</strong>
+    </span>
+
+    <button class="pagination-btn pagination-next"
+            {{if not .HasNext}}disabled{{end}}
+            data-page="{{if .HasNext}}{{add .CurrentPage 1}}{{else}}{{.TotalPages}}{{end}}">
+        {{.Labels.Next}}
+        {{template "icon-chevron-right"}}
+    </button>
+</nav>
+{{end}}
+
+{{/* PAGINATION COMPACT - Icon-only for mobile */}}
+{{define "pagination-compact"}}
+<nav class="pagination pagination-compact" role="navigation" aria-label="Pagination">
+    <button class="pagination-btn pagination-prev"
+            {{if not .HasPrev}}disabled{{end}}
+            data-page="{{if .HasPrev}}{{sub .CurrentPage 1}}{{else}}1{{end}}"
+            aria-label="Previous page">
+        {{template "icon-chevron-left"}}
+    </button>
+
+    {{range .Pages}}
+    {{if eq . 0}}
+    <span class="pagination-ellipsis">...</span>
+    {{else}}
+    <button class="pagination-page{{if eq . $.CurrentPage}} active{{end}}"
+            data-page="{{.}}"
+            {{if eq . $.CurrentPage}}aria-current="page"{{end}}>
+        {{.}}
+    </button>
+    {{end}}
+    {{end}}
+
+    <button class="pagination-btn pagination-next"
+            {{if not .HasNext}}disabled{{end}}
+            data-page="{{if .HasNext}}{{add .CurrentPage 1}}{{else}}{{.TotalPages}}{{end}}"
+            aria-label="Next page">
+        {{template "icon-chevron-right"}}
+    </button>
+</nav>
+{{end}}
+
+{{/* PAGINATION LOAD MORE - Button-based infinite scroll alternative */}}
+{{define "pagination-load-more"}}
+<div class="pagination-load-more">
+    {{if .HasMore}}
+    <button class="btn-load-more" data-page="{{add .CurrentPage 1}}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+        {{.Labels.LoadMore}}
+    </button>
+    <p class="pagination-load-more-info">
+        {{.Labels.Showing}} {{.ShowingCount}} {{.Labels.Of}} {{.TotalCount}} {{.Labels.Items}}
+    </p>
+    {{else}}
+    <p class="pagination-load-more-complete">
+        {{.Labels.AllLoaded}}
+    </p>
+    {{end}}
+</div>
+{{end}}

@@ -1,0 +1,258 @@
+{{define "multi-select"}}
+{{/*
+    Multi-Select Component with Overflow Handling
+
+    Usage:
+    {{template "multi-select" dict
+        "ID" "mySelect"
+        "Name" "field_name"
+        "Placeholder" "Select items..."
+        "SearchPlaceholder" "Search..."
+        "Options" .MyOptions
+        "Selected" .SelectedItems
+        "Required" true
+        "HelpText" "Select one or more items"
+        "NoResults" "No results found"
+        "MaxVisibleChips" 2
+        "MoreSelectedTemplate" "+{count} more"
+    }}
+
+    Options format: []struct { Value string; Label string; Selected bool }
+    Selected format: []struct { Value string; Label string }
+*/}}
+<div class="multi-select" data-name="{{.Name}}" id="{{.ID}}" data-max-chips="{{if .MaxVisibleChips}}{{.MaxVisibleChips}}{{else}}2{{end}}" data-more-template="{{if .MoreSelectedTemplate}}{{.MoreSelectedTemplate}}{{else}}+{count} more{{end}}">
+    <div class="multi-select-trigger" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+        <div class="multi-select-selected">
+            {{if .Selected}}
+            {{range .Selected}}
+            <span class="multi-select-chip" data-value="{{.Value}}">
+                <span class="multi-select-chip-label">{{.Label}}</span>
+                <button type="button" class="multi-select-chip-remove" aria-label="Remove {{.Label}}">&times;</button>
+            </span>
+            {{end}}
+            {{else}}
+            <span class="multi-select-placeholder">{{.Placeholder}}</span>
+            {{end}}
+        </div>
+        <span class="multi-select-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </span>
+    </div>
+    <div class="multi-select-dropdown" role="listbox">
+        <div class="multi-select-search-wrapper">
+            <svg class="multi-select-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input type="text" class="multi-select-search" placeholder="{{.SearchPlaceholder}}" autocomplete="off">
+        </div>
+        <div class="multi-select-options">
+            {{range .Options}}
+            <div class="multi-select-option{{if .Selected}} selected{{end}}" data-value="{{.Value}}" data-label="{{.Label}}" role="option">
+                <span class="multi-select-checkbox">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2 5L4 7L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="multi-select-option-label">{{.Label}}</span>
+            </div>
+            {{end}}
+        </div>
+        <div class="multi-select-empty">{{if .NoResults}}{{.NoResults}}{{else}}No results found{{end}}</div>
+    </div>
+    <input type="hidden" name="{{.Name}}" class="multi-select-input" {{if .Required}}required{{end}}>
+    {{if .HelpText}}
+    <small class="form-hint">{{.HelpText}}</small>
+    {{end}}
+</div>
+
+<script>
+(function() {
+    const container = document.getElementById('{{.ID}}');
+    if (!container) return;
+
+    const trigger = container.querySelector('.multi-select-trigger');
+    const selectedContainer = container.querySelector('.multi-select-selected');
+    const optionsContainer = container.querySelector('.multi-select-options');
+    const hiddenInput = container.querySelector('.multi-select-input');
+    const searchInput = container.querySelector('.multi-select-search');
+    const emptyState = container.querySelector('.multi-select-empty');
+    const allOptions = Array.from(optionsContainer.querySelectorAll('.multi-select-option'));
+
+    // Config from data attributes
+    const MAX_VISIBLE_CHIPS = parseInt(container.dataset.maxChips) || 2;
+    const moreSelectedTemplate = container.dataset.moreTemplate || '+{count} more';
+    const placeholder = '{{.Placeholder}}';
+
+    // Initialize selected values from pre-selected chips
+    const selected = new Map();
+    container.querySelectorAll('.multi-select-chip').forEach(chip => {
+        const value = chip.dataset.value;
+        const label = chip.querySelector('.multi-select-chip-label')?.textContent || '';
+        if (value) selected.set(value, label.trim());
+    });
+
+    function updateDisplay() {
+        selectedContainer.innerHTML = '';
+
+        if (selected.size === 0) {
+            selectedContainer.innerHTML = `<span class="multi-select-placeholder">${placeholder}</span>`;
+        } else {
+            const isOpen = container.classList.contains('open');
+            const entries = Array.from(selected.entries());
+            const visibleCount = isOpen ? entries.length : Math.min(MAX_VISIBLE_CHIPS, entries.length);
+            const hiddenCount = entries.length - visibleCount;
+
+            // Show visible chips
+            entries.slice(0, visibleCount).forEach(([value, label]) => {
+                const chip = document.createElement('span');
+                chip.className = 'multi-select-chip';
+                chip.dataset.value = value;
+                chip.innerHTML = `
+                    <span class="multi-select-chip-label">${label}</span>
+                    <button type="button" class="multi-select-chip-remove" aria-label="Remove ${label}">&times;</button>
+                `;
+                selectedContainer.appendChild(chip);
+            });
+
+            // Show "+X more" counter if there are hidden chips
+            if (hiddenCount > 0 && !isOpen) {
+                const counter = document.createElement('span');
+                counter.className = 'multi-select-overflow-count';
+                counter.textContent = moreSelectedTemplate.replace('{count}', hiddenCount);
+                counter.title = entries.slice(visibleCount).map(([_, label]) => label).join(', ');
+                selectedContainer.appendChild(counter);
+            }
+        }
+
+        // Update option visual states
+        allOptions.forEach(opt => {
+            opt.classList.toggle('selected', selected.has(opt.dataset.value));
+        });
+
+        // Update hidden input with comma-separated values
+        hiddenInput.value = Array.from(selected.keys()).join(',');
+
+        // Update ARIA state
+        trigger.setAttribute('aria-expanded', container.classList.contains('open'));
+    }
+
+    function toggleOption(value, label) {
+        if (selected.has(value)) {
+            selected.delete(value);
+        } else {
+            selected.set(value, label);
+        }
+        updateDisplay();
+    }
+
+    function filterOptions(query) {
+        const lowerQuery = query.toLowerCase();
+        let visibleCount = 0;
+
+        allOptions.forEach(opt => {
+            const label = opt.dataset.label.toLowerCase();
+            const matches = label.includes(lowerQuery);
+            opt.classList.toggle('hidden', !matches);
+            if (matches) visibleCount++;
+        });
+
+        // Show/hide empty state
+        if (emptyState) {
+            emptyState.classList.toggle('visible', visibleCount === 0);
+        }
+    }
+
+    function openDropdown() {
+        container.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+        if (searchInput) {
+            searchInput.value = '';
+            filterOptions('');
+            setTimeout(() => searchInput.focus(), 10);
+        }
+        updateDisplay(); // Re-render to show all chips
+    }
+
+    function closeDropdown() {
+        container.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+        updateDisplay(); // Re-render to show collapsed state with overflow
+    }
+
+    // Click on trigger
+    trigger.addEventListener('click', function(e) {
+        // Handle chip remove button clicks
+        if (e.target.classList.contains('multi-select-chip-remove')) {
+            e.stopPropagation();
+            const chip = e.target.closest('.multi-select-chip');
+            if (chip) {
+                selected.delete(chip.dataset.value);
+                updateDisplay();
+            }
+            return;
+        }
+
+        // Toggle dropdown
+        if (container.classList.contains('open')) {
+            closeDropdown();
+        } else {
+            openDropdown();
+        }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!container.contains(e.target)) {
+            closeDropdown();
+        }
+    });
+
+    // Option selection
+    allOptions.forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleOption(this.dataset.value, this.dataset.label);
+        });
+    });
+
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            filterOptions(e.target.value);
+        });
+
+        // Prevent search input from closing dropdown
+        searchInput.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDropdown();
+                trigger.focus();
+            }
+        });
+    }
+
+    // Keyboard navigation
+    trigger.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (container.classList.contains('open')) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+
+    // Initialize display
+    updateDisplay();
+})();
+</script>
+{{end}}

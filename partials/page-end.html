@@ -1,0 +1,42 @@
+{{define "page-end"}}
+{{/*
+    Page End Partial
+    ================
+    Include this at the end of every page template (after </main>).
+    It provides:
+    - Help pane (knowledge base side panel)
+    - Notification drawer component (with its own CSS and JS)
+    - Settings modal (account settings popup)
+    - Popover component init (for header theme switcher + any other popovers)
+    - Common scripts (sidebar toggle, keyboard shortcuts)
+*/}}
+
+    {{/* Help Pane - knowledge base side panel */}}
+    {{template "help-pane" .}}
+
+    {{/* Notification Sheet - includes its own CSS and JS */}}
+    {{template "sheet-notification" .}}
+
+    {{/* Form Sheet Container - for add/edit forms via Sheet.js */}}
+    {{template "sheet-form-container" .}}
+
+    {{/* Settings Modal - account settings popup */}}
+    {{template "settings-modal" .}}
+
+    {{/* Popover Component - auto-inits all [data-popover] elements (incl. header theme switcher) */}}
+    {{template "popover-init"}}
+
+    {{/* Theme Switcher Script */}}
+    <script src="/assets/js/theme-switcher.js?v={{.CacheVersion}}"></script>
+
+    {{/* Help Pane Script */}}
+    {{if .HasHelp}}
+    <script src="/assets/js/components/help-pane.js?v={{.CacheVersion}}"></script>
+    {{end}}
+
+    {{/* Common Page Scripts */}}
+    {{template "scripts" .}}
+
+    {{/* Table Scripts - loaded once for all pages */}}
+    {{template "table-scripts" .}}
+{{end}}

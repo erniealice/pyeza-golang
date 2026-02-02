@@ -1,0 +1,262 @@
+/*
+ * ==========================================================================
+ * SKELETON COMPONENT STYLES (rem-based)
+ * ==========================================================================
+ * Animated loading placeholders for HTMX content swaps.
+ * Provides shimmer animation on text lines, circles, rects,
+ * and preset composites for cards, tables, and stat cards.
+ * ==========================================================================
+ */
+
+/* ========================================
+   SHIMMER ANIMATION
+   ======================================== */
+
+@keyframes skeletonShimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* ========================================
+   BASE SKELETON ELEMENT
+   ======================================== */
+
+.skeleton-line,
+.skeleton-circle,
+.skeleton-rect {
+    background: linear-gradient(
+        90deg,
+        var(--bg-sidebar) 25%,
+        var(--bg-hover) 50%,
+        var(--bg-sidebar) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.8s ease-in-out infinite;
+    border-radius: var(--radius-sm);
+}
+
+/* ========================================
+   TEXT LINES
+   ======================================== */
+
+.skeleton-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* 8px */
+}
+
+.skeleton-line {
+    height: 0.875rem; /* 14px */
+    width: 100%;
+}
+
+/* Last line in a group is shorter for natural look */
+.skeleton-text .skeleton-line:last-child:not(:first-child) {
+    width: 65%;
+}
+
+/* Short variant */
+.skeleton-line-short {
+    width: 50%;
+}
+
+/* ========================================
+   CIRCLE (Avatar placeholder)
+   ======================================== */
+
+.skeleton-circle {
+    border-radius: var(--radius-round);
+    flex-shrink: 0;
+}
+
+.skeleton-circle-xs {
+    width: 1.5rem; /* 24px */
+    height: 1.5rem;
+}
+
+.skeleton-circle-sm {
+    width: 2rem; /* 32px */
+    height: 2rem;
+}
+
+.skeleton-circle-md {
+    width: 2.5rem; /* 40px */
+    height: 2.5rem;
+}
+
+.skeleton-circle-lg {
+    width: 3.5rem; /* 56px */
+    height: 3.5rem;
+}
+
+.skeleton-circle-xl {
+    width: 5rem; /* 80px */
+    height: 5rem;
+}
+
+/* ========================================
+   RECTANGLE (Image / block placeholder)
+   ======================================== */
+
+.skeleton-rect {
+    border-radius: var(--radius-md);
+}
+
+/* ========================================
+   CARD PRESET
+   ======================================== */
+
+.skeleton-card {
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    padding: 1.5rem; /* 24px */
+}
+
+.skeleton-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* 12px */
+    margin-bottom: 1.25rem; /* 20px */
+}
+
+.skeleton-card-header-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem; /* 6px */
+}
+
+.skeleton-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* 8px */
+}
+
+/* ========================================
+   TABLE PRESET
+   ======================================== */
+
+.skeleton-table {
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.skeleton-table-row {
+    display: flex;
+    gap: 1rem; /* 16px */
+    padding: 0.875rem 1.25rem; /* 14px 20px */
+    border-bottom: var(--border-width) solid var(--border-light);
+}
+
+.skeleton-table-row:last-child {
+    border-bottom: none;
+}
+
+.skeleton-table-header {
+    background: var(--bg-sidebar);
+}
+
+.skeleton-table-header .skeleton-line {
+    height: 0.625rem; /* 10px — smaller for headers */
+    opacity: 0.6;
+}
+
+.skeleton-table-cell {
+    flex: 1;
+}
+
+.skeleton-table-cell .skeleton-line {
+    height: 0.75rem; /* 12px */
+}
+
+/* Vary widths per column for natural look */
+.skeleton-table-row .skeleton-table-cell:nth-child(1) .skeleton-line { width: 70%; }
+.skeleton-table-row .skeleton-table-cell:nth-child(2) .skeleton-line { width: 85%; }
+.skeleton-table-row .skeleton-table-cell:nth-child(3) .skeleton-line { width: 55%; }
+.skeleton-table-row .skeleton-table-cell:nth-child(4) .skeleton-line { width: 40%; }
+.skeleton-table-row .skeleton-table-cell:nth-child(5) .skeleton-line { width: 60%; }
+
+/* Stagger animation for rows */
+.skeleton-table-row:nth-child(2) { animation-delay: 0.05s; }
+.skeleton-table-row:nth-child(3) { animation-delay: 0.1s; }
+.skeleton-table-row:nth-child(4) { animation-delay: 0.15s; }
+.skeleton-table-row:nth-child(5) { animation-delay: 0.2s; }
+.skeleton-table-row:nth-child(6) { animation-delay: 0.25s; }
+
+/* ========================================
+   STAT CARD PRESET
+   ======================================== */
+
+.skeleton-stat {
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; /* 24px */
+}
+
+/* ========================================
+   HTMX INTEGRATION
+   ========================================
+   Show skeleton during HTMX requests.
+   Use with hx-indicator on the skeleton wrapper.
+   ======================================== */
+
+.skeleton-indicator {
+    display: none;
+}
+
+.skeleton-indicator.htmx-request {
+    display: block;
+}
+
+/* Hide content while loading */
+.skeleton-content.htmx-request {
+    display: none;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .skeleton-card {
+        padding: 1.25rem; /* 20px */
+    }
+
+    .skeleton-table-row {
+        padding: 0.75rem 1rem; /* 12px 16px */
+    }
+
+    .skeleton-stat {
+        padding: 1.25rem; /* 20px */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-line,
+    .skeleton-circle,
+    .skeleton-rect {
+        animation: none;
+        background: var(--bg-sidebar);
+    }
+}
+
+@media (prefers-contrast: high) {
+    .skeleton-line,
+    .skeleton-circle,
+    .skeleton-rect {
+        border: var(--border-width) solid var(--border);
+    }
+}

@@ -1,0 +1,108 @@
+/*
+ * ==========================================================================
+ * SPINNER COMPONENT STYLES (rem-based)
+ * ==========================================================================
+ * Additions to the existing loading-indicator.css spinner.
+ * Provides wrapper layouts (inline, centered), label text,
+ * and color variants for the Go template component.
+ *
+ * NOTE: The base .spinner class and size variants (sm, md, lg)
+ * are defined in loading-indicator.css. This file extends them.
+ * ==========================================================================
+ */
+
+/* ========================================
+   SPINNER WRAPPER
+   ======================================== */
+
+.spinner-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem; /* 10px */
+}
+
+/* ========================================
+   INLINE VARIANT
+   ========================================
+   For use inside buttons, text spans, table cells.
+   ======================================== */
+
+.spinner-inline {
+    display: inline-flex;
+    gap: 0.5rem; /* 8px */
+}
+
+.spinner-inline .spinner {
+    width: 1rem; /* 16px */
+    height: 1rem;
+    border-width: 2px;
+}
+
+.spinner-inline .spinner-label {
+    font-size: 0.8125rem; /* 13px */
+}
+
+/* ========================================
+   CENTERED VARIANT
+   ========================================
+   For page/section loading — centers in parent.
+   ======================================== */
+
+.spinner-centered {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 1rem; /* 48px 16px */
+    width: 100%;
+    min-height: 10rem; /* 160px */
+}
+
+/* ========================================
+   LABEL
+   ======================================== */
+
+.spinner-label {
+    font-family: var(--font-body);
+    font-size: 0.875rem; /* 14px */
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* ========================================
+   COLOR VARIANTS
+   ======================================== */
+
+/* Muted (gray) */
+.spinner-muted {
+    border-color: var(--border-light);
+    border-top-color: var(--text-muted);
+}
+
+/* Inverse (white — for dark backgrounds) */
+.spinner-inverse {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-top-color: var(--text-inverse);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .spinner-centered {
+        padding: 2rem 1rem; /* 32px 16px */
+        min-height: 8rem; /* 128px */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner-wrap .spinner {
+        animation: none;
+        border-top-color: var(--accent-primary);
+        opacity: 0.7;
+    }
+}
