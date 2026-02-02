@@ -1,6 +1,6 @@
 package ui
 
-import "leapfor.xyz/pyeza-golang/types"
+import "github.com/erniealice/pyeza-golang/types"
 
 // Re-export all types for backwards compatibility
 

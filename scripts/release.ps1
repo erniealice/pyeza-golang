@@ -34,7 +34,7 @@ if ($Version -notmatch '^\d+\.\d+\.\d+(-[\w.]+)?$') {
 $tag = "v$Version"
 
 Write-Host ""
-Write-Host "Releasing module: leapfor.xyz/pyeza-golang@$tag" -ForegroundColor Cyan
+Write-Host "Releasing module: github.com/erniealice/pyeza-golang@$tag" -ForegroundColor Cyan
 Write-Host ""
 
 # Ensure working tree is clean
@@ -63,7 +63,7 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # Request the Go module proxy to fetch the new version
 Write-Host "  Publishing to Go module proxy..." -ForegroundColor Gray
-$proxyUrl = "https://proxy.golang.org/leapfor.xyz/pyeza-golang/@v/$tag.info"
+$proxyUrl = "https://proxy.golang.org/github.com/erniealice/pyeza-golang/@v/$tag.info"
 try {
     $response = Invoke-WebRequest -Uri $proxyUrl -UseBasicParsing
     Write-Host "  Proxy response: $($response.StatusCode)" -ForegroundColor Gray
@@ -74,6 +74,6 @@ try {
 
 Write-Host ""
 Write-Host "=" * 50 -ForegroundColor Green
-Write-Host "Released leapfor.xyz/pyeza-golang@$tag" -ForegroundColor Green
-Write-Host "  Verify: go list -m leapfor.xyz/pyeza-golang@$tag" -ForegroundColor White
+Write-Host "Released github.com/erniealice/pyeza-golang@$tag" -ForegroundColor Green
+Write-Host "  Verify: go list -m github.com/erniealice/pyeza-golang@$tag" -ForegroundColor White
 Write-Host "=" * 50 -ForegroundColor Green

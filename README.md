@@ -1,4 +1,4 @@
-# @leapfor.xyz/pyeza-golang
+# @github.com/erniealice/pyeza-golang
 
 Shared design system for Leapfor applications. Provides CSS component styles, design tokens, and theme support.
 

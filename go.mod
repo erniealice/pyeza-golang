@@ -1,4 +1,4 @@
-module leapfor.xyz/pyeza-golang
+module github.com/erniealice/pyeza-golang
 
 go 1.25.1
 
