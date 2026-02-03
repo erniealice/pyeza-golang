@@ -1,4 +1,4 @@
-package ui
+package pyeza
 
 // CommonLabels holds translatable strings for common/shared ui.
 type CommonLabels struct {

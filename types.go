@@ -1,4 +1,4 @@
-package ui
+package pyeza
 
 import "github.com/erniealice/pyeza-golang/types"
 
