@@ -135,9 +135,9 @@ func (r *HTMLRenderer) Init() error {
 
 		// Build patterns: shared components first, then app-specific templates
 		patterns := []string{
-			filepath.Join(sharedDir, "_icons", "*.html"),
-			filepath.Join(sharedDir, "_partials", "*.html"),
-			filepath.Join(sharedDir, "_components", "*.html"),
+			filepath.Join(sharedDir, "icons", "*.html"),
+			filepath.Join(sharedDir, "partials", "*.html"),
+			filepath.Join(sharedDir, "components", "*.html"),
 		}
 		patterns = append(patterns, r.templatePatterns...)
 
