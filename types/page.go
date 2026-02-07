@@ -16,4 +16,6 @@ type PageData struct {
 	HasNotifications  bool
 	HelpContent       template.HTML // Server-rendered markdown content for help pane
 	HasHelp           bool          // Whether this page has help content
+	HeaderIconHTML    template.HTML // Pre-rendered icon HTML for header
+	CommonLabels      any           // i18n labels (avoids circular import)
 }
