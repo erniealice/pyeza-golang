@@ -1,0 +1,69 @@
+/*
+ * ==========================================================================
+ * THEME: SHADCN NEUTRAL
+ * Faithful port of the shadcn/ui default neutral theme
+ * Clean monochrome palette — achromatic grays, zero chroma
+ * Think: shadcn/ui components, Tailwind defaults, zinc-based UI
+ * ==========================================================================
+ */
+[data-theme="shadcn-neutral"] {
+    /* Backgrounds — pure white, subtle gray layers */
+    --bg-base: #FFFFFF;
+    --bg-sidebar: #FAFAFA;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F5F5F5;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(10, 10, 10, 0.5);
+
+    /* Text — true neutral, no warm/cool undertone */
+    --text-primary: #0A0A0A;
+    --text-secondary: #525252;
+    --text-muted: #737373;
+    --text-inverse: #FAFAFA;
+
+    /* Primary Accent — near-black (shadcn convention: primary = dark) */
+    --accent-primary: #171717;
+    --accent-primary-light: #F5F5F5;
+    --accent-primary-dark: #0A0A0A;
+
+    /* Secondary Accents — Tailwind standard color scale */
+    --accent-terracotta: #EF4444;
+    --accent-terracotta-light: #FEF2F2;
+    --accent-terracotta-dark: #DC2626;
+    --accent-sage: #22C55E;
+    --accent-sage-light: #F0FDF4;
+    --accent-navy: #3B82F6;
+    --accent-navy-light: #EFF6FF;
+    --accent-navy-dark: #2563EB;
+    --accent-amber: #EAB308;
+    --accent-amber-light: #FEFCE8;
+    --accent-plum: #8B5CF6;
+    --accent-slate: #737373;
+
+    /* Status Colors — standard Tailwind semantic colors */
+    --status-success: #22C55E;
+    --status-success-light: #F0FDF4;
+    --status-warning: #EAB308;
+    --status-warning-light: #FEFCE8;
+    --status-error: #EF4444;
+    --status-error-light: #FEF2F2;
+    --status-info: #3B82F6;
+    --status-info-light: #EFF6FF;
+
+    /* Borders & Shadows — clean, minimal depth */
+    --border: #E5E5E5;
+    --border-light: #F5F5F5;
+    --border-focus: var(--accent-primary);
+    --border-default: #E5E5E5;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.09);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+    --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
+
+    /* Theme Meta */
+    --theme-name: "shadcn Neutral";
+    --theme-icon-bg: linear-gradient(135deg, #FFFFFF 0%, #E5E5E5 100%);
+    --theme-icon-accent: #171717;
+}
