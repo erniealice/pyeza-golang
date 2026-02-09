@@ -24,6 +24,7 @@ type PageData struct {
 	HeaderIconHTML    template.HTML    // Pre-rendered icon HTML for header
 	CommonLabels      any              // i18n labels (avoids circular import)
 	Messages          map[string]string // flat i18n messages (dot-notation keys)
+	UserPermissions   *UserPermissions         // permission codes for current user (for UI adaptation)
 }
 
 // T returns the translation for the given dot-notation key.

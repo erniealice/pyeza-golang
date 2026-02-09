@@ -14,10 +14,11 @@ type SidebarConfig struct {
 
 // SidebarApp represents an entry in the app switcher dropdown.
 type SidebarApp struct {
-	Key   string
-	Label string
-	Icon  string // template name, e.g. "icon-users"
-	URL   string
+	Key        string
+	Label      string
+	Icon       string // template name, e.g. "icon-users"
+	URL        string
+	Permission string // e.g. "client:list" — if set, app hidden when user lacks permission
 }
 
 // SidebarSection is a group of navigation items with an optional title.
@@ -28,10 +29,11 @@ type SidebarSection struct {
 
 // SidebarItem is a single navigation link in the sidebar.
 type SidebarItem struct {
-	Key      string
-	Label    string
-	Icon     string // template name, e.g. "icon-dashboard"
-	Href     string
-	Tooltip  string
-	Children []SidebarItem
+	Key        string
+	Label      string
+	Icon       string // template name, e.g. "icon-dashboard"
+	Href       string
+	Tooltip    string
+	Children   []SidebarItem
+	Permission string // e.g. "client:list" — if set, item hidden when user lacks permission
 }
