@@ -1,6 +1,7 @@
 package pyeza
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"log"
@@ -25,10 +26,9 @@ type HTMLRenderer struct {
 // templatePatterns: list of glob patterns for app-specific templates
 // The components package will automatically locate its own templates.
 func NewHTMLRenderer(templatePatterns []string) *HTMLRenderer {
-	return &HTMLRenderer{
-		templatePatterns: templatePatterns,
-		templateFuncs:    getDefaultFuncMap(),
-	}
+	r := &HTMLRenderer{templatePatterns: templatePatterns}
+	r.templateFuncs = r.buildFuncMap()
+	return r
 }
 
 // WithFuncs adds custom template functions to the renderer
@@ -98,6 +98,41 @@ func getDefaultFuncMap() template.FuncMap {
 	}
 }
 
+// buildFuncMap returns the default FuncMap extended with renderer-aware functions.
+// This method exists because renderContent needs a closure over r.templates,
+// which is nil at parse time but populated before any template is rendered.
+func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
+	base := getDefaultFuncMap()
+
+	// renderContent dynamically executes a named template and returns the result
+	// as template.HTML. This is safe because the sub-template output is already
+	// auto-escaped by html/template — the template.HTML wrapper prevents
+	// double-escaping, not escaping.
+	//
+	// SECURITY: The name parameter must always be a compile-time constant set
+	// in Go view code (e.g., ContentTemplate: "inventory-detail-content").
+	// NEVER derive it from user input (URL params, headers, form values, cookies).
+	// Doing so would allow template injection — an attacker could render
+	// arbitrary templates or trigger server errors.
+	base["renderContent"] = func(name string, data any) template.HTML {
+		if name == "" {
+			return template.HTML("")
+		}
+		t := r.templates.Lookup(name)
+		if t == nil {
+			return template.HTML(`<div class="page-content"><p>Page content not available</p></div>`)
+		}
+		var buf bytes.Buffer
+		if err := t.Execute(&buf, data); err != nil {
+			log.Printf("renderContent error for %s: %v", name, err)
+			return template.HTML(`<div class="page-content"><p>Page content not available</p></div>`)
+		}
+		return template.HTML(buf.String())
+	}
+
+	return base
+}
+
 // getSharedComponentsDir returns the path to the shared components directory
 func (r *HTMLRenderer) getSharedComponentsDir() string {
 	// Get the file path of this source file
@@ -138,6 +173,7 @@ func (r *HTMLRenderer) Init() error {
 			filepath.Join(sharedDir, "icons", "*.html"),
 			filepath.Join(sharedDir, "partials", "*.html"),
 			filepath.Join(sharedDir, "components", "*.html"),
+			filepath.Join(sharedDir, "templates", "blocks", "*.html"),
 		}
 		patterns = append(patterns, r.templatePatterns...)
 

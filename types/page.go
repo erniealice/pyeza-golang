@@ -6,9 +6,14 @@ import "html/template"
 type PageData struct {
 	CacheVersion      string
 	Title             string
+	// ContentTemplate is the name of the content template to render inside app-shell.
+	// SECURITY: Must always be a compile-time constant set in Go view code.
+	// NEVER derive from user input (URL params, headers, form values, cookies).
+	ContentTemplate   string
 	CurrentPath       string
 	ActiveNav         string
 	ActiveSubNav      string // Active sub-navigation item (for sidebar sub-menus)
+	Sidebar           SidebarConfig
 	HeaderIcon        string
 	HeaderTitle       string
 	HeaderSubtitle    string

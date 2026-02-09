@@ -1,0 +1,72 @@
+{{define "sidebar01"}}
+<aside class="sidebar" id="sidebar">
+    <script>if(localStorage.getItem('sidebarCollapsed')==='true')document.getElementById('sidebar').classList.add('collapsed');</script>
+    <div class="sidebar-header">
+        <a href="{{.Sidebar.LogoURL}}" class="logo">
+            <span class="logo-text">{{.Sidebar.LogoText}}</span>
+        </a>
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+            {{template "icon-chevron-left" .}}
+        </button>
+    </div>
+
+    <!-- App Switcher -->
+    {{if .Sidebar.Apps}}
+    <div class="app-switcher" id="appSwitcher">
+        <button class="app-switcher-btn" id="appSwitcherBtn"
+                aria-haspopup="true" aria-expanded="false"
+                data-tooltip="{{range .Sidebar.Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}">
+            <div class="app-switcher-icon app-icon--{{.Sidebar.ActiveApp}}">
+                {{range .Sidebar.Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{renderContent .Icon $}}{{end}}{{end}}
+            </div>
+            <span class="app-switcher-name">
+                {{range .Sidebar.Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}
+            </span>
+            <span class="app-switcher-chevron">
+                {{template "icon-chevron-down" .}}
+            </span>
+        </button>
+
+        <div class="app-switcher-menu" role="menu" aria-labelledby="appSwitcherBtn">
+            <div class="app-switcher-header">Switch App</div>
+            <div class="app-switcher-grid">
+                {{range .Sidebar.Apps}}
+                <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem">
+                    <div class="app-option-icon app-icon--{{.Key}}">
+                        {{renderContent .Icon $}}
+                    </div>
+                    <span class="app-option-name">{{.Label}}</span>
+                </button>
+                {{end}}
+            </div>
+        </div>
+    </div>
+    {{end}}
+
+    <nav class="sidebar-nav" id="appNav">
+        {{range .Sidebar.Sections}}
+        <div class="nav-section">
+            {{if .Title}}<div class="nav-section-title">{{.Title}}</div>{{end}}
+            {{range .Items}}
+            <a href="{{.Href}}"
+               class="nav-item{{if eq .Key $.Sidebar.ActiveSubNav}} active{{end}}"
+               data-tooltip="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}">
+                <span class="nav-icon">{{renderContent .Icon $}}</span>
+                <span class="nav-text">{{.Label}}</span>
+            </a>
+            {{if .Children}}
+            {{range .Children}}
+            <a href="{{.Href}}"
+               class="nav-item nav-item--child{{if eq .Key $.Sidebar.ActiveSubNav}} active{{end}}"
+               data-tooltip="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}">
+                <span class="nav-icon">{{renderContent .Icon $}}</span>
+                <span class="nav-text">{{.Label}}</span>
+            </a>
+            {{end}}
+            {{end}}
+            {{end}}
+        </div>
+        {{end}}
+    </nav>
+</aside>
+{{end}}
