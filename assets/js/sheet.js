@@ -112,14 +112,15 @@
      * @param {Event} event - The HTMX after-request event
      */
     function handleResponse(event) {
-        const xhr = event.detail.xhr;
-        const successful = event.detail.successful;
+        // Mark the event as handled so the global listener doesn't re-invoke us
+        // when the same event is also handled by an hx-on:: attribute (HTMX 2.x).
+        if (event.detail._sheetHandled) return;
+        event.detail._sheetHandled = true;
+
+        var xhr = event.detail.xhr;
+        var successful = event.detail.successful;
 
         if (successful) {
-            // Check for custom headers from server
-            const closeDrawer = xhr.getResponseHeader('HX-Close-Drawer');
-            const triggerRefresh = xhr.getResponseHeader('HX-Trigger-Refresh');
-
             // Default behavior: close drawer on success
             close();
 
@@ -131,10 +132,11 @@
                 }
             }));
 
-            // Trigger table refresh if requested or by default
-            if (triggerRefresh !== 'false') {
-                refreshTable();
-            }
+            // Reload the page after a brief delay to reflect the new data.
+            // The delay allows HTMX to finish processing the HX-Trigger
+            // header before the navigation starts, avoiding a race between
+            // the HTMX DOM swap and the browser reload.
+            setTimeout(function() { window.location.reload(); }, 100);
         } else {
             // Handle error
             const errorMessage = xhr.getResponseHeader('HX-Error-Message') || 'An error occurred. Please try again.';
@@ -298,9 +300,9 @@
 
             // Handle form submission loading state
             document.body.addEventListener('htmx:beforeRequest', function(e) {
-                const form = e.detail.elt;
-                if (form && form.closest('.form-drawer-content')) {
-                    const submitBtn = form.querySelector('button[type="submit"]');
+                var form = e.detail.elt;
+                if (form && (form.closest('#sheetContent') || form.closest('.form-drawer-content'))) {
+                    var submitBtn = form.querySelector('button[type="submit"]');
                     if (submitBtn) {
                         submitBtn.disabled = true;
                         submitBtn.classList.add('btn-loading');
@@ -308,13 +310,25 @@
                 }
             });
 
+            // Global afterRequest handler for forms inside the sheet.
+            // The form templates use hx-on::after-request (HTMX 2.x syntax)
+            // but the app loads HTMX 1.9.x which ignores that attribute.
+            // This global listener ensures Sheet.handleResponse fires on
+            // both success and error for any form POST inside #sheetContent.
+            // A flag on the event prevents double-calling if HTMX is later
+            // upgraded to 2.x where the attribute handler would also fire.
             document.body.addEventListener('htmx:afterRequest', function(e) {
-                const form = e.detail.elt;
-                if (form && form.closest('.form-drawer-content')) {
-                    const submitBtn = form.querySelector('button[type="submit"]');
+                var form = e.detail.elt;
+                if (form && (form.closest('#sheetContent') || form.closest('.form-drawer-content'))) {
+                    var submitBtn = form.querySelector('button[type="submit"]');
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.classList.remove('btn-loading');
+                    }
+                    // Guard against double invocation (attribute + global listener)
+                    if (!e.detail._sheetHandled) {
+                        e.detail._sheetHandled = true;
+                        handleResponse(e);
                     }
                 }
             });

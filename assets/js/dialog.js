@@ -129,10 +129,10 @@
                             'Content-Type': 'application/x-www-form-urlencoded'
                         }
                     }).then(function(response) {
-                        if (response.ok) {
-                            // Close dialog
-                            closeDialog();
+                        // Always close dialog after server response
+                        closeDialog();
 
+                        if (response.ok) {
                             // Refresh table if refresh URL is available
                             // HTMX ajax target must be a CSS selector string, not a DOM element.
                             // Passing a DOM element as the target causes HTMX to do a full page
