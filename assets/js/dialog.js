@@ -174,6 +174,42 @@
             }
         });
 
+        // Handle HTMX responses for confirm buttons inside the dialog.
+        // When the confirm button has hx-post, the click handler returns early
+        // and lets HTMX handle the POST. This listener closes the dialog and
+        // refreshes the table after HTMX completes the request.
+        document.body.addEventListener('htmx:afterRequest', function(e) {
+            var elt = e.detail.elt;
+            if (elt && elt.closest('[data-dialog-overlay]')) {
+                if (e.detail.successful) {
+                    // Close dialog on success
+                    closeDialog();
+
+                    // Refresh table to reflect the change (deleted row, status update, etc.)
+                    var tableCard = document.querySelector('.table-card[data-refresh-url]');
+                    if (tableCard && typeof htmx !== 'undefined') {
+                        htmx.ajax('GET', tableCard.dataset.refreshUrl, {
+                            target: '#' + tableCard.id,
+                            swap: 'outerHTML',
+                            pushUrl: false
+                        });
+                    } else {
+                        // Fallback: reload page if no HTMX refresh target available
+                        setTimeout(function() { window.location.reload(); }, 100);
+                    }
+
+                    // Trigger custom event for other listeners (like bulk-action.js)
+                    dialog.dispatchEvent(new CustomEvent('dialog:confirm', {
+                        detail: { success: true }
+                    }));
+                } else {
+                    // On error: log and keep dialog open so user can retry or cancel
+                    var status = e.detail.xhr ? e.detail.xhr.status : 'unknown';
+                    console.error('Dialog action failed with status:', status);
+                }
+            }
+        });
+
         // Watch for HTMX content load and auto-open
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {

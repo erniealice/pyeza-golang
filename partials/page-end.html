@@ -34,6 +34,10 @@
     <script src="/assets/js/components/help-pane.js?v={{.CacheVersion}}"></script>
     {{end}}
 
+    {{/* Toast Container + auto-dismiss script */}}
+    {{template "toast-container" .}}
+    {{template "toast-init"}}
+
     {{/* Common Page Scripts */}}
     {{template "scripts" .}}
 
