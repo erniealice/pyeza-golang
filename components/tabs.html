@@ -49,7 +49,23 @@ ACCESSIBILITY:
 {{if or (eq $variant "default") (eq $variant "")}}
 <div class="tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
     {{range .Items}}
-    {{if .Href}}
+    {{if .HxGet}}
+    <button type="button"
+            class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            role="tab"
+            aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            data-tab="{{.Key}}"
+            hx-get="{{.HxGet}}"
+            hx-target="#tabContent"
+            hx-swap="innerHTML"
+            hx-trigger="click"
+            {{if .Href}}hx-push-url="{{.Href}}"{{end}}
+            {{if .Disabled}}aria-disabled="true" disabled{{end}}>
+        {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
+        {{.Label}}
+        {{if .Count}}<span class="tab-badge">{{.Count}}</span>{{end}}
+    </button>
+    {{else if .Href}}
     <a href="{{.Href}}"
        class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"

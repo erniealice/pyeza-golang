@@ -38,6 +38,22 @@
     {{template "toast-container" .}}
     {{template "toast-init"}}
 
+    {{/* Tab Active State - toggles active class on HTMX tab clicks */}}
+    <script>
+    document.addEventListener('click', function(e) {
+        var tab = e.target.closest('[role="tab"]');
+        if (!tab) return;
+        var tablist = tab.closest('[role="tablist"]');
+        if (!tablist) return;
+        tablist.querySelectorAll('[role="tab"]').forEach(function(t) {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+    });
+    </script>
+
     {{/* Common Page Scripts */}}
     {{template "scripts" .}}
 

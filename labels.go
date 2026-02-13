@@ -206,6 +206,7 @@ type FontOptionLabels struct {
 	Mono      string `json:"mono"`
 	Rounded   string `json:"rounded"`
 	Condensed string `json:"condensed"`
+	Exa       string `json:"exa"`
 }
 
 type HelpPaneLabels struct {
@@ -389,7 +390,8 @@ type CardLabels struct {
 type TabItem struct {
 	Key      string // Unique identifier (used for URL/data-tab)
 	Label    string // Display text
-	Href     string // Link URL (for link-based tabs)
+	Href     string // Link URL (for link-based tabs), or hx-push-url when HxGet is set
+	HxGet    string // HTMX endpoint (optional — renders as HTMX button, swaps #tabContent)
 	Icon     string // Icon template name (optional)
 	Count    int    // Badge count (optional)
 	Disabled bool   // Whether the tab is disabled
