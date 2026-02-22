@@ -198,6 +198,7 @@ type ThemeOptionLabels struct {
 	CorporateSteel string `json:"corporateSteel"`
 	PaperInk       string `json:"paperInk"`
 	PeachFizz      string `json:"peachFizz"`
+	ModernRetail   string `json:"modernRetail"`
 }
 
 type FontOptionLabels struct {

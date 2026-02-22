@@ -1,0 +1,68 @@
+/*
+ * ==========================================================================
+ * THEME: MODERN RETAIL
+ * Vibrant indigo primary with a clean, blue-tinted neutral palette
+ * Matches RYTA brand identity — logo infinity symbol in #4318D9
+ * ==========================================================================
+ */
+[data-theme="modern-retail"] {
+    /* Backgrounds — clean with slight blue tint */
+    --bg-base: #FAFAFE;
+    --bg-sidebar: #F4F3FB;
+    --bg-card: #FFFFFF;
+    --bg-hover: #EEEDF5;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(15, 13, 26, 0.45);
+
+    /* Text — deep blue-black */
+    --text-primary: #0F0D1A;
+    --text-secondary: #4A4658;
+    --text-muted: #8E8A9D;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — vibrant indigo from RYTA logo */
+    --accent-primary: #4318D9;
+    --accent-primary-light: #EDE9FC;
+    --accent-primary-dark: #3712B5;
+
+    /* Secondary Accents */
+    --accent-terracotta: #EF4444;
+    --accent-terracotta-light: #FEF2F2;
+    --accent-terracotta-dark: #DC2626;
+    --accent-sage: #10B981;
+    --accent-sage-light: #ECFDF5;
+    --accent-navy: #3B82F6;
+    --accent-navy-light: #EFF6FF;
+    --accent-navy-dark: #2563EB;
+    --accent-amber: #F59E0B;
+    --accent-amber-light: #FFFBEB;
+    --accent-plum: #8B5CF6;
+    --accent-slate: #64748B;
+
+    /* Status Colors */
+    --status-success: #10B981;
+    --status-success-light: #ECFDF5;
+    --status-warning: #F59E0B;
+    --status-warning-light: #FFFBEB;
+    --status-error: #EF4444;
+    --status-error-light: #FEF2F2;
+    --status-info: #3B82F6;
+    --status-info-light: #EFF6FF;
+
+    /* Borders & Shadows — cool-toned, subtle */
+    --border: #E5E3EE;
+    --border-light: #F0EEF5;
+    --border-focus: var(--accent-primary);
+    --border-default: #E5E3EE;
+    --shadow-sm: 0 1px 2px rgba(15, 13, 26, 0.04);
+    --shadow-md: 0 4px 12px rgba(15, 13, 26, 0.06);
+    --shadow-lg: 0 8px 24px rgba(15, 13, 26, 0.08);
+    --shadow-card: 0 2px 8px rgba(15, 13, 26, 0.04), 0 1px 2px rgba(15, 13, 26, 0.06);
+    --shadow-float: 0 12px 40px rgba(15, 13, 26, 0.14);
+    --shadow-xl: 0 20px 50px rgba(15, 13, 26, 0.11);
+
+    /* Theme Meta */
+    --theme-name: "Modern Retail";
+    --theme-icon-bg: linear-gradient(135deg, #FAFAFE 0%, #E5E3EE 100%);
+    --theme-icon-accent: #4318D9;
+}
