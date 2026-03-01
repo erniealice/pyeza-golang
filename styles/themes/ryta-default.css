@@ -1,0 +1,69 @@
+/*
+ * ==========================================================================
+ * THEME: RYTA DEFAULT
+ * Official Ryta brand theme — deep indigo primary from ryta-v1.svg (#3D0DDA)
+ * Clean, professional, modern — neutral whites with vibrant indigo accents
+ * Think: SaaS dashboard, brand-forward admin, polished product UI
+ * ==========================================================================
+ */
+[data-theme="ryta-default"] {
+    /* Backgrounds — clean white with faint indigo tint */
+    --bg-base: #FAFAFD;
+    --bg-sidebar: #F3F2FA;
+    --bg-card: #FFFFFF;
+    --bg-hover: #EEEDF8;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(14, 6, 42, 0.45);
+
+    /* Text — near-black with blue undertone */
+    --text-primary: #0E062A;
+    --text-secondary: #4A4460;
+    --text-muted: #8E88A4;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — Ryta brand indigo from SVG */
+    --accent-primary: #3D0DDA;
+    --accent-primary-light: #EEEBFC;
+    --accent-primary-dark: #2F0AAD;
+
+    /* Secondary Accents */
+    --accent-terracotta: #E53E3E;
+    --accent-terracotta-light: #FEF0F0;
+    --accent-terracotta-dark: #C53030;
+    --accent-sage: #0FA968;
+    --accent-sage-light: #ECFDF3;
+    --accent-navy: #2B6CB0;
+    --accent-navy-light: #EBF4FF;
+    --accent-navy-dark: #2256A0;
+    --accent-amber: #D69E2E;
+    --accent-amber-light: #FEFCE8;
+    --accent-plum: #805AD5;
+    --accent-slate: #6B7280;
+
+    /* Status Colors */
+    --status-success: #0FA968;
+    --status-success-light: #ECFDF3;
+    --status-warning: #D69E2E;
+    --status-warning-light: #FEFCE8;
+    --status-error: #E53E3E;
+    --status-error-light: #FEF0F0;
+    --status-info: #2B6CB0;
+    --status-info-light: #EBF4FF;
+
+    /* Borders & Shadows — crisp, cool-toned */
+    --border: #E2DFF0;
+    --border-light: #EEEDF5;
+    --border-focus: var(--accent-primary);
+    --border-default: #E2DFF0;
+    --shadow-sm: 0 1px 2px rgba(14, 6, 42, 0.04);
+    --shadow-md: 0 4px 12px rgba(14, 6, 42, 0.06);
+    --shadow-lg: 0 8px 24px rgba(14, 6, 42, 0.09);
+    --shadow-card: 0 2px 8px rgba(14, 6, 42, 0.04), 0 1px 2px rgba(14, 6, 42, 0.05);
+    --shadow-float: 0 12px 40px rgba(14, 6, 42, 0.14);
+    --shadow-xl: 0 20px 50px rgba(14, 6, 42, 0.12);
+
+    /* Theme Meta */
+    --theme-name: "Ryta Default";
+    --theme-icon-bg: linear-gradient(135deg, #FAFAFD 0%, #E2DFF0 100%);
+    --theme-icon-accent: #3D0DDA;
+}

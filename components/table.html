@@ -157,6 +157,14 @@ JavaScript:
     </div>
     {{end}}
 
+    {{/* Mobile Options Toggle (visible only on mobile) */}}
+    <button type="button" class="toolbar-mobile-toggle" onclick="this.closest('.table-toolbar').classList.toggle('actions-open')" aria-label="More options">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+    </button>
+
+    {{/* Mobile Backdrop (closes actions sheet) */}}
+    <div class="toolbar-mobile-backdrop" onclick="this.closest('.table-toolbar').classList.remove('actions-open')"></div>
+
     {{/* Toolbar Actions */}}
     <div class="toolbar-actions">
         {{/* Filters Button */}}
@@ -424,7 +432,7 @@ JavaScript:
     </td>
     {{end}}
     {{range .Cells}}
-    <td style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}};{{end}}vertical-align: {{$rowVAlign}}">
+    <td{{if .Label}} data-label="{{.Label}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}};{{end}}vertical-align: {{$rowVAlign}}">
         {{if eq .Type "name"}}
         {{if .Href}}<a href="{{.Href}}" class="item-name-link">{{.Value}}</a>{{else}}<span class="item-name">{{.Value}}</span>{{end}}
         {{if .Alert}}<span class="alert-icon">{{template "icon-alert-triangle" .}}</span>{{end}}

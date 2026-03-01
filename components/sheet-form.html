@@ -46,6 +46,7 @@ JavaScript:
     <div class="sheet-overlay" id="sheetOverlay"></div>
     <div class="sheet-panel sheet-panel-md">
         <div class="sheet-header">
+            <div class="sheet-drag-handle"></div>
             <h2 id="sheetTitle" class="sheet-title">{{if .Title}}{{.Title}}{{else}}{{if .IsEdit}}{{.CommonLabels.Buttons.Edit}}{{else}}{{.CommonLabels.Buttons.Add}}{{end}}{{end}}</h2>
             <div class="sheet-header-actions">
                 <button type="button" class="sheet-close" id="sheetClose" aria-label="Close">

@@ -25,6 +25,27 @@ type PageData struct {
 	CommonLabels      any              // i18n labels (avoids circular import)
 	Messages          map[string]string // flat i18n messages (dot-notation keys)
 	UserPermissions   *UserPermissions         // permission codes for current user (for UI adaptation)
+	BottomNavTabs     []BottomNavTab           // mobile bottom navigation tabs
+	AllApps           []AppGridItem            // all apps for mobile app grid overlay
+}
+
+// BottomNavTab represents a single tab in the mobile bottom navigation bar.
+// Used by the "bottom-nav" template component.
+type BottomNavTab struct {
+	Key    string // identifier for the tab
+	Label  string // display text
+	Icon   string // icon template name (e.g., "icon-users")
+	Href   string // link URL
+	Badge  string // optional badge text (e.g., notification count)
+	Active bool   // true if this tab is the current page
+}
+
+// AppGridItem represents a single app in the mobile app grid overlay.
+// Used by the "mobile-app-grid" template component.
+type AppGridItem struct {
+	Label string // display text
+	Icon  string // icon template name (e.g., "icon-users")
+	Href  string // link URL
 }
 
 // T returns the translation for the given dot-notation key.

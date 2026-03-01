@@ -65,6 +65,7 @@ Classes automatically applied:
     <div class="sheet-panel sheet-panel--{{$panelWidth}}">
         {{if .Header}}
         <div class="sheet-header">
+            <div class="sheet-drag-handle"></div>
             {{if .Title}}
             <h2 class="sheet-title">{{.Title}}</h2>
             {{end}}
@@ -98,6 +99,7 @@ Standalone header for custom sheet layouts
 */}}
 {{define "sheet-header"}}
 <div class="sheet-header">
+    <div class="sheet-drag-handle"></div>
     {{if .Title}}
     <h2 class="sheet-title">{{.Title}}</h2>
     {{end}}

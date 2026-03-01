@@ -572,21 +572,39 @@
     background: linear-gradient(135deg, #4a9b9b 0%, #3a7b7b 100%);
 }
 
-.app-switcher-name {
+.app-switcher-info {
     flex: 1;
-    font-size: 0.9375rem; /* 15px */
-    font-weight: 600;
-    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
     text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     transition: opacity var(--transition-speed) ease;
 }
 
-.sidebar.collapsed .app-switcher-name {
+.sidebar.collapsed .app-switcher-info {
     opacity: 0;
     width: 0;
+}
+
+.app-switcher-name {
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.app-switcher-group-label {
+    font-size: 0.6875rem; /* 11px */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .app-switcher-chevron {
@@ -644,6 +662,7 @@
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    overflow-y: auto;
 }
 
 /* Collapsed state - menu appears to the right */
@@ -655,6 +674,9 @@
 }
 
 .app-switcher-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 0.75rem 1rem; /* 12px 16px */
     font-size: 0.6875rem; /* 11px */
     font-weight: 600;
@@ -662,6 +684,31 @@
     letter-spacing: 0.08em;
     color: var(--text-muted);
     border-bottom: var(--border-width) solid var(--border-light);
+}
+
+.app-switcher-close {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0;
+    transition: all var(--transition-fast);
+}
+
+.app-switcher-close:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.app-switcher-close svg {
+    width: 0.875rem; /* 14px */
+    height: 0.875rem;
 }
 
 .app-switcher-grid {
@@ -1018,9 +1065,9 @@
 }
 
 @media (max-width: 768px) {
-    /* Show mobile menu toggle */
+    /* Hide mobile menu toggle — replaced by bottom nav on mobile */
     .mobile-menu-toggle {
-        display: flex;
+        display: none !important;
     }
 
     /* Hide desktop sidebar toggle */

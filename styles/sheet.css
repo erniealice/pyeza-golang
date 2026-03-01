@@ -694,8 +694,44 @@
     display: none;
 }
 
+/* Drag handle for mobile sheet (hidden by default, shown on mobile) */
+.sheet-drag-handle {
+    display: none; /* shown on mobile via media query */
+    width: 3rem;
+    height: 0.25rem;
+    background: var(--border);
+    border-radius: 9999px;
+    margin: 0.75rem auto 0;
+}
+
 /* ==========================================================================
-   RESPONSIVE - MOBILE
+   RESPONSIVE - TABLET / MOBILE (768px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .sheet-panel {
+        width: 100vw;
+        height: 100vh;
+        max-width: 100vw;
+        top: auto;
+        bottom: 0;
+        right: 0;
+        transform: translateY(100%);
+        border-radius: var(--radius-lg, 0.75rem) var(--radius-lg, 0.75rem) 0 0;
+    }
+
+    .sheet.open .sheet-panel,
+    .sheet.active .sheet-panel {
+        transform: translateY(0);
+    }
+
+    .sheet-drag-handle {
+        display: block;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE - SMALL MOBILE
    ========================================================================== */
 
 @media (max-width: 480px) {

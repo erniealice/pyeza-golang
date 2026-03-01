@@ -42,10 +42,34 @@
     // ========================================
 
     if (appSwitcher && appSwitcherBtn) {
+        function updateMenuMaxHeight() {
+            var menu = appSwitcher.querySelector('.app-switcher-menu');
+            if (!menu) return;
+            var rect = appSwitcher.getBoundingClientRect();
+            var menuTop = rect.bottom + 4; // 0.25rem gap below the button
+            var availableHeight = window.innerHeight - menuTop - 16; // 16px bottom padding
+            menu.style.maxHeight = Math.max(availableHeight, 120) + 'px'; // at least 120px
+        }
+
         function toggleAppSwitcher(open) {
             const isOpen = typeof open === 'boolean' ? open : !appSwitcher.classList.contains('open');
             appSwitcher.classList.toggle('open', isOpen);
             appSwitcherBtn.setAttribute('aria-expanded', isOpen);
+
+            if (isOpen) {
+                // Expand all groups so the user sees everything on open
+                appSwitcher.querySelectorAll('.app-switcher-group').forEach(function(group) {
+                    group.classList.add('open');
+                    var title = group.querySelector('.app-switcher-group-title');
+                    if (title) title.setAttribute('aria-expanded', 'true');
+                });
+                // Calculate max height based on remaining viewport space
+                requestAnimationFrame(updateMenuMaxHeight);
+            } else {
+                // Clear inline max-height when closing
+                var menu = appSwitcher.querySelector('.app-switcher-menu');
+                if (menu) menu.style.maxHeight = '';
+            }
         }
 
         function selectApp(href) {
@@ -66,6 +90,15 @@
             e.stopPropagation();
             toggleAppSwitcher();
         });
+
+        // Close button in menu header
+        var closeBtn = appSwitcher.querySelector('.app-switcher-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleAppSwitcher(false);
+            });
+        }
 
         // Accordion group toggles
         appSwitcher.querySelectorAll('.app-switcher-group-title').forEach(function(title) {
@@ -110,6 +143,13 @@
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
                 e.preventDefault();
                 toggleAppSwitcher();
+            }
+        });
+
+        // Recalculate max-height on resize while open
+        window.addEventListener('resize', function() {
+            if (appSwitcher.classList.contains('open')) {
+                updateMenuMaxHeight();
             }
         });
 

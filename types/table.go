@@ -39,6 +39,7 @@ type TableCell struct {
 	Alert     bool          // For name cells: show alert icon
 	Href      string        // For links: href attribute
 	HTML      template.HTML // For custom HTML content
+	Label     string        // Column label for mobile card view (set automatically from column via ApplyColumnStyles)
 	Align     string        // Horizontal alignment (set automatically from column, do not set manually)
 	VAlign    string        // Vertical alignment: "top" (default), "middle", "bottom"
 	Width     string        // Width (set automatically from column, do not set manually)
@@ -57,12 +58,15 @@ type TableCell struct {
 	Options    []SelectOption // Dropdown options
 }
 
-// ApplyColumnStyles copies alignment, width, minWidth, and vAlign from columns to cells in all rows.
+// ApplyColumnStyles copies alignment, width, minWidth, vAlign, and label from columns to cells in all rows.
 // Call this after building rows to ensure cells inherit column styles.
 func ApplyColumnStyles(columns []TableColumn, rows []TableRow) {
 	for i := range rows {
 		for j := range rows[i].Cells {
 			if j < len(columns) {
+				if columns[j].Label != "" {
+					rows[i].Cells[j].Label = columns[j].Label
+				}
 				if columns[j].Align != "" {
 					rows[i].Cells[j].Align = columns[j].Align
 				}

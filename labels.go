@@ -199,6 +199,7 @@ type ThemeOptionLabels struct {
 	PaperInk       string `json:"paperInk"`
 	PeachFizz      string `json:"peachFizz"`
 	ModernRetail   string `json:"modernRetail"`
+	RytaDefault    string `json:"rytaDefault"`
 }
 
 type FontOptionLabels struct {
@@ -207,7 +208,8 @@ type FontOptionLabels struct {
 	Mono      string `json:"mono"`
 	Rounded   string `json:"rounded"`
 	Condensed string `json:"condensed"`
-	Exa       string `json:"exa"`
+	Exa         string `json:"exa"`
+	RytaMinimal string `json:"rytaMinimal"`
 }
 
 type HelpPaneLabels struct {

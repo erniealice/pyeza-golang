@@ -646,6 +646,7 @@
     .form-textarea {
         padding: 0.625rem 0.875rem; /* 10px 14px */
         font-size: 1rem; /* 16px - Prevents iOS zoom on focus */
+        min-height: 3rem; /* 48px touch target */
     }
 
     .form-select {
@@ -658,6 +659,18 @@
 
     .form-row-quarters {
         grid-template-columns: 1fr;
+    }
+
+    .sheet-form-actions,
+    .form-actions-sticky {
+        position: sticky;
+        bottom: 0;
+        background: var(--bg-card);
+        padding: 1rem;
+        border-top: 1px solid var(--border);
+        margin: 0 -1rem;
+        width: calc(100% + 2rem);
+        z-index: 10;
     }
 }
 

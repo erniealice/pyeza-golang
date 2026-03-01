@@ -1,0 +1,37 @@
+{{/*
+================================================================================
+BOTTOM NAV COMPONENT - Mobile-only persistent tab bar
+================================================================================
+A fixed bottom navigation bar for mobile screens, providing quick access
+to primary app sections. Hidden on desktop (shown via CSS media query).
+
+USAGE:
+    {{template "bottom-nav" dict
+        "BottomNavTabs" .BottomNavTabs
+    }}
+
+PARAMETERS:
+    BottomNavTabs - Array of tab items, each with:
+                      - Href   : Link URL
+                      - Label  : Display text
+                      - Icon   : Icon template name (e.g., "icon-calendar")
+                      - Active : Boolean, true if this tab is current
+                      - Badge  : Optional badge text (e.g., notification count)
+
+ACCESSIBILITY:
+    - Uses <nav> with aria-label
+    - Each tab has aria-label for screen readers
+================================================================================
+*/}}
+
+{{define "bottom-nav"}}
+<nav class="bottom-nav" id="bottom-nav" aria-label="Mobile navigation">
+    {{range .BottomNavTabs}}
+    <a href="{{.Href}}" class="bottom-nav-tab{{if .Active}} active{{end}}" aria-label="{{.Label}}">
+        <span class="bottom-nav-tab-icon">{{renderContent .Icon $}}</span>
+        <span class="bottom-nav-tab-label">{{.Label}}</span>
+        {{if .Badge}}<span class="bottom-nav-badge">{{.Badge}}</span>{{end}}
+    </a>
+    {{end}}
+</nav>
+{{end}}

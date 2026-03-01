@@ -21,16 +21,26 @@
             <div class="app-switcher-icon app-icon--{{.Sidebar.ActiveApp}}">
                 {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{renderContent .Icon $}}{{end}}{{end}}{{end}}
             </div>
-            <span class="app-switcher-name">
-                {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}{{end}}
-            </span>
+            <div class="app-switcher-info">
+                <span class="app-switcher-name">
+                    {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}{{end}}
+                </span>
+                <span class="app-switcher-group-label">
+                    {{range .Sidebar.AppGroups}}{{$groupTitle := .Title}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{$groupTitle}}{{end}}{{end}}{{end}}
+                </span>
+            </div>
             <span class="app-switcher-chevron">
                 {{template "icon-chevron-down" .}}
             </span>
         </button>
 
         <div class="app-switcher-menu" role="menu" aria-labelledby="appSwitcherBtn">
-            <div class="app-switcher-header">Switch App</div>
+            <div class="app-switcher-header">
+                <span>Switch App</span>
+                <button class="app-switcher-close" type="button" aria-label="Close menu">
+                    {{template "icon-x" .}}
+                </button>
+            </div>
             {{range .Sidebar.AppGroups}}
             {{$groupHasActive := false}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{$groupHasActive = true}}{{end}}{{end}}
             <div class="app-switcher-group{{if $groupHasActive}} open{{end}}">
