@@ -90,6 +90,8 @@ type SidebarLabels struct {
 	ClientsTitle      string `json:"clients_title"`
 	UsersTitle        string `json:"users_title"`
 	SalesTitle        string `json:"sales_title"`
+	PurchasesTitle    string `json:"purchases_title"`
+	ExpensesTitle     string `json:"expenses_title"`
 	PriceListsTitle   string `json:"price_lists_title"`
 	ProductsTitle     string `json:"products_title"`
 	TransactionsTitle string `json:"transactions_title"`
@@ -97,6 +99,12 @@ type SidebarLabels struct {
 	LocationsTitle    string `json:"locations_title"`
 	PermissionsTitle  string `json:"permissions_title"`
 	WorkspacesTitle   string `json:"workspaces_title"`
+
+	// Shared status labels (used across purchase, expense, etc.)
+	AllLabel      string `json:"all_label"`
+	PendingLabel  string `json:"pending_label"`
+	ApprovedLabel string `json:"approved_label"`
+	PaidLabel     string `json:"paid_label"`
 
 	// Unique nav item labels and icons
 	ClientsActiveIcon      string `json:"clients_active_icon"`
@@ -119,8 +127,16 @@ type SidebarLabels struct {
 	MasterlistIcon         string `json:"masterlist_icon"`
 	MovementsLabel         string `json:"movements_label"`
 	MovementsIcon          string `json:"movements_icon"`
+	RevenueLabel           string `json:"revenue_label"`
+	RevenueIcon            string `json:"revenue_icon"`
+	CostOfSalesLabel       string `json:"cost_of_sales_label"`
+	CostOfSalesIcon        string `json:"cost_of_sales_icon"`
 	GrossProfitLabel       string `json:"gross_profit_label"`
 	GrossProfitIcon        string `json:"gross_profit_icon"`
+	ExpensesReportLabel    string `json:"expenses_report_label"`
+	ExpensesReportIcon     string `json:"expenses_report_icon"`
+	NetProfitLabel         string `json:"net_profit_label"`
+	NetProfitIcon          string `json:"net_profit_icon"`
 	LocationsActiveIcon    string `json:"locations_active_icon"`
 	LocationsInactiveIcon  string `json:"locations_inactive_icon"`
 	PermissionsActiveIcon  string `json:"permissions_active_icon"`
@@ -167,6 +183,8 @@ func DefaultSidebarLabels() SidebarLabels {
 		ClientsTitle:      "Clients",
 		UsersTitle:        "Users",
 		SalesTitle:        "Sales",
+		PurchasesTitle:    "Purchases",
+		ExpensesTitle:     "Expenses",
 		PriceListsTitle:   "Price Lists",
 		ProductsTitle:     "Products",
 		TransactionsTitle: "Transactions",
@@ -174,6 +192,11 @@ func DefaultSidebarLabels() SidebarLabels {
 		LocationsTitle:    "Locations",
 		PermissionsTitle:  "Permissions",
 		WorkspacesTitle:   "Workspaces",
+
+		AllLabel:      "All",
+		PendingLabel:  "Pending",
+		ApprovedLabel: "Approved",
+		PaidLabel:     "Paid",
 
 		ClientsActiveIcon:      "icon-user-check",
 		ClientsInactiveIcon:    "icon-user-minus",
@@ -195,8 +218,16 @@ func DefaultSidebarLabels() SidebarLabels {
 		MasterlistIcon:         "icon-package",
 		MovementsLabel:         "Transactions",
 		MovementsIcon:          "icon-repeat",
+		RevenueLabel:           "Revenue",
+		RevenueIcon:            "icon-trending-up",
+		CostOfSalesLabel:       "Cost of Sales",
+		CostOfSalesIcon:        "icon-package",
 		GrossProfitLabel:       "Gross Profit",
 		GrossProfitIcon:        "icon-bar-chart",
+		ExpensesReportLabel:    "Expenses",
+		ExpensesReportIcon:     "icon-file-minus",
+		NetProfitLabel:         "Net Profit",
+		NetProfitIcon:          "icon-dollar-sign",
 		LocationsActiveIcon:    "icon-map-pin",
 		LocationsInactiveIcon:  "icon-map-pin",
 		PermissionsActiveIcon:  "icon-key",
