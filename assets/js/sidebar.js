@@ -133,6 +133,96 @@
     }
 
     // ========================================
+    // Mobile Sidebar
+    // ========================================
+
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function isMobile() {
+        return window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    /**
+     * Calculate the offset for the scrollable nav area.
+     * Measures sidebar-header + app-switcher heights, then sets a CSS
+     * custom property so the max-height calc stays accurate.
+     */
+    function updateMobileNavHeight() {
+        if (!sidebar || !isMobile()) return;
+        var offset = 0;
+        var header = sidebar.querySelector('.sidebar-header');
+        var switcher = sidebar.querySelector('.app-switcher');
+        if (header) offset += header.offsetHeight;
+        if (switcher) offset += switcher.offsetHeight;
+        sidebar.style.setProperty('--sidebar-mobile-header-offset', offset + 'px');
+    }
+
+    function openMobileSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.add('mobile-open');
+        if (sidebarOverlay) sidebarOverlay.classList.add('visible');
+        document.body.style.overflow = 'hidden'; // prevent body scroll
+
+        // Expand ALL app-switcher groups so user sees everything
+        sidebar.querySelectorAll('.app-switcher-group').forEach(function(group) {
+            group.classList.add('open');
+            var title = group.querySelector('.app-switcher-group-title');
+            if (title) title.setAttribute('aria-expanded', 'true');
+        });
+
+        // Calculate offset after groups expand (in next frame for accurate measurement)
+        requestAnimationFrame(updateMobileNavHeight);
+    }
+
+    function closeMobileSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.remove('mobile-open');
+        if (sidebarOverlay) sidebarOverlay.classList.remove('visible');
+        document.body.style.overflow = '';
+    }
+
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (sidebar.classList.contains('mobile-open')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        });
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeMobileSidebar);
+    }
+
+    // Close mobile sidebar on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar && sidebar.classList.contains('mobile-open')) {
+            closeMobileSidebar();
+        }
+    });
+
+    // Close mobile sidebar when navigating (HTMX or link click inside nav)
+    if (sidebar) {
+        sidebar.querySelectorAll('.nav-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                if (isMobile()) closeMobileSidebar();
+            });
+        });
+    }
+
+    // Recalculate on resize
+    window.addEventListener('resize', function() {
+        if (!isMobile() && sidebar) {
+            sidebar.classList.remove('mobile-open');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // ========================================
     // User Menu
     // ========================================
 

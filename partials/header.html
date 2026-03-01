@@ -33,6 +33,9 @@
 
 {{define "header"}}
 <header id="page-header" class="header">
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">
+        {{template "icon-menu" .}}
+    </button>
     {{template "header-content" .}}
 </header>
 {{end}}
