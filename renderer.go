@@ -11,15 +11,18 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+
+	"github.com/erniealice/pyeza-golang/route"
 )
 
 // HTMLRenderer handles HTML template rendering with shared components
 type HTMLRenderer struct {
-	templates      *template.Template
-	templateFuncs  template.FuncMap
+	templates        *template.Template
+	templateFuncs    template.FuncMap
 	templatePatterns []string
-	parseOnce      sync.Once
-	parseErr       error
+	parseOnce        sync.Once
+	parseErr         error
+	routeMap         map[string]string // route key → URL pattern (populated before first render)
 }
 
 // NewHTMLRenderer creates a new HTMLRenderer.
@@ -35,6 +38,14 @@ func NewHTMLRenderer(templatePatterns []string) *HTMLRenderer {
 func (r *HTMLRenderer) WithFuncs(funcs template.FuncMap) *HTMLRenderer {
 	r.templateFuncs = funcs
 	return r
+}
+
+// SetRouteMap sets the route lookup map used by the "route" and "routeWith"
+// template functions. Must be called before the first template render.
+// The map keys are dot-separated route names (e.g., "product.list"),
+// and values are URL patterns with chi-style {param} placeholders.
+func (r *HTMLRenderer) SetRouteMap(m map[string]string) {
+	r.routeMap = m
 }
 
 // getDefaultFuncMap returns the default template functions
@@ -103,6 +114,39 @@ func getDefaultFuncMap() template.FuncMap {
 // which is nil at parse time but populated before any template is rendered.
 func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 	base := getDefaultFuncMap()
+
+	// route looks up a static URL by key from the route map.
+	// Falls back to the key itself if not found.
+	// Usage: {{route "product.list"}} → "/app/products/list/{status}"
+	base["route"] = func(key string) string {
+		if r.routeMap != nil {
+			if url, ok := r.routeMap[key]; ok {
+				return url
+			}
+		}
+		return key
+	}
+
+	// routeWith looks up a parameterized URL by key and resolves {param} placeholders.
+	// Pairs are key-value arguments: {{routeWith "product.edit" "id" .ID}}
+	// Uses ...any (not ...string) because template expressions like
+	// {{index .Item "id"}} return interface{}, not string.
+	base["routeWith"] = func(key string, pairs ...any) string {
+		pattern := key
+		if r.routeMap != nil {
+			if url, ok := r.routeMap[key]; ok {
+				pattern = url
+			}
+		}
+		if len(pairs) == 0 || len(pairs)%2 != 0 {
+			return pattern
+		}
+		strPairs := make([]string, len(pairs))
+		for i, p := range pairs {
+			strPairs[i] = fmt.Sprintf("%v", p)
+		}
+		return route.ResolveURL(pattern, strPairs...)
+	}
 
 	// renderContent dynamically executes a named template and returns the result
 	// as template.HTML. This is safe because the sub-template output is already

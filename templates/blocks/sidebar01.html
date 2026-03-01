@@ -10,8 +10,48 @@
         </button>
     </div>
 
-    <!-- App Switcher -->
-    {{if .Sidebar.Apps}}
+    {{if eq .Sidebar.AppDisplayMode "grouped"}}
+    <!-- Grouped App Switcher -->
+    <div class="app-switcher" id="appSwitcher">
+        <button class="app-switcher-btn" id="appSwitcherBtn"
+                aria-haspopup="true" aria-expanded="false"
+                data-tooltip="{{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}{{end}}">
+            <div class="app-switcher-icon app-icon--{{.Sidebar.ActiveApp}}">
+                {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{renderContent .Icon $}}{{end}}{{end}}{{end}}
+            </div>
+            <span class="app-switcher-name">
+                {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}{{end}}
+            </span>
+            <span class="app-switcher-chevron">
+                {{template "icon-chevron-down" .}}
+            </span>
+        </button>
+
+        <div class="app-switcher-menu" role="menu" aria-labelledby="appSwitcherBtn">
+            <div class="app-switcher-header">Switch App</div>
+            {{range .Sidebar.AppGroups}}
+            {{$groupHasActive := false}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{$groupHasActive = true}}{{end}}{{end}}
+            <div class="app-switcher-group{{if $groupHasActive}} open{{end}}">
+                <button class="app-switcher-group-title" type="button" aria-expanded="{{if $groupHasActive}}true{{else}}false{{end}}">
+                    <span>{{.Title}}</span>
+                    <span class="app-switcher-group-chevron">{{template "icon-chevron-down" $}}</span>
+                </button>
+                <div class="app-switcher-group-items">
+                    {{range .Apps}}
+                    <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem">
+                        <div class="app-option-icon app-icon--{{.Key}}">
+                            {{renderContent .Icon $}}
+                        </div>
+                        <span class="app-option-name">{{.Label}}</span>
+                    </button>
+                    {{end}}
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    {{else if .Sidebar.Apps}}
+    <!-- App Switcher Dropdown -->
     <div class="app-switcher" id="appSwitcher">
         <button class="app-switcher-btn" id="appSwitcherBtn"
                 aria-haspopup="true" aria-expanded="false"
@@ -29,7 +69,7 @@
 
         <div class="app-switcher-menu" role="menu" aria-labelledby="appSwitcherBtn">
             <div class="app-switcher-header">Switch App</div>
-            <div class="app-switcher-grid">
+            <div class="app-switcher-grid{{if eq .Sidebar.AppGridColumns 1}} app-switcher-grid--cols-1{{end}}">
                 {{range .Sidebar.Apps}}
                 <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem">
                     <div class="app-option-icon app-icon--{{.Key}}">
