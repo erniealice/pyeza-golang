@@ -12,6 +12,7 @@
     z-index: 150;
     padding: 0;
     margin: 0;
+    align-items: center;
 }
 
 .bottom-nav-tab {
@@ -76,74 +77,146 @@
     padding: 0 0.25rem;
 }
 
-/* Mobile app grid for "More" tab */
-.mobile-app-grid-overlay {
-    position: fixed;
-    inset: 0;
-    bottom: 4rem; /* above bottom nav */
-    background: var(--bg-page);
-    z-index: 140;
-    overflow-y: auto;
-    display: none;
-}
-
-.mobile-app-grid-overlay.open {
-    display: block;
-}
-
-.mobile-app-grid-header {
-    padding: 1.5rem 1rem 1rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.mobile-app-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    padding: 0 1rem 2rem;
-}
-
-.mobile-app-grid-item {
+/* Center FAB — raised floating action button */
+.bottom-nav-fab {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 0.5rem;
-    border-radius: var(--radius-md, 0.5rem);
-    text-decoration: none;
-    color: var(--text-primary);
-    transition: background var(--transition-fast, 150ms ease);
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-top: -1.5rem;
+    border-radius: 50%;
+    background: var(--accent-terracotta, #c75b39);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 10;
     -webkit-tap-highlight-color: transparent;
 }
 
-.mobile-app-grid-item:hover {
-    background: var(--bg-hover);
+.bottom-nav-fab:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
-.mobile-app-grid-item-icon {
+.bottom-nav-fab .bottom-nav-tab-icon {
+    font-size: 1.5rem;
+}
+
+/* Bottom sheet backdrop — hidden on desktop */
+.mobile-app-sheet-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 998;
+}
+
+/* Bottom sheet container — hidden on desktop */
+.mobile-app-sheet {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 4rem; /* above bottom nav */
+    max-height: 70vh;
+    background: var(--bg-primary, #fff);
+    border-radius: 1rem 1rem 0 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    transform: translateY(calc(100% + 4rem)); /* 100% + bottom offset to fully hide below viewport */
+    transition: transform 0.3s ease;
+    z-index: 999;
+    overflow-y: auto;
+    padding: 0.5rem 1rem 1rem;
+}
+
+/* Drag handle */
+.mobile-app-sheet-handle {
+    width: 2rem;
+    height: 0.25rem;
+    background: var(--border-secondary, #ddd);
+    border-radius: 0.125rem;
+    margin: 0.5rem auto 1rem;
+}
+
+/* Group sections */
+.mobile-app-sheet-group {
+    margin-bottom: 1rem;
+}
+
+.mobile-app-sheet-group-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #999);
+    padding: 0.25rem 0;
+    margin-bottom: 0.5rem;
+}
+
+/* App items — vertical list */
+.mobile-app-sheet-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.mobile-app-sheet-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.5rem;
+    border-radius: 0.5rem;
+    color: var(--text-primary, #333);
+    text-decoration: none;
+    font-size: 0.875rem;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-app-sheet-item:hover,
+.mobile-app-sheet-item:active {
+    background: var(--bg-hover, #f5f5f5);
+}
+
+.mobile-app-sheet-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 2rem;
     height: 2rem;
-    color: var(--text-muted);
+    color: var(--text-secondary, #666);
 }
 
-.mobile-app-grid-item-icon svg {
+.mobile-app-sheet-item-icon svg {
     width: 100%;
     height: 100%;
 }
 
-.mobile-app-grid-item-label {
-    font-size: 0.75rem;
+.mobile-app-sheet-item-label {
     font-weight: 500;
-    text-align: center;
-    line-height: 1.2;
 }
 
-/* Show bottom nav on mobile + set safe-bottom for floating elements */
+/* Show bottom nav and sheet on mobile */
 @media (max-width: 768px) {
     .bottom-nav {
         display: flex;
+    }
+
+    .mobile-app-sheet {
+        display: block;
+        /* starts off-screen via transform, slides up when .open */
+    }
+
+    .mobile-app-sheet-backdrop.open {
+        display: block;
+    }
+
+    .mobile-app-sheet.open {
+        transform: translateY(0);
     }
 
     :root {

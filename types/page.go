@@ -27,25 +27,36 @@ type PageData struct {
 	UserPermissions   *UserPermissions         // permission codes for current user (for UI adaptation)
 	BottomNavTabs     []BottomNavTab           // mobile bottom navigation tabs
 	AllApps           []AppGridItem            // all apps for mobile app grid overlay
+	AppGroups         []AppGridGroup           // grouped apps for mobile bottom sheet
 }
 
 // BottomNavTab represents a single tab in the mobile bottom navigation bar.
 // Used by the "bottom-nav" template component.
 type BottomNavTab struct {
-	Key    string // identifier for the tab
-	Label  string // display text
-	Icon   string // icon template name (e.g., "icon-users")
-	Href   string // link URL
-	Badge  string // optional badge text (e.g., notification count)
-	Active bool   // true if this tab is the current page
+	Key     string // identifier for the tab
+	Label   string // display text
+	Icon    string // icon template name (e.g., "icon-users")
+	Href    string // link URL
+	Badge   string // optional badge text (e.g., notification count)
+	Active  bool   // true if this tab is the current page
+	IsFAB   bool   // true for the center floating action button
+	FABIcon string // icon template name for FAB (e.g., "icon-calendar-plus")
 }
 
 // AppGridItem represents a single app in the mobile app grid overlay.
 // Used by the "mobile-app-grid" template component.
 type AppGridItem struct {
-	Label string // display text
-	Icon  string // icon template name (e.g., "icon-users")
-	Href  string // link URL
+	Label      string // display text
+	Icon       string // icon template name (e.g., "icon-users")
+	Href       string // link URL
+	Group      string // group header (e.g., "Manage", "Transactions")
+	Permission string // permission code required (empty = always visible)
+}
+
+// AppGridGroup represents a group of apps in the mobile app grid.
+type AppGridGroup struct {
+	Title string        // group header text
+	Items []AppGridItem // apps in this group
 }
 
 // T returns the translation for the given dot-notation key.

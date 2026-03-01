@@ -622,6 +622,66 @@
 }
 
 /* ==========================================================================
+   COLOR PICKER FIELD
+   ========================================================================== */
+
+.color-picker-field {
+    display: flex;
+    align-items: stretch;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color var(--duration-fast),
+                box-shadow var(--duration-fast);
+}
+
+.color-picker-field:hover {
+    border-color: var(--text-muted);
+}
+
+.color-picker-field:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 0.1875rem var(--accent-primary-light); /* 3px */
+}
+
+.color-picker-band {
+    flex: 1;
+    min-height: 2.75rem; /* 44px - matches form-input height */
+    transition: background-color var(--duration-fast);
+}
+
+.color-picker-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem; /* 44px */
+    background: var(--bg-card);
+    border-left: var(--border-width) solid var(--border);
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.color-picker-trigger svg {
+    width: 1.125rem; /* 18px */
+    height: 1.125rem;
+}
+
+.color-picker-field:hover .color-picker-trigger {
+    color: var(--text-primary);
+}
+
+.color-picker-native {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================================================
    RESPONSIVE FORM LAYOUTS
    ========================================================================== */
 

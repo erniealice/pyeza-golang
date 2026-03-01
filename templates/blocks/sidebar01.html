@@ -22,11 +22,11 @@
                 {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{renderContent .Icon $}}{{end}}{{end}}{{end}}
             </div>
             <div class="app-switcher-info">
-                <span class="app-switcher-name">
-                    {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}{{end}}
-                </span>
                 <span class="app-switcher-group-label">
                     {{range .Sidebar.AppGroups}}{{$groupTitle := .Title}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{$groupTitle}}{{end}}{{end}}{{end}}
+                </span>
+                <span class="app-switcher-name">
+                    {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}{{end}}
                 </span>
             </div>
             <span class="app-switcher-chevron">

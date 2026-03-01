@@ -205,6 +205,7 @@ func CopyStaticAssets(targetDir string) error {
 		{srcRelPath: "assets/js/dialog.js", dstRelPath: "dialog.js"},
 		{srcRelPath: "assets/js/image-upload.js", dstRelPath: "image-upload.js"},
 		{srcRelPath: "assets/js/sidebar.js", dstRelPath: "sidebar.js"},
+		{srcRelPath: "assets/js/bottom-nav.js", dstRelPath: "bottom-nav.js"},
 	}
 
 	var totalCopied int

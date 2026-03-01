@@ -27,11 +27,17 @@ ACCESSIBILITY:
 {{define "bottom-nav"}}
 <nav class="bottom-nav" id="bottom-nav" aria-label="Mobile navigation">
     {{range .BottomNavTabs}}
+    {{if .IsFAB}}
+    <button class="bottom-nav-fab" data-href="{{.Href}}" aria-label="{{.Label}}">
+        <span class="bottom-nav-tab-icon">{{if .FABIcon}}{{renderContent .FABIcon $}}{{else}}{{renderContent .Icon $}}{{end}}</span>
+    </button>
+    {{else}}
     <a href="{{.Href}}" class="bottom-nav-tab{{if .Active}} active{{end}}" aria-label="{{.Label}}">
         <span class="bottom-nav-tab-icon">{{renderContent .Icon $}}</span>
         <span class="bottom-nav-tab-label">{{.Label}}</span>
         {{if .Badge}}<span class="bottom-nav-badge">{{.Badge}}</span>{{end}}
     </a>
+    {{end}}
     {{end}}
 </nav>
 {{end}}

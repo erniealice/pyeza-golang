@@ -1,0 +1,61 @@
+{{/*
+================================================================================
+MOBILE APP GRID — Bottom sheet with grouped app navigation
+================================================================================
+A slide-up bottom sheet showing all available apps, grouped by category.
+Triggered from the "More" tab in the bottom navigation.
+Positioned above the bottom nav bar.
+
+USAGE:
+    {{template "mobile-app-grid" .}}
+
+PARAMETERS (from PageData):
+    AppGroups - Array of groups, each with:
+                  - Title : Group header text (e.g., "Manage", "Transactions")
+                  - Items : Array of app items, each with:
+                      - Href  : Link URL
+                      - Icon  : Icon template name (e.g., "icon-users")
+                      - Label : Display text
+
+    AllApps   - Flat array of all app items (backward compatibility fallback)
+
+JavaScript:
+    Toggle visibility by adding/removing .open class on #mobile-app-grid
+    and #mobile-app-sheet-backdrop. See bottom-nav.js.
+================================================================================
+*/}}
+
+{{define "mobile-app-grid"}}
+<div class="mobile-app-sheet-backdrop" id="mobile-app-sheet-backdrop"></div>
+<div class="mobile-app-sheet" id="mobile-app-grid">
+    <div class="mobile-app-sheet-handle"></div>
+    {{if .AppGroups}}
+    {{range .AppGroups}}
+    <div class="mobile-app-sheet-group">
+        <div class="mobile-app-sheet-group-title">{{.Title}}</div>
+        <div class="mobile-app-sheet-items">
+            {{range .Items}}
+            <a href="{{.Href}}" class="mobile-app-sheet-item">
+                <span class="mobile-app-sheet-item-icon">{{renderContent .Icon $}}</span>
+                <span class="mobile-app-sheet-item-label">{{.Label}}</span>
+            </a>
+            {{end}}
+        </div>
+    </div>
+    {{end}}
+    {{else}}
+    {{/* Backward compatibility: render flat AllApps list without grouping */}}
+    <div class="mobile-app-sheet-group">
+        <div class="mobile-app-sheet-group-title">All Apps</div>
+        <div class="mobile-app-sheet-items">
+            {{range .AllApps}}
+            <a href="{{.Href}}" class="mobile-app-sheet-item">
+                <span class="mobile-app-sheet-item-icon">{{renderContent .Icon $}}</span>
+                <span class="mobile-app-sheet-item-label">{{.Label}}</span>
+            </a>
+            {{end}}
+        </div>
+    </div>
+    {{end}}
+</div>
+{{end}}

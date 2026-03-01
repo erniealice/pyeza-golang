@@ -22,7 +22,14 @@
     function toggleSidebar() {
         if (!sidebar) return;
         sidebar.classList.toggle('collapsed');
-        saveSidebarState(sidebar.classList.contains('collapsed'));
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+        saveSidebarState(isCollapsed);
+    }
+
+    // Sync body class on load if sidebar starts collapsed (e.g. restored from localStorage)
+    if (sidebar && sidebar.classList.contains('collapsed')) {
+        document.body.classList.add('sidebar-collapsed');
     }
 
     if (toggleBtn) {
@@ -317,4 +324,55 @@
             }
         });
     }
+
+    // ========================================
+    // Active Nav Highlight (HTMX navigation)
+    // ========================================
+    // hx-boost swaps only #main-content — sidebar stays stale.
+    // Update the active nav item by matching the new URL against
+    // nav-item hrefs using longest common path-prefix.
+
+    function updateActiveNav() {
+        if (!appNav) return;
+
+        var pathname = location.pathname;
+        var items = appNav.querySelectorAll('.nav-item');
+        var bestItems = [];
+        var bestLen = 0;
+
+        items.forEach(function(item) {
+            var href = item.getAttribute('href');
+            if (!href) return;
+
+            var hrefParts = href.split('/').filter(Boolean);
+            var pathParts = pathname.split('/').filter(Boolean);
+            var matchLen = 0;
+
+            for (var i = 0; i < Math.min(hrefParts.length, pathParts.length); i++) {
+                if (hrefParts[i] === pathParts[i]) matchLen++;
+                else break;
+            }
+
+            if (matchLen > bestLen) {
+                bestLen = matchLen;
+                bestItems = [item];
+            } else if (matchLen === bestLen && matchLen > 0) {
+                bestItems.push(item);
+            }
+        });
+
+        if (bestLen < 2) return; // need at least /app/{section} match
+
+        // If tie, keep current active if it's one of the candidates
+        if (bestItems.length > 1) {
+            var current = appNav.querySelector('.nav-item.active');
+            if (current && bestItems.indexOf(current) !== -1) return;
+        }
+
+        items.forEach(function(i) { i.classList.remove('active'); });
+        bestItems[0].classList.add('active');
+    }
+
+    document.addEventListener('htmx:pushedIntoHistory', updateActiveNav);
+    window.addEventListener('popstate', updateActiveNav);
 })();
