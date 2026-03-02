@@ -546,44 +546,52 @@
     stroke: white;
 }
 
-.app-icon--clients {
-    background: linear-gradient(135deg, var(--accent-terracotta) 0%, var(--accent-terracotta-dark) 100%);
-}
-
 .app-icon--users {
-    background: linear-gradient(135deg, var(--accent-amber) 0%, #B8922F 100%);
+    background: linear-gradient(135deg, var(--app-color-users) 0%, var(--app-color-users-dark) 100%);
 }
 
-.app-icon--sales {
-    background: linear-gradient(135deg, var(--accent-sage) 0%, var(--accent-sage) 100%);
+.app-icon--clients {
+    background: linear-gradient(135deg, var(--app-color-clients) 0%, var(--app-color-clients-dark) 100%);
 }
 
 .app-icon--inventory {
-    background: linear-gradient(135deg, var(--accent-navy) 0%, var(--accent-navy) 100%);
+    background: linear-gradient(135deg, var(--app-color-inventory) 0%, var(--app-color-inventory-dark) 100%);
 }
 
 .app-icon--services {
-    background: linear-gradient(135deg, #7c6bc4 0%, #5a4fa0 100%);
+    background: linear-gradient(135deg, var(--app-color-services) 0%, var(--app-color-services-dark) 100%);
 }
 
 .app-icon--locations {
-    background: linear-gradient(135deg, #e07c5a 0%, #c4613f 100%);
+    background: linear-gradient(135deg, var(--app-color-locations) 0%, var(--app-color-locations-dark) 100%);
+}
+
+.app-icon--assets {
+    background: linear-gradient(135deg, var(--app-color-assets) 0%, var(--app-color-assets-dark) 100%);
+}
+
+.app-icon--suppliers {
+    background: linear-gradient(135deg, var(--app-color-suppliers) 0%, var(--app-color-suppliers-dark) 100%);
+}
+
+.app-icon--sales {
+    background: linear-gradient(135deg, var(--app-color-sales) 0%, var(--app-color-sales-dark) 100%);
 }
 
 .app-icon--purchases {
-    background: linear-gradient(135deg, #5b8c5a 0%, #467345 100%);
+    background: linear-gradient(135deg, var(--app-color-purchases) 0%, var(--app-color-purchases-dark) 100%);
 }
 
 .app-icon--expenses {
-    background: linear-gradient(135deg, #c45a5a 0%, #a04040 100%);
-}
-
-.app-icon--admin {
-    background: linear-gradient(135deg, #6b7c8d 0%, #4e5d6b 100%);
+    background: linear-gradient(135deg, var(--app-color-expenses) 0%, var(--app-color-expenses-dark) 100%);
 }
 
 .app-icon--reports {
-    background: linear-gradient(135deg, #4a9b9b 0%, #3a7b7b 100%);
+    background: linear-gradient(135deg, var(--app-color-reports) 0%, var(--app-color-reports-dark) 100%);
+}
+
+.app-icon--admin {
+    background: linear-gradient(135deg, var(--app-color-admin) 0%, var(--app-color-admin-dark) 100%);
 }
 
 .app-switcher-info {
@@ -804,84 +812,100 @@
 }
 
 /* Non-active app options: colored icons on light backgrounds */
-.app-option:not(.active) .app-icon--clients {
-    background: var(--accent-terracotta-light);
-}
-.app-option:not(.active) .app-icon--clients svg {
-    color: var(--accent-terracotta);
-    stroke: var(--accent-terracotta);
-}
-
 .app-option:not(.active) .app-icon--users {
-    background: var(--accent-amber-light);
+    background: var(--app-color-users-light);
 }
 .app-option:not(.active) .app-icon--users svg {
-    color: var(--accent-amber);
-    stroke: var(--accent-amber);
+    color: var(--app-color-users);
+    stroke: var(--app-color-users);
 }
 
-.app-option:not(.active) .app-icon--sales {
-    background: var(--accent-sage-light);
+.app-option:not(.active) .app-icon--clients {
+    background: var(--app-color-clients-light);
 }
-.app-option:not(.active) .app-icon--sales svg {
-    color: var(--accent-sage);
-    stroke: var(--accent-sage);
+.app-option:not(.active) .app-icon--clients svg {
+    color: var(--app-color-clients);
+    stroke: var(--app-color-clients);
 }
 
 .app-option:not(.active) .app-icon--inventory {
-    background: var(--accent-navy-light);
+    background: var(--app-color-inventory-light);
 }
 .app-option:not(.active) .app-icon--inventory svg {
-    color: var(--accent-navy);
-    stroke: var(--accent-navy);
+    color: var(--app-color-inventory);
+    stroke: var(--app-color-inventory);
 }
 
 .app-option:not(.active) .app-icon--services {
-    background: rgba(124, 107, 196, 0.12);
+    background: var(--app-color-services-light);
 }
 .app-option:not(.active) .app-icon--services svg {
-    color: #7c6bc4;
-    stroke: #7c6bc4;
+    color: var(--app-color-services);
+    stroke: var(--app-color-services);
 }
 
 .app-option:not(.active) .app-icon--locations {
-    background: rgba(224, 124, 90, 0.12);
+    background: var(--app-color-locations-light);
 }
 .app-option:not(.active) .app-icon--locations svg {
-    color: #e07c5a;
-    stroke: #e07c5a;
+    color: var(--app-color-locations);
+    stroke: var(--app-color-locations);
+}
+
+.app-option:not(.active) .app-icon--assets {
+    background: var(--app-color-assets-light);
+}
+.app-option:not(.active) .app-icon--assets svg {
+    color: var(--app-color-assets);
+    stroke: var(--app-color-assets);
+}
+
+.app-option:not(.active) .app-icon--suppliers {
+    background: var(--app-color-suppliers-light);
+}
+.app-option:not(.active) .app-icon--suppliers svg {
+    color: var(--app-color-suppliers);
+    stroke: var(--app-color-suppliers);
+}
+
+.app-option:not(.active) .app-icon--sales {
+    background: var(--app-color-sales-light);
+}
+.app-option:not(.active) .app-icon--sales svg {
+    color: var(--app-color-sales);
+    stroke: var(--app-color-sales);
 }
 
 .app-option:not(.active) .app-icon--purchases {
-    background: rgba(91, 140, 90, 0.12);
+    background: var(--app-color-purchases-light);
 }
 .app-option:not(.active) .app-icon--purchases svg {
-    color: #5b8c5a;
-    stroke: #5b8c5a;
+    color: var(--app-color-purchases);
+    stroke: var(--app-color-purchases);
 }
 
 .app-option:not(.active) .app-icon--expenses {
-    background: rgba(196, 90, 90, 0.12);
+    background: var(--app-color-expenses-light);
 }
 .app-option:not(.active) .app-icon--expenses svg {
-    color: #c45a5a;
-    stroke: #c45a5a;
-}
-
-.app-option:not(.active) .app-icon--admin {
-    background: rgba(107, 124, 141, 0.12);
-}
-.app-option:not(.active) .app-icon--admin svg {
-    color: #6b7c8d;
-    stroke: #6b7c8d;
+    color: var(--app-color-expenses);
+    stroke: var(--app-color-expenses);
 }
 
 .app-option:not(.active) .app-icon--reports {
-    background: rgba(74, 155, 155, 0.12);
+    background: var(--app-color-reports-light);
 }
 .app-option:not(.active) .app-icon--reports svg {
-    color: #4a9b9b;
-    stroke: #4a9b9b;
+    color: var(--app-color-reports);
+    stroke: var(--app-color-reports);
+}
+
+.app-option:not(.active) .app-icon--admin {
+    background: var(--app-color-admin-light);
+}
+.app-option:not(.active) .app-icon--admin svg {
+    color: var(--app-color-admin);
+    stroke: var(--app-color-admin);
 }
 
 /* Active app option: white icon on gradient background */

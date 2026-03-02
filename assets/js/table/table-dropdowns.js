@@ -37,7 +37,8 @@
         // This MUST run on every init() call for HTMX navigation
         dropdowns.forEach(dropdown => {
             const btn = dropdown.querySelector('.toolbar-btn');
-            if (!btn) return;
+            if (!btn || btn.dataset.dropdownInit) return;
+            btn.dataset.dropdownInit = 'true';
 
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();

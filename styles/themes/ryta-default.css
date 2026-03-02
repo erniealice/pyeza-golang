@@ -62,6 +62,44 @@
     --shadow-float: 0 12px 40px rgba(14, 6, 42, 0.14);
     --shadow-xl: 0 20px 50px rgba(14, 6, 42, 0.12);
 
+    /* App Icon Colors — vivid, modern, high-saturation */
+    --app-color-users: #D69E2E;
+    --app-color-users-dark: #B88620;
+    --app-color-users-light: #FEFCE8;
+    --app-color-clients: #E53E3E;
+    --app-color-clients-dark: #C53030;
+    --app-color-clients-light: #FEF0F0;
+    --app-color-inventory: #2B6CB0;
+    --app-color-inventory-dark: #225698;
+    --app-color-inventory-light: #EBF4FF;
+    --app-color-services: #805AD5;
+    --app-color-services-dark: #6842B8;
+    --app-color-services-light: #F3EEFA;
+    --app-color-locations: #DD6B20;
+    --app-color-locations-dark: #C05616;
+    --app-color-locations-light: #FFF1E6;
+    --app-color-assets: #0891B2;
+    --app-color-assets-dark: #0E7490;
+    --app-color-assets-light: #E6F7F9;
+    --app-color-suppliers: #4F46E5;
+    --app-color-suppliers-dark: #4338CA;
+    --app-color-suppliers-light: #EEF2FF;
+    --app-color-sales: #059669;
+    --app-color-sales-dark: #047857;
+    --app-color-sales-light: #ECFDF5;
+    --app-color-purchases: #16A34A;
+    --app-color-purchases-dark: #15803D;
+    --app-color-purchases-light: #F0FDF4;
+    --app-color-expenses: #DC2626;
+    --app-color-expenses-dark: #B91C1C;
+    --app-color-expenses-light: #FEF2F2;
+    --app-color-reports: #0D9488;
+    --app-color-reports-dark: #0F766E;
+    --app-color-reports-light: #F0FDFA;
+    --app-color-admin: #6B7280;
+    --app-color-admin-dark: #4B5563;
+    --app-color-admin-light: #F3F4F6;
+
     /* Theme Meta */
     --theme-name: "Ryta Default";
     --theme-icon-bg: linear-gradient(135deg, #FAFAFD 0%, #E2DFF0 100%);

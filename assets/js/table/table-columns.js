@@ -24,6 +24,8 @@
             if (!table) return;
 
             checkboxes.forEach(checkbox => {
+                if (checkbox.dataset.columnInit) return;
+                checkbox.dataset.columnInit = 'true';
                 checkbox.addEventListener('change', function() {
                     const columnIndex = parseInt(this.dataset.index);
                     const columnKey = this.dataset.column;

@@ -60,6 +60,44 @@
     --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.5);
     --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
 
+    /* App Icon Colors — bright on dark, rgba light variants */
+    --app-color-users: #FACC15;
+    --app-color-users-dark: #EAB308;
+    --app-color-users-light: rgba(250, 204, 21, 0.15);
+    --app-color-clients: #FB923C;
+    --app-color-clients-dark: #EA580C;
+    --app-color-clients-light: rgba(251, 146, 60, 0.15);
+    --app-color-inventory: #38BDF8;
+    --app-color-inventory-dark: #0EA5E9;
+    --app-color-inventory-light: rgba(56, 189, 248, 0.15);
+    --app-color-services: #C084FC;
+    --app-color-services-dark: #A855F7;
+    --app-color-services-light: rgba(192, 132, 252, 0.15);
+    --app-color-locations: #FB7185;
+    --app-color-locations-dark: #F43F5E;
+    --app-color-locations-light: rgba(251, 113, 133, 0.15);
+    --app-color-assets: #22D3EE;
+    --app-color-assets-dark: #06B6D4;
+    --app-color-assets-light: rgba(34, 211, 238, 0.15);
+    --app-color-suppliers: #818CF8;
+    --app-color-suppliers-dark: #6366F1;
+    --app-color-suppliers-light: rgba(129, 140, 248, 0.15);
+    --app-color-sales: #4ADE80;
+    --app-color-sales-dark: #22C55E;
+    --app-color-sales-light: rgba(74, 222, 128, 0.15);
+    --app-color-purchases: #34D399;
+    --app-color-purchases-dark: #10B981;
+    --app-color-purchases-light: rgba(52, 211, 153, 0.15);
+    --app-color-expenses: #F87171;
+    --app-color-expenses-dark: #EF4444;
+    --app-color-expenses-light: rgba(248, 113, 113, 0.15);
+    --app-color-reports: #2DD4BF;
+    --app-color-reports-dark: #14B8A6;
+    --app-color-reports-light: rgba(45, 212, 191, 0.15);
+    --app-color-admin: #9DB5A8;
+    --app-color-admin-dark: #6B8578;
+    --app-color-admin-light: rgba(157, 181, 168, 0.15);
+
     /* Theme Meta */
     --theme-name: "Forest Night";
     --theme-icon-bg: linear-gradient(135deg, #1A2922 0%, #0D1512 100%);

@@ -9,6 +9,8 @@
         const searchInputs = document.querySelectorAll('.toolbar-search-input');
 
         searchInputs.forEach(input => {
+            if (input.dataset.searchInit) return;
+            input.dataset.searchInit = 'true';
             const tableId = input.dataset.table;
             if (!tableId) return;
 

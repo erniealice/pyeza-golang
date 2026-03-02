@@ -108,12 +108,12 @@
         // Full card swap detection (existing behavior)
         const hasTable = swappedContent.querySelectorAll('.data-table').length > 0;
         const hasToolbar = swappedContent.querySelectorAll('.table-toolbar').length > 0;
-        const isHeaderSwap = swappedContent.id === 'page-header' || swappedContent.classList.contains('header');
 
-        console.log('[HTMX] afterSettle - target:', swappedContent.id || swappedContent.className, 'hasTable:', hasTable, 'hasToolbar:', hasToolbar, 'isHeader:', isHeaderSwap);
+        console.log('[HTMX] afterSettle - target:', swappedContent.id || swappedContent.className, 'hasTable:', hasTable, 'hasToolbar:', hasToolbar);
 
         // Re-initialize if any table-related content was swapped
-        if (hasTable || hasToolbar || isHeaderSwap) {
+        // Note: header OOB swaps don't need table re-init (no table elements in header)
+        if (hasTable || hasToolbar) {
             console.log('[HTMX] Re-initializing table modules');
             init();
         }

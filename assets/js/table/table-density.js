@@ -28,6 +28,8 @@
             });
 
             options.forEach(option => {
+                if (option.dataset.densityInit) return;
+                option.dataset.densityInit = 'true';
                 option.addEventListener('click', function() {
                     const density = this.dataset.density;
 

@@ -13,6 +13,8 @@
         const exportOptions = document.querySelectorAll('.export-option');
 
         exportOptions.forEach(option => {
+            if (option.dataset.exportInit) return;
+            option.dataset.exportInit = 'true';
             option.addEventListener('click', function() {
                 const format = this.dataset.format;
                 const dropdown = this.closest('.toolbar-dropdown');

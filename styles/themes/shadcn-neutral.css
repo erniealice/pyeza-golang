@@ -62,6 +62,44 @@
     --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.12);
     --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
 
+    /* App Icon Colors — standard Tailwind color scale */
+    --app-color-users: #EAB308;
+    --app-color-users-dark: #CA8A04;
+    --app-color-users-light: #FEFCE8;
+    --app-color-clients: #EF4444;
+    --app-color-clients-dark: #DC2626;
+    --app-color-clients-light: #FEF2F2;
+    --app-color-inventory: #3B82F6;
+    --app-color-inventory-dark: #2563EB;
+    --app-color-inventory-light: #EFF6FF;
+    --app-color-services: #8B5CF6;
+    --app-color-services-dark: #7C3AED;
+    --app-color-services-light: #F5F3FF;
+    --app-color-locations: #F97316;
+    --app-color-locations-dark: #EA580C;
+    --app-color-locations-light: #FFF7ED;
+    --app-color-assets: #06B6D4;
+    --app-color-assets-dark: #0891B2;
+    --app-color-assets-light: #ECFEFF;
+    --app-color-suppliers: #6366F1;
+    --app-color-suppliers-dark: #4F46E5;
+    --app-color-suppliers-light: #EEF2FF;
+    --app-color-sales: #22C55E;
+    --app-color-sales-dark: #16A34A;
+    --app-color-sales-light: #F0FDF4;
+    --app-color-purchases: #10B981;
+    --app-color-purchases-dark: #059669;
+    --app-color-purchases-light: #ECFDF5;
+    --app-color-expenses: #F43F5E;
+    --app-color-expenses-dark: #E11D48;
+    --app-color-expenses-light: #FFF1F2;
+    --app-color-reports: #14B8A6;
+    --app-color-reports-dark: #0D9488;
+    --app-color-reports-light: #F0FDFA;
+    --app-color-admin: #737373;
+    --app-color-admin-dark: #525252;
+    --app-color-admin-light: #F5F5F5;
+
     /* Theme Meta */
     --theme-name: "shadcn Neutral";
     --theme-icon-bg: linear-gradient(135deg, #FFFFFF 0%, #E5E5E5 100%);

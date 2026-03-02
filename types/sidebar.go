@@ -71,6 +71,10 @@ type SidebarLabels struct {
 	ServicesAppIcon   string `json:"services_app_icon"`
 	LocationsAppLabel string `json:"locations_app_label"`
 	LocationsAppIcon  string `json:"locations_app_icon"`
+	AssetsAppLabel      string `json:"assets_app_label"`
+	AssetsAppIcon       string `json:"assets_app_icon"`
+	SuppliersAppLabel   string `json:"suppliers_app_label"`
+	SuppliersAppIcon    string `json:"suppliers_app_icon"`
 	PurchasesAppLabel string `json:"purchases_app_label"`
 	PurchasesAppIcon  string `json:"purchases_app_icon"`
 	ExpensesAppLabel  string `json:"expenses_app_label"`
@@ -81,10 +85,14 @@ type SidebarLabels struct {
 	AdminAppIcon      string `json:"admin_app_icon"`
 
 	// App group titles
-	MasterlistsGroupTitle  string `json:"masterlists_group_title"`
-	TransactionsGroupTitle string `json:"transactions_group_title"`
-	ReportsGroupTitle      string `json:"reports_group_title"`
-	AdminGroupTitle        string `json:"admin_group_title"`
+	MasterlistsGroupTitle    string `json:"masterlists_group_title"`
+	TransactionsGroupTitle   string `json:"transactions_group_title"`
+	ReportsGroupTitle        string `json:"reports_group_title"`
+	AdminGroupTitle          string `json:"admin_group_title"`
+	FoundationGroupTitle     string `json:"foundation_group_title"`
+	CoreDataGroupTitle       string `json:"core_data_group_title"`
+	OperationsGroupTitle     string `json:"operations_group_title"`
+	IntelligenceGroupTitle   string `json:"intelligence_group_title"`
 
 	// Section titles
 	ClientsTitle      string `json:"clients_title"`
@@ -97,14 +105,22 @@ type SidebarLabels struct {
 	TransactionsTitle string `json:"transactions_title"`
 	ReportsTitle      string `json:"reports_title"`
 	LocationsTitle    string `json:"locations_title"`
+	AssetsTitle       string `json:"assets_title"`
+	SuppliersTitle    string `json:"suppliers_title"`
+	PlansTitle        string `json:"plans_title"`
+	SubscriptionsTitle string `json:"subscriptions_title"`
+	CollectionsTitle  string `json:"collections_title"`
 	PermissionsTitle  string `json:"permissions_title"`
 	WorkspacesTitle   string `json:"workspaces_title"`
 
-	// Shared status labels (used across purchase, expense, etc.)
+	// Shared status labels (used across purchase, expense, supplier, etc.)
 	AllLabel      string `json:"all_label"`
 	PendingLabel  string `json:"pending_label"`
 	ApprovedLabel string `json:"approved_label"`
 	PaidLabel     string `json:"paid_label"`
+	BlockedLabel  string `json:"blocked_label"`
+	OnHoldLabel   string `json:"on_hold_label"`
+	CompleteLabel string `json:"complete_label"`
 
 	// Unique nav item labels and icons
 	ClientsActiveIcon      string `json:"clients_active_icon"`
@@ -139,7 +155,20 @@ type SidebarLabels struct {
 	NetProfitIcon          string `json:"net_profit_icon"`
 	LocationsActiveIcon    string `json:"locations_active_icon"`
 	LocationsInactiveIcon  string `json:"locations_inactive_icon"`
-	PermissionsActiveIcon  string `json:"permissions_active_icon"`
+	AssetsActiveIcon          string `json:"assets_active_icon"`
+	AssetsInactiveIcon        string `json:"assets_inactive_icon"`
+	FixedAssetsLabel          string `json:"fixed_assets_label"`
+	FixedAssetsIcon           string `json:"fixed_assets_icon"`
+	SuppliersActiveIcon       string `json:"suppliers_active_icon"`
+	SuppliersBlockedIcon      string `json:"suppliers_blocked_icon"`
+	SuppliersOnHoldIcon       string `json:"suppliers_on_hold_icon"`
+	PlansActiveIcon           string `json:"plans_active_icon"`
+	PlansInactiveIcon         string `json:"plans_inactive_icon"`
+	SubscriptionsActiveIcon   string `json:"subscriptions_active_icon"`
+	SubscriptionsInactiveIcon string `json:"subscriptions_inactive_icon"`
+	CollectionsPendingIcon    string `json:"collections_pending_icon"`
+	CollectionsCompleteIcon   string `json:"collections_complete_icon"`
+	PermissionsActiveIcon     string `json:"permissions_active_icon"`
 	PermissionsInactiveIcon string `json:"permissions_inactive_icon"`
 	WorkspacesActiveIcon   string `json:"workspaces_active_icon"`
 	WorkspacesInactiveIcon string `json:"workspaces_inactive_icon"`
@@ -161,11 +190,15 @@ func DefaultSidebarLabels() SidebarLabels {
 		SalesAppLabel:     "Sales",
 		SalesAppIcon:      "icon-shopping-bag",
 		InventoryAppLabel: "Inventory",
-		InventoryAppIcon:  "icon-briefcase",
+		InventoryAppIcon:  "icon-package",
 		ServicesAppLabel:  "Services",
 		ServicesAppIcon:   "icon-layers",
 		LocationsAppLabel: "Locations",
 		LocationsAppIcon:  "icon-map-pin",
+		AssetsAppLabel:      "Assets",
+		AssetsAppIcon:       "icon-archive",
+		SuppliersAppLabel:   "Suppliers",
+		SuppliersAppIcon:    "icon-truck",
 		PurchasesAppLabel: "Purchases",
 		PurchasesAppIcon:  "icon-clipboard",
 		ExpensesAppLabel:  "Expenses",
@@ -175,10 +208,14 @@ func DefaultSidebarLabels() SidebarLabels {
 		AdminAppLabel:     "Settings",
 		AdminAppIcon:      "icon-settings",
 
-		MasterlistsGroupTitle:  "Masterlists",
-		TransactionsGroupTitle: "Transactions",
-		ReportsGroupTitle:      "Reports",
-		AdminGroupTitle:        "Admin",
+		MasterlistsGroupTitle:    "Masterlists",
+		TransactionsGroupTitle:  "Transactions",
+		ReportsGroupTitle:       "Reports",
+		AdminGroupTitle:         "Admin",
+		FoundationGroupTitle:    "Foundation",
+		CoreDataGroupTitle:      "Core Data",
+		OperationsGroupTitle:    "Operations",
+		IntelligenceGroupTitle:  "Intelligence",
 
 		ClientsTitle:      "Clients",
 		UsersTitle:        "Users",
@@ -190,6 +227,11 @@ func DefaultSidebarLabels() SidebarLabels {
 		TransactionsTitle: "Transactions",
 		ReportsTitle:      "Reports",
 		LocationsTitle:    "Locations",
+		AssetsTitle:        "Assets",
+		SuppliersTitle:    "Suppliers",
+		PlansTitle:        "Plans",
+		SubscriptionsTitle: "Subscriptions",
+		CollectionsTitle:  "Collections",
 		PermissionsTitle:  "Permissions",
 		WorkspacesTitle:   "Workspaces",
 
@@ -197,6 +239,9 @@ func DefaultSidebarLabels() SidebarLabels {
 		PendingLabel:  "Pending",
 		ApprovedLabel: "Approved",
 		PaidLabel:     "Paid",
+		BlockedLabel:  "Blocked",
+		OnHoldLabel:   "On Hold",
+		CompleteLabel: "Complete",
 
 		ClientsActiveIcon:      "icon-user-check",
 		ClientsInactiveIcon:    "icon-user-minus",
@@ -230,7 +275,20 @@ func DefaultSidebarLabels() SidebarLabels {
 		NetProfitIcon:          "icon-dollar-sign",
 		LocationsActiveIcon:    "icon-map-pin",
 		LocationsInactiveIcon:  "icon-map-pin",
-		PermissionsActiveIcon:  "icon-key",
+		AssetsActiveIcon:          "icon-archive",
+		AssetsInactiveIcon:        "icon-archive",
+		FixedAssetsLabel:          "Fixed Assets",
+		FixedAssetsIcon:           "icon-archive",
+		SuppliersActiveIcon:       "icon-truck",
+		SuppliersBlockedIcon:      "icon-x-circle",
+		SuppliersOnHoldIcon:       "icon-pause-circle",
+		PlansActiveIcon:           "icon-file-text",
+		PlansInactiveIcon:         "icon-file-minus",
+		SubscriptionsActiveIcon:   "icon-refresh-cw",
+		SubscriptionsInactiveIcon: "icon-x-circle",
+		CollectionsPendingIcon:    "icon-clock",
+		CollectionsCompleteIcon:   "icon-check-circle",
+		PermissionsActiveIcon:     "icon-key",
 		PermissionsInactiveIcon: "icon-key",
 		WorkspacesActiveIcon:   "icon-briefcase",
 		WorkspacesInactiveIcon: "icon-briefcase",

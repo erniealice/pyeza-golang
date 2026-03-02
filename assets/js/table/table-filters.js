@@ -13,6 +13,8 @@
         const filterPanels = document.querySelectorAll('.filter-panel');
 
         filterPanels.forEach(panel => {
+            if (panel.dataset.filterInit) return;
+            panel.dataset.filterInit = 'true';
             const dropdown = panel.closest('.toolbar-dropdown');
             const toolbar = dropdown.closest('.table-toolbar');
             const tableId = toolbar ? toolbar.dataset.table : null;

@@ -245,7 +245,10 @@ func (r *HTMLRenderer) Init() error {
 	return r.parseErr
 }
 
-// Render renders a template with the given data and writes it to the response writer
+// Render renders a template with the given data and writes it to the response writer.
+// WARNING: Writes directly to w — if template execution fails midway, partial HTML
+// is already committed. Use RenderBuffered for fallback chains where you need
+// atomic (all-or-nothing) rendering.
 func (r *HTMLRenderer) Render(w http.ResponseWriter, templateName string, data interface{}) error {
 	if r.templates == nil {
 		if err := r.Init(); err != nil {
@@ -260,6 +263,31 @@ func (r *HTMLRenderer) Render(w http.ResponseWriter, templateName string, data i
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	return tmpl.Execute(w, data)
+}
+
+// RenderBuffered renders a template to an internal buffer first. If execution
+// succeeds, the buffer is flushed to w. If it fails, nothing is written —
+// making it safe to use in fallback chains (try content, then partial, then full).
+func (r *HTMLRenderer) RenderBuffered(w http.ResponseWriter, templateName string, data interface{}) error {
+	if r.templates == nil {
+		if err := r.Init(); err != nil {
+			return err
+		}
+	}
+
+	tmpl := r.templates.Lookup(templateName)
+	if tmpl == nil {
+		return fmt.Errorf("template not found: %s", templateName)
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return err
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, err := buf.WriteTo(w)
+	return err
 }
 
 // GetTemplate returns a parsed template by name

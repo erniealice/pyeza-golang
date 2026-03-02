@@ -30,6 +30,8 @@
             const sortBtns = menu.querySelectorAll('.sort-dir-btn');
 
             sortBtns.forEach(btn => {
+                if (btn.dataset.sortInit) return;
+                btn.dataset.sortInit = 'true';
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
 
@@ -85,6 +87,8 @@
             const tbody = table.querySelector('tbody');
 
             headers.forEach(th => {
+                if (th.dataset.headerSortInit) return;
+                th.dataset.headerSortInit = 'true';
                 th.addEventListener('click', function() {
                     const column = this.dataset.sort;
                     if (!column) return;
