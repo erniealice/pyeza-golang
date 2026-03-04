@@ -79,6 +79,8 @@ type SidebarLabels struct {
 	PurchasesAppIcon  string `json:"purchases_app_icon"`
 	ExpensesAppLabel  string `json:"expenses_app_label"`
 	ExpensesAppIcon   string `json:"expenses_app_icon"`
+	CashAppLabel      string `json:"cash_app_label"`
+	CashAppIcon       string `json:"cash_app_icon"`
 	ReportsAppLabel   string `json:"reports_app_label"`
 	ReportsAppIcon    string `json:"reports_app_icon"`
 	AdminAppLabel     string `json:"admin_app_label"`
@@ -109,12 +111,15 @@ type SidebarLabels struct {
 	SuppliersTitle    string `json:"suppliers_title"`
 	PlansTitle        string `json:"plans_title"`
 	SubscriptionsTitle string `json:"subscriptions_title"`
-	CollectionsTitle  string `json:"collections_title"`
-	PermissionsTitle  string `json:"permissions_title"`
+	CashTitle            string `json:"cash_title"`
+	CollectionsTitle     string `json:"collections_title"`
+	DisbursementsTitle   string `json:"disbursements_title"`
+	PermissionsTitle     string `json:"permissions_title"`
 	WorkspacesTitle   string `json:"workspaces_title"`
 
 	// Shared status labels (used across purchase, expense, supplier, etc.)
 	AllLabel      string `json:"all_label"`
+	DraftLabel    string `json:"draft_label"`
 	PendingLabel  string `json:"pending_label"`
 	ApprovedLabel string `json:"approved_label"`
 	PaidLabel     string `json:"paid_label"`
@@ -166,12 +171,34 @@ type SidebarLabels struct {
 	PlansInactiveIcon         string `json:"plans_inactive_icon"`
 	SubscriptionsActiveIcon   string `json:"subscriptions_active_icon"`
 	SubscriptionsInactiveIcon string `json:"subscriptions_inactive_icon"`
-	CollectionsPendingIcon    string `json:"collections_pending_icon"`
-	CollectionsCompleteIcon   string `json:"collections_complete_icon"`
-	PermissionsActiveIcon     string `json:"permissions_active_icon"`
+	CollectionsPendingIcon       string `json:"collections_pending_icon"`
+	CollectionsCompleteIcon      string `json:"collections_complete_icon"`
+	DisbursementsDraftIcon       string `json:"disbursements_draft_icon"`
+	DisbursementsPendingIcon     string `json:"disbursements_pending_icon"`
+	DisbursementsApprovedIcon    string `json:"disbursements_approved_icon"`
+	DisbursementsPaidIcon        string `json:"disbursements_paid_icon"`
+	PermissionsActiveIcon        string `json:"permissions_active_icon"`
 	PermissionsInactiveIcon string `json:"permissions_inactive_icon"`
 	WorkspacesActiveIcon   string `json:"workspaces_active_icon"`
 	WorkspacesInactiveIcon string `json:"workspaces_inactive_icon"`
+
+	// Module-level report labels
+	CashBookLabel             string `json:"cash_book_label"`
+	CashBookIcon              string `json:"cash_book_icon"`
+	PayablesAgingLabel        string `json:"payables_aging_label"`
+	PayablesAgingIcon         string `json:"payables_aging_icon"`
+	ReceivablesAgingLabel     string `json:"receivables_aging_label"`
+	ReceivablesAgingIcon      string `json:"receivables_aging_icon"`
+	SalesSummaryLabel         string `json:"sales_summary_label"`
+	SalesSummaryIcon          string `json:"sales_summary_icon"`
+	PurchasesSummaryLabel     string `json:"purchases_summary_label"`
+	PurchasesSummaryIcon      string `json:"purchases_summary_icon"`
+	ExpensesSummaryLabel      string `json:"expenses_summary_label"`
+	ExpensesSummaryIcon       string `json:"expenses_summary_icon"`
+	LapsingScheduleLabel      string `json:"lapsing_schedule_label"`
+	LapsingScheduleIcon       string `json:"lapsing_schedule_icon"`
+	DepreciationPoliciesLabel string `json:"depreciation_policies_label"`
+	DepreciationPoliciesIcon  string `json:"depreciation_policies_icon"`
 }
 
 // DefaultSidebarLabels returns Level 1 generic defaults for sidebar navigation.
@@ -203,6 +230,8 @@ func DefaultSidebarLabels() SidebarLabels {
 		PurchasesAppIcon:  "icon-clipboard",
 		ExpensesAppLabel:  "Expenses",
 		ExpensesAppIcon:   "icon-credit-card",
+		CashAppLabel:      "Cash",
+		CashAppIcon:       "icon-dollar-sign",
 		ReportsAppLabel:   "Reports",
 		ReportsAppIcon:    "icon-check-circle",
 		AdminAppLabel:     "Settings",
@@ -231,11 +260,14 @@ func DefaultSidebarLabels() SidebarLabels {
 		SuppliersTitle:    "Suppliers",
 		PlansTitle:        "Plans",
 		SubscriptionsTitle: "Subscriptions",
-		CollectionsTitle:  "Collections",
-		PermissionsTitle:  "Permissions",
+		CashTitle:            "Cash",
+		CollectionsTitle:     "Collections",
+		DisbursementsTitle:   "Disbursements",
+		PermissionsTitle:     "Permissions",
 		WorkspacesTitle:   "Workspaces",
 
 		AllLabel:      "All",
+		DraftLabel:    "Draft",
 		PendingLabel:  "Pending",
 		ApprovedLabel: "Approved",
 		PaidLabel:     "Paid",
@@ -286,11 +318,32 @@ func DefaultSidebarLabels() SidebarLabels {
 		PlansInactiveIcon:         "icon-file-minus",
 		SubscriptionsActiveIcon:   "icon-refresh-cw",
 		SubscriptionsInactiveIcon: "icon-x-circle",
-		CollectionsPendingIcon:    "icon-clock",
-		CollectionsCompleteIcon:   "icon-check-circle",
-		PermissionsActiveIcon:     "icon-key",
+		CollectionsPendingIcon:       "icon-clock",
+		CollectionsCompleteIcon:      "icon-check-circle",
+		DisbursementsDraftIcon:       "icon-edit",
+		DisbursementsPendingIcon:     "icon-clock",
+		DisbursementsApprovedIcon:    "icon-check-circle",
+		DisbursementsPaidIcon:        "icon-check-circle",
+		PermissionsActiveIcon:        "icon-key",
 		PermissionsInactiveIcon: "icon-key",
 		WorkspacesActiveIcon:   "icon-briefcase",
 		WorkspacesInactiveIcon: "icon-briefcase",
+
+		CashBookLabel:             "Cash Book",
+		CashBookIcon:              "icon-book",
+		PayablesAgingLabel:        "Payables Aging",
+		PayablesAgingIcon:         "icon-file-text",
+		ReceivablesAgingLabel:     "Receivables Aging",
+		ReceivablesAgingIcon:      "icon-file-text",
+		SalesSummaryLabel:         "Sales Summary",
+		SalesSummaryIcon:          "icon-bar-chart",
+		PurchasesSummaryLabel:     "Purchases Summary",
+		PurchasesSummaryIcon:      "icon-bar-chart",
+		ExpensesSummaryLabel:      "Expenses Summary",
+		ExpensesSummaryIcon:       "icon-bar-chart",
+		LapsingScheduleLabel:      "Lapsing Schedule",
+		LapsingScheduleIcon:       "icon-calendar",
+		DepreciationPoliciesLabel: "Depreciation Policies",
+		DepreciationPoliciesIcon:  "icon-settings",
 	}
 }

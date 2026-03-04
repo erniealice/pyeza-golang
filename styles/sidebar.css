@@ -586,6 +586,10 @@
     background: linear-gradient(135deg, var(--app-color-expenses) 0%, var(--app-color-expenses-dark) 100%);
 }
 
+.app-icon--cash {
+    background: linear-gradient(135deg, var(--app-color-cash) 0%, var(--app-color-cash-dark) 100%);
+}
+
 .app-icon--reports {
     background: linear-gradient(135deg, var(--app-color-reports) 0%, var(--app-color-reports-dark) 100%);
 }
@@ -890,6 +894,14 @@
 .app-option:not(.active) .app-icon--expenses svg {
     color: var(--app-color-expenses);
     stroke: var(--app-color-expenses);
+}
+
+.app-option:not(.active) .app-icon--cash {
+    background: var(--app-color-cash-light);
+}
+.app-option:not(.active) .app-icon--cash svg {
+    color: var(--app-color-cash);
+    stroke: var(--app-color-cash);
 }
 
 .app-option:not(.active) .app-icon--reports {

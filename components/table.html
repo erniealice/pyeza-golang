@@ -310,7 +310,15 @@ JavaScript:
 
         {{/* Primary Action Button */}}
         {{if .PrimaryAction}}
-        {{if .PrimaryAction.ActionURL}}
+        {{if .PrimaryAction.Disabled}}
+        <button type="button"
+                class="btn-primary toolbar-primary-action disabled"
+                disabled
+                title="{{.PrimaryAction.DisabledTooltip}}">
+            {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
+            {{.PrimaryAction.Label}}
+        </button>
+        {{else if .PrimaryAction.ActionURL}}
         <button type="button"
                 class="btn-primary toolbar-primary-action"
                 hx-get="{{.PrimaryAction.ActionURL}}"

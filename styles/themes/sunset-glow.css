@@ -91,6 +91,9 @@
     --app-color-expenses: #FF5252;
     --app-color-expenses-dark: #E84040;
     --app-color-expenses-light: rgba(255, 82, 82, 0.15);
+    --app-color-cash: #D4A574;
+    --app-color-cash-dark: #B88A5C;
+    --app-color-cash-light: rgba(212, 165, 116, 0.15);
     --app-color-reports: #00B8D4;
     --app-color-reports-dark: #009DB3;
     --app-color-reports-light: rgba(0, 184, 212, 0.15);

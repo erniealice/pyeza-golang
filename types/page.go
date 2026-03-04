@@ -28,6 +28,8 @@ type PageData struct {
 	BottomNavTabs     []BottomNavTab           // mobile bottom navigation tabs
 	AllApps           []AppGridItem            // all apps for mobile app grid overlay
 	AppGroups         []AppGridGroup           // grouped apps for mobile bottom sheet
+	DefaultTheme      string                   // server-configured default theme (for <html> data-theme)
+	DefaultFont       string                   // server-configured default font (for <html> data-font)
 }
 
 // BottomNavTab represents a single tab in the mobile bottom navigation bar.

@@ -174,10 +174,12 @@ type TableLabels struct {
 
 // PrimaryAction defines a primary action button for the table toolbar
 type PrimaryAction struct {
-	Label     string // Button label text
-	Href      string // Button href (for link-based actions)
-	Icon      string // Icon template name (e.g., "icon-plus")
-	ActionURL string // HTMX action URL for form loading
+	Label           string // Button label text
+	Href            string // Button href (for link-based actions)
+	Icon            string // Icon template name (e.g., "icon-plus")
+	ActionURL       string // HTMX action URL for form loading
+	Disabled        bool   // If true, render as disabled button (no click, no HTMX)
+	DisabledTooltip string // Tooltip shown when hovering over disabled button
 }
 
 // BulkAction defines an action available when multiple rows are selected
