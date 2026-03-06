@@ -368,10 +368,17 @@ type LoadingLabels struct {
 }
 
 type ErrorLabels struct {
-	General      string `json:"general"`
-	NotFound     string `json:"notFound"`
-	Unauthorized string `json:"unauthorized"`
-	Forbidden    string `json:"forbidden"`
+	General             string `json:"general"`
+	NotFound            string `json:"notFound"`
+	Unauthorized        string `json:"unauthorized"`
+	Forbidden           string `json:"forbidden"`
+	NoPermission        string `json:"noPermission"`
+	PermissionDenied    string `json:"permissionDenied"`
+	InvalidFormData     string `json:"invalidFormData"`
+	InvalidStatus       string `json:"invalidStatus"`
+	InvalidTargetStatus string `json:"invalidTargetStatus"`
+	IDRequired          string `json:"idRequired"`
+	NoIDsProvided       string `json:"noIDsProvided"`
 }
 
 type DropdownLabels struct {

@@ -106,6 +106,18 @@ func getDefaultFuncMap() template.FuncMap {
 		"list": func(values ...any) []any {
 			return values
 		},
+		// t looks up a translation key from a Messages map.
+		// Safe for sub-templates called via dict where .T() is unavailable.
+		// Falls back to returning the key itself if not found.
+		// Usage: {{t .Messages "buttons.save"}}
+		"t": func(messages any, key string) string {
+			if m, ok := messages.(map[string]string); ok {
+				if v, found := m[key]; found {
+					return v
+				}
+			}
+			return key
+		},
 	}
 }
 

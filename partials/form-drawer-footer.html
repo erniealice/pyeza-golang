@@ -4,20 +4,20 @@ FORM SHEET FOOTER - Reusable footer buttons for form sheets
 ================================================================================
 
 Usage - Basic (Save button only):
-    {{template "sheet-form-footer" dict "CommonLabels" .CommonLabels}}
+    {{template "sheet-form-footer" dict "Messages" .Messages}}
 
 Usage - With Cancel:
-    {{template "sheet-form-footer" dict "CommonLabels" .CommonLabels "ShowCancel" true}}
+    {{template "sheet-form-footer" dict "Messages" .Messages "ShowCancel" true}}
 
 Usage - Edit mode (Update button):
-    {{template "sheet-form-footer" dict "CommonLabels" .CommonLabels "ShowCancel" true "IsEdit" true}}
+    {{template "sheet-form-footer" dict "Messages" .Messages "ShowCancel" true "IsEdit" true}}
 
 Usage - Custom Submit Label:
-    {{template "sheet-form-footer" dict "CommonLabels" .CommonLabels "ShowCancel" true "SubmitLabel" "Create"}}
+    {{template "sheet-form-footer" dict "Messages" .Messages "ShowCancel" true "SubmitLabel" "Create"}}
 
 Usage - Custom buttons (full control):
     {{template "sheet-form-footer" dict
-        "CommonLabels" .CommonLabels
+        "Messages" .Messages
         "ShowCancel" true
         "SubmitLabel" "Send"
         "CancelLabel" "Discard"
@@ -29,10 +29,10 @@ Usage - Custom buttons (full control):
 {{define "sheet-form-footer"}}
 <div class="sheet-footer">
     {{if .ShowCancel}}
-    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{if .CancelLabel}}{{.CancelLabel}}{{else}}{{.CommonLabels.Buttons.Cancel}}{{end}}</button>
+    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{if .CancelLabel}}{{.CancelLabel}}{{else}}{{t .Messages "buttons.cancel"}}{{end}}</button>
     {{end}}
     <button type="submit" class="btn btn-primary">
-        {{if .SubmitLabel}}{{.SubmitLabel}}{{else if .IsEdit}}{{.CommonLabels.Buttons.Update}}{{else}}{{.CommonLabels.Buttons.Save}}{{end}}
+        {{if .SubmitLabel}}{{.SubmitLabel}}{{else if .IsEdit}}{{t .Messages "buttons.update"}}{{else}}{{t .Messages "buttons.save"}}{{end}}
     </button>
 </div>
 {{end}}
@@ -43,20 +43,20 @@ Variants for convenience:
 
 {{define "sheet-form-footer-save"}}
 <div class="sheet-footer">
-    <button type="submit" class="btn btn-primary">{{.CommonLabels.Buttons.Save}}</button>
+    <button type="submit" class="btn btn-primary">{{t .Messages "buttons.save"}}</button>
 </div>
 {{end}}
 
 {{define "sheet-form-footer-cancel-save"}}
 <div class="sheet-footer">
-    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{.CommonLabels.Buttons.Cancel}}</button>
-    <button type="submit" class="btn btn-primary">{{.CommonLabels.Buttons.Save}}</button>
+    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{t .Messages "buttons.cancel"}}</button>
+    <button type="submit" class="btn btn-primary">{{t .Messages "buttons.save"}}</button>
 </div>
 {{end}}
 
 {{define "sheet-form-footer-cancel-update"}}
 <div class="sheet-footer">
-    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{.CommonLabels.Buttons.Cancel}}</button>
-    <button type="submit" class="btn btn-primary">{{.CommonLabels.Buttons.Update}}</button>
+    <button type="button" class="btn btn-secondary" onclick="Sheet.close()">{{t .Messages "buttons.cancel"}}</button>
+    <button type="submit" class="btn btn-primary">{{t .Messages "buttons.update"}}</button>
 </div>
 {{end}}

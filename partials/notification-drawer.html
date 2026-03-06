@@ -3,29 +3,29 @@
 <div class="notification-overlay" id="notificationOverlay"></div>
 <aside class="notification-sheet" id="notificationSheet">
     <div class="notification-drawer-header">
-        <h2 class="notification-drawer-title">{{.CommonLabels.Notifications.Title}}</h2>
+        <h2 class="notification-drawer-title">{{.T "notifications.title"}}</h2>
         <div class="notification-drawer-actions">
-            <button class="notification-mark-all" id="markAllRead" title="{{.CommonLabels.Notifications.MarkAllRead}}">
+            <button class="notification-mark-all" id="markAllRead" title="{{.T "notifications.markAllRead"}}">
                 {{template "icon-check-square"}}
-                <span>{{.CommonLabels.Notifications.MarkAllRead}}</span>
+                <span>{{.T "notifications.markAllRead"}}</span>
             </button>
-            <button class="notification-close-btn" id="notificationCloseBtn" aria-label="{{.CommonLabels.Notifications.Close}}">
+            <button class="notification-close-btn" id="notificationCloseBtn" aria-label="{{.T "notifications.close"}}">
                 {{template "icon-x"}}
             </button>
         </div>
     </div>
 
     <div class="notification-tabs">
-        <button class="notification-tab active" data-filter="all">{{.CommonLabels.Notifications.Tabs.All}}</button>
-        <button class="notification-tab" data-filter="unread">{{.CommonLabels.Notifications.Tabs.Unread}}</button>
-        <button class="notification-tab" data-filter="alert">{{.CommonLabels.Notifications.Tabs.Alerts}}</button>
+        <button class="notification-tab active" data-filter="all">{{.T "notifications.tabs.all"}}</button>
+        <button class="notification-tab" data-filter="unread">{{.T "notifications.tabs.unread"}}</button>
+        <button class="notification-tab" data-filter="alert">{{.T "notifications.tabs.alerts"}}</button>
     </div>
 
     <div class="notification-list" id="notificationList">
         <!-- Loading state -->
         <div class="notification-loading" id="notificationLoading">
             <div class="notification-spinner"></div>
-            <span>{{.CommonLabels.Notifications.Loading}}</span>
+            <span>{{.T "notifications.loading"}}</span>
         </div>
 
         <!-- Empty state (hidden by default) -->
@@ -33,8 +33,8 @@
             <div class="notification-empty-icon">
                 {{template "icon-bell"}}
             </div>
-            <h3>{{.CommonLabels.Notifications.Empty.Title}}</h3>
-            <p>{{.CommonLabels.Notifications.Empty.Message}}</p>
+            <h3>{{.T "notifications.empty.title"}}</h3>
+            <p>{{.T "notifications.empty.message"}}</p>
         </div>
 
         <!-- Notifications will be rendered here -->
@@ -43,7 +43,7 @@
 
     <div class="notification-sheet-footer">
         <a href="/notifications" class="notification-view-all">
-            {{.CommonLabels.Notifications.ViewAll}}
+            {{.T "notifications.viewAll"}}
             {{template "icon-arrow-right"}}
         </a>
     </div>
