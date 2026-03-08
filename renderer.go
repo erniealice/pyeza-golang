@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -20,6 +21,7 @@ type HTMLRenderer struct {
 	templates        *template.Template
 	templateFuncs    template.FuncMap
 	templatePatterns []string
+	templateFS       []fs.FS
 	parseOnce        sync.Once
 	parseErr         error
 	routeMap         map[string]string // route key → URL pattern (populated before first render)
@@ -30,6 +32,15 @@ type HTMLRenderer struct {
 // The components package will automatically locate its own templates.
 func NewHTMLRenderer(templatePatterns []string) *HTMLRenderer {
 	r := &HTMLRenderer{templatePatterns: templatePatterns}
+	r.templateFuncs = r.buildFuncMap()
+	return r
+}
+
+// NewHTMLRendererFromFS creates a renderer that loads templates from embedded or virtual filesystems.
+// Pass pyeza.SharedFS first (icons, partials, components, blocks), then view-domain FS instances.
+// For dev hot-reload, pass os.DirFS() instances instead of embed.FS.
+func NewHTMLRendererFromFS(filesystems ...fs.FS) *HTMLRenderer {
+	r := &HTMLRenderer{templateFS: filesystems}
 	r.templateFuncs = r.buildFuncMap()
 	return r
 }
@@ -215,9 +226,43 @@ func (r *HTMLRenderer) getSharedComponentsDir() string {
 	return componentsDir
 }
 
+// initFromFS parses templates from fs.FS instances instead of glob patterns.
+func (r *HTMLRenderer) initFromFS() error {
+	r.templates = template.New("").Funcs(r.templateFuncs)
+
+	for _, fsys := range r.templateFS {
+		err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() || !strings.HasSuffix(path, ".html") {
+				return nil
+			}
+			content, readErr := fs.ReadFile(fsys, path)
+			if readErr != nil {
+				return readErr
+			}
+			_, parseErr := r.templates.Parse(string(content))
+			if parseErr != nil {
+				return fmt.Errorf("parsing %s: %w", path, parseErr)
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Init parses all templates from the templates directory
 func (r *HTMLRenderer) Init() error {
 	r.parseOnce.Do(func() {
+		if len(r.templateFS) > 0 {
+			r.parseErr = r.initFromFS()
+			return
+		}
+
 		// Get shared components directory
 		sharedDir := r.getSharedComponentsDir()
 
