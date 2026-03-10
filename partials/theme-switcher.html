@@ -13,7 +13,7 @@
      data-popover-align="end"
      data-popover-width="240px"
      data-popover-trigger="click">
-    <button class="popover-trigger header-btn" aria-label="{{.T "theme.toggle"}}" title="{{.T "theme.changeTheme"}}">
+    <button class="popover-trigger header-btn" aria-label="{{.CommonLabels.Theme.Toggle}}" title="{{.CommonLabels.Theme.ChangeTheme}}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5"/>
             <line x1="12" y1="1" x2="12" y2="3"/>
@@ -30,36 +30,36 @@
         <div class="popover-arrow"></div>
 
         <div class="theme-panel-section">
-            <div class="theme-panel-title">{{.T "theme.title"}}</div>
+            <div class="theme-panel-title">{{.CommonLabels.Theme.Title}}</div>
             <div class="theme-swatches">
-                <button class="theme-option" data-theme="warm-cream" title="{{.T "theme.themes.warmCream"}}">
+                <button class="theme-option" data-theme="warm-cream" title="{{.CommonLabels.Theme.Themes.WarmCream}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #FAF8F5 0%, #E8E4DE 100%);"><span class="theme-swatch-dot" style="background: #C4654A;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="corporate-steel" title="{{.T "theme.themes.corporateSteel"}}">
+                <button class="theme-option" data-theme="corporate-steel" title="{{.CommonLabels.Theme.Themes.CorporateSteel}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #F4F6F9 0%, #D5DBE4 100%);"><span class="theme-swatch-dot" style="background: #2E5C8A;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="paper-ink" title="{{.T "theme.themes.paperInk"}}">
+                <button class="theme-option" data-theme="paper-ink" title="{{.CommonLabels.Theme.Themes.PaperInk}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #F9F7F3 0%, #DDD9D2 100%);"><span class="theme-swatch-dot" style="background: #2D2A25;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="modern-retail" title="{{.T "theme.themes.modernRetail"}}">
+                <button class="theme-option" data-theme="modern-retail" title="{{.CommonLabels.Theme.Themes.ModernRetail}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #FAFAFE 0%, #E5E3EE 100%);"><span class="theme-swatch-dot" style="background: #4318D9;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="peach-fizz" title="{{.T "theme.themes.peachFizz"}}">
+                <button class="theme-option" data-theme="peach-fizz" title="{{.CommonLabels.Theme.Themes.PeachFizz}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #FEF8F4 0%, #F6EBE3 100%);"><span class="theme-swatch-dot" style="background: #E87461;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="minimal-light" title="{{.T "theme.themes.minimalLight"}}">
+                <button class="theme-option" data-theme="minimal-light" title="{{.CommonLabels.Theme.Themes.MinimalLight}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);"><span class="theme-swatch-dot" style="background: #171717;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="sunset-glow" title="{{.T "theme.themes.sunsetGlow"}}">
+                <button class="theme-option" data-theme="sunset-glow" title="{{.CommonLabels.Theme.Themes.SunsetGlow}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #FF6B35 0%, #F25F5C 100%);"><span class="theme-swatch-dot" style="background: #FFE066;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="ocean-deep" title="{{.T "theme.themes.oceanDeep"}}">
+                <button class="theme-option" data-theme="ocean-deep" title="{{.CommonLabels.Theme.Themes.OceanDeep}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #15202B 0%, #0F1419 100%);"><span class="theme-swatch-dot" style="background: #1D9BF0;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="forest-night" title="{{.T "theme.themes.forestNight"}}">
+                <button class="theme-option" data-theme="forest-night" title="{{.CommonLabels.Theme.Themes.ForestNight}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #1A2922 0%, #0D1512 100%);"><span class="theme-swatch-dot" style="background: #4ADE80;"></span></span>
                 </button>
-                <button class="theme-option" data-theme="ryta-default" title="{{.T "theme.themes.rytaDefault"}}">
+                <button class="theme-option" data-theme="ryta-default" title="{{.CommonLabels.Theme.Themes.RytaDefault}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #FAFAFD 0%, #E2DFF0 100%);"><span class="theme-swatch-dot" style="background: #3D0DDA;"></span></span>
                 </button>
             </div>
@@ -68,35 +68,35 @@
         <div class="theme-panel-divider"></div>
 
         <div class="theme-panel-section">
-            <div class="theme-panel-title">{{.T "theme.fontFamily"}}</div>
+            <div class="theme-panel-title">{{.CommonLabels.Theme.FontFamily}}</div>
             <div class="font-options">
                 <button class="font-option" data-font="default">
                     <span class="font-option-preview" style="font-family: 'Figtree', sans-serif;">Ag</span>
-                    <span class="font-option-name">{{.T "theme.fonts.default"}}</span>
+                    <span class="font-option-name">{{.CommonLabels.Theme.Fonts.Default}}</span>
                 </button>
                 <button class="font-option" data-font="serif">
                     <span class="font-option-preview" style="font-family: 'Playfair Display', serif;">Ag</span>
-                    <span class="font-option-name">{{.T "theme.fonts.serif"}}</span>
+                    <span class="font-option-name">{{.CommonLabels.Theme.Fonts.Serif}}</span>
                 </button>
                 <button class="font-option" data-font="mono">
                     <span class="font-option-preview" style="font-family: 'JetBrains Mono', monospace;">Ag</span>
-                    <span class="font-option-name">{{.T "theme.fonts.mono"}}</span>
+                    <span class="font-option-name">{{.CommonLabels.Theme.Fonts.Mono}}</span>
                 </button>
                 <button class="font-option" data-font="rounded">
                     <span class="font-option-preview" style="font-family: 'Nunito', sans-serif;">Ag</span>
-                    <span class="font-option-name">{{.T "theme.fonts.rounded"}}</span>
+                    <span class="font-option-name">{{.CommonLabels.Theme.Fonts.Rounded}}</span>
                 </button>
                 <button class="font-option" data-font="condensed">
                     <span class="font-option-preview" style="font-family: 'Barlow Condensed', sans-serif;">Ag</span>
-                    <span class="font-option-name">{{.T "theme.fonts.condensed"}}</span>
+                    <span class="font-option-name">{{.CommonLabels.Theme.Fonts.Condensed}}</span>
                 </button>
                 <button class="font-option" data-font="exa">
                     <span class="font-option-preview" style="font-family: 'Lexend Exa', sans-serif;">Ag</span>
-                    <span class="font-option-name">{{.T "theme.fonts.exa"}}</span>
+                    <span class="font-option-name">{{.CommonLabels.Theme.Fonts.Exa}}</span>
                 </button>
                 <button class="font-option" data-font="ryta-minimal">
                     <span class="font-option-preview" style="font-family: 'Lexend Exa', sans-serif;">Ag</span>
-                    <span class="font-option-name">{{.T "theme.fonts.rytaMinimal"}}</span>
+                    <span class="font-option-name">{{.CommonLabels.Theme.Fonts.RytaMinimal}}</span>
                 </button>
             </div>
         </div>
