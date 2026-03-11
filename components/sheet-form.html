@@ -47,7 +47,7 @@ JavaScript:
     <div class="sheet-panel sheet-panel-md">
         <div class="sheet-header">
             <div class="sheet-drag-handle"></div>
-            <h2 id="sheetTitle" class="sheet-title">{{if .Title}}{{.Title}}{{else}}{{if .IsEdit}}{{t .Messages "buttons.edit"}}{{else}}{{t .Messages "buttons.add"}}{{end}}{{end}}</h2>
+            <h2 id="sheetTitle" class="sheet-title">{{if .Title}}{{.Title}}{{end}}</h2>
             <div class="sheet-header-actions">
                 <button type="button" class="sheet-close" id="sheetClose" aria-label="Close">
                     {{template "icon-x" .}}

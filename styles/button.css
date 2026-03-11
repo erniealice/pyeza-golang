@@ -577,7 +577,9 @@
 .btn-loading.btn-secondary::after,
 .btn-loading.btn.btn-secondary::after,
 .btn-loading.btn-outline::after,
-.btn-loading.btn.btn-outline::after {
+.btn-loading.btn.btn-outline::after,
+.btn-loading.btn--ghost::after,
+.btn-loading.btn.btn--ghost::after {
     border-top-color: var(--text-secondary);
 }
 
