@@ -20,7 +20,7 @@ type assetMapping struct {
 // Works both in monorepo and as external package.
 //
 // The targetDir should be the app's assets/css directory.
-// Component styles will be copied to assets/css/components/
+// Component styles will be copied to assets/css/pyeza/
 //
 // Infrastructure files (_variables.css, index.css) are not copied as they
 // are build-time imports only.
@@ -42,7 +42,7 @@ func CopyStyles(targetDir string) error {
 // runtime.Caller. Works both in monorepo and as external package.
 //
 // The targetDir should be the app's assets/css directory.
-// - Component styles are copied to assets/css/components/
+// - Component styles are copied to assets/css/pyeza/
 // - App main.css is generated at assets/css/app/main.css with the selected theme and font
 //
 // Theme options: warm-cream, ocean-deep, forest-night, minimal-light, sunset-glow
@@ -64,8 +64,8 @@ func CopyStylesWithTheme(targetDir, theme string, font string) error {
 	componentsDir := filepath.Dir(filename)
 	stylesSrcDir := filepath.Join(componentsDir, "styles")
 
-	// Copy component styles to assets/css/components/
-	componentsTargetDir := filepath.Join(targetDir, "components")
+	// Copy component styles to assets/css/pyeza/
+	componentsTargetDir := filepath.Join(targetDir, "pyeza")
 	copied, err := copyDirStyles(stylesSrcDir, componentsTargetDir)
 	if err != nil {
 		return fmt.Errorf("failed to copy styles: %w", err)
@@ -174,7 +174,7 @@ func generateMainCSS(stylesSrcDir, appCssDir, theme, font string) error {
 // Works both in monorepo and as external package.
 //
 // The targetDir should be the app's assets/js directory.
-// Component assets will be copied to assets/js/components/
+// Component assets will be copied to assets/js/pyeza/
 //
 // Example:
 //
@@ -192,14 +192,14 @@ func CopyStaticAssets(targetDir string) error {
 
 	componentsDir := filepath.Dir(filename)
 
-	// All component assets go under a "components" subdirectory for clean separation
-	componentsTargetDir := filepath.Join(targetDir, "components")
+	// All component assets go under a "pyeza" subdirectory for clean separation
+	componentsTargetDir := filepath.Join(targetDir, "pyeza")
 
 	// Define all assets to copy: source relative to componentsDir, destination relative to componentsTargetDir
 	assets := []assetMapping{
-		// Table JS files (to assets/js/components/table/)
+		// Table JS files (to assets/js/pyeza/table/)
 		{srcRelPath: "assets/js/table", dstRelPath: "table"},
-		// Individual component JS files (to assets/js/components/)
+		// Individual component JS files (to assets/js/pyeza/)
 		{srcRelPath: "assets/js/sheet.js", dstRelPath: "sheet.js"},
 		{srcRelPath: "assets/js/help-pane.js", dstRelPath: "help-pane.js"},
 		{srcRelPath: "assets/js/dialog.js", dstRelPath: "dialog.js"},

@@ -513,11 +513,12 @@ JavaScript:
                 {{if eq .Type "delete"}}{{template "icon-trash" $}}{{end}}
                 {{if eq .Type "download"}}{{template "icon-download" $}}{{end}}
                 {{if eq .Type "archive"}}{{template "icon-archive" $}}{{end}}
+                {{if eq .Type "mail"}}{{template "icon-mail" $}}{{end}}
                 {{if eq .Type "check"}}{{template "icon-check" $}}{{end}}
                 {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
             </a>
             {{else}}
-            <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}" title="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" data-action="{{.Action}}"{{if .Disabled}} disabled{{end}}{{if $.ID}} data-id="{{$.ID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{end}}{{end}}{{if .DrawerTitle}} data-drawer-title="{{.DrawerTitle}}"{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}>
+            <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}" title="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" data-action="{{.Action}}"{{if .Disabled}} disabled{{end}}{{if $.ID}} data-id="{{$.ID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .DrawerTitle}} data-drawer-title="{{.DrawerTitle}}"{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}>
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "preview"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
@@ -528,6 +529,7 @@ JavaScript:
                 {{if eq .Type "delete"}}{{template "icon-trash" $}}{{end}}
                 {{if eq .Type "download"}}{{template "icon-download" $}}{{end}}
                 {{if eq .Type "archive"}}{{template "icon-archive" $}}{{end}}
+                {{if eq .Type "mail"}}{{template "icon-mail" $}}{{end}}
                 {{if eq .Type "check"}}{{template "icon-check" $}}{{end}}
                 {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
             </button>
@@ -744,7 +746,7 @@ JavaScript:
             data-action="{{.Action}}"
             {{if .Disabled}}disabled{{end}}
             {{if .DataID}}data-id="{{.DataID}}"{{end}}
-            {{if .URL}}{{if eq .Action "edit"}}data-edit-url="{{.URL}}"{{else if eq .Action "delete"}}data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}}data-activate-url="{{.URL}}"{{end}}{{end}}
+            {{if .URL}}{{if eq .Action "edit"}}data-edit-url="{{.URL}}"{{else if eq .Action "delete"}}data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}}data-activate-url="{{.URL}}"{{else if eq .Action "download"}}data-download-url="{{.URL}}"{{else if eq .Action "send-email"}}data-send-email-url="{{.URL}}"{{end}}{{end}}
             {{if .DrawerTitle}}data-drawer-title="{{.DrawerTitle}}"{{end}}
             {{if .ItemName}}data-item-name="{{.ItemName}}"{{end}}
             {{if .ConfirmTitle}}data-confirm-title="{{.ConfirmTitle}}"{{end}}
@@ -759,6 +761,7 @@ JavaScript:
         {{else if eq .Type "delete"}}{{template "icon-trash" $}}
         {{else if eq .Type "download"}}{{template "icon-download" $}}
         {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+        {{else if eq .Type "mail"}}{{template "icon-mail" $}}
         {{else if eq .Type "check"}}{{template "icon-check" $}}
         {{end}}
     </button>
@@ -772,7 +775,7 @@ JavaScript:
     </button>
     <div class="action-dropdown-menu">
         {{range .}}
-        <div class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" data-action="{{.Action}}" {{if .Disabled}}title="{{.DisabledTooltip}}"{{end}} {{if .DataID}}data-id="{{.DataID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{end}}{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}>
+        <div class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" data-action="{{.Action}}" {{if .Disabled}}title="{{.DisabledTooltip}}"{{end}} {{if .DataID}}data-id="{{.DataID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}>
             {{if eq .Type "view"}}{{template "icon-eye" $}}
             {{else if eq .Type "preview"}}{{template "icon-eye" $}}
             {{else if eq .Type "edit"}}{{template "icon-edit" $}}
@@ -783,6 +786,7 @@ JavaScript:
             {{else if eq .Type "delete"}}{{template "icon-trash" $}}
             {{else if eq .Type "download"}}{{template "icon-download" $}}
             {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+            {{else if eq .Type "mail"}}{{template "icon-mail" $}}
             {{else if eq .Type "check"}}{{template "icon-check" $}}
             {{end}}
             {{.Label}}

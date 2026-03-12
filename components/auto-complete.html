@@ -1,0 +1,334 @@
+{{define "auto-complete"}}
+{{/*
+    Auto-Complete Component (Single-Select with Filter or Server-Side Search)
+
+    Supports two modes based on the parameters provided:
+
+    Mode 1: Filter (client-side, Options provided)
+    {{template "auto-complete" dict
+        "ID" "status-select"
+        "Name" "status"
+        "Label" "Status"
+        "Placeholder" "Select status..."
+        "SearchPlaceholder" "Filter..."
+        "Options" .StatusOptions
+        "Value" .SelectedStatus
+        "SelectedLabel" .SelectedStatusLabel
+    }}
+    Options format: []struct { Value string; Label string; Selected bool }
+    Options are rendered server-side and filtered client-side (no network requests).
+
+    Mode 2: Action/Search (server-side, SearchURL provided)
+    {{template "auto-complete" dict
+        "ID" "client-search"
+        "Name" "client_id"
+        "Label" "Customer"
+        "Placeholder" "Select customer..."
+        "SearchPlaceholder" "Search customers..."
+        "SearchURL" "/action/subscriptions/search/clients"
+        "Value" .ClientID
+        "SelectedLabel" .ClientLabel
+        "Required" true
+        "NoResults" "No customers found"
+    }}
+    SearchURL should accept ?q=searchterm and return JSON:
+    [{"value": "id-1", "label": "Display Name"}, ...]
+
+    Mode detection: SearchURL present → action/search mode, otherwise → filter mode.
+*/}}
+<div class="form-group">
+    {{if .Label}}
+    <label class="form-label" for="{{.ID}}-search">
+        {{.Label}}{{if .Required}} <span class="form-required" aria-hidden="true">*</span>{{end}}
+    </label>
+    {{end}}
+
+    <div class="auto-complete" id="{{.ID}}" data-search-url="{{.SearchURL}}">
+        <div class="auto-complete-trigger" tabindex="0" role="combobox"
+             aria-haspopup="listbox" aria-expanded="false" aria-owns="{{.ID}}-listbox">
+            <span class="auto-complete-display">
+                {{if .SelectedLabel}}
+                <span class="auto-complete-value">{{.SelectedLabel}}</span>
+                {{else}}
+                <span class="auto-complete-placeholder">{{.Placeholder}}</span>
+                {{end}}
+            </span>
+            <button type="button" class="auto-complete-clear" aria-label="Clear selection"
+                    {{if not .SelectedLabel}}style="display:none"{{end}}>&times;</button>
+            <span class="auto-complete-arrow">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </div>
+
+        <div class="auto-complete-dropdown" id="{{.ID}}-listbox" role="listbox">
+            <div class="auto-complete-search-wrapper">
+                <svg class="auto-complete-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <input type="text" class="auto-complete-search" id="{{.ID}}-search"
+                       placeholder="{{.SearchPlaceholder}}" autocomplete="off">
+            </div>
+            <div class="auto-complete-results">
+                {{if .Options}}
+                {{range .Options}}
+                <div class="auto-complete-option{{if .Selected}} selected{{end}}"
+                     data-value="{{.Value}}" data-label="{{.Label}}" role="option">
+                    {{.Label}}
+                </div>
+                {{end}}
+                {{end}}
+            </div>
+            <div class="auto-complete-empty">{{if .NoResults}}{{.NoResults}}{{else}}No results found{{end}}</div>
+            <div class="auto-complete-loading">
+                <span class="auto-complete-spinner"></span>
+                <span>Searching...</span>
+            </div>
+        </div>
+
+        <input type="hidden" name="{{.Name}}" class="auto-complete-input"
+               value="{{.Value}}" {{if .Required}}required{{end}}>
+    </div>
+</div>
+
+<script>
+(function() {
+    const container = document.getElementById('{{.ID}}');
+    if (!container || container.dataset.init) return;
+    container.dataset.init = '1';
+
+    const searchURL = container.dataset.searchUrl;
+    const isActionMode = !!searchURL;
+
+    const trigger = container.querySelector('.auto-complete-trigger');
+    const display = container.querySelector('.auto-complete-display');
+    const clearBtn = container.querySelector('.auto-complete-clear');
+    const results = container.querySelector('.auto-complete-results');
+    const hiddenInput = container.querySelector('.auto-complete-input');
+    const searchInput = container.querySelector('.auto-complete-search');
+    const emptyState = container.querySelector('.auto-complete-empty');
+    const loadingState = container.querySelector('.auto-complete-loading');
+    const placeholder = '{{.Placeholder}}';
+
+    let debounceTimer = null;
+    let abortController = null;
+    let focusedIndex = -1;
+
+    // In filter mode, cache the pre-rendered options for client-side filtering
+    const allOptions = isActionMode ? [] : Array.from(results.querySelectorAll('.auto-complete-option'));
+
+    function setSelected(value, label) {
+        hiddenInput.value = value;
+        display.innerHTML = value
+            ? '<span class="auto-complete-value">' + escapeHTML(label) + '</span>'
+            : '<span class="auto-complete-placeholder">' + escapeHTML(placeholder) + '</span>';
+        clearBtn.style.display = value ? '' : 'none';
+
+        // Update selected class on options (for filter mode, keeps visual state consistent)
+        if (!isActionMode) {
+            allOptions.forEach(function(opt) {
+                opt.classList.toggle('selected', opt.dataset.value === value);
+            });
+        }
+
+        closeDropdown();
+    }
+
+    function clearSelection() {
+        setSelected('', '');
+        // Re-open so user can pick a new value
+        openDropdown();
+    }
+
+    function escapeHTML(str) {
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
+    function openDropdown() {
+        container.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+        searchInput.value = '';
+        focusedIndex = -1;
+        emptyState.classList.remove('visible');
+        loadingState.classList.remove('visible');
+
+        if (isActionMode) {
+            // Action mode: clear results and fetch from server
+            results.innerHTML = '';
+            doSearch('');
+        } else {
+            // Filter mode: show all pre-rendered options
+            allOptions.forEach(function(opt) {
+                opt.classList.remove('hidden');
+            });
+            emptyState.classList.remove('visible');
+        }
+
+        setTimeout(function() { searchInput.focus(); }, 10);
+    }
+
+    function closeDropdown() {
+        container.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+        focusedIndex = -1;
+    }
+
+    // --- Action mode: server-side search ---
+
+    function doSearch(query) {
+        if (abortController) abortController.abort();
+        abortController = new AbortController();
+
+        loadingState.classList.add('visible');
+        emptyState.classList.remove('visible');
+        results.innerHTML = '';
+
+        var url = searchURL + (searchURL.includes('?') ? '&' : '?') + 'q=' + encodeURIComponent(query);
+
+        fetch(url, { signal: abortController.signal })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                loadingState.classList.remove('visible');
+                focusedIndex = -1;
+
+                if (!data || data.length === 0) {
+                    emptyState.classList.add('visible');
+                    return;
+                }
+
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    var sel = item.value === hiddenInput.value ? ' selected' : '';
+                    html += '<div class="auto-complete-option' + sel + '" '
+                        + 'data-value="' + escapeHTML(item.value) + '" '
+                        + 'data-label="' + escapeHTML(item.label) + '" '
+                        + 'role="option">'
+                        + escapeHTML(item.label)
+                        + '</div>';
+                }
+                results.innerHTML = html;
+
+                // Attach click handlers to dynamically created options
+                results.querySelectorAll('.auto-complete-option').forEach(function(opt) {
+                    opt.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        setSelected(this.dataset.value, this.dataset.label);
+                    });
+                });
+            })
+            .catch(function(err) {
+                if (err.name !== 'AbortError') {
+                    loadingState.classList.remove('visible');
+                    emptyState.classList.add('visible');
+                }
+            });
+    }
+
+    // --- Filter mode: client-side filtering ---
+
+    function filterOptions(query) {
+        var lowerQuery = query.toLowerCase();
+        var visibleCount = 0;
+
+        allOptions.forEach(function(opt) {
+            var matches = opt.dataset.label.toLowerCase().includes(lowerQuery);
+            opt.classList.toggle('hidden', !matches);
+            if (matches) visibleCount++;
+        });
+
+        emptyState.classList.toggle('visible', visibleCount === 0);
+        focusedIndex = -1;
+    }
+
+    // --- Shared: search input handler ---
+
+    searchInput.addEventListener('input', function() {
+        if (isActionMode) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function() {
+                doSearch(searchInput.value);
+            }, 300);
+        } else {
+            filterOptions(searchInput.value);
+        }
+    });
+
+    // Prevent search input from closing dropdown
+    searchInput.addEventListener('click', function(e) { e.stopPropagation(); });
+
+    // --- Shared: keyboard navigation ---
+
+    searchInput.addEventListener('keydown', function(e) {
+        var options = results.querySelectorAll('.auto-complete-option:not(.hidden)');
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            focusedIndex = Math.min(focusedIndex + 1, options.length - 1);
+            updateFocus(options);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            focusedIndex = Math.max(focusedIndex - 1, 0);
+            updateFocus(options);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (focusedIndex >= 0 && focusedIndex < options.length) {
+                var opt = options[focusedIndex];
+                setSelected(opt.dataset.value, opt.dataset.label);
+            }
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+            trigger.focus();
+        }
+    });
+
+    function updateFocus(options) {
+        options.forEach(function(o, i) {
+            o.classList.toggle('focused', i === focusedIndex);
+            if (i === focusedIndex) o.scrollIntoView({ block: 'nearest' });
+        });
+    }
+
+    // --- Shared: trigger interactions ---
+
+    trigger.addEventListener('click', function(e) {
+        if (e.target.closest('.auto-complete-clear')) return;
+        container.classList.contains('open') ? closeDropdown() : openDropdown();
+    });
+
+    clearBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        clearSelection();
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!container.contains(e.target)) closeDropdown();
+    });
+
+    trigger.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            container.classList.contains('open') ? closeDropdown() : openDropdown();
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+
+    // --- Filter mode: attach click handlers to pre-rendered options ---
+
+    if (!isActionMode) {
+        allOptions.forEach(function(opt) {
+            opt.addEventListener('click', function(e) {
+                e.stopPropagation();
+                setSelected(this.dataset.value, this.dataset.label);
+            });
+        });
+    }
+})();
+</script>
+{{end}}

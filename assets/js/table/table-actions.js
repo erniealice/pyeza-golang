@@ -109,6 +109,54 @@
                 showRowActionDialog(confirmTitle, confirmMessage, 'Activate', 'primary', url);
             }
 
+            // Handle Download button (direct GET — opens in new tab or triggers download)
+            const downloadBtn = e.target.closest('.action-btn[data-action="download"]');
+            if (downloadBtn) {
+                e.preventDefault();
+                const id = downloadBtn.dataset.id;
+                const downloadUrl = downloadBtn.dataset.downloadUrl;
+                const confirmTitle = downloadBtn.dataset.confirmTitle;
+                const confirmMessage = downloadBtn.dataset.confirmMessage;
+
+                if (!downloadUrl || !id) {
+                    console.warn('Download button missing data-download-url or data-id');
+                    return;
+                }
+
+                const url = downloadUrl + (downloadUrl.includes('?') ? '&' : '?') + 'id=' + id;
+
+                if (confirmTitle) {
+                    // Show confirmation dialog, then trigger download
+                    showRowActionDialogWithCallback(confirmTitle, confirmMessage || 'Proceed with download?', 'Download', 'primary', function() {
+                        window.open(url, '_blank');
+                    });
+                } else {
+                    // Direct download without confirmation
+                    window.open(url, '_blank');
+                }
+            }
+
+            // Handle Send Email button (POST with dialog confirmation)
+            const sendEmailBtn = e.target.closest('.action-btn[data-action="send-email"]');
+            if (sendEmailBtn) {
+                e.preventDefault();
+                const id = sendEmailBtn.dataset.id;
+                const sendEmailUrl = sendEmailBtn.dataset.sendEmailUrl;
+                const itemName = sendEmailBtn.dataset.itemName || 'this item';
+                const confirmTitle = sendEmailBtn.dataset.confirmTitle || 'Send Email';
+                const confirmMessage = sendEmailBtn.dataset.confirmMessage || 'Send invoice for ' + itemName + ' via email?';
+
+                if (!sendEmailUrl || !id) {
+                    console.warn('Send-email button missing data-send-email-url or data-id');
+                    return;
+                }
+
+                const url = sendEmailUrl + (sendEmailUrl.includes('?') ? '&' : '?') + 'id=' + id;
+
+                // Use HTMX-based dialog (same as delete/deactivate)
+                showRowActionDialog(confirmTitle, confirmMessage, 'Send Email', 'primary', url);
+            }
+
         });
     }
 
@@ -153,6 +201,23 @@
                     history.replaceState(null, '', currentUrl);
                 }
             }, 0);
+        }
+    }
+
+    /**
+     * Show confirmation dialog with a callback instead of actionUrl
+     */
+    function showRowActionDialogWithCallback(title, message, confirmLabel, variant, callback) {
+        if (window.TableDialog) {
+            window.TableDialog.showConfirmDialog({
+                title: title,
+                message: message,
+                confirmLabel: confirmLabel,
+                variant: variant,
+                onConfirm: callback
+            });
+        } else if (confirm(message)) {
+            callback();
         }
     }
 
