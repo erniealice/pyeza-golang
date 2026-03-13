@@ -1,0 +1,16 @@
+{{define "file-dropzone"}}
+<div class="file-dropzone" data-max-size="{{.MaxSize}}" data-accept="{{.Accept}}">
+    <input type="file" name="{{.Name}}" class="file-dropzone__input" {{if .Accept}}accept="{{.Accept}}"{{end}} {{if .Required}}required{{end}}>
+    <div class="file-dropzone__prompt">
+        {{template "icon-upload"}}
+        <p class="file-dropzone__text">{{if .DropText}}{{.DropText}}{{else}}Drag and drop a file here, or click to browse{{end}}</p>
+        {{if .HintText}}<p class="file-dropzone__hint">{{.HintText}}</p>{{end}}
+    </div>
+    <div class="file-dropzone__preview">
+        <span class="file-dropzone__preview-name"></span>
+        <span class="file-dropzone__preview-size"></span>
+        <button type="button" class="file-dropzone__remove" title="Remove file">&times;</button>
+    </div>
+    <div class="file-dropzone__error"></div>
+</div>
+{{end}}

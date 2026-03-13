@@ -52,8 +52,9 @@ type SidebarItem struct {
 // Follows the three-level cascade: Go defaults → industry JSON → app override.
 // Loaded from sidebar.json via lyngua LoadPathIfExists.
 type SidebarLabels struct {
-	// Shared item labels
+	// Shared item labels and icons
 	DashboardLabel string `json:"dashboard_label"`
+	DashboardIcon  string `json:"dashboard_icon"`
 	ActiveLabel    string `json:"active_label"`
 	InactiveLabel  string `json:"inactive_label"`
 	SettingsTitle  string `json:"settings_title"`
@@ -117,8 +118,9 @@ type SidebarLabels struct {
 	PermissionsTitle     string `json:"permissions_title"`
 	WorkspacesTitle   string `json:"workspaces_title"`
 
-	// Shared status labels (used across purchase, expense, supplier, etc.)
+	// Shared status labels and icons (used across purchase, expense, supplier, etc.)
 	AllLabel      string `json:"all_label"`
+	AllIcon       string `json:"all_icon"`
 	DraftLabel    string `json:"draft_label"`
 	PendingLabel  string `json:"pending_label"`
 	ApprovedLabel string `json:"approved_label"`
@@ -126,6 +128,16 @@ type SidebarLabels struct {
 	BlockedLabel  string `json:"blocked_label"`
 	OnHoldLabel   string `json:"on_hold_label"`
 	CompleteLabel string `json:"complete_label"`
+
+	// Purchase nav icons
+	PurchasesPendingIcon  string `json:"purchases_pending_icon"`
+	PurchasesApprovedIcon string `json:"purchases_approved_icon"`
+	PurchasesPaidIcon     string `json:"purchases_paid_icon"`
+
+	// Expense nav icons
+	ExpensesPendingIcon  string `json:"expenses_pending_icon"`
+	ExpensesApprovedIcon string `json:"expenses_approved_icon"`
+	ExpensesPaidIcon     string `json:"expenses_paid_icon"`
 
 	// Unique nav item labels and icons
 	ClientsActiveIcon      string `json:"clients_active_icon"`
@@ -169,6 +181,8 @@ type SidebarLabels struct {
 	SuppliersOnHoldIcon       string `json:"suppliers_on_hold_icon"`
 	PlansActiveIcon           string `json:"plans_active_icon"`
 	PlansInactiveIcon         string `json:"plans_inactive_icon"`
+	ServicesActiveIcon        string `json:"services_active_icon"`
+	ServicesInactiveIcon      string `json:"services_inactive_icon"`
 	SubscriptionsActiveIcon   string `json:"subscriptions_active_icon"`
 	SubscriptionsInactiveIcon string `json:"subscriptions_inactive_icon"`
 	CollectionsPendingIcon       string `json:"collections_pending_icon"`
@@ -203,6 +217,11 @@ type SidebarLabels struct {
 	// Invoice templates
 	InvoiceTemplatesLabel string `json:"invoice_templates_label"`
 	InvoiceTemplatesIcon  string `json:"invoice_templates_icon"`
+
+	// Bottom nav icons
+	HomeIcon string `json:"home_icon"`
+	FABIcon  string `json:"fab_icon"`
+	MoreIcon string `json:"more_icon"`
 }
 
 // DefaultSidebarLabels returns Level 1 generic defaults for sidebar navigation.
@@ -210,6 +229,7 @@ type SidebarLabels struct {
 func DefaultSidebarLabels() SidebarLabels {
 	return SidebarLabels{
 		DashboardLabel: "Dashboard",
+		DashboardIcon:  "icon-dashboard",
 		ActiveLabel:    "Active",
 		InactiveLabel:  "Inactive",
 		SettingsTitle:  "Settings",
@@ -271,6 +291,7 @@ func DefaultSidebarLabels() SidebarLabels {
 		WorkspacesTitle:   "Workspaces",
 
 		AllLabel:      "All",
+		AllIcon:       "icon-list",
 		DraftLabel:    "Draft",
 		PendingLabel:  "Pending",
 		ApprovedLabel: "Approved",
@@ -278,6 +299,14 @@ func DefaultSidebarLabels() SidebarLabels {
 		BlockedLabel:  "Blocked",
 		OnHoldLabel:   "On Hold",
 		CompleteLabel: "Complete",
+
+		PurchasesPendingIcon:  "icon-clock",
+		PurchasesApprovedIcon: "icon-check-circle",
+		PurchasesPaidIcon:     "icon-check-circle",
+
+		ExpensesPendingIcon:  "icon-clock",
+		ExpensesApprovedIcon: "icon-check-circle",
+		ExpensesPaidIcon:     "icon-check-circle",
 
 		ClientsActiveIcon:      "icon-user-check",
 		ClientsInactiveIcon:    "icon-user-minus",
@@ -320,6 +349,8 @@ func DefaultSidebarLabels() SidebarLabels {
 		SuppliersOnHoldIcon:       "icon-pause-circle",
 		PlansActiveIcon:           "icon-file-text",
 		PlansInactiveIcon:         "icon-file-minus",
+		ServicesActiveIcon:        "icon-layers",
+		ServicesInactiveIcon:      "icon-x-circle",
 		SubscriptionsActiveIcon:   "icon-refresh-cw",
 		SubscriptionsInactiveIcon: "icon-x-circle",
 		CollectionsPendingIcon:       "icon-clock",
@@ -352,5 +383,9 @@ func DefaultSidebarLabels() SidebarLabels {
 
 		InvoiceTemplatesLabel: "Invoice Templates",
 		InvoiceTemplatesIcon:  "icon-file-text",
+
+		HomeIcon: "icon-home",
+		FABIcon:  "icon-calendar-plus",
+		MoreIcon: "icon-grid",
 	}
 }

@@ -1,0 +1,27 @@
+{{/*
+Attachment tab content — rendered when the "attachments" tab is active on a detail page.
+Data: .AttachmentUploadURL, .AttachmentTable, .Labels (domain labels with .Detail.AttachmentUpload)
+*/}}
+{{define "attachment-tab"}}
+<div class="attachment-tab-content">
+    {{if .AttachmentUploadURL}}
+    <div class="tab-toolbar" style="margin-bottom: 1rem; display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary btn-sm"
+                hx-get="{{.AttachmentUploadURL}}"
+                hx-target="#sheetContent"
+                hx-swap="innerHTML"
+                onclick="Sheet.open()">
+            {{if .Labels}}{{.Labels.Detail.AttachmentUpload}}{{else}}Upload{{end}}
+        </button>
+    </div>
+    {{end}}
+    {{if .AttachmentTable}}
+        {{template "table" .AttachmentTable}}
+    {{else}}
+        <div class="empty-state">
+            <p class="empty-state-title">No attachments</p>
+            <p class="empty-state-message">Upload files to attach them to this record.</p>
+        </div>
+    {{end}}
+</div>
+{{end}}

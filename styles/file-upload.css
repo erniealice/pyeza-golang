@@ -1,0 +1,132 @@
+/* pyeza — file upload dropzone */
+
+/* ── Dropzone Container ─────────────────────────── */
+.file-dropzone {
+    position: relative;
+    border: 2px dashed var(--color-border, #d1d5db);
+    border-radius: var(--radius-lg, 8px);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    margin-bottom: 1rem;
+}
+
+.file-dropzone:hover,
+.file-dropzone--dragover {
+    border-color: var(--color-primary, #3b82f6);
+    background-color: var(--color-primary-50, rgba(59, 130, 246, 0.05));
+}
+
+.file-dropzone--error {
+    border-color: var(--color-danger, #ef4444);
+    background-color: rgba(239, 68, 68, 0.03);
+}
+
+.file-dropzone--has-file {
+    border-style: solid;
+    border-color: var(--color-primary, #3b82f6);
+    background-color: var(--color-primary-50, rgba(59, 130, 246, 0.03));
+}
+
+/* ── Hidden File Input ──────────────────────────── */
+.file-dropzone__input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+/* ── Prompt (icon + text) ───────────────────────── */
+.file-dropzone__prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.file-dropzone__prompt svg {
+    width: 2rem;
+    height: 2rem;
+    color: var(--color-text-muted, #6b7280);
+}
+
+.file-dropzone__text {
+    font-size: var(--font-size-sm, 0.875rem);
+    font-weight: 500;
+    color: var(--color-text, #1f2937);
+    margin: 0;
+}
+
+.file-dropzone__hint {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--color-text-muted, #6b7280);
+    margin: 0;
+}
+
+/* Hide prompt when file is selected */
+.file-dropzone--has-file .file-dropzone__prompt {
+    display: none;
+}
+
+/* ── File Preview ───────────────────────────────── */
+.file-dropzone__preview {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: none;
+}
+
+.file-dropzone--has-file .file-dropzone__preview {
+    display: flex;
+    justify-content: center;
+}
+
+.file-dropzone__preview-name {
+    font-size: var(--font-size-sm, 0.875rem);
+    font-weight: 500;
+    color: var(--color-text, #1f2937);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%;
+}
+
+.file-dropzone__preview-size {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--color-text-muted, #6b7280);
+}
+
+.file-dropzone__remove {
+    pointer-events: auto;
+    background: none;
+    border: 1px solid var(--color-border, #d1d5db);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--color-text-muted, #6b7280);
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0.125rem 0.5rem;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.file-dropzone__remove:hover {
+    color: var(--color-danger, #ef4444);
+    border-color: var(--color-danger, #ef4444);
+}
+
+/* ── Error Message ──────────────────────────────── */
+.file-dropzone__error {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--color-danger, #ef4444);
+    margin-top: 0.5rem;
+    min-height: 1rem;
+}
+
+.file-dropzone__error:empty {
+    display: none;
+}
