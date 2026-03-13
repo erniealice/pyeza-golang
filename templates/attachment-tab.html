@@ -11,12 +11,12 @@ Data: .AttachmentUploadURL, .AttachmentTable, .Labels (domain labels with .Detai
                 hx-target="#sheetContent"
                 hx-swap="innerHTML"
                 onclick="Sheet.open()">
-            {{if .Labels}}{{.Labels.Detail.AttachmentUpload}}{{else}}Upload{{end}}
+            Upload
         </button>
     </div>
     {{end}}
     {{if .AttachmentTable}}
-        {{template "table" .AttachmentTable}}
+        {{template "table-card" .AttachmentTable}}
     {{else}}
         <div class="empty-state">
             <p class="empty-state-title">No attachments</p>
