@@ -218,6 +218,10 @@ type SidebarLabels struct {
 	InvoiceTemplatesLabel string `json:"invoice_templates_label"`
 	InvoiceTemplatesIcon  string `json:"invoice_templates_icon"`
 
+	// Purchase templates
+	PurchaseTemplatesLabel string `json:"purchase_templates_label"`
+	PurchaseTemplatesIcon  string `json:"purchase_templates_icon"`
+
 	// Bottom nav icons
 	HomeIcon string `json:"home_icon"`
 	FABIcon  string `json:"fab_icon"`
@@ -383,6 +387,9 @@ func DefaultSidebarLabels() SidebarLabels {
 
 		InvoiceTemplatesLabel: "Invoice Templates",
 		InvoiceTemplatesIcon:  "icon-file-text",
+
+		PurchaseTemplatesLabel: "Templates",
+		PurchaseTemplatesIcon:  "icon-file-text",
 
 		HomeIcon: "icon-home",
 		FABIcon:  "icon-calendar-plus",

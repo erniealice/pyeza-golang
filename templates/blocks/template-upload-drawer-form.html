@@ -1,0 +1,31 @@
+{{/*
+Template upload drawer form — loaded into #sheetContent via HTMX.
+Data: .FormAction, .Labels, .CommonLabels, .AcceptTypes
+*/}}
+{{define "template-upload-drawer-form"}}
+<form hx-post="{{.FormAction}}" hx-swap="none" hx-encoding="multipart/form-data" hx-on::after-request="Sheet.handleResponse(event)">
+
+    <div class="sheet-body">
+        {{template "form-section" (dict "Title" .Labels.UploadTemplate)}}
+
+        <div class="form-row single">
+            {{template "form-group" (dict
+                "Type" "text"
+                "Name" "name"
+                "Label" .Labels.TemplateName
+                "Required" true
+                "Placeholder" .Labels.TemplateName
+            )}}
+        </div>
+
+        <div class="form-row single">
+            <div class="form-group">
+                <label class="form-label" for="template_file">{{.Labels.UploadTemplate}} <span class="form-required" aria-hidden="true">*</span></label>
+                <input type="file" class="form-input" id="template_file" name="template_file" accept="{{.AcceptTypes}}" required>
+            </div>
+        </div>
+    </div>
+
+    {{template "sheet-form-footer" (dict "CommonLabels" .CommonLabels "ShowCancel" true "IsEdit" false)}}
+</form>
+{{end}}
