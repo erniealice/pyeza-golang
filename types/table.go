@@ -32,7 +32,7 @@ type SelectOption struct {
 
 // TableCell defines a cell value with optional formatting
 type TableCell struct {
-	Type      string        // Cell type: "text", "badge", "name", "link", "chips", "html", "author", "input", "select"
+	Type      string        // Cell type: "text", "badge", "name", "link", "chips", "html", "author", "input", "select", "money", "datetime"
 	Value     string        // Text value to display
 	Variant   string        // For badges: variant class (e.g., "success", "error", "warning")
 	BadgeType string        // For badges: badge type ("status", "count", "type") - defaults to "status"
@@ -53,6 +53,9 @@ type TableCell struct {
 	InputPrefix string // Prefix text displayed before input (e.g., "$")
 	InputSuffix string // Suffix text displayed after input (e.g., "%")
 	InputType   string // HTML input type: "text" (default), "number"
+	// Money fields for "money" type
+	Currency string // Currency code prefix (e.g., "PHP", "USD")
+	CentMode bool   // If true, Value is in centavos/cents (divide by 100 before formatting)
 	// Select fields for "select" type
 	SelectName string         // Form field name attribute
 	Options    []SelectOption // Dropdown options

@@ -57,6 +57,8 @@ Cell Types:
     - "author": Author cell showing name on first line and date below
     - "input": Editable text/number input with optional prefix (e.g., "$") or suffix (e.g., "%")
     - "select": Dropdown select with options
+    - "money": Right-aligned monetary amount with currency prefix (use MoneyCell helper)
+    - "datetime": Pre-formatted date/time value (use DateTimeCell helper)
 
 Minimal Mode:
     Set Minimal: true to render the table without toolbar and footer.
@@ -495,6 +497,13 @@ JavaScript:
             <option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>
             {{end}}
         </select>
+        {{else if eq .Type "money"}}
+        <span class="money-cell">
+            {{if .Currency}}<span class="money-currency">{{.Currency}}</span>{{end}}
+            <span class="money-amount">{{.Value}}</span>
+        </span>
+        {{else if eq .Type "datetime"}}
+        <span class="datetime-cell">{{.Value}}</span>
         {{else}}
         {{.Value}}
         {{end}}
