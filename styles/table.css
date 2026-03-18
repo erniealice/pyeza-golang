@@ -1953,7 +1953,7 @@
 
 @media print {
     .table-card {
-        border: 1px solid #ddd;
+        border: var(--border-width) solid var(--border);
         box-shadow: none;
     }
 
