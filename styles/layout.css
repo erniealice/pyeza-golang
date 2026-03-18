@@ -127,6 +127,11 @@
     --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
     /* Z-index layers */
+    --z-sidebar: 100;
+    --z-sidebar-toggle: 200;
+    --z-settings-overlay: 400;
+    --z-settings-modal: 500;
+    --z-popover: 1000;
     --z-modal-backdrop: 9998;
     --z-modal: 9999;
 }

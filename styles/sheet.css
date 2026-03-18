@@ -266,6 +266,17 @@
 }
 
 /* ==========================================================================
+   TAB TOOLBAR
+   Toolbar row used at the top of tab content areas (e.g. attachment-tab)
+   ========================================================================== */
+
+.tab-toolbar {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ==========================================================================
    FORM VARIANT STYLES
    Specific to form sheets
    ========================================================================== */

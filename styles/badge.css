@@ -557,6 +557,22 @@
     }
 }
 
+/* ========================================
+   BEM MODIFIER SYSTEM
+   ========================================
+   Used by domain templates (fycha, centymo, fayna, etc.)
+   Pattern: .badge.badge--{variant}
+   ======================================== */
+
+.badge.badge--success { background: var(--status-success-light); color: var(--status-success); }
+.badge.badge--warning { background: var(--status-warning-light); color: var(--status-warning); }
+.badge.badge--info    { background: var(--status-info-light);    color: var(--status-info); }
+.badge.badge--danger  { background: var(--status-error-light);   color: var(--status-error); }
+.badge.badge--pending  { background: var(--accent-navy-light);    color: var(--accent-navy); }
+.badge.badge--draft    { background: var(--accent-amber-light);   color: var(--accent-amber); }
+.badge.badge--inactive { background: var(--bg-sidebar);           color: var(--text-muted); }
+.badge.badge--archived { background: var(--bg-sidebar);           color: var(--text-muted); }
+
 /* High contrast mode */
 @media (prefers-contrast: high) {
     .badge,
