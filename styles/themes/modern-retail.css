@@ -101,9 +101,21 @@
     --app-color-admin: #64748B;
     --app-color-admin-dark: #475569;
     --app-color-admin-light: #F8FAFC;
-    --app-color-operations: #D97706;
-    --app-color-operations-dark: #B45309;
-    --app-color-operations-light: #FFFBEB;
+    --app-color-jobs: #D97706;
+    --app-color-jobs-dark: #B45309;
+    --app-color-jobs-light: #FFFBEB;
+    --app-color-payroll: #0891B2;
+    --app-color-payroll-dark: #0E7490;
+    --app-color-payroll-light: #ECFEFF;
+    --app-color-loans: #D97706;
+    --app-color-loans-dark: #B45309;
+    --app-color-loans-light: #FFFBEB;
+    --app-color-equity: #4F46E5;
+    --app-color-equity-dark: #4338CA;
+    --app-color-equity-light: #EEF2FF;
+    --app-color-ledger: #16A34A;
+    --app-color-ledger-dark: #15803D;
+    --app-color-ledger-light: #F0FDF4;
 
     /* Theme Meta */
     --theme-name: "Modern Retail";

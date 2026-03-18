@@ -598,8 +598,24 @@
     background: linear-gradient(135deg, var(--app-color-admin) 0%, var(--app-color-admin-dark) 100%);
 }
 
-.app-icon--operations {
-    background: linear-gradient(135deg, var(--app-color-operations) 0%, var(--app-color-operations-dark) 100%);
+.app-icon--jobs {
+    background: linear-gradient(135deg, var(--app-color-jobs) 0%, var(--app-color-jobs-dark) 100%);
+}
+
+.app-icon--payroll {
+    background: linear-gradient(135deg, var(--app-color-payroll) 0%, var(--app-color-payroll-dark) 100%);
+}
+
+.app-icon--loans {
+    background: linear-gradient(135deg, var(--app-color-loans) 0%, var(--app-color-loans-dark) 100%);
+}
+
+.app-icon--equity {
+    background: linear-gradient(135deg, var(--app-color-equity) 0%, var(--app-color-equity-dark) 100%);
+}
+
+.app-icon--ledger {
+    background: linear-gradient(135deg, var(--app-color-ledger) 0%, var(--app-color-ledger-dark) 100%);
 }
 
 .app-switcher-info {
@@ -924,12 +940,44 @@
     stroke: var(--app-color-admin);
 }
 
-.app-option:not(.active) .app-icon--operations {
-    background: var(--app-color-operations-light);
+.app-option:not(.active) .app-icon--jobs {
+    background: var(--app-color-jobs-light);
 }
-.app-option:not(.active) .app-icon--operations svg {
-    color: var(--app-color-operations);
-    stroke: var(--app-color-operations);
+.app-option:not(.active) .app-icon--jobs svg {
+    color: var(--app-color-jobs);
+    stroke: var(--app-color-jobs);
+}
+
+.app-option:not(.active) .app-icon--payroll {
+    background: var(--app-color-payroll-light);
+}
+.app-option:not(.active) .app-icon--payroll svg {
+    color: var(--app-color-payroll);
+    stroke: var(--app-color-payroll);
+}
+
+.app-option:not(.active) .app-icon--loans {
+    background: var(--app-color-loans-light);
+}
+.app-option:not(.active) .app-icon--loans svg {
+    color: var(--app-color-loans);
+    stroke: var(--app-color-loans);
+}
+
+.app-option:not(.active) .app-icon--equity {
+    background: var(--app-color-equity-light);
+}
+.app-option:not(.active) .app-icon--equity svg {
+    color: var(--app-color-equity);
+    stroke: var(--app-color-equity);
+}
+
+.app-option:not(.active) .app-icon--ledger {
+    background: var(--app-color-ledger-light);
+}
+.app-option:not(.active) .app-icon--ledger svg {
+    color: var(--app-color-ledger);
+    stroke: var(--app-color-ledger);
 }
 
 /* Active app option: white icon on gradient background */

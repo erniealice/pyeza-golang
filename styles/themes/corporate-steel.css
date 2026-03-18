@@ -101,9 +101,21 @@
     --app-color-admin: #5A6B7C;
     --app-color-admin-dark: #435060;
     --app-color-admin-light: #EDF0F3;
-    --app-color-operations: #8A6D30;
-    --app-color-operations-dark: #6E5824;
-    --app-color-operations-light: #F5F0E5;
+    --app-color-jobs: #8A6D30;
+    --app-color-jobs-dark: #6E5824;
+    --app-color-jobs-light: #F5F0E5;
+    --app-color-payroll: #306878;
+    --app-color-payroll-dark: #225060;
+    --app-color-payroll-light: #E8F2F5;
+    --app-color-loans: #7A5828;
+    --app-color-loans-dark: #60451E;
+    --app-color-loans-light: #F5F0E6;
+    --app-color-equity: #3A3878;
+    --app-color-equity-dark: #2C2A60;
+    --app-color-equity-light: #ECEEF6;
+    --app-color-ledger: #2E6040;
+    --app-color-ledger-dark: #1E4C30;
+    --app-color-ledger-light: #E8F2EC;
 
     /* Theme Meta */
     --theme-name: "Corporate Steel";

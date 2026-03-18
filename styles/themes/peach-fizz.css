@@ -101,9 +101,21 @@
     --app-color-admin: #8A7E78;
     --app-color-admin-dark: #706560;
     --app-color-admin-light: #F3F0EE;
-    --app-color-operations: #C89040;
-    --app-color-operations-dark: #A87830;
-    --app-color-operations-light: #FBF3E8;
+    --app-color-jobs: #C89040;
+    --app-color-jobs-dark: #A87830;
+    --app-color-jobs-light: #FBF3E8;
+    --app-color-payroll: #4A9098;
+    --app-color-payroll-dark: #387880;
+    --app-color-payroll-light: #EBF4F5;
+    --app-color-loans: #C08840;
+    --app-color-loans-dark: #A07030;
+    --app-color-loans-light: #FBF4E8;
+    --app-color-equity: #7068B8;
+    --app-color-equity-dark: #5858A0;
+    --app-color-equity-light: #F0EEF8;
+    --app-color-ledger: #509868;
+    --app-color-ledger-dark: #3E8050;
+    --app-color-ledger-light: #EBF5EF;
 
     /* Theme Meta */
     --theme-name: "Peach Fizz";

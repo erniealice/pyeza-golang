@@ -103,9 +103,21 @@
     --app-color-admin: #6B7C8D;
     --app-color-admin-dark: #4E5D6B;
     --app-color-admin-light: #F0F2F5;
-    --app-color-operations: #B08040;
-    --app-color-operations-dark: #946830;
-    --app-color-operations-light: #F8F2E8;
+    --app-color-jobs: #B08040;
+    --app-color-jobs-dark: #946830;
+    --app-color-jobs-light: #F8F2E8;
+    --app-color-payroll: #4A8896;
+    --app-color-payroll-dark: #367078;
+    --app-color-payroll-light: #EDF4F6;
+    --app-color-loans: #A87840;
+    --app-color-loans-dark: #8C6030;
+    --app-color-loans-light: #F8F3E8;
+    --app-color-equity: #5C5898;
+    --app-color-equity-dark: #464278;
+    --app-color-equity-light: #F0EFF7;
+    --app-color-ledger: #527060;
+    --app-color-ledger-dark: #3E5848;
+    --app-color-ledger-light: #EFF4F1;
 
     /* Theme Meta */
     --theme-name: "Warm Cream";

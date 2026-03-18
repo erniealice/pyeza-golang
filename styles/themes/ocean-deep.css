@@ -100,9 +100,21 @@
     --app-color-admin: #8B98A5;
     --app-color-admin-dark: #6E767D;
     --app-color-admin-light: rgba(139, 152, 165, 0.15);
-    --app-color-operations: #D97706;
-    --app-color-operations-dark: #B45309;
-    --app-color-operations-light: rgba(217, 119, 6, 0.15);
+    --app-color-jobs: #D97706;
+    --app-color-jobs-dark: #B45309;
+    --app-color-jobs-light: rgba(217, 119, 6, 0.15);
+    --app-color-payroll: #22D3EE;
+    --app-color-payroll-dark: #06B6D4;
+    --app-color-payroll-light: rgba(34, 211, 238, 0.15);
+    --app-color-loans: #FBBF24;
+    --app-color-loans-dark: #D9A51E;
+    --app-color-loans-light: rgba(251, 191, 36, 0.15);
+    --app-color-equity: #818CF8;
+    --app-color-equity-dark: #6366F1;
+    --app-color-equity-light: rgba(129, 140, 248, 0.15);
+    --app-color-ledger: #4ADE80;
+    --app-color-ledger-dark: #22C55E;
+    --app-color-ledger-light: rgba(74, 222, 128, 0.15);
 
     /* Theme Meta */
     --theme-name: "Ocean Deep";

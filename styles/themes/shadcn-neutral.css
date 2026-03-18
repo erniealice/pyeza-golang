@@ -102,9 +102,21 @@
     --app-color-admin: #737373;
     --app-color-admin-dark: #525252;
     --app-color-admin-light: #F5F5F5;
-    --app-color-operations: #D97706;
-    --app-color-operations-dark: #B45309;
-    --app-color-operations-light: #FFFBEB;
+    --app-color-jobs: #D97706;
+    --app-color-jobs-dark: #B45309;
+    --app-color-jobs-light: #FFFBEB;
+    --app-color-payroll: #0E7490;
+    --app-color-payroll-dark: #0C6580;
+    --app-color-payroll-light: #ECFEFF;
+    --app-color-loans: #92400E;
+    --app-color-loans-dark: #78350F;
+    --app-color-loans-light: #FFFBEB;
+    --app-color-equity: #3730A3;
+    --app-color-equity-dark: #312E81;
+    --app-color-equity-light: #EEF2FF;
+    --app-color-ledger: #166534;
+    --app-color-ledger-dark: #14532D;
+    --app-color-ledger-light: #F0FDF4;
 
     /* Theme Meta */
     --theme-name: "shadcn Neutral";

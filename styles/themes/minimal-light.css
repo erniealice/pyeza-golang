@@ -100,9 +100,21 @@
     --app-color-admin: #64748B;
     --app-color-admin-dark: #475569;
     --app-color-admin-light: #F8FAFC;
-    --app-color-operations: #B45309;
-    --app-color-operations-dark: #92400E;
-    --app-color-operations-light: #FFFBEB;
+    --app-color-jobs: #B45309;
+    --app-color-jobs-dark: #92400E;
+    --app-color-jobs-light: #FFFBEB;
+    --app-color-payroll: #0E7490;
+    --app-color-payroll-dark: #0C6580;
+    --app-color-payroll-light: #ECFEFF;
+    --app-color-loans: #92400E;
+    --app-color-loans-dark: #78350F;
+    --app-color-loans-light: #FFF7ED;
+    --app-color-equity: #3730A3;
+    --app-color-equity-dark: #312E81;
+    --app-color-equity-light: #EEF2FF;
+    --app-color-ledger: #166534;
+    --app-color-ledger-dark: #14532D;
+    --app-color-ledger-light: #F0FDF4;
 
     /* Theme Meta */
     --theme-name: "Minimal Light";

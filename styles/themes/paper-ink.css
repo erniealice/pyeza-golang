@@ -101,9 +101,21 @@
     --app-color-admin: #6B6862;
     --app-color-admin-dark: #525048;
     --app-color-admin-light: #F0EFED;
-    --app-color-operations: #8A6B30;
-    --app-color-operations-dark: #705525;
-    --app-color-operations-light: #F5F0E6;
+    --app-color-jobs: #8A6B30;
+    --app-color-jobs-dark: #705525;
+    --app-color-jobs-light: #F5F0E6;
+    --app-color-payroll: #3A6870;
+    --app-color-payroll-dark: #2C5258;
+    --app-color-payroll-light: #EAF1F2;
+    --app-color-loans: #8A6230;
+    --app-color-loans-dark: #704E25;
+    --app-color-loans-light: #F5F0E6;
+    --app-color-equity: #424080;
+    --app-color-equity-dark: #323068;
+    --app-color-equity-light: #EEEDF5;
+    --app-color-ledger: #3A6848;
+    --app-color-ledger-dark: #2C5238;
+    --app-color-ledger-light: #EAF1ED;
 
     /* Theme Meta */
     --theme-name: "Paper & Ink";
