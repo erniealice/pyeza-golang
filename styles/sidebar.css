@@ -598,6 +598,10 @@
     background: linear-gradient(135deg, var(--app-color-admin) 0%, var(--app-color-admin-dark) 100%);
 }
 
+.app-icon--operations {
+    background: linear-gradient(135deg, var(--app-color-operations) 0%, var(--app-color-operations-dark) 100%);
+}
+
 .app-switcher-info {
     flex: 1;
     display: flex;
@@ -918,6 +922,14 @@
 .app-option:not(.active) .app-icon--admin svg {
     color: var(--app-color-admin);
     stroke: var(--app-color-admin);
+}
+
+.app-option:not(.active) .app-icon--operations {
+    background: var(--app-color-operations-light);
+}
+.app-option:not(.active) .app-icon--operations svg {
+    color: var(--app-color-operations);
+    stroke: var(--app-color-operations);
 }
 
 /* Active app option: white icon on gradient background */

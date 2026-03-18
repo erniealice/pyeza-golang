@@ -103,6 +103,9 @@
     --app-color-admin: #6B7C8D;
     --app-color-admin-dark: #4E5D6B;
     --app-color-admin-light: #F0F2F5;
+    --app-color-operations: #B08040;
+    --app-color-operations-dark: #946830;
+    --app-color-operations-light: #F8F2E8;
 
     /* Theme Meta */
     --theme-name: "Warm Cream";

@@ -101,6 +101,9 @@
     --app-color-admin: #5A6B7C;
     --app-color-admin-dark: #435060;
     --app-color-admin-light: #EDF0F3;
+    --app-color-operations: #8A6D30;
+    --app-color-operations-dark: #6E5824;
+    --app-color-operations-light: #F5F0E5;
 
     /* Theme Meta */
     --theme-name: "Corporate Steel";

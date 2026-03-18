@@ -101,6 +101,9 @@
     --app-color-admin: #64748B;
     --app-color-admin-dark: #475569;
     --app-color-admin-light: #F8FAFC;
+    --app-color-operations: #D97706;
+    --app-color-operations-dark: #B45309;
+    --app-color-operations-light: #FFFBEB;
 
     /* Theme Meta */
     --theme-name: "Modern Retail";

@@ -100,6 +100,9 @@
     --app-color-admin: #C9B8B0;
     --app-color-admin-dark: #A89890;
     --app-color-admin-light: rgba(201, 184, 176, 0.15);
+    --app-color-operations: #C87A45;
+    --app-color-operations-dark: #A86430;
+    --app-color-operations-light: rgba(200, 122, 69, 0.15);
 
     /* Theme Meta */
     --theme-name: "Sunset Glow";

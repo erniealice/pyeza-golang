@@ -101,6 +101,9 @@
     --app-color-admin: #6B6862;
     --app-color-admin-dark: #525048;
     --app-color-admin-light: #F0EFED;
+    --app-color-operations: #8A6B30;
+    --app-color-operations-dark: #705525;
+    --app-color-operations-light: #F5F0E6;
 
     /* Theme Meta */
     --theme-name: "Paper & Ink";

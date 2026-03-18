@@ -101,6 +101,9 @@
     --app-color-admin: #8A7E78;
     --app-color-admin-dark: #706560;
     --app-color-admin-light: #F3F0EE;
+    --app-color-operations: #C89040;
+    --app-color-operations-dark: #A87830;
+    --app-color-operations-light: #FBF3E8;
 
     /* Theme Meta */
     --theme-name: "Peach Fizz";

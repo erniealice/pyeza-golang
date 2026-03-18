@@ -102,6 +102,9 @@
     --app-color-admin: #6B7280;
     --app-color-admin-dark: #4B5563;
     --app-color-admin-light: #F3F4F6;
+    --app-color-operations: #B45309;
+    --app-color-operations-dark: #92400E;
+    --app-color-operations-light: #FFFBEB;
 
     /* Theme Meta */
     --theme-name: "Ryta Default";

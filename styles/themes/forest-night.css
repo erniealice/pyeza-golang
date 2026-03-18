@@ -100,6 +100,9 @@
     --app-color-admin: #9DB5A8;
     --app-color-admin-dark: #6B8578;
     --app-color-admin-light: rgba(157, 181, 168, 0.15);
+    --app-color-operations: #D97706;
+    --app-color-operations-dark: #B45309;
+    --app-color-operations-light: rgba(217, 119, 6, 0.15);
 
     /* Theme Meta */
     --theme-name: "Forest Night";

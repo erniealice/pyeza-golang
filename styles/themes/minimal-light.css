@@ -100,6 +100,9 @@
     --app-color-admin: #64748B;
     --app-color-admin-dark: #475569;
     --app-color-admin-light: #F8FAFC;
+    --app-color-operations: #B45309;
+    --app-color-operations-dark: #92400E;
+    --app-color-operations-light: #FFFBEB;
 
     /* Theme Meta */
     --theme-name: "Minimal Light";
