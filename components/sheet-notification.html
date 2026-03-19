@@ -35,7 +35,7 @@ HTMX Events:
 {{define "sheet-notification"}}
 <div class="sheet sheet-notification" id="notificationSheet">
     <div class="sheet-overlay" id="notificationSheetOverlay"></div>
-    <div class="sheet-panel sheet-panel-sm">
+    <div class="sheet-panel sheet-panel-sm" role="dialog">
         <div class="sheet-header">
             <h2 class="sheet-title">{{.CommonLabels.Notifications.Title}}</h2>
             <div class="sheet-header-actions">
@@ -105,12 +105,20 @@ HTMX Events:
         if (!sheet) return;
         sheet.classList.add('open');
         document.body.style.overflow = 'hidden';
+        // Install focus trap on the panel
+        var panel = sheet.querySelector('.sheet-panel');
+        if (panel && window.FocusTrap) {
+            setTimeout(function() { window.FocusTrap.trapFocus(panel); }, 300);
+        }
         fetchNotifications();
     }
 
     function close() {
         const sheet = getSheet();
         if (!sheet) return;
+        // Release focus trap before closing
+        var panel = sheet.querySelector('.sheet-panel');
+        if (panel && window.FocusTrap) window.FocusTrap.releaseFocus(panel);
         sheet.classList.remove('open');
         document.body.style.overflow = '';
     }

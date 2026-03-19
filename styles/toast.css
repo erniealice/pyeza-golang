@@ -230,6 +230,12 @@
     animation: toastSlideOut var(--duration-slow) var(--ease-default) forwards;
 }
 
+/* Delay class — applied by JS instead of inline style for testability */
+.toast--delayed {
+    opacity: 0;
+    pointer-events: none;
+}
+
 @keyframes toastProgress {
     from {
         transform: scaleX(1);

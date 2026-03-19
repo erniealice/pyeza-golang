@@ -159,11 +159,13 @@ type TableLabels struct {
 	Clear            string
 	ApplyFilters     string
 	// Density options
+	DensityLabel       string // Accessible label for the density toolbar button
 	DensityDefault     string
 	DensityComfortable string
 	DensityCompact     string
 	// Footer/Pagination
-	Show         string
+	EntriesPerPage string // Accessible label for the entries-per-page selector
+	Show           string
 	Entries      string
 	Showing      string
 	To           string

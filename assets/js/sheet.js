@@ -42,16 +42,17 @@
     // ========================================
 
     function setBackgroundInert(inert) {
-        ['sidebar', 'main-content'].forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) {
-                if (inert) {
-                    el.setAttribute('inert', '');
-                } else {
-                    el.removeAttribute('inert');
-                }
+        // Only inert the sidebar — #main-content contains the sheet itself,
+        // so setting inert on it would block the sheet form fields.
+        // The sheet overlay already prevents interaction with background content.
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            if (inert) {
+                sidebar.setAttribute('inert', '');
+            } else {
+                sidebar.removeAttribute('inert');
             }
-        });
+        }
     }
 
     // ========================================
@@ -406,21 +407,25 @@
                 }
             });
 
-            // P1: before outerHTML swap, capture focused element; restore after htmx:afterSettle
+            // P1: before outerHTML swap, capture focused element identity; restore after settle.
+            // Stored in closure variable — DOM element is destroyed by outerHTML swap.
+            var _sheetFocusId = null;
             document.body.addEventListener('htmx:beforeSwap', function(e) {
                 if (e.detail.target && e.detail.target.id === 'sheetContent') {
-                    e.detail.target._focusedBeforeSwap = document.activeElement;
+                    var el = document.activeElement;
+                    _sheetFocusId = el && el.id ? el.id : null;
                 }
             });
 
             document.body.addEventListener('htmx:afterSettle', function(e) {
+                if (!_sheetFocusId) return;
                 var content = document.getElementById('sheetContent');
-                if (!content) return;
-                var prev = content._focusedBeforeSwap;
-                if (prev && content.contains(prev) && typeof prev.focus === 'function') {
-                    prev.focus();
-                    delete content._focusedBeforeSwap;
+                if (!content) { _sheetFocusId = null; return; }
+                var restored = document.getElementById(_sheetFocusId);
+                if (restored && content.contains(restored) && typeof restored.focus === 'function') {
+                    restored.focus();
                 }
+                _sheetFocusId = null;
             });
 
             // Global afterRequest handler for forms inside the sheet.

@@ -47,7 +47,7 @@ ACCESSIBILITY:
 
 {{/* Default variant - Pill-style tabs */}}
 {{if or (eq $variant "default") (eq $variant "")}}
-<div class="tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" {{if .Label}}aria-label="{{.Label}}"{{end}}>
+<div class="tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
     {{range .Items}}
     {{if .HxGet}}
     <button type="button"
@@ -103,7 +103,7 @@ ACCESSIBILITY:
 
 {{/* Main variant - Large icon+text with underline (regulations page) */}}
 {{if eq $variant "main"}}
-<div class="main-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" {{if .Label}}aria-label="{{.Label}}"{{end}}>
+<div class="main-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
@@ -134,7 +134,7 @@ ACCESSIBILITY:
 
 {{/* Sub variant - Compact secondary tabs */}}
 {{if eq $variant "sub"}}
-<div class="sub-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" {{if .Label}}aria-label="{{.Label}}"{{end}}>
+<div class="sub-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
@@ -183,7 +183,7 @@ ACCESSIBILITY:
 
 {{/* Help variant - Rounded pill tabs with counts (helpdesk) */}}
 {{if eq $variant "help"}}
-<div class="help-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" {{if .Label}}aria-label="{{.Label}}"{{end}}>
+<div class="help-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"

@@ -122,11 +122,9 @@
 
         // Delay before showing
         if (delay > 0) {
-            toast.style.opacity = '0';
-            toast.style.pointerEvents = 'none';
+            toast.classList.add('toast--delayed');
             setTimeout(function() {
-                toast.style.opacity = '';
-                toast.style.pointerEvents = '';
+                toast.classList.remove('toast--delayed');
             }, delay);
         }
 

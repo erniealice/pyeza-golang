@@ -27,16 +27,17 @@
     // ========================================
 
     function setBackgroundInert(inert) {
-        ['sidebar', 'main-content'].forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) {
-                if (inert) {
-                    el.setAttribute('inert', '');
-                } else {
-                    el.removeAttribute('inert');
-                }
+        // Only inert the sidebar — #main-content contains the dialog itself,
+        // so setting inert on it would block the dialog controls.
+        // The dialog overlay already prevents interaction with background content.
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            if (inert) {
+                sidebar.setAttribute('inert', '');
+            } else {
+                sidebar.removeAttribute('inert');
             }
-        });
+        }
     }
 
     /**
@@ -271,23 +272,27 @@
             }
         });
 
-        // P1: before outerHTML swap into dialog container, store focused element
+        // P1: before outerHTML swap into dialog container, capture focused element identity.
+        // Stored in closure variable — DOM element is destroyed by outerHTML swap.
+        var _dialogFocusId = null;
         document.body.addEventListener('htmx:beforeSwap', function(e) {
             var container = dialog.querySelector('[data-dialog-container]');
             if (container && e.detail.target === container) {
-                container._focusedBeforeSwap = document.activeElement;
+                var el = document.activeElement;
+                _dialogFocusId = el && el.id ? el.id : null;
             }
         });
 
-        // P1: after htmx:afterSettle, restore focus if the element still exists
+        // P1: after htmx:afterSettle, restore focus by id lookup
         document.body.addEventListener('htmx:afterSettle', function(e) {
+            if (!_dialogFocusId) return;
             var container = dialog.querySelector('[data-dialog-container]');
-            if (!container) return;
-            var prev = container._focusedBeforeSwap;
-            if (prev && container.contains(prev) && typeof prev.focus === 'function') {
-                prev.focus();
-                delete container._focusedBeforeSwap;
+            if (!container) { _dialogFocusId = null; return; }
+            var restored = document.getElementById(_dialogFocusId);
+            if (restored && container.contains(restored) && typeof restored.focus === 'function') {
+                restored.focus();
             }
+            _dialogFocusId = null;
         });
 
         // Watch for HTMX content load and auto-open
