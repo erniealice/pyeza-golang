@@ -4,7 +4,7 @@
  * Provides keyboard and mouse interaction for dialog overlays:
  * - Close on ESC key
  * - Close on clicking outside the dialog (overlay)
- * - Focus management for accessibility
+ * - Focus management for accessibility (trap + restore)
  *
  * Dialog content is loaded via HTMX from /ui/dialog/confirm
  *
@@ -19,6 +19,26 @@
 (function() {
     'use strict';
 
+    // P0: remember the element that triggered the dialog so we can restore focus
+    let _opener = null;
+
+    // ========================================
+    // INERT HELPERS (P3)
+    // ========================================
+
+    function setBackgroundInert(inert) {
+        ['sidebar', 'main-content'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                if (inert) {
+                    el.setAttribute('inert', '');
+                } else {
+                    el.removeAttribute('inert');
+                }
+            }
+        });
+    }
+
     /**
      * Close the dialog overlay
      */
@@ -26,7 +46,20 @@
         const dialog = document.querySelector('[data-dialog-overlay]');
         if (!dialog) return;
 
+        // P0: release focus trap
+        if (window.FocusTrap) window.FocusTrap.releaseFocus(dialog);
+
         dialog.classList.remove('visible');
+
+        // P3: restore background interactivity
+        setBackgroundInert(false);
+
+        // P0: restore focus to the opener
+        if (_opener && typeof _opener.focus === 'function') {
+            _opener.focus();
+        }
+        _opener = null;
+
         setTimeout(() => {
             dialog.hidden = true;
             // Clear content after animation
@@ -44,10 +77,38 @@
         const dialog = document.querySelector('[data-dialog-overlay]');
         if (!dialog) return;
 
+        // P0: capture opener before the dialog steals focus
+        _opener = document.activeElement;
+
         dialog.hidden = false;
         // Trigger reflow for animation
         void dialog.offsetWidth;
         dialog.classList.add('visible');
+
+        // P3: suppress background while dialog is open
+        setBackgroundInert(true);
+
+        // P0: label the dialog by its title; install focus trap; move focus inside
+        setTimeout(function() {
+            var container = dialog.querySelector('[data-dialog-container]');
+            if (container) {
+                // P0: find .dialog-title, assign id, wire aria-labelledby
+                var titleEl = container.querySelector('.dialog-title');
+                if (titleEl) {
+                    titleEl.id = 'dialogTitle';
+                    container.setAttribute('aria-labelledby', 'dialogTitle');
+                }
+            }
+
+            // P0: install focus trap on the full overlay
+            if (window.FocusTrap) window.FocusTrap.trapFocus(dialog);
+
+            // Move focus to first focusable element inside dialog
+            var focusable = dialog.querySelector(
+                'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusable) focusable.focus();
+        }, 50);
     }
 
     // Initialize when DOM is ready
@@ -207,6 +268,25 @@
                     var status = e.detail.xhr ? e.detail.xhr.status : 'unknown';
                     console.error('Dialog action failed with status:', status);
                 }
+            }
+        });
+
+        // P1: before outerHTML swap into dialog container, store focused element
+        document.body.addEventListener('htmx:beforeSwap', function(e) {
+            var container = dialog.querySelector('[data-dialog-container]');
+            if (container && e.detail.target === container) {
+                container._focusedBeforeSwap = document.activeElement;
+            }
+        });
+
+        // P1: after htmx:afterSettle, restore focus if the element still exists
+        document.body.addEventListener('htmx:afterSettle', function(e) {
+            var container = dialog.querySelector('[data-dialog-container]');
+            if (!container) return;
+            var prev = container._focusedBeforeSwap;
+            if (prev && container.contains(prev) && typeof prev.focus === 'function') {
+                prev.focus();
+                delete container._focusedBeforeSwap;
             }
         });
 

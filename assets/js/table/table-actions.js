@@ -11,6 +11,7 @@
     function init() {
         initRowActions();
         initRowNavigation();
+        initMobileActionDropdowns();
     }
 
     function initRowActions() {
@@ -290,11 +291,98 @@
         });
     }
 
+    /**
+     * P1: Mobile action dropdown — open/close/escape/arrow-key pattern.
+     * Targets .row-actions-trigger buttons and their sibling .action-dropdown menus.
+     * Uses event delegation so it works after HTMX swaps.
+     */
+    let mobileDropdownsInitialized = false;
+
+    function initMobileActionDropdowns() {
+        if (mobileDropdownsInitialized) return;
+        mobileDropdownsInitialized = true;
+
+        // Toggle on trigger click
+        document.addEventListener('click', function(e) {
+            var trigger = e.target.closest('.row-actions-trigger');
+            if (!trigger) return;
+
+            e.stopPropagation();
+            var wrapper = trigger.closest('.action-dropdown, .row-actions-wrapper') || trigger.parentElement;
+            var menu = wrapper ? wrapper.querySelector('.action-dropdown-menu, .row-actions-menu, [role="menu"]') : null;
+            if (!menu) return;
+
+            var isOpen = wrapper.classList.contains('open');
+
+            // Close all other open action dropdowns first
+            document.querySelectorAll('.action-dropdown.open, .row-actions-wrapper.open').forEach(function(el) {
+                el.classList.remove('open');
+                var t = el.querySelector('.row-actions-trigger');
+                if (t) t.setAttribute('aria-expanded', 'false');
+            });
+
+            if (!isOpen) {
+                wrapper.classList.add('open');
+                trigger.setAttribute('aria-expanded', 'true');
+                // Move focus to first menu item
+                var firstItem = menu.querySelector('a, button:not([disabled])');
+                if (firstItem) firstItem.focus();
+            }
+        });
+
+        // Close all action dropdowns on outside click
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.action-dropdown, .row-actions-wrapper')) {
+                document.querySelectorAll('.action-dropdown.open, .row-actions-wrapper.open').forEach(function(el) {
+                    el.classList.remove('open');
+                    var t = el.querySelector('.row-actions-trigger');
+                    if (t) t.setAttribute('aria-expanded', 'false');
+                });
+            }
+        });
+
+        // Keyboard: Escape closes; ArrowDown/ArrowUp navigates items
+        document.addEventListener('keydown', function(e) {
+            var activeWrapper = document.querySelector('.action-dropdown.open, .row-actions-wrapper.open');
+            if (!activeWrapper) return;
+
+            var trigger = activeWrapper.querySelector('.row-actions-trigger');
+            var menu = activeWrapper.querySelector('.action-dropdown-menu, .row-actions-menu, [role="menu"]');
+            var items = menu ? Array.from(menu.querySelectorAll('a, button:not([disabled])')) : [];
+
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                activeWrapper.classList.remove('open');
+                if (trigger) {
+                    trigger.setAttribute('aria-expanded', 'false');
+                    trigger.focus();
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                var idx = items.indexOf(document.activeElement);
+                var next = idx < items.length - 1 ? items[idx + 1] : items[0];
+                if (next) next.focus();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                var idx2 = items.indexOf(document.activeElement);
+                var prev = idx2 > 0 ? items[idx2 - 1] : items[items.length - 1];
+                if (prev) prev.focus();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                if (items[0]) items[0].focus();
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                if (items.length) items[items.length - 1].focus();
+            }
+        });
+    }
+
     // Expose module
     window.TableActions = {
         init,
         initRowActions,
-        initRowNavigation
+        initRowNavigation,
+        initMobileActionDropdowns
     };
 
 })();

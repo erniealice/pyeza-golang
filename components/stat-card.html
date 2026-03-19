@@ -35,6 +35,7 @@ USAGE:
             {{else}}
             {{template "icon-trending-down" $}}
             {{end}}
+            <span class="visually-hidden">{{if .TrendUp}}Trending up{{else}}Trending down{{end}}</span>
             {{.Trend}}
         </div>
         {{end}}

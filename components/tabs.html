@@ -47,13 +47,16 @@ ACCESSIBILITY:
 
 {{/* Default variant - Pill-style tabs */}}
 {{if or (eq $variant "default") (eq $variant "")}}
-<div class="tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+<div class="tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" {{if .Label}}aria-label="{{.Label}}"{{end}}>
     {{range .Items}}
     {{if .HxGet}}
     <button type="button"
             class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
+            id="tab-{{.Key}}"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            aria-controls="tabContent"
+            tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
             data-tab="{{.Key}}"
             hx-get="{{.HxGet}}"
             hx-target="#tabContent"
@@ -69,7 +72,10 @@ ACCESSIBILITY:
     <a href="{{.Href}}"
        class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"
+       id="tab-{{.Key}}"
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       aria-controls="tabContent"
+       tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
        data-tab="{{.Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
@@ -80,7 +86,10 @@ ACCESSIBILITY:
     <button type="button"
             class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
+            id="tab-{{.Key}}"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+            aria-controls="tabContent"
+            tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
             data-tab="{{.Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
@@ -94,7 +103,7 @@ ACCESSIBILITY:
 
 {{/* Main variant - Large icon+text with underline (regulations page) */}}
 {{if eq $variant "main"}}
-<div class="main-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+<div class="main-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" {{if .Label}}aria-label="{{.Label}}"{{end}}>
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
@@ -125,7 +134,7 @@ ACCESSIBILITY:
 
 {{/* Sub variant - Compact secondary tabs */}}
 {{if eq $variant "sub"}}
-<div class="sub-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+<div class="sub-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" {{if .Label}}aria-label="{{.Label}}"{{end}}>
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
@@ -156,7 +165,7 @@ ACCESSIBILITY:
 
 {{/* Client variant - Horizontal sticky tabs with icons */}}
 {{if eq $variant "client"}}
-<nav class="client-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+<nav class="client-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .NavLabel}}{{.NavLabel}}{{else if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
     {{range .Items}}
     <button type="button"
             class="client-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
@@ -174,7 +183,7 @@ ACCESSIBILITY:
 
 {{/* Help variant - Rounded pill tabs with counts (helpdesk) */}}
 {{if eq $variant "help"}}
-<div class="help-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+<div class="help-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" {{if .Label}}aria-label="{{.Label}}"{{end}}>
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
@@ -203,15 +212,14 @@ ACCESSIBILITY:
 </div>
 {{end}}
 
-{{/* Category variant - Minimal filter tabs (marketplace) */}}
+{{/* Category variant - Minimal filter tabs (marketplace) — URL-based nav pattern */}}
 {{if eq $variant "category"}}
-<div class="category-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist">
+<nav class="category-tabs"{{if $id}} id="{{$id}}"{{end}} aria-label="{{if .Label}}{{.Label}}{{else}}Category filter{{end}}">
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
        class="category-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
-       role="tab"
-       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       {{if eq .Key $activeTab}}aria-current="page"{{end}}
        data-tab="{{.Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
@@ -221,9 +229,8 @@ ACCESSIBILITY:
     {{else}}
     <button type="button"
             class="category-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
-            role="tab"
-            aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             data-tab="{{.Key}}"
+            {{if eq .Key $activeTab}}aria-pressed="true"{{end}}
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -231,7 +238,7 @@ ACCESSIBILITY:
     </button>
     {{end}}
     {{end}}
-</div>
+</nav>
 {{end}}
 
 {{end}}

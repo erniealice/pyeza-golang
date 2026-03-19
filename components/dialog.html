@@ -1,7 +1,7 @@
 {{/* Dialog Shell - Static component in app shell */}}
 {{define "dialog"}}
 <div id="dialog" class="dialog-overlay" hidden data-dialog-overlay>
-    <div class="dialog-container" data-dialog-container>
+    <div class="dialog-container" role="dialog" aria-modal="true" data-dialog-container>
         <!-- Dialog content loads here via HTMX -->
     </div>
 </div>
@@ -10,7 +10,7 @@
 {{/* Dialog Confirm Fragment - HTMX partial */}}
 {{define "dialog-confirm"}}
 <div class="dialog-header">
-    <h3 class="dialog-title">{{.Title}}</h3>
+    <h3 class="dialog-title" id="dialog-title">{{.Title}}</h3>
 </div>
 <div class="dialog-body">
     <p class="dialog-message">{{.Message}}</p>

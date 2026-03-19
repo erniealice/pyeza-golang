@@ -20,6 +20,12 @@ type CommonLabels struct {
 	Dropdown      DropdownLabels      `json:"dropdown"`
 	Integration   IntegrationLabels   `json:"integration"`
 	Card          CardLabels          `json:"card"`
+	Tabs          TabLabels           `json:"tabs"`
+}
+
+// TabLabels holds shared tab label strings used across all domain packages
+type TabLabels struct {
+	Attachments string `json:"attachments"`
 }
 
 // SidebarLabels holds sidebar navigation labels

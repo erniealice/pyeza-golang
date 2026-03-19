@@ -31,11 +31,11 @@ Usage:
 {{define "sheet-form-container"}}
 <div id="sheet" class="sheet sheet-form">
     <div id="sheetOverlay" class="sheet-overlay"></div>
-    <div class="sheet-panel sheet-panel-md">
+    <div class="sheet-panel sheet-panel-md" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
         <div class="sheet-header">
             <h2 id="sheetTitle" class="sheet-title"></h2>
             <div class="sheet-header-actions">
-                <button id="sheetClose" type="button" class="sheet-close" aria-label="Close">
+                <button id="sheetClose" type="button" class="sheet-close" aria-label="Close dialog">
                     {{template "icon-x"}}
                 </button>
             </div>

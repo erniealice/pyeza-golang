@@ -44,12 +44,12 @@ JavaScript:
 {{define "sheet-form"}}
 <div id="sheet" class="sheet sheet-form">
     <div class="sheet-overlay" id="sheetOverlay"></div>
-    <div class="sheet-panel sheet-panel-md">
+    <div class="sheet-panel sheet-panel-md" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
         <div class="sheet-header">
             <div class="sheet-drag-handle"></div>
             <h2 id="sheetTitle" class="sheet-title">{{if .Title}}{{.Title}}{{end}}</h2>
             <div class="sheet-header-actions">
-                <button type="button" class="sheet-close" id="sheetClose" aria-label="Close">
+                <button type="button" class="sheet-close" id="sheetClose" aria-label="{{if .CommonLabels}}{{.CommonLabels.Buttons.Close}}{{else}}Close dialog{{end}}">
                     {{template "icon-x" .}}
                 </button>
             </div>

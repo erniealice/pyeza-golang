@@ -124,6 +124,7 @@ USAGE:
             role="switch"
             aria-checked="{{if .Checked}}true{{else}}false{{end}}"
             {{if .Disabled}}aria-disabled="true"{{end}}
+            tabindex="{{if .Disabled}}-1{{else}}0{{end}}"
         >
             <span class="toggle-knob"></span>
         </span>

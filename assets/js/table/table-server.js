@@ -155,6 +155,34 @@
     }
 
     /**
+     * P1: Capture the currently focused element's identity within a container
+     * so it can be restored after an outerHTML swap replaces the container.
+     * Returns a selector string (id or nth-child path) or null.
+     */
+    function captureFocusIdentity(container) {
+        var focused = document.activeElement;
+        if (!focused || !container.contains(focused)) return null;
+        // Prefer id-based selector
+        if (focused.id) return '#' + focused.id;
+        // Fall back to data-attributes
+        if (focused.dataset && focused.dataset.id) return '[data-id="' + focused.dataset.id + '"]';
+        return null;
+    }
+
+    /**
+     * P1: Restore focus after a swap using a previously captured identity string.
+     */
+    function restoreFocusIdentity(container, identity) {
+        if (!identity) return;
+        try {
+            var el = container.querySelector(identity);
+            if (el && typeof el.focus === 'function') el.focus();
+        } catch (e) {
+            // selector may be invalid after swap — ignore
+        }
+    }
+
+    /**
      * Execute an HTMX request for server-side pagination.
      *
      * @param {HTMLElement} tableCard - The table-card element
@@ -193,7 +221,10 @@
             // creating a full document where each element is properly parsed.
             console.log('[TableServer] Targeted swap via fetch:', { url, baseId });
 
-            fetch(url)
+            // P1: capture focused element before the swap replaces DOM nodes
+        var focusIdentity = captureFocusIdentity(tableCard);
+
+        fetch(url)
                 .then(function(response) {
                     if (!response.ok) throw new Error('HTTP ' + response.status);
                     return response.text();
@@ -233,6 +264,9 @@
                     if (window.TablePagination) {
                         window.TablePagination.init();
                     }
+
+                    // P1: restore focus after swap
+                    restoreFocusIdentity(tableCard, focusIdentity);
 
                     console.log('[TableServer] Targeted swap complete for:', baseId);
                 })
@@ -369,7 +403,9 @@
         executeServerRequest,
         applyPaginationMeta,
         encodeFilters,
-        decodeFilters
+        decodeFilters,
+        captureFocusIdentity,
+        restoreFocusIdentity
     };
 
 })();

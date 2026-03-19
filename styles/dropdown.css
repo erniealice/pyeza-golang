@@ -130,6 +130,19 @@
 .filter-option:focus-visible {
     outline: none;
     background: var(--bg-base);
+    position: relative;
+}
+
+.filter-option:focus-visible::before {
+    content: '';
+    position: absolute;
+    left: 0.375rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.1875rem;
+    height: 60%;
+    background: var(--accent-primary);
+    border-radius: 0.125rem;
 }
 
 .filter-option:last-child {
@@ -495,13 +508,11 @@
 
 /* High contrast focus for keyboard users */
 @media (prefers-reduced-motion: no-preference) {
-    .filter-option:focus-visible,
     .action-dropdown-item:focus-visible,
     .icon-dropdown-item:focus-visible {
         position: relative;
     }
 
-    .filter-option:focus-visible::before,
     .action-dropdown-item:focus-visible::before,
     .icon-dropdown-item:focus-visible::before {
         content: '';

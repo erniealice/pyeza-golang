@@ -200,6 +200,7 @@ func CopyStaticAssets(targetDir string) error {
 		// Table JS files (to assets/js/pyeza/table/)
 		{srcRelPath: "assets/js/table", dstRelPath: "table"},
 		// Individual component JS files (to assets/js/pyeza/)
+		{srcRelPath: "assets/js/focus-trap.js", dstRelPath: "focus-trap.js"},
 		{srcRelPath: "assets/js/sheet.js", dstRelPath: "sheet.js"},
 		{srcRelPath: "assets/js/help-pane.js", dstRelPath: "help-pane.js"},
 		{srcRelPath: "assets/js/dialog.js", dstRelPath: "dialog.js"},

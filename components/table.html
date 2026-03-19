@@ -109,7 +109,7 @@ JavaScript:
 {{define "table-bulk-toolbar"}}
 <div class="table-bulk-toolbar hidden" data-table="{{.ID}}">
     <div class="bulk-toolbar-left">
-        <button type="button" class="bulk-cancel-btn" data-action="cancel-selection">
+        <button type="button" class="bulk-cancel-btn" data-action="cancel-selection" aria-label="{{if .BulkActions.CancelLabel}}{{.BulkActions.CancelLabel}}{{else}}Cancel selection{{end}}">
             {{template "icon-x" .}}
         </button>
         <span class="bulk-selected-count">
@@ -154,6 +154,7 @@ JavaScript:
                id="{{.ID}}-search"
                class="toolbar-search-input"
                data-table="{{.ID}}"
+               aria-label="{{if .Labels.SearchPlaceholder}}{{.Labels.SearchPlaceholder}}{{else}}Search{{end}}"
                placeholder="{{if .Labels.SearchPlaceholder}}{{.Labels.SearchPlaceholder}}{{else}}Search...{{end}}"
                {{if .ServerPagination}}{{if .ServerPagination.SearchQuery}} value="{{.ServerPagination.SearchQuery}}"{{end}}{{end}}>
     </div>
@@ -211,10 +212,10 @@ JavaScript:
                 <div class="sort-option" data-sort="{{.Key}}">
                     <span class="sort-option-label">{{.Label}}</span>
                     <div class="sort-option-direction">
-                        <button type="button" class="sort-dir-btn" data-direction="asc" title="Ascending">
+                        <button type="button" class="sort-dir-btn" data-direction="asc" aria-label="Sort ascending">
                             {{template "icon-arrow-up" $}}
                         </button>
-                        <button type="button" class="sort-dir-btn" data-direction="desc" title="Descending">
+                        <button type="button" class="sort-dir-btn" data-direction="desc" aria-label="Sort descending">
                             {{template "icon-arrow-down" $}}
                         </button>
                     </div>
@@ -268,7 +269,7 @@ JavaScript:
         {{/* Density Button */}}
         {{if .ShowDensity}}
         <div class="toolbar-dropdown" data-dropdown="density">
-            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true" title="Row density">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true" aria-label="{{if .Labels.DensityLabel}}{{.Labels.DensityLabel}}{{else}}Row density{{end}}">
                 {{template "icon-density" .}}
                 {{template "icon-chevron-down" .}}
             </button>
@@ -366,8 +367,8 @@ JavaScript:
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
-                <span class="column-label">{{.Label}}</span>
+            <th {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
+                {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
                 {{if .Sortable}}
                 <span class="sort-indicator">
                     <span class="sort-asc{{if and $isActive (eq $activeDirection "asc")}} active{{end}}">{{template "icon-arrow-up" $}}</span>
@@ -389,15 +390,15 @@ JavaScript:
                        id="{{.ID}}-select-all"
                        class="select-all-checkbox"
                        data-table="{{.ID}}"
-                       aria-label="{{.Labels.SelectAll}}">
+                       aria-label="{{if .Labels.SelectAll}}{{.Labels.SelectAll}}{{else}}Select all rows{{end}}">
             </th>
             {{end}}
             {{range .Columns}}
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
-                <span class="column-label">{{.Label}}</span>
+            <th {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
+                {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
                 {{if .Sortable}}
                 <span class="sort-indicator">
                     <span class="sort-asc{{if and $isActive (eq $activeDirection "asc")}} active{{end}}">{{template "icon-arrow-up"}}</span>
@@ -474,8 +475,8 @@ JavaScript:
         <div class="table-cell-chips"{{if $hasOverflow}} data-chip-expandable="true"{{end}}>
             {{range $i, $chip := .Chips}}<span class="table-chip{{if ge $i $maxVisible}} chip-hidden{{end}}">{{$chip.Label}}</span>{{end}}
             {{if $hasOverflow}}
-            <button type="button" class="chip-expand-toggle" onclick="this.parentElement.classList.toggle('expanded')" title="Show all {{$chipCount}} items">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <button type="button" class="chip-expand-toggle" onclick="this.parentElement.classList.toggle('expanded')" aria-label="Show all {{$chipCount}} items">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 <span class="expand-text">+{{sub $chipCount $maxVisible}} more</span>
                 <span class="collapse-text">Less</span>
             </button>
@@ -488,11 +489,12 @@ JavaScript:
                    name="{{.InputName}}"
                    value="{{.Value}}"
                    class="matrix-input"
+                   aria-label="{{if .Label}}{{.Label}}{{else}}{{.InputName}}{{end}}"
                    step="any">
             {{if .InputSuffix}}<span class="input-suffix">{{.InputSuffix}}</span>{{end}}
         </div>
         {{else if eq .Type "select"}}
-        <select name="{{.SelectName}}" class="matrix-select">
+        <select name="{{.SelectName}}" class="matrix-select" aria-label="{{if .Label}}{{.Label}}{{else}}{{.SelectName}}{{end}}">
             {{range .Options}}
             <option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>
             {{end}}
@@ -514,7 +516,7 @@ JavaScript:
         <div class="action-buttons">
             {{range .Actions}}
             {{if .Href}}
-            <a href="{{.Href}}" class="action-btn {{.Type}}" title="{{.Label}}" data-action="{{.Action}}">
+            <a href="{{.Href}}" class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}">
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
                 {{if eq .Type "manage"}}{{template "icon-shield" $}}{{end}}
@@ -527,7 +529,7 @@ JavaScript:
                 {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
             </a>
             {{else}}
-            <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}" title="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" data-action="{{.Action}}"{{if .Disabled}} disabled{{end}}{{if $.ID}} data-id="{{$.ID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .DrawerTitle}} data-drawer-title="{{.DrawerTitle}}"{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}>
+            <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}" aria-label="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" data-action="{{.Action}}"{{if .Disabled}} disabled{{end}}{{if $.ID}} data-id="{{$.ID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .DrawerTitle}} data-drawer-title="{{.DrawerTitle}}"{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}>
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "preview"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
@@ -569,10 +571,10 @@ JavaScript:
                     </span>
                 </button>
                 <div class="table-group-selection">
-                    <button type="button" class="group-select-btn" data-action="select-group" title="Select all">
+                    <button type="button" class="group-select-btn" data-action="select-group" aria-label="Select all in group">
                         {{template "icon-check" $}}
                     </button>
-                    <button type="button" class="group-select-btn group-select-btn--clear" data-action="clear-group" title="Clear selection">
+                    <button type="button" class="group-select-btn group-select-btn--clear" data-action="clear-group" aria-label="Clear group selection">
                         {{template "icon-x" $}}
                     </button>
                 </div>
@@ -603,7 +605,7 @@ JavaScript:
     {{if .ShowEntries}}
     <div class="footer-entries">
         <span>{{if .Labels.Show}}{{.Labels.Show}}{{else}}Show{{end}}</span>
-        <select id="{{.ID}}-entries" class="entries-selector" data-table="{{.ID}}">
+        <select id="{{.ID}}-entries" class="entries-selector" data-table="{{.ID}}" aria-label="{{if .Labels.EntriesPerPage}}{{.Labels.EntriesPerPage}}{{else}}Entries per page{{end}}">
             <option value="10">10</option>
             <option value="25" selected>25</option>
             <option value="50">50</option>
@@ -648,7 +650,7 @@ JavaScript:
     {{if .ShowEntries}}
     <div class="footer-entries">
         <span>{{if .Labels.Show}}{{.Labels.Show}}{{else}}Show{{end}}</span>
-        <select id="{{.ID}}-entries" class="entries-selector server-entries-selector" data-table="{{.ID}}">
+        <select id="{{.ID}}-entries" class="entries-selector server-entries-selector" data-table="{{.ID}}" aria-label="{{if .Labels.EntriesPerPage}}{{.Labels.EntriesPerPage}}{{else}}Entries per page{{end}}">
             <option value="10"{{if eq $pageSize 10}} selected{{end}}>10</option>
             <option value="25"{{if eq $pageSize 25}} selected{{end}}>25</option>
             <option value="50"{{if eq $pageSize 50}} selected{{end}}>50</option>
@@ -751,7 +753,7 @@ JavaScript:
 <div class="action-buttons">
     {{range .}}
     <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}"
-            title="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
+            aria-label="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
             data-action="{{.Action}}"
             {{if .Disabled}}disabled{{end}}
             {{if .DataID}}data-id="{{.DataID}}"{{end}}
@@ -778,13 +780,13 @@ JavaScript:
 </div>
 {{/* Mobile dropdown version */}}
 <div class="action-dropdown">
-    <button class="action-dropdown-btn">
+    <button type="button" class="action-dropdown-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="action-menu-{{if .}}{{(index . 0).DataID}}{{end}}">
         Actions
         {{template "icon-chevron-down"}}
     </button>
-    <div class="action-dropdown-menu">
+    <div class="action-dropdown-menu" id="action-menu-{{if .}}{{(index . 0).DataID}}{{end}}" role="menu">
         {{range .}}
-        <div class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" data-action="{{.Action}}" {{if .Disabled}}title="{{.DisabledTooltip}}"{{end}} {{if .DataID}}data-id="{{.DataID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}>
+        <button type="button" class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" role="menuitem" data-action="{{.Action}}" {{if .Disabled}}aria-label="{{.DisabledTooltip}}"{{end}} {{if .DataID}}data-id="{{.DataID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .Disabled}} disabled{{end}}>
             {{if eq .Type "view"}}{{template "icon-eye" $}}
             {{else if eq .Type "preview"}}{{template "icon-eye" $}}
             {{else if eq .Type "edit"}}{{template "icon-edit" $}}
@@ -799,7 +801,7 @@ JavaScript:
             {{else if eq .Type "check"}}{{template "icon-check" $}}
             {{end}}
             {{.Label}}
-        </div>
+        </button>
         {{end}}
     </div>
 </div>

@@ -129,6 +129,11 @@
     box-shadow: var(--shadow-md);
 }
 
+.sidebar-toggle:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
 .sidebar-toggle svg {
     width: 1rem; /* 16px */
     height: 1rem;
@@ -206,6 +211,11 @@
 .nav-item:hover {
     background: var(--bg-hover);
     color: var(--text-primary);
+}
+
+.nav-item:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
 }
 
 .nav-item.active {
@@ -523,6 +533,11 @@
     box-shadow: var(--shadow-sm);
 }
 
+.app-switcher-btn:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
 .app-switcher.open .app-switcher-btn {
     border-color: var(--color-terracotta);
     background: var(--color-terracotta-light);
@@ -814,6 +829,11 @@
     background: var(--bg-hover);
 }
 
+.app-option:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
 .app-option.active {
     background: var(--accent-terracotta-light);
     border-color: var(--accent-terracotta);
@@ -1056,6 +1076,11 @@
 .app-switcher-group-title:hover {
     color: var(--text-primary);
     background: var(--bg-hover);
+}
+
+.app-switcher-group-title:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
 }
 
 .app-switcher-group-chevron {

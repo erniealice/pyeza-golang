@@ -13,12 +13,16 @@
     // Track if document-level listeners have been added
     let documentListenersInitialized = false;
 
+    // Track the last trigger that opened a dropdown (for focus restore on Escape)
+    let lastOpenTrigger = null;
+
     // Define handlers outside init so references are stable
     const clickOutsideHandler = function(e) {
         if (!e.target.closest('.toolbar-dropdown')) {
             if (window.TableCore) {
                 window.TableCore.closeAllDropdowns();
             }
+            lastOpenTrigger = null;
         }
     };
 
@@ -27,6 +31,11 @@
             if (window.TableCore) {
                 window.TableCore.closeAllDropdowns();
             }
+            // P2: restore focus to the trigger that opened the dropdown
+            if (lastOpenTrigger && typeof lastOpenTrigger.focus === 'function') {
+                lastOpenTrigger.focus();
+            }
+            lastOpenTrigger = null;
         }
     };
 
@@ -53,6 +62,19 @@
                 if (!isOpen) {
                     dropdown.classList.add('open');
                     btn.setAttribute('aria-expanded', 'true');
+
+                    // P2: set aria-controls to the id of the dropdown menu panel
+                    var menu = dropdown.querySelector('.toolbar-dropdown-menu, .dropdown-menu, [role="menu"]');
+                    if (menu) {
+                        if (!menu.id) {
+                            menu.id = 'dropdown-menu-' + Math.random().toString(36).slice(2, 8);
+                        }
+                        btn.setAttribute('aria-controls', menu.id);
+                    }
+
+                    lastOpenTrigger = btn;
+                } else {
+                    lastOpenTrigger = null;
                 }
             });
         });

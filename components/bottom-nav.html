@@ -28,9 +28,15 @@ ACCESSIBILITY:
 <nav class="bottom-nav" id="bottom-nav" aria-label="Mobile navigation">
     {{range .BottomNavTabs}}
     {{if .IsFAB}}
-    <button class="bottom-nav-fab" data-href="{{.Href}}" aria-label="{{.Label}}">
+    {{if .Href}}
+    <a href="{{.Href}}" class="bottom-nav-fab" aria-label="{{.Label}}">
+        <span class="bottom-nav-tab-icon">{{if .FABIcon}}{{renderContent .FABIcon $}}{{else}}{{renderContent .Icon $}}{{end}}</span>
+    </a>
+    {{else}}
+    <button type="button" class="bottom-nav-fab" data-action-url="{{.DataURL}}" aria-label="{{.Label}}">
         <span class="bottom-nav-tab-icon">{{if .FABIcon}}{{renderContent .FABIcon $}}{{else}}{{renderContent .Icon $}}{{end}}</span>
     </button>
+    {{end}}
     {{else}}
     <a href="{{.Href}}" class="bottom-nav-tab{{if .Active}} active{{end}}" aria-label="{{.Label}}">
         <span class="bottom-nav-tab-icon">{{renderContent .Icon $}}</span>

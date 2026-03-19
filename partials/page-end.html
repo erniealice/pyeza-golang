@@ -38,7 +38,7 @@
     {{template "toast-container" .}}
     {{template "toast-init"}}
 
-    {{/* Tab Active State - toggles active class on HTMX tab clicks */}}
+    {{/* Tab Active State - toggles active class on HTMX tab clicks + arrow-key navigation */}}
     <script>
     document.addEventListener('click', function(e) {
         var tab = e.target.closest('[role="tab"]');
@@ -48,9 +48,52 @@
         tablist.querySelectorAll('[role="tab"]').forEach(function(t) {
             t.classList.remove('active');
             t.setAttribute('aria-selected', 'false');
+            t.setAttribute('tabindex', '-1');
         });
         tab.classList.add('active');
         tab.setAttribute('aria-selected', 'true');
+        tab.setAttribute('tabindex', '0');
+    });
+
+    // P1: Left/Right/Home/End arrow-key navigation within a tablist
+    document.addEventListener('keydown', function(e) {
+        var tab = e.target.closest('[role="tab"]');
+        if (!tab) return;
+        var tablist = tab.closest('[role="tablist"]');
+        if (!tablist) return;
+
+        var tabs = Array.from(tablist.querySelectorAll('[role="tab"]:not([disabled])'));
+        var idx = tabs.indexOf(tab);
+        var next = null;
+
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            next = tabs[(idx + 1) % tabs.length];
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            next = tabs[(idx - 1 + tabs.length) % tabs.length];
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            next = tabs[0];
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            next = tabs[tabs.length - 1];
+        }
+
+        if (next && next !== tab) {
+            // Move roving tabindex focus — click to activate (triggers HTMX + active state)
+            tabs.forEach(function(t) {
+                t.setAttribute('tabindex', '-1');
+                t.setAttribute('aria-selected', 'false');
+                t.classList.remove('active');
+            });
+            next.setAttribute('tabindex', '0');
+            next.setAttribute('aria-selected', 'true');
+            next.classList.add('active');
+            next.focus();
+            // Fire click so HTMX loads the tab panel
+            next.click();
+        }
     });
     </script>
 

@@ -38,7 +38,7 @@
 
 <div class="{{$classes}}"
     {{- if .ID }} id="{{.ID}}"{{end}}
-    role="alert"
+    {{- if or (eq $state "success") (eq $state "info") }}role="status" aria-live="polite"{{else}}role="alert"{{end}}
 >
     {{- if $showIcon }}
     <div class="alert-icon">
@@ -60,7 +60,7 @@
         <div class="alert-message">{{.Message}}</div>
     </div>
     {{- if $dismissible }}
-    <button class="alert-dismiss" aria-label="Dismiss alert" onclick="this.closest('.alert').remove()">
+    <button class="alert-dismiss" aria-label="{{if .DismissLabel}}{{.DismissLabel}}{{else}}Dismiss alert{{end}}" onclick="this.closest('.alert').remove()">
         {{template "icon-x"}}
     </button>
     {{- end }}

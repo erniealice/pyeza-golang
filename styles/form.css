@@ -76,7 +76,7 @@
 }
 
 /* Focus State */
-.form-input:focus {
+.form-input:focus-visible {
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 0.1875rem var(--accent-primary-light); /* 3px */
@@ -132,7 +132,7 @@
     background-size: 1rem; /* 16px */
 }
 
-.form-select:focus {
+.form-select:focus-visible {
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 0.1875rem var(--accent-primary-light); /* 3px */
@@ -189,7 +189,7 @@
     opacity: 0.7;
 }
 
-.form-textarea:focus {
+.form-textarea:focus-visible {
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 0.1875rem var(--accent-primary-light); /* 3px */
@@ -241,12 +241,12 @@
     border-color: var(--status-error);
 }
 
-.form-group.has-error .form-input:focus,
-.form-group.has-error .form-select:focus,
-.form-group.has-error .form-textarea:focus,
-.form-input.is-invalid:focus,
-.form-select.is-invalid:focus,
-.form-textarea.is-invalid:focus {
+.form-group.has-error .form-input:focus-visible,
+.form-group.has-error .form-select:focus-visible,
+.form-group.has-error .form-textarea:focus-visible,
+.form-input.is-invalid:focus-visible,
+.form-select.is-invalid:focus-visible,
+.form-textarea.is-invalid:focus-visible {
     box-shadow: 0 0 0 0.1875rem var(--status-error-light); /* 3px */
 }
 
@@ -257,9 +257,9 @@
     border-color: var(--status-success);
 }
 
-.form-input.is-valid:focus,
-.form-select.is-valid:focus,
-.form-textarea.is-valid:focus {
+.form-input.is-valid:focus-visible,
+.form-select.is-valid:focus-visible,
+.form-textarea.is-valid:focus-visible {
     box-shadow: 0 0 0 0.1875rem var(--status-success-light); /* 3px */
 }
 
@@ -332,7 +332,8 @@
    ========================================================================== */
 
 /* Visually hidden but accessible */
-.visually-hidden {
+.visually-hidden,
+.sr-only {
     position: absolute;
     width: 1px;
     height: 1px;

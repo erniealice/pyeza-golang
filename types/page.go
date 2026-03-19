@@ -30,6 +30,13 @@ type PageData struct {
 	AppGroups         []AppGridGroup           // grouped apps for mobile bottom sheet
 	DefaultTheme      string                   // server-configured default theme (for <html> data-theme)
 	DefaultFont       string                   // server-configured default font (for <html> data-font)
+	// Session user fields — populated from auth context by the ViewAdapter.
+	// Used by settings-modal.html to display the authenticated user's name/email.
+	// These use the "Session" prefix to avoid collision with domain-specific UserEmail
+	// fields on concrete page data structs (e.g. user detail page).
+	SessionUserName     string // authenticated user's display name (e.g. "John Doe")
+	SessionUserEmail    string // authenticated user's email address
+	SessionUserInitials string // two-letter initials derived from the display name (e.g. "JD")
 }
 
 // BottomNavTab represents a single tab in the mobile bottom navigation bar.

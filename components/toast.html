@@ -71,8 +71,7 @@
 
 <div class="{{$classes}}"
     {{- if .ID }} id="{{.ID}}"{{end}}
-    role="alert"
-    aria-live="assertive"
+    {{- if or (eq $state "success") (eq $state "info") }}role="status" aria-live="polite"{{else}}role="alert" aria-live="assertive"{{end}}
     data-duration="{{$duration}}"
     data-delay="{{$delay}}"
 >
@@ -94,7 +93,7 @@
         <div class="toast-message">{{.Message}}</div>
     </div>
     {{- if $dismissible }}
-    <button class="toast-close" aria-label="Dismiss notification" onclick="this.closest('.toast').classList.add('toast-exit')">
+    <button class="toast-close" aria-label="{{if .DismissLabel}}{{.DismissLabel}}{{else}}Dismiss notification{{end}}" onclick="this.closest('.toast').classList.add('toast-exit')">
         {{template "icon-x"}}
     </button>
     {{- end }}

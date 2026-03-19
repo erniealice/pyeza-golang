@@ -44,23 +44,23 @@
 
         <div class="settings-modal-footer">
             <div class="settings-user-card">
-                <div class="settings-user-avatar">JD</div>
+                <div class="settings-user-avatar">{{.SessionUserInitials}}</div>
                 <div class="settings-user-info">
-                    <div class="settings-user-name">John Doe</div>
-                    <div class="settings-user-email">john.doe@company.com</div>
+                    <div class="settings-user-name">{{.SessionUserName}}</div>
+                    <div class="settings-user-email">{{.SessionUserEmail}}</div>
                 </div>
             </div>
         </div>
     </aside>
 
     <!-- Settings Content Area -->
-    <main class="settings-modal-content" id="settingsContent">
+    <div class="settings-modal-content" id="settingsContent" role="region" aria-label="Settings content">
         <!-- Content loaded via fetch -->
         <div class="settings-loading">
             <div class="settings-loading-spinner"></div>
             <p>{{.CommonLabels.Settings.Loading}}</p>
         </div>
-    </main>
+    </div>
 </div>
 
 <!-- Settings Modal Script -->

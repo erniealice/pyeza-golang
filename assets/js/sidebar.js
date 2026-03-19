@@ -25,11 +25,20 @@
         const isCollapsed = sidebar.classList.contains('collapsed');
         document.body.classList.toggle('sidebar-collapsed', isCollapsed);
         saveSidebarState(isCollapsed);
+        // P2: sync aria-expanded on the toggle button
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+        }
     }
 
     // Sync body class on load if sidebar starts collapsed (e.g. restored from localStorage)
     if (sidebar && sidebar.classList.contains('collapsed')) {
         document.body.classList.add('sidebar-collapsed');
+    }
+
+    // P2: set initial aria-expanded on the toggle button to reflect current sidebar state
+    if (toggleBtn && sidebar) {
+        toggleBtn.setAttribute('aria-expanded', sidebar.classList.contains('collapsed') ? 'false' : 'true');
     }
 
     if (toggleBtn) {
@@ -106,6 +115,18 @@
                 toggleAppSwitcher(false);
             });
         }
+
+        // P2: wire aria-controls on app-switcher group titles to their panel
+        appSwitcher.querySelectorAll('.app-switcher-group').forEach(function(group) {
+            var title = group.querySelector('.app-switcher-group-title');
+            var panel = group.querySelector('.app-switcher-group-items, .app-switcher-options, ul, [role="group"]');
+            if (title && panel) {
+                if (!panel.id) {
+                    panel.id = 'app-switcher-group-' + Math.random().toString(36).slice(2, 8);
+                }
+                title.setAttribute('aria-controls', panel.id);
+            }
+        });
 
         // Accordion group toggles
         appSwitcher.querySelectorAll('.app-switcher-group-title').forEach(function(title) {

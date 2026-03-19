@@ -20,7 +20,7 @@
     <div class="header-actions">
         <div class="search-bar">
             {{template "icon-search" .}}
-            <input type="text" placeholder="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}">
+            <input type="text" aria-label="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}" placeholder="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}">
             <span class="search-shortcut">{{.CommonLabels.Header.SearchShortcut}}</span>
         </div>
         <button class="header-btn" id="notificationBtn" aria-label="{{.CommonLabels.Header.Notifications}}">

@@ -131,15 +131,19 @@
     }
 
     function updateTableSortIndicators(table, column, direction) {
-        // Remove sort classes from all headers
+        // Remove sort classes and aria-sort from all headers
         table.querySelectorAll('thead th.sortable').forEach(th => {
             th.classList.remove('sort-asc', 'sort-desc');
+            // P1: reset aria-sort to "none" on all non-active sortable headers
+            th.setAttribute('aria-sort', 'none');
         });
 
-        // Add sort class to active column
+        // Add sort class and aria-sort to active column
         const activeHeader = table.querySelector(`thead th[data-sort="${column}"]`);
         if (activeHeader) {
             activeHeader.classList.add(`sort-${direction}`);
+            // P1: aria-sort uses "ascending" / "descending" per ARIA spec
+            activeHeader.setAttribute('aria-sort', direction === 'asc' ? 'ascending' : 'descending');
         }
     }
 

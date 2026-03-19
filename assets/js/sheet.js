@@ -11,6 +11,7 @@
     // ========================================
 
     let isOpen = false;
+    let _opener = null; // element that triggered the open — restored on close
 
     // ========================================
     // DOM ELEMENTS
@@ -37,6 +38,23 @@
     }
 
     // ========================================
+    // INERT HELPERS (P3)
+    // ========================================
+
+    function setBackgroundInert(inert) {
+        ['sidebar', 'main-content'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                if (inert) {
+                    el.setAttribute('inert', '');
+                } else {
+                    el.removeAttribute('inert');
+                }
+            }
+        });
+    }
+
+    // ========================================
     // CORE FUNCTIONS
     // ========================================
 
@@ -53,6 +71,9 @@
             return;
         }
 
+        // P0: store the opener so we can restore focus on close
+        _opener = document.activeElement;
+
         // Set title if provided
         if (title && titleEl) {
             titleEl.textContent = title;
@@ -67,11 +88,17 @@
         // Set state
         isOpen = true;
 
-        // Focus management - focus the first focusable element in content
+        // P3: suppress background
+        setBackgroundInert(true);
+
+        // P0: install focus trap on the sheet panel; move focus inside after animation
+        const panel = drawer.querySelector('.sheet-panel') || drawer;
         setTimeout(() => {
+            if (window.FocusTrap) window.FocusTrap.trapFocus(panel);
+
             const content = getContent();
             if (content) {
-                const firstInput = content.querySelector('input:not([type="hidden"]), select, textarea');
+                const firstInput = content.querySelector('input:not([type="hidden"]), select, textarea, button:not([disabled])');
                 if (firstInput) {
                     firstInput.focus();
                 }
@@ -89,6 +116,10 @@
             return;
         }
 
+        // P0: release focus trap
+        const panel = drawer.querySelector('.sheet-panel') || drawer;
+        if (window.FocusTrap) window.FocusTrap.releaseFocus(panel);
+
         // Remove active/open classes
         drawer.classList.remove('active', 'open');
 
@@ -97,6 +128,15 @@
 
         // Set state
         isOpen = false;
+
+        // P3: restore background interactivity
+        setBackgroundInert(false);
+
+        // P0: restore focus to the opener
+        if (_opener && typeof _opener.focus === 'function') {
+            _opener.focus();
+        }
+        _opener = null;
 
         // Clear content after animation
         setTimeout(() => {
@@ -173,6 +213,8 @@
         if (!errorEl) {
             errorEl = document.createElement('div');
             errorEl.className = 'form-drawer-error';
+            // P2: announce errors immediately as an alert
+            errorEl.setAttribute('role', 'alert');
             content.insertBefore(errorEl, content.firstChild);
         }
 
@@ -212,8 +254,11 @@
 
         var toast = document.createElement('div');
         toast.className = 'toast toast-' + state;
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
+
+        // P2: success/info use polite; error/warning stay assertive
+        var isUrgent = (state === 'error' || state === 'warning');
+        toast.setAttribute('role', isUrgent ? 'alert' : 'status');
+        toast.setAttribute('aria-live', isUrgent ? 'assertive' : 'polite');
         toast.setAttribute('data-duration', '3000');
         toast.setAttribute('data-delay', '0');
 
@@ -327,22 +372,13 @@
 
         // HTMX-specific events
         if (typeof htmx !== 'undefined') {
-            // After content is loaded into drawer
-            document.body.addEventListener('htmx:afterSwap', function(e) {
-                if (e.detail.target.id === 'sheetContent') {
-                    hideError();
-                    // Focus first input after content loads
-                    setTimeout(() => {
-                        const firstInput = e.detail.target.querySelector('input:not([type="hidden"]), select, textarea');
-                        if (firstInput) {
-                            firstInput.focus();
-                        }
-                    }, 100);
-                }
-            });
-
-            // Handle form submission loading state
+            // P1: set aria-busy before HTMX loads content into the sheet
             document.body.addEventListener('htmx:beforeRequest', function(e) {
+                if (e.detail.target && e.detail.target.id === 'sheetContent') {
+                    e.detail.target.setAttribute('aria-busy', 'true');
+                }
+
+                // Also disable submit button while a form inside the sheet is submitting
                 var form = e.detail.elt;
                 if (form && (form.closest('#sheetContent') || form.closest('.form-drawer-content'))) {
                     var submitBtn = form.querySelector('button[type="submit"]');
@@ -350,6 +386,40 @@
                         submitBtn.disabled = true;
                         submitBtn.classList.add('btn-loading');
                     }
+                }
+            });
+
+            // After content is loaded into drawer
+            document.body.addEventListener('htmx:afterSwap', function(e) {
+                if (e.detail.target.id === 'sheetContent') {
+                    // P1: remove aria-busy once content has swapped in
+                    e.detail.target.removeAttribute('aria-busy');
+
+                    hideError();
+                    // Focus first input after content loads
+                    setTimeout(() => {
+                        const firstInput = e.detail.target.querySelector('input:not([type="hidden"]), select, textarea, button:not([disabled])');
+                        if (firstInput) {
+                            firstInput.focus();
+                        }
+                    }, 100);
+                }
+            });
+
+            // P1: before outerHTML swap, capture focused element; restore after htmx:afterSettle
+            document.body.addEventListener('htmx:beforeSwap', function(e) {
+                if (e.detail.target && e.detail.target.id === 'sheetContent') {
+                    e.detail.target._focusedBeforeSwap = document.activeElement;
+                }
+            });
+
+            document.body.addEventListener('htmx:afterSettle', function(e) {
+                var content = document.getElementById('sheetContent');
+                if (!content) return;
+                var prev = content._focusedBeforeSwap;
+                if (prev && content.contains(prev) && typeof prev.focus === 'function') {
+                    prev.focus();
+                    delete content._focusedBeforeSwap;
                 }
             });
 
