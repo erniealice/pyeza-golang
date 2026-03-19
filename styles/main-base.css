@@ -55,25 +55,35 @@ html,
    All values in rem so they scale with data-density.
 
    Domain packages MUST use these tokens instead of hardcoded rem/px font sizes.
-   Pyeza component CSS (typography.css, form.css, etc.) already references these.
+   Pyeza component CSS (typography.css, form.css, etc.) references these.
 
-   Scale follows a modular ratio (~1.125 minor third):
-     0.75rem → 0.8125rem → 0.875rem → 0.9375rem → 1rem → 1.0625rem
-     → 1.125rem → 1.25rem → 1.5rem → 1.875rem → 2.25rem → 3rem
+   19-step scale: dense small end (UI metadata), graduated large end (headings).
    ========================================================================== */
 
 :root {
-    --text-2xs: 0.6875rem;  /* 11px — micro labels, superscripts */
-    --text-xs:  0.75rem;    /* 12px — info labels, badge text, uppercase headers */
-    --text-sm:  0.8125rem;  /* 13px — secondary text, descriptions, table cells */
-    --text-md:  0.875rem;   /* 14px — form labels, helper text */
-    --text-base: 0.9375rem; /* 15px — body text, activity titles, list items */
-    --text-lg:  1.0625rem;  /* 17px — section titles, card headers */
-    --text-xl:  1.25rem;    /* 20px — page subtitles, coming-soon titles */
-    --text-2xl: 1.5rem;     /* 24px — page section headers */
-    --text-3xl: 1.875rem;   /* 30px — page titles */
-    --text-4xl: 2.25rem;    /* 36px — hero headers */
-    --text-5xl: 3rem;       /* 48px — display text */
+    /* UI metadata text */
+    --text-2xs:  0.6875rem;  /* 11px — micro labels, superscripts */
+    --text-xs:   0.75rem;    /* 12px — badge text, uppercase category headers */
+    --text-sm:   0.8125rem;  /* 13px — secondary text, table cells, descriptions */
+    --text-md:   0.875rem;   /* 14px — form labels, helper text */
+    --text-base: 0.9375rem;  /* 15px — body text, list items */
+
+    /* Component headings */
+    --text-lg:   1.0625rem;  /* 17px — section labels, overline text */
+    --text-xl:   1.125rem;   /* 18px — card titles, dialog titles, panel headings */
+    --text-2xl:  1.25rem;    /* 20px — page subtitles, sheet titles */
+    --text-3xl:  1.375rem;   /* 22px — empty-state titles, report titles */
+
+    /* Page-level headings */
+    --text-4xl:  1.5rem;     /* 24px — H3 section headers */
+    --text-5xl:  1.75rem;    /* 28px — H2 page titles, prominent headings */
+    --text-6xl:  1.875rem;   /* 30px — H2 alternate, large section headers */
+    --text-7xl:  2rem;       /* 32px — stat values, login/signup titles */
+    --text-8xl:  2.25rem;    /* 36px — H1 hero headers */
+    --text-9xl:  3rem;       /* 48px — display text */
+
+    /* Mono font family — for numeric displays, code, masked values */
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 }
 
 /* ==========================================================================

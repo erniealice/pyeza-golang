@@ -43,7 +43,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     font-family: var(--font-body);
-    font-size: 0.9375rem;
+    font-size: var(--text-base);
     font-weight: 500;
     color: var(--text-primary);
     cursor: pointer;
@@ -104,7 +104,7 @@
 .filter-menu-header {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border-light);
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -118,7 +118,7 @@
     gap: 0.625rem;
     padding: 0.625rem 1rem;
     cursor: pointer;
-    font-size: 0.9375rem;
+    font-size: var(--text-base);
     color: var(--text-primary);
     transition: background var(--transition-fast);
 }
@@ -194,7 +194,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: var(--text-md);
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
@@ -257,7 +257,7 @@
     gap: 0.625rem;
     padding: 0.625rem 0.875rem;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: var(--text-md);
     color: var(--text-primary);
     transition: background var(--transition-fast);
 }
@@ -375,7 +375,7 @@
 .icon-dropdown-item {
     padding: 0.625rem 0.875rem;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: var(--text-md);
     color: var(--text-primary);
     transition: background var(--transition-fast);
 }
@@ -455,7 +455,7 @@
 @media (max-width: 768px) {
     .filter-btn {
         padding: 0.625rem 0.875rem;
-        font-size: 0.875rem;
+        font-size: var(--text-md);
     }
 
     .filter-menu {
@@ -464,7 +464,7 @@
 
     .action-dropdown-btn {
         padding: 0.5rem 0.75rem;
-        font-size: 0.8125rem;
+        font-size: var(--text-sm);
     }
 
     .action-dropdown-menu {

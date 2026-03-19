@@ -91,6 +91,7 @@
     --border-width: 1px;
     --border-width-thick: 2px;
     --border-width-focus: 2px;
+    --border-width-accent: 3px;  /* accent left-borders, status indicators */
 }
 
 /* None: borderless (shadow-driven depth) */
@@ -125,6 +126,18 @@
     /* Easing Functions */
     --ease-default: ease;
     --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Spacing scale — used for padding, margin, gap */
+    --spacing-2xs: 0.25rem;   /* 4px  — tight internal padding */
+    --spacing-xs:  0.375rem;  /* 6px  — badge padding, small gaps */
+    --spacing-sm:  0.5rem;    /* 8px  — compact element gaps */
+    --spacing-md:  0.75rem;   /* 12px — standard padding, form gaps */
+    --spacing-lg:  1rem;      /* 16px — card padding, section gaps */
+    --spacing-xl:  1.25rem;   /* 20px — between sections */
+    --spacing-2xl: 1.5rem;    /* 24px — info grid gaps, generous padding */
+    --spacing-3xl: 1.75rem;   /* 28px — detail body padding */
+    --spacing-4xl: 2rem;      /* 32px — section spacers */
+    --spacing-5xl: 2.5rem;    /* 40px — page-level spacing */
 
     /* Z-index layers */
     --z-sidebar: 100;

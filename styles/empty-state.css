@@ -107,7 +107,7 @@
 .empty-state-title,
 .empty-state h3 {
     font-family: var(--font-display, inherit);
-    font-size: 1.375rem;
+    font-size: var(--text-3xl);
     font-weight: 400;
     color: var(--text-primary);
     margin: 0 0 6px;
@@ -116,7 +116,7 @@
 
 .empty-state.compact .empty-state-title,
 .empty-state.compact h3 {
-    font-size: 1.125rem;
+    font-size: var(--text-xl);
 }
 
 /* ========================================
@@ -126,7 +126,7 @@
 .empty-state-desc,
 .empty-state p {
     font-family: var(--font-body);
-    font-size: 0.9375rem;
+    font-size: var(--text-base);
     color: var(--text-muted);
     margin: 0 0 24px;
     line-height: 1.5;
@@ -135,7 +135,7 @@
 
 .empty-state.compact .empty-state-desc,
 .empty-state.compact p {
-    font-size: 0.875rem;
+    font-size: var(--text-md);
     margin-bottom: 20px;
 }
 
@@ -160,7 +160,7 @@
     background: var(--accent-primary, var(--accent-terracotta));
     color: white;
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: var(--text-md);
     font-weight: 600;
     text-decoration: none;
     border: none;
@@ -221,12 +221,12 @@
 
     .empty-state-title,
     .empty-state h3 {
-        font-size: 1.25rem;
+        font-size: var(--text-2xl);
     }
 
     .empty-state-desc,
     .empty-state p {
-        font-size: 0.875rem;
+        font-size: var(--text-md);
     }
 }
 

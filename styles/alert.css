@@ -18,7 +18,7 @@
     gap: 0.75rem; /* 12px */
     padding: 0.875rem 1rem; /* 14px 16px */
     border-radius: var(--radius-md);
-    font-size: 0.875rem; /* 14px */
+    font-size: var(--text-md); /* 14px */
     line-height: 1.5;
     border: var(--border-width) solid transparent;
 }
@@ -216,7 +216,7 @@
 @media (max-width: 768px) {
     .alert {
         padding: 0.75rem; /* 12px */
-        font-size: 0.8125rem; /* 13px */
+        font-size: var(--text-sm); /* 13px */
     }
 }
 

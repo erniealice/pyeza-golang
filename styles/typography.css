@@ -30,25 +30,25 @@ h1, h2, h3, h4, h5, h6,
 
 /* H1 - Page Titles, Hero Headers */
 h1, .h1 {
-    font-size: var(--text-4xl);
+    font-size: var(--text-8xl);
     line-height: 1.2;
 }
 
 /* H2 - Section Headers */
 h2, .h2 {
-    font-size: var(--text-3xl);
+    font-size: var(--text-6xl);
     line-height: 1.2;
 }
 
 /* H3 - Card Titles, Subsection Headers */
 h3, .h3 {
-    font-size: var(--text-2xl);
+    font-size: var(--text-4xl);
     line-height: 1.375;
 }
 
 /* H4 - Widget Headers, List Titles */
 h4, .h4 {
-    font-size: var(--text-xl);
+    font-size: var(--text-2xl);
     line-height: 1.375;
 }
 
@@ -74,7 +74,7 @@ h6, .h6 {
 
 .display-1 {
     font-family: var(--font-display);
-    font-size: var(--text-5xl);
+    font-size: var(--text-9xl);
     font-weight: 500;
     line-height: 1;
     letter-spacing: -0.05em;
@@ -83,7 +83,7 @@ h6, .h6 {
 
 .display-2 {
     font-family: var(--font-display);
-    font-size: var(--text-4xl);
+    font-size: var(--text-8xl);
     font-weight: 500;
     line-height: 1.2;
     letter-spacing: -0.025em;
@@ -419,22 +419,22 @@ hr.thick {
 
 @media (max-width: 768px) {
     h1, .h1 {
-        font-size: var(--text-3xl);
+        font-size: var(--text-6xl);
     }
 
     h2, .h2 {
-        font-size: var(--text-2xl);
-    }
-
-    h3, .h3 {
-        font-size: var(--text-xl);
-    }
-
-    .display-1 {
         font-size: var(--text-4xl);
     }
 
+    h3, .h3 {
+        font-size: var(--text-2xl);
+    }
+
+    .display-1 {
+        font-size: var(--text-8xl);
+    }
+
     .display-2 {
-        font-size: var(--text-3xl);
+        font-size: var(--text-6xl);
     }
 }

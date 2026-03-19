@@ -39,7 +39,7 @@
 }
 
 .spinner-inline .spinner-label {
-    font-size: 0.8125rem; /* 13px */
+    font-size: var(--text-sm); /* 13px */
 }
 
 /* ========================================
@@ -63,7 +63,7 @@
 
 .spinner-label {
     font-family: var(--font-body);
-    font-size: 0.875rem; /* 14px */
+    font-size: var(--text-md); /* 14px */
     color: var(--text-muted);
     font-weight: 500;
 }

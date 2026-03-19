@@ -53,7 +53,7 @@
 }
 
 .bottom-nav-tab-label {
-    font-size: 0.6875rem;
+    font-size: var(--text-2xs);
     font-weight: 500;
     line-height: 1;
     white-space: nowrap;
@@ -104,7 +104,7 @@
 }
 
 .bottom-nav-fab .bottom-nav-tab-icon {
-    font-size: 1.5rem;
+    font-size: var(--text-4xl);
 }
 
 /* Bottom sheet backdrop — hidden on desktop */
@@ -173,7 +173,7 @@
     border-radius: 0.5rem;
     color: var(--text-primary, #333);
     text-decoration: none;
-    font-size: 0.875rem;
+    font-size: var(--text-md);
     -webkit-tap-highlight-color: transparent;
 }
 

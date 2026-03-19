@@ -114,8 +114,8 @@
    ======================================== */
 
 .chip-code {
-    font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
     font-weight: 500;
     color: var(--text-secondary);
     transition: color 0.2s ease;
@@ -127,7 +127,7 @@
 
 .chip-label {
     font-family: var(--font-body);
-    font-size: 0.8125rem;
+    font-size: var(--text-sm);
     font-weight: 500;
     color: var(--text-secondary);
     transition: color 0.2s ease;
@@ -160,7 +160,7 @@
 
 .chip.sm .chip-code,
 .chip.sm .chip-label {
-    font-size: 0.6875rem;
+    font-size: var(--text-2xs);
 }
 
 /* Large variant */
@@ -182,7 +182,7 @@
 
 .chip.lg .chip-code,
 .chip.lg .chip-label {
-    font-size: 0.875rem;
+    font-size: var(--text-md);
 }
 
 /* ========================================
@@ -270,7 +270,7 @@
 }
 
 .chip-group-badge {
-    font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.625rem;
     font-weight: 500;
     padding: 0.125rem 0.375rem;
@@ -358,7 +358,7 @@
 }
 
 .wic-badge {
-    font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.625rem;
     font-weight: 500;
     padding: 0.125rem 0.375rem;
@@ -424,8 +424,8 @@
 }
 
 .wic-code {
-    font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
     font-weight: 500;
     color: var(--text-secondary);
 }
@@ -496,7 +496,7 @@
     background: var(--bg-base);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
     font-weight: 500;
     color: var(--text-secondary);
     white-space: nowrap;
@@ -536,7 +536,7 @@
     background: var(--accent-terracotta-light, #fdf2f0);
     border: 1px solid var(--accent-terracotta, #c4704f);
     border-radius: var(--radius-full);
-    font-size: 0.6875rem;
+    font-size: var(--text-2xs);
     font-weight: 600;
     color: var(--accent-terracotta, #c4704f);
     white-space: nowrap;

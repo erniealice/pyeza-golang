@@ -67,7 +67,7 @@
 }
 
 .carousel-slide-description {
-    font-size: 1.125rem;
+    font-size: var(--text-xl);
     line-height: 1.6;
     opacity: 0.95;
     max-width: 400px;
@@ -186,7 +186,7 @@
 }
 
 .carousel--compact .carousel-slide-title {
-    font-size: 1.75rem;
+    font-size: var(--text-5xl);
 }
 
 .carousel--compact .carousel-slide-description {
@@ -214,7 +214,7 @@
 
 @media (max-width: 1023px) {
     .carousel-slide-title {
-        font-size: 2rem;
+        font-size: var(--text-7xl);
     }
 }
 
@@ -224,7 +224,7 @@
     }
 
     .carousel-slide-title {
-        font-size: 1.5rem;
+        font-size: var(--text-4xl);
     }
 
     .carousel-slide-description {
