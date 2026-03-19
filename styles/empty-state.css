@@ -129,7 +129,7 @@
     font-size: var(--text-base);
     color: var(--text-muted);
     margin: 0 0 24px;
-    line-height: 1.5;
+    line-height: var(--leading-normal);
     max-width: 320px;
 }
 
@@ -161,7 +161,7 @@
     color: white;
     font-family: var(--font-body);
     font-size: var(--text-md);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     text-decoration: none;
     border: none;
     cursor: pointer;

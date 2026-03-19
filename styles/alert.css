@@ -19,7 +19,7 @@
     padding: 0.875rem 1rem; /* 14px 16px */
     border-radius: var(--radius-md);
     font-size: var(--text-md); /* 14px */
-    line-height: 1.5;
+    line-height: var(--leading-normal);
     border: var(--border-width) solid transparent;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .alert-title {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: inherit;
     margin-bottom: 0.125rem; /* 2px */
 }

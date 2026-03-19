@@ -16,7 +16,7 @@
     align-items: center;
     padding: 0.25rem 0.625rem; /* 4px 10px */
     font-size: var(--text-2xs); /* 11px */
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     border-radius: var(--radius-full);
@@ -41,7 +41,7 @@
     padding: 0.25rem 0.625rem; /* 4px 10px */
     border-radius: var(--radius-full);
     font-size: var(--text-xs); /* 12px */
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     text-transform: capitalize;
     line-height: 1.4;
 }
@@ -156,11 +156,11 @@
     height: 1.25rem;
     padding: 0 0.375rem; /* 6px */
     font-size: var(--text-xs); /* 12px */
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     border-radius: var(--radius-md);
     background: var(--accent-primary-light);
     color: var(--accent-primary);
-    line-height: 1;
+    line-height: var(--leading-none);
 }
 
 /* Large count badge */
@@ -197,11 +197,11 @@
     padding: 0 0.375rem; /* 6px */
     margin-left: 0.5rem; /* 8px */
     font-size: var(--text-xs); /* 12px */
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     border-radius: var(--radius-md);
     background: var(--accent-primary-light);
     color: var(--accent-primary);
-    line-height: 1;
+    line-height: var(--leading-none);
 }
 
 /* Active tab badge styling */
@@ -217,7 +217,7 @@
 .nav-badge {
     margin-left: auto;
     font-size: var(--text-xs); /* 12px */
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     padding: 0.125rem 0.5rem; /* 2px 8px */
     border-radius: var(--radius-full);
     background: var(--accent-primary-light);
@@ -250,7 +250,7 @@
 .section-badge {
     padding: 0.25rem 0.75rem; /* 4px 12px */
     font-size: var(--text-xs); /* 12px */
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     border-radius: var(--radius-full);
     background: var(--accent-sage-light);
     color: var(--accent-sage);
@@ -398,7 +398,7 @@
     background: var(--status-warning-light);
     color: var(--status-warning);
     font-size: var(--text-xs); /* 12px */
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .alert-badge svg {
@@ -458,7 +458,7 @@
     background: var(--bg-sidebar);
     color: var(--text-secondary);
     font-size: var(--text-xs); /* 12px */
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .badge-removable-btn {

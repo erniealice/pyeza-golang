@@ -66,7 +66,7 @@
     color: var(--text-muted);
     border-radius: var(--radius-sm);
     font-size: var(--text-xs);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -88,7 +88,7 @@
     color: var(--accent-sage);
     border-radius: var(--radius-sm);
     font-size: var(--text-sm);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     transition: all 0.15s ease;
     white-space: nowrap;
     flex-shrink: 0;
@@ -120,7 +120,7 @@
     color: inherit;
     opacity: 0.7;
     font-size: var(--text-md);
-    line-height: 1;
+    line-height: var(--leading-none);
     transition: all 0.15s ease;
 }
 
@@ -294,7 +294,7 @@
 
 .multi-select-option.selected .multi-select-option-label {
     color: var(--accent-sage);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 /* Empty state */

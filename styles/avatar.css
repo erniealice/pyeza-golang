@@ -35,8 +35,8 @@
 .avatar-fallback {
     font-family: var(--font-body);
     font-size: var(--avatar-font);
-    font-weight: 600;
-    line-height: 1;
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--leading-none);
     text-transform: uppercase;
     letter-spacing: 0.02em;
 }

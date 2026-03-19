@@ -84,6 +84,21 @@ html,
 
     /* Mono font family — for numeric displays, code, masked values */
     --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+    /* Font weight — three semantic tiers */
+    --font-weight-medium:   500;  /* body emphasis, field values */
+    --font-weight-semibold: 600;  /* section titles, labels, buttons, card headers */
+    --font-weight-bold:     700;  /* major totals, hero amounts, stat values */
+
+    /* Letter spacing (tracking) */
+    --tracking-normal: 0.05em;  /* standard uppercase metadata labels */
+    --tracking-wide:   0.06em;  /* financial statement section headers */
+
+    /* Line height (leading) */
+    --leading-none:    1;    /* badge text, single-line items */
+    --leading-tight:   1.3;  /* compact card content, data cells */
+    --leading-normal:  1.5;  /* body descriptions, form labels */
+    --leading-relaxed: 1.6;  /* notes, prose blocks, journal entries */
 }
 
 /* ==========================================================================

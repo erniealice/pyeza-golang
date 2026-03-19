@@ -139,7 +139,7 @@
     align-items: center;
     gap: 4px;
     font-size: var(--text-sm);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     padding: 4px 8px;
     border-radius: var(--radius-full);
 }
@@ -167,7 +167,7 @@
 /* Stat Value */
 .stat-value {
     font-size: var(--text-7xl);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--text-primary);
     line-height: 1.2;
     margin-bottom: 4px;
@@ -268,7 +268,7 @@
 
 .stat-mini-value {
     font-size: var(--text-2xl);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--text-primary);
     line-height: 1.2;
 }
@@ -303,11 +303,11 @@
 .connected-stats span {
     font-size: var(--text-base);
     color: var(--accent-sage);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .connected-stats strong {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 /* ========================================

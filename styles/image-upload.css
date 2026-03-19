@@ -39,7 +39,7 @@
 
 .image-upload-zone__text {
     font-size: var(--font-size-sm, 0.875rem);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text, #1f2937);
 }
 
@@ -88,7 +88,7 @@
 }
 
 .image-upload-progress__status {
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .image-upload-progress__status--uploading {

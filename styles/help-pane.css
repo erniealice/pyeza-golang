@@ -115,7 +115,7 @@ body.help-pane-open .page-content {
     align-items: center;
     gap: 0.625rem;
     font-size: var(--text-base);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
 }
 
@@ -172,7 +172,7 @@ body.help-pane-open .page-content {
 .markdown-content h1 {
     font-family: var(--font-display);
     font-size: var(--text-4xl);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     margin: 0 0 1rem 0;
     padding-bottom: 0.75rem;
@@ -182,14 +182,14 @@ body.help-pane-open .page-content {
 .markdown-content h2 {
     font-family: var(--font-display);
     font-size: var(--text-xl);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     margin: 1.5rem 0 0.75rem 0;
 }
 
 .markdown-content h3 {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
     margin: 1.25rem 0 0.5rem 0;
 }
@@ -217,7 +217,7 @@ body.help-pane-open .page-content {
 }
 
 .markdown-content strong {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
 }
 
@@ -291,7 +291,7 @@ body.help-pane-open .page-content {
 }
 
 .markdown-content th {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
     background: var(--bg-base);
 }

@@ -130,7 +130,7 @@
 .toast-title {
     font-family: var(--font-body);
     font-size: var(--text-md); /* 14px */
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
     line-height: 1.4;
     margin-bottom: 0.125rem; /* 2px */
@@ -139,14 +139,14 @@
 .toast-message {
     font-size: var(--text-sm); /* 13px */
     color: var(--text-secondary);
-    line-height: 1.5;
+    line-height: var(--leading-normal);
 }
 
 /* When no title, make message slightly larger */
 .toast-body > .toast-message:first-child {
     font-size: var(--text-md); /* 14px */
     color: var(--text-primary);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 /* ========================================

@@ -120,7 +120,7 @@
 
 .toggle-label {
     font-size: var(--text-base);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     user-select: none;
 }
@@ -165,7 +165,7 @@
 
 .toggle-item .toggle-label {
     font-size: var(--text-base);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
 }
 

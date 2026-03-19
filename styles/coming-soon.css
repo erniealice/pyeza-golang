@@ -9,30 +9,30 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4rem 2rem;
+    padding: 4rem var(--spacing-4xl);
     text-align: center;
 }
 .coming-soon-icon {
-    width: 4rem;
-    height: 4rem;
+    width: var(--icon-3xl);
+    height: var(--icon-3xl);
     border-radius: var(--radius-round);
     background: var(--accent-primary-light);
     color: var(--accent-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.25rem;
+    margin-bottom: var(--spacing-xl);
 }
 .coming-soon-icon svg {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: var(--icon-lg);
+    height: var(--icon-lg);
 }
 .coming-soon-title {
     font-family: var(--font-display);
     font-size: var(--text-2xl);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-sm);
 }
 .coming-soon-text {
     font-size: var(--text-base);

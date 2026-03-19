@@ -33,7 +33,7 @@
     background: var(--bg-card);
     font-family: var(--font-body);
     font-size: var(--text-md); /* 14px */
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--text-secondary);
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-default);
@@ -92,7 +92,7 @@
     background: var(--bg-card);
     font-family: var(--font-body);
     font-size: var(--text-md); /* 14px */
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--text-secondary);
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-default);
@@ -115,7 +115,7 @@
     background: var(--accent-terracotta);
     border-color: var(--accent-terracotta);
     color: white;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .pagination-page:disabled {
@@ -181,7 +181,7 @@
 
 .pagination-info strong {
     color: var(--text-primary);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* ========================================
@@ -254,7 +254,7 @@
     background: var(--bg-card);
     font-family: var(--font-body);
     font-size: var(--text-base); /* 15px */
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-default);

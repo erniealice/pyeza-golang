@@ -139,6 +139,16 @@
     --spacing-4xl: 2rem;      /* 32px — section spacers */
     --spacing-5xl: 2.5rem;    /* 40px — page-level spacing */
 
+    /* Icon sizes — structural dimensions for SVG/icon elements */
+    --icon-2xs: 0.875rem;   /* 14px — inline icons, breadcrumbs, badges */
+    --icon-xs:  1rem;       /* 16px — table cell icons, small actions */
+    --icon-sm:  1.25rem;    /* 20px — sidebar icons, form helper icons */
+    --icon-md:  1.5rem;     /* 24px — standard action icons, toolbar */
+    --icon-lg:  1.75rem;    /* 28px — panel icons, coming-soon svg */
+    --icon-xl:  2rem;       /* 32px — empty-state icons, large actions */
+    --icon-2xl: 2.5rem;     /* 40px — dashboard activity icons */
+    --icon-3xl: 3rem;       /* 48px — login page icons, hero icons */
+
     /* Z-index layers */
     --z-sidebar: 100;
     --z-sidebar-toggle: 200;
