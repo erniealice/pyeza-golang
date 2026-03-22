@@ -1,0 +1,98 @@
+{{/*
+Audit history tab content — rendered when the "History" tab is active on a detail page.
+Data: .AuditEntries, .AuditHasNext, .AuditNextCursor, .AuditHistoryURL, .CommonLabels.Audit
+*/}}
+{{define "audit-history-tab"}}
+<div class="audit-history-tab-content">
+    {{$labels := .CommonLabels.Audit}}
+    {{if .AuditEntries}}
+    <div class="table-responsive">
+        <table class="table table--audit-history" id="audit-history-table">
+            <thead>
+                <tr>
+                    <th>{{$labels.Timestamp}}</th>
+                    <th>{{$labels.Actor}}</th>
+                    <th>{{$labels.Action}}</th>
+                    <th>{{$labels.ChangedFields}}</th>
+                    <th>{{$labels.Details}}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{range .AuditEntries}}
+            <tr class="audit-row">
+                <td class="audit-timestamp">{{.OccurredAt}}</td>
+                <td class="audit-actor">{{.ActorID}}</td>
+                <td class="audit-action">
+                    {{if eq .Action 1}}<span class="badge badge--success">{{$labels.Actions.Insert}}</span>
+                    {{else if eq .Action 2}}<span class="badge badge--info">{{$labels.Actions.Update}}</span>
+                    {{else if eq .Action 3}}<span class="badge badge--danger">{{$labels.Actions.Delete}}</span>
+                    {{else if eq .Action 4}}<span class="badge badge--warning">{{$labels.Actions.Restore}}</span>
+                    {{else if eq .Action 5}}<span class="badge badge--muted">{{$labels.Actions.Archive}}</span>
+                    {{end}}
+                </td>
+                <td class="audit-changed-fields">
+                    {{if .FieldChanges}}
+                        {{range .FieldChanges}}
+                            <span class="audit-field-chip">{{.FieldName}}</span>
+                        {{end}}
+                    {{else}}
+                        <span class="text-muted">—</span>
+                    {{end}}
+                </td>
+                <td class="audit-details">
+                    {{if .FieldChanges}}
+                    <button class="btn btn-ghost btn-xs audit-expand-btn"
+                            onclick="this.closest('tr').nextElementSibling.classList.toggle('hidden')"
+                            type="button">
+                        {{$labels.Details}}
+                    </button>
+                    {{end}}
+                </td>
+            </tr>
+            {{if .FieldChanges}}
+            <tr class="audit-diff-row hidden">
+                <td colspan="5">
+                    <div class="audit-diff">
+                        <table class="table table--compact table--audit-diff">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>{{$labels.OldValue}}</th>
+                                    <th>{{$labels.NewValue}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {{range .FieldChanges}}
+                            <tr>
+                                <td class="audit-field-name"><code>{{.FieldName}}</code></td>
+                                <td class="audit-old-value">{{if .OldValue}}{{.OldValue}}{{else}}<span class="text-muted">—</span>{{end}}</td>
+                                <td class="audit-new-value">{{if .NewValue}}{{.NewValue}}{{else}}<span class="text-muted">—</span>{{end}}</td>
+                            </tr>
+                            {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+    {{if .AuditHasNext}}
+    <div class="pagination-bar">
+        <a class="btn btn-ghost btn-sm"
+           hx-get="{{.AuditHistoryURL}}?cursor={{.AuditNextCursor}}"
+           hx-target="#tabContent"
+           hx-push-url="false">
+            Load more
+        </a>
+    </div>
+    {{end}}
+    {{else}}
+    <div class="empty-state">
+        <p class="empty-state-title">{{$labels.NoHistory}}</p>
+    </div>
+    {{end}}
+</div>
+{{end}}

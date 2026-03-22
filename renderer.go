@@ -2,6 +2,7 @@ package pyeza
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/fs"
@@ -14,6 +15,7 @@ import (
 	"sync"
 
 	"github.com/erniealice/pyeza-golang/route"
+	"github.com/erniealice/pyeza-golang/types"
 )
 
 // HTMLRenderer handles HTML template rendering with shared components
@@ -128,6 +130,42 @@ func getDefaultFuncMap() template.FuncMap {
 				}
 			}
 			return key
+		},
+		// filterColumnsJSON serializes filterable columns as a JSON array for use
+		// in inert <script type="application/json"> blocks in table templates.
+		// Only columns with Filterable==true are included.
+		// Each entry has: key, label, type, and optionally options (for FilterTypeStatus).
+		// Returns template.JS to prevent double-escaping.
+		// Usage: {{filterColumnsJSON .Columns}}
+		"filterColumnsJSON": func(columns any) template.JS {
+			cols, ok := columns.([]types.TableColumn)
+			if !ok {
+				return template.JS("[]")
+			}
+			filterable := make([]map[string]any, 0)
+			for _, c := range cols {
+				if !c.Filterable {
+					continue
+				}
+				entry := map[string]any{
+					"key":   c.Key,
+					"label": c.Label,
+					"type":  string(c.FilterType),
+				}
+				if len(c.FilterOptions) > 0 {
+					opts := make([]map[string]string, len(c.FilterOptions))
+					for i, o := range c.FilterOptions {
+						opts[i] = map[string]string{"value": o.Value, "label": o.Label}
+					}
+					entry["options"] = opts
+				}
+				filterable = append(filterable, entry)
+			}
+			b, _ := json.Marshal(filterable)
+			if b == nil {
+				return template.JS("[]")
+			}
+			return template.JS(b)
 		},
 	}
 }

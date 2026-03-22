@@ -1,0 +1,125 @@
+/*
+ * ==========================================================================
+ * THEME: SOFT CLAY
+ * Earthy terracotta/sage/warm neutrals with minimal soft shadows
+ * Think: pottery studio, organic products, modern premium
+ * ==========================================================================
+ */
+[data-theme="soft-clay"] {
+    /* Backgrounds — warm clay-white earth tones */
+    --bg-base: #FAF7F4;
+    --bg-sidebar: #F3EDE7;
+    --bg-card: #FFFFFF;
+    --bg-hover: #EDE6DE;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(58, 42, 30, 0.45);
+
+    /* Text — warm espresso tones */
+    --text-primary: #2E2118;
+    --text-secondary: #6B5B4E;
+    --text-muted: #9A8C80;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — warm terracotta */
+    --accent-primary: #B8704A;
+    --accent-primary-light: #FAF0EA;
+    --accent-primary-dark: #975838;
+
+    /* Secondary Accents — earthy palette */
+    --accent-terracotta: #B8704A;
+    --accent-terracotta-light: #FAF0EA;
+    --accent-terracotta-dark: #975838;
+    --accent-sage: #6B8E6B;
+    --accent-sage-light: #F0F4F0;
+    --accent-navy: #5A7080;
+    --accent-navy-light: #EFF2F5;
+    --accent-navy-dark: #445868;
+    --accent-amber: #C49840;
+    --accent-amber-light: #FBF4E6;
+    --accent-plum: #886878;
+    --accent-slate: #706058;
+
+    /* Status Colors — desaturated earth tones */
+    --status-success: #6B8E6B;
+    --status-success-light: #F0F4F0;
+    --status-warning: #C49840;
+    --status-warning-light: #FBF4E6;
+    --status-error: #B85A4A;
+    --status-error-light: #FAF0EE;
+    --status-info: #5A7080;
+    --status-info-light: #EFF2F5;
+
+    /* Borders & Shadows — minimal, soft diffusion */
+    --border: #E4DACF;
+    --border-light: #EDE6DE;
+    --border-focus: var(--accent-primary);
+    --border-default: #E4DACF;
+    --shadow-sm: 0 1px 3px rgba(58, 42, 30, 0.03);
+    --shadow-md: 0 4px 12px rgba(58, 42, 30, 0.05);
+    --shadow-lg: 0 8px 24px rgba(58, 42, 30, 0.07);
+    --shadow-card: 0 2px 8px rgba(58, 42, 30, 0.03), 0 1px 3px rgba(58, 42, 30, 0.04);
+    --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-float: 0 12px 40px rgba(58, 42, 30, 0.10);
+    --shadow-xl: 0 20px 50px rgba(58, 42, 30, 0.09);
+
+    /* App Icon Colors — warm earthy tones throughout */
+    --app-color-users: #C49840;
+    --app-color-users-dark: #A88030;
+    --app-color-users-light: #FBF4E6;
+    --app-color-clients: #B8704A;
+    --app-color-clients-dark: #975838;
+    --app-color-clients-light: #FAF0EA;
+    --app-color-inventory: #5A7080;
+    --app-color-inventory-dark: #445868;
+    --app-color-inventory-light: #EFF2F5;
+    --app-color-services: #886878;
+    --app-color-services-dark: #6E5060;
+    --app-color-services-light: #F4EFF2;
+    --app-color-locations: #C07850;
+    --app-color-locations-dark: #A06040;
+    --app-color-locations-light: #FAF0EA;
+    --app-color-assets: #508878;
+    --app-color-assets-dark: #3C6E60;
+    --app-color-assets-light: #EDF4F2;
+    --app-color-suppliers: #5A6880;
+    --app-color-suppliers-dark: #445068;
+    --app-color-suppliers-light: #EFF1F5;
+    --app-color-sales: #6B8E6B;
+    --app-color-sales-dark: #547254;
+    --app-color-sales-light: #F0F4F0;
+    --app-color-purchases: #5A8058;
+    --app-color-purchases-dark: #446844;
+    --app-color-purchases-light: #EEF3EE;
+    --app-color-expenses: #B85A4A;
+    --app-color-expenses-dark: #984438;
+    --app-color-expenses-light: #FAEDEA;
+    --app-color-cash: #C49840;
+    --app-color-cash-dark: #A88030;
+    --app-color-cash-light: #FBF4E6;
+    --app-color-reports: #508888;
+    --app-color-reports-dark: #3C6E6E;
+    --app-color-reports-light: #EDF4F4;
+    --app-color-admin: #706058;
+    --app-color-admin-dark: #584840;
+    --app-color-admin-light: #F2EEEB;
+    --app-color-jobs: #A07838;
+    --app-color-jobs-dark: #886028;
+    --app-color-jobs-light: #F6EFE2;
+    --app-color-payroll: #507880;
+    --app-color-payroll-dark: #3C6068;
+    --app-color-payroll-light: #EDF2F4;
+    --app-color-loans: #907040;
+    --app-color-loans-dark: #785830;
+    --app-color-loans-light: #F4EDE2;
+    --app-color-equity: #585488;
+    --app-color-equity-dark: #403C6E;
+    --app-color-equity-light: #EEEDF4;
+    --app-color-ledger: #4A7858;
+    --app-color-ledger-dark: #386044;
+    --app-color-ledger-light: #EDF2EE;
+
+    /* Theme Meta */
+    --theme-name: "Soft Clay";
+    --theme-icon-bg: linear-gradient(135deg, #FAF7F4 0%, #E4DACF 100%);
+    --theme-icon-accent: #B8704A;
+}

@@ -5,13 +5,15 @@
     Compact theme & font picker for the header.
     Uses the popover component for show/hide behavior.
     Theme swatches use hardcoded colors from each theme's --theme-icon-bg / --theme-icon-accent.
+    Each theme bundles a preset of density, border, radius, and font.
+    Granular controls allow per-axis overrides.
     Runtime switching is handled by theme-switcher.js.
 */}}
 <div class="theme-switcher-popover"
      data-popover
      data-popover-position="bottom"
      data-popover-align="end"
-     data-popover-width="240px"
+     data-popover-width="260px"
      data-popover-trigger="click">
     <button type="button" class="popover-trigger header-btn" aria-label="{{.CommonLabels.Theme.Toggle}}" title="{{.CommonLabels.Theme.ChangeTheme}}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -29,6 +31,7 @@
     <div class="popover-panel theme-panel">
         <div class="popover-arrow"></div>
 
+        {{/* ── Theme swatches ── */}}
         <div class="theme-panel-section">
             <div class="theme-panel-title">{{.CommonLabels.Theme.Title}}</div>
             <div class="theme-swatches">
@@ -62,11 +65,27 @@
                 <button type="button" class="theme-option" data-theme="ryta-default" title="{{.CommonLabels.Theme.Themes.RytaDefault}}">
                     <span class="theme-swatch" style="background: linear-gradient(135deg, #FAFAFD 0%, #E2DFF0 100%);"><span class="theme-swatch-dot" style="background: #3D0DDA;"></span></span>
                 </button>
+                <button type="button" class="theme-option" data-theme="shadcn-neutral" title="shadcn Neutral">
+                    <span class="theme-swatch" style="background: linear-gradient(135deg, #FFFFFF 0%, #E5E5E5 100%);"><span class="theme-swatch-dot" style="background: #171717;"></span></span>
+                </button>
+                <button type="button" class="theme-option" data-theme="salon-blush" title="{{.CommonLabels.Theme.Themes.SalonBlush}}">
+                    <span class="theme-swatch" style="background: linear-gradient(135deg, #FDF8F8 0%, #EADDE0 100%);"><span class="theme-swatch-dot" style="background: #C97B8B;"></span></span>
+                </button>
+                <button type="button" class="theme-option" data-theme="ledger-mono" title="{{.CommonLabels.Theme.Themes.LedgerMono}}">
+                    <span class="theme-swatch" style="background: linear-gradient(135deg, #F2F3F5 0%, #CBCED4 100%);"><span class="theme-swatch-dot" style="background: #2C3544;"></span></span>
+                </button>
+                <button type="button" class="theme-option" data-theme="brutalist-ink" title="{{.CommonLabels.Theme.Themes.BrutalistInk}}">
+                    <span class="theme-swatch" style="background: linear-gradient(135deg, #FAFAFA 0%, #D0D0D0 100%);"><span class="theme-swatch-dot" style="background: #E02020;"></span></span>
+                </button>
+                <button type="button" class="theme-option" data-theme="soft-clay" title="{{.CommonLabels.Theme.Themes.SoftClay}}">
+                    <span class="theme-swatch" style="background: linear-gradient(135deg, #FAF7F4 0%, #E4DACF 100%);"><span class="theme-swatch-dot" style="background: #B8704A;"></span></span>
+                </button>
             </div>
         </div>
 
         <div class="theme-panel-divider"></div>
 
+        {{/* ── Font family ── */}}
         <div class="theme-panel-section">
             <div class="theme-panel-title">{{.CommonLabels.Theme.FontFamily}}</div>
             <div class="font-options">
@@ -99,6 +118,72 @@
                     <span class="font-option-name">{{.CommonLabels.Theme.Fonts.RytaMinimal}}</span>
                 </button>
             </div>
+        </div>
+
+        <div class="theme-panel-divider"></div>
+
+        {{/* ── Density selector ── */}}
+        <div class="theme-panel-section">
+            <div class="theme-panel-title">{{.CommonLabels.Theme.Density.Title}}</div>
+            <div class="axis-selector">
+                <button type="button" class="axis-option" data-axis="density" data-value="dense" title="{{.CommonLabels.Theme.Density.Dense}}">
+                    <span class="axis-option-icon axis-option-icon--density-dense">Aa</span>
+                </button>
+                <button type="button" class="axis-option" data-axis="density" data-value="compact" title="{{.CommonLabels.Theme.Density.Compact}}">
+                    <span class="axis-option-icon axis-option-icon--density-compact">Aa</span>
+                </button>
+                <button type="button" class="axis-option" data-axis="density" data-value="default" title="{{.CommonLabels.Theme.Density.Default}}">
+                    <span class="axis-option-icon axis-option-icon--density-default">Aa</span>
+                </button>
+                <button type="button" class="axis-option" data-axis="density" data-value="comfortable" title="{{.CommonLabels.Theme.Density.Comfortable}}">
+                    <span class="axis-option-icon axis-option-icon--density-comfortable">Aa</span>
+                </button>
+            </div>
+        </div>
+
+        {{/* ── Radius selector ── */}}
+        <div class="theme-panel-section">
+            <div class="theme-panel-title">{{.CommonLabels.Theme.Radius.Title}}</div>
+            <div class="axis-selector">
+                <button type="button" class="axis-option" data-axis="radius" data-value="none" title="{{.CommonLabels.Theme.Radius.None}}">
+                    <span class="axis-option-icon axis-option-icon--radius-none"></span>
+                </button>
+                <button type="button" class="axis-option" data-axis="radius" data-value="sm" title="{{.CommonLabels.Theme.Radius.Sm}}">
+                    <span class="axis-option-icon axis-option-icon--radius-sm"></span>
+                </button>
+                <button type="button" class="axis-option" data-axis="radius" data-value="default" title="{{.CommonLabels.Theme.Radius.Default}}">
+                    <span class="axis-option-icon axis-option-icon--radius-default"></span>
+                </button>
+                <button type="button" class="axis-option" data-axis="radius" data-value="lg" title="{{.CommonLabels.Theme.Radius.Lg}}">
+                    <span class="axis-option-icon axis-option-icon--radius-lg"></span>
+                </button>
+                <button type="button" class="axis-option" data-axis="radius" data-value="full" title="{{.CommonLabels.Theme.Radius.Full}}">
+                    <span class="axis-option-icon axis-option-icon--radius-full"></span>
+                </button>
+            </div>
+        </div>
+
+        {{/* ── Border selector ── */}}
+        <div class="theme-panel-section">
+            <div class="theme-panel-title">{{.CommonLabels.Theme.Border.Title}}</div>
+            <div class="axis-selector">
+                <button type="button" class="axis-option" data-axis="border" data-value="none" title="{{.CommonLabels.Theme.Border.None}}">
+                    <span class="axis-option-icon axis-option-icon--border-none"></span>
+                </button>
+                <button type="button" class="axis-option" data-axis="border" data-value="default" title="{{.CommonLabels.Theme.Border.Default}}">
+                    <span class="axis-option-icon axis-option-icon--border-default"></span>
+                </button>
+                <button type="button" class="axis-option" data-axis="border" data-value="heavy" title="{{.CommonLabels.Theme.Border.Heavy}}">
+                    <span class="axis-option-icon axis-option-icon--border-heavy"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="theme-panel-divider"></div>
+
+        {{/* ── Reset to preset defaults ── */}}
+        <div class="theme-panel-section">
+            <button type="button" class="theme-reset-btn">{{.CommonLabels.Theme.ResetDefaults}}</button>
         </div>
     </div>
 </div>

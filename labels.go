@@ -21,11 +21,47 @@ type CommonLabels struct {
 	Integration   IntegrationLabels   `json:"integration"`
 	Card          CardLabels          `json:"card"`
 	Tabs          TabLabels           `json:"tabs"`
+	Audit         AuditLabels         `json:"audit"`
 }
 
 // TabLabels holds shared tab label strings used across all domain packages
 type TabLabels struct {
 	Attachments string `json:"attachments"`
+}
+
+// AuditLabels holds translatable strings for the audit history tab.
+type AuditLabels struct {
+	History       string               `json:"history"`
+	Action        string               `json:"action"`
+	Actor         string               `json:"actor"`
+	Timestamp     string               `json:"timestamp"`
+	ChangedFields string               `json:"changed_fields"`
+	OldValue      string               `json:"old_value"`
+	NewValue      string               `json:"new_value"`
+	NoHistory     string               `json:"no_history"`
+	Details       string               `json:"details"`
+	Actions       AuditActionLabels    `json:"actions"`
+	FieldTypes    AuditFieldTypeLabels `json:"field_types"`
+}
+
+// AuditActionLabels holds display names for audit action types.
+type AuditActionLabels struct {
+	Insert  string `json:"insert"`
+	Update  string `json:"update"`
+	Delete  string `json:"delete"`
+	Restore string `json:"restore"`
+	Archive string `json:"archive"`
+}
+
+// AuditFieldTypeLabels holds display names for field types.
+type AuditFieldTypeLabels struct {
+	String    string `json:"string"`
+	Int64     string `json:"int64"`
+	Bool      string `json:"bool"`
+	Timestamp string `json:"timestamp"`
+	UUID      string `json:"uuid"`
+	Enum      string `json:"enum"`
+	Text      string `json:"text"`
 }
 
 // SidebarLabels holds sidebar navigation labels
@@ -187,12 +223,16 @@ type SettingsBillingLabels struct {
 }
 
 type ThemeLabels struct {
-	Title       string            `json:"title"`
-	Toggle      string            `json:"toggle"`
-	ChangeTheme string            `json:"changeTheme"`
-	Themes      ThemeOptionLabels `json:"themes"`
-	FontFamily  string            `json:"fontFamily"`
-	Fonts       FontOptionLabels  `json:"fonts"`
+	Title         string                `json:"title"`
+	Toggle        string                `json:"toggle"`
+	ChangeTheme   string                `json:"changeTheme"`
+	Themes        ThemeOptionLabels     `json:"themes"`
+	FontFamily    string                `json:"fontFamily"`
+	Fonts         FontOptionLabels      `json:"fonts"`
+	Density       ThemeDensityLabels    `json:"density"`
+	Radius        ThemeRadiusLabels     `json:"radius"`
+	Border        ThemeBorderLabels     `json:"border"`
+	ResetDefaults string                `json:"resetDefaults"`
 }
 
 type ThemeOptionLabels struct {
@@ -206,6 +246,34 @@ type ThemeOptionLabels struct {
 	PeachFizz      string `json:"peachFizz"`
 	ModernRetail   string `json:"modernRetail"`
 	RytaDefault    string `json:"rytaDefault"`
+	SalonBlush     string `json:"salonBlush"`
+	LedgerMono     string `json:"ledgerMono"`
+	BrutalistInk   string `json:"brutalistInk"`
+	SoftClay       string `json:"softClay"`
+}
+
+type ThemeDensityLabels struct {
+	Title       string `json:"title"`
+	Dense       string `json:"dense"`
+	Compact     string `json:"compact"`
+	Default     string `json:"default"`
+	Comfortable string `json:"comfortable"`
+}
+
+type ThemeRadiusLabels struct {
+	Title   string `json:"title"`
+	None    string `json:"none"`
+	Sm      string `json:"sm"`
+	Default string `json:"default"`
+	Lg      string `json:"lg"`
+	Full    string `json:"full"`
+}
+
+type ThemeBorderLabels struct {
+	Title   string `json:"title"`
+	None    string `json:"none"`
+	Default string `json:"default"`
+	Heavy   string `json:"heavy"`
 }
 
 type FontOptionLabels struct {

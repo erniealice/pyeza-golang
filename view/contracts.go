@@ -29,6 +29,8 @@ type ViewContext struct {
 	QueryParams  map[string]string
 	CacheVersion string
 	Messages     map[string]string // flat i18n messages (dot-notation keys)
+	BusinessType string            // "retail", "service", "professional" — set by ViewAdapter from app config
+	Translations any               // *lyngua/golang/v1.TranslationProvider — typed as any to avoid import cycle
 }
 
 // T returns the translation for the given dot-notation key.

@@ -63,12 +63,12 @@
     --radius-xl: 2rem;       /* 32px */
 }
 
-/* Full: pill-shaped everything */
+/* Full: pill-shaped small elements, generously rounded containers */
 [data-radius="full"] {
-    --radius-sm: 9999px;
-    --radius-md: 9999px;
-    --radius-lg: 9999px;
-    --radius-xl: 9999px;
+    --radius-sm: 9999px;     /* pills: badges, chips, small controls */
+    --radius-md: 9999px;     /* pills: buttons, single-line inputs */
+    --radius-lg: 1.25rem;    /* 20px: cards, dialogs, nav items, panels */
+    --radius-xl: 1.75rem;    /* 28px: large containers */
 }
 
 /* Functional shapes — always fixed regardless of radius config */
@@ -92,6 +92,7 @@
     --border-width-thick: 2px;
     --border-width-focus: 2px;
     --border-width-accent: 3px;  /* accent left-borders, status indicators */
+    --input-shadow: none;        /* inputs use border, no extra shadow */
 }
 
 /* None: borderless (shadow-driven depth) */
@@ -99,6 +100,7 @@
     --border-width: 0;
     --border-width-thick: 1px;
     --border-width-focus: 2px;
+    --input-shadow: inset 0 0 0 1px var(--border-light);  /* ghost border for input definition */
 }
 
 /* Heavy: more defined edges */
@@ -106,6 +108,7 @@
     --border-width: 2px;
     --border-width-thick: 3px;
     --border-width-focus: 3px;
+    --input-shadow: none;
 }
 
 /* ==========================================================================

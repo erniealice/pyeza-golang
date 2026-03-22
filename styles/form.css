@@ -64,6 +64,7 @@
     font-family: var(--font-body);
     font-size: var(--text-base); /* 15px */
     color: var(--text-primary);
+    box-shadow: var(--input-shadow);
     transition: border-color var(--duration-fast),
                 box-shadow var(--duration-fast),
                 background-color var(--duration-fast);
@@ -79,7 +80,7 @@
 .form-input:focus-visible {
     outline: none;
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 0.1875rem var(--accent-primary-light); /* 3px */
+    box-shadow: 0 0 0 0.1875rem var(--accent-primary-light); /* 3px — overrides --input-shadow */
 }
 
 /* Hover State */
@@ -121,6 +122,7 @@
     cursor: pointer;
     appearance: none;
     width: 100%;
+    box-shadow: var(--input-shadow);
     transition: border-color var(--duration-fast),
                 box-shadow var(--duration-fast),
                 background-color var(--duration-fast);
@@ -170,7 +172,7 @@
 .form-textarea {
     padding: 0.75rem 1rem; /* 12px 16px */
     border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     background: var(--bg-card);
     font-family: var(--font-body);
     font-size: var(--text-base); /* 15px */
@@ -179,6 +181,7 @@
     resize: vertical;
     line-height: var(--leading-relaxed);
     width: 100%;
+    box-shadow: var(--input-shadow);
     transition: border-color var(--duration-fast),
                 box-shadow var(--duration-fast),
                 background-color var(--duration-fast);

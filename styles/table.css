@@ -58,7 +58,7 @@
     padding: 0.625rem 1rem;
     background: var(--bg-base);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     min-width: 15rem;
     flex: 1;
     max-width: 25rem;
@@ -498,7 +498,7 @@
     padding: 0.625rem 0.875rem;
     background: var(--bg-base);
     border: 1px dashed var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     font-family: var(--font-body);
     font-size: var(--text-md);
     color: var(--text-secondary);
@@ -648,7 +648,7 @@
     padding: 0.625rem 1rem;
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     width: 17.5rem;
     transition: all var(--transition-fast, 0.2s) ease;
 }
@@ -985,7 +985,7 @@ button.sort-btn {
     min-width: 10rem;
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     z-index: 100;
     opacity: 0;
@@ -1012,11 +1012,11 @@ button.sort-btn {
 }
 
 .action-dropdown-item:first-child {
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .action-dropdown-item:last-child {
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .action-dropdown-item:hover {
@@ -1520,7 +1520,7 @@ button.sort-btn {
         width: 100%;
         justify-content: flex-start;
         padding: 0.75rem 1rem;
-        border-radius: var(--radius-md);
+        border-radius: var(--radius-lg);
         font-size: var(--text-base);
         border: none;
         background: transparent;
@@ -1685,7 +1685,7 @@ button.sort-btn {
         position: relative;
         background: var(--bg-card);
         border: 1px solid var(--border);
-        border-radius: var(--radius-md, 0.5rem);
+        border-radius: var(--radius-lg);
         padding: 1rem 1rem 0.75rem;
         margin-bottom: 0.625rem;
         display: grid;
@@ -2403,7 +2403,7 @@ body.density-comfortable .action-buttons {
 
 .table-card-minimal .data-table {
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     overflow: hidden;
 }
 

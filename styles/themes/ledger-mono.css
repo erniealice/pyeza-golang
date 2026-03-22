@@ -1,0 +1,125 @@
+/*
+ * ==========================================================================
+ * THEME: LEDGER MONO
+ * Cool slate/steel gray with crisp high-contrast shadows
+ * Think: spreadsheets, accounting ledgers, grid precision
+ * ==========================================================================
+ */
+[data-theme="ledger-mono"] {
+    /* Backgrounds — cool, clinical precision */
+    --bg-base: #F2F3F5;
+    --bg-sidebar: #E8EAED;
+    --bg-card: #FFFFFF;
+    --bg-hover: #DCDFE3;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(20, 24, 30, 0.55);
+
+    /* Text — near-black with cool undertones */
+    --text-primary: #14181E;
+    --text-secondary: #4A5060;
+    --text-muted: #7A808C;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — dark steel */
+    --accent-primary: #2C3544;
+    --accent-primary-light: #EDEFF2;
+    --accent-primary-dark: #1A2030;
+
+    /* Secondary Accents — desaturated, data-focused */
+    --accent-terracotta: #C0392B;
+    --accent-terracotta-light: #FBEAE8;
+    --accent-terracotta-dark: #962D22;
+    --accent-sage: #27896D;
+    --accent-sage-light: #E8F5F0;
+    --accent-navy: #2C3544;
+    --accent-navy-light: #EDEFF2;
+    --accent-navy-dark: #1A2030;
+    --accent-amber: #A68A00;
+    --accent-amber-light: #FBF5E0;
+    --accent-plum: #5A5080;
+    --accent-slate: #5C6370;
+
+    /* Status Colors — high-contrast for data readability */
+    --status-success: #27896D;
+    --status-success-light: #E8F5F0;
+    --status-warning: #A68A00;
+    --status-warning-light: #FBF5E0;
+    --status-error: #C0392B;
+    --status-error-light: #FBEAE8;
+    --status-info: #2C5EA0;
+    --status-info-light: #EBF0F8;
+
+    /* Borders & Shadows — crisp, defined edges */
+    --border: #CBCED4;
+    --border-light: #DCDFE3;
+    --border-focus: var(--accent-primary);
+    --border-default: #CBCED4;
+    --shadow-sm: 0 1px 2px rgba(20, 24, 30, 0.06);
+    --shadow-md: 0 4px 12px rgba(20, 24, 30, 0.09);
+    --shadow-lg: 0 8px 24px rgba(20, 24, 30, 0.12);
+    --shadow-card: 0 1px 3px rgba(20, 24, 30, 0.06), 0 1px 2px rgba(20, 24, 30, 0.04);
+    --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.10);
+    --shadow-float: 0 12px 40px rgba(20, 24, 30, 0.18);
+    --shadow-xl: 0 20px 50px rgba(20, 24, 30, 0.16);
+
+    /* App Icon Colors — muted, ledger-appropriate */
+    --app-color-users: #A68A00;
+    --app-color-users-dark: #8A7200;
+    --app-color-users-light: #F8F3E0;
+    --app-color-clients: #B04040;
+    --app-color-clients-dark: #903030;
+    --app-color-clients-light: #F6EAEA;
+    --app-color-inventory: #2C5EA0;
+    --app-color-inventory-dark: #1E4880;
+    --app-color-inventory-light: #EBF0F8;
+    --app-color-services: #5A5080;
+    --app-color-services-dark: #443C68;
+    --app-color-services-light: #EEECF4;
+    --app-color-locations: #B06038;
+    --app-color-locations-dark: #904A28;
+    --app-color-locations-light: #F6EDE6;
+    --app-color-assets: #387880;
+    --app-color-assets-dark: #286068;
+    --app-color-assets-light: #E8F2F4;
+    --app-color-suppliers: #3C5890;
+    --app-color-suppliers-dark: #2C4470;
+    --app-color-suppliers-light: #E8EDF5;
+    --app-color-sales: #27896D;
+    --app-color-sales-dark: #1A6E55;
+    --app-color-sales-light: #E8F5F0;
+    --app-color-purchases: #2A7840;
+    --app-color-purchases-dark: #1E6030;
+    --app-color-purchases-light: #E8F2EA;
+    --app-color-expenses: #C0392B;
+    --app-color-expenses-dark: #962D22;
+    --app-color-expenses-light: #FBEAE8;
+    --app-color-cash: #A68A00;
+    --app-color-cash-dark: #8A7200;
+    --app-color-cash-light: #F8F3E0;
+    --app-color-reports: #287878;
+    --app-color-reports-dark: #1E6060;
+    --app-color-reports-light: #E8F2F2;
+    --app-color-admin: #5C6370;
+    --app-color-admin-dark: #444C58;
+    --app-color-admin-light: #EDEEF0;
+    --app-color-jobs: #8A6D20;
+    --app-color-jobs-dark: #6E5818;
+    --app-color-jobs-light: #F4EFE0;
+    --app-color-payroll: #286878;
+    --app-color-payroll-dark: #1E5060;
+    --app-color-payroll-light: #E8EFF2;
+    --app-color-loans: #7A5820;
+    --app-color-loans-dark: #604418;
+    --app-color-loans-light: #F2ECE0;
+    --app-color-equity: #3A3878;
+    --app-color-equity-dark: #2C2A60;
+    --app-color-equity-light: #ECEEF6;
+    --app-color-ledger: #2E6040;
+    --app-color-ledger-dark: #1E4C30;
+    --app-color-ledger-light: #E8F2EC;
+
+    /* Theme Meta */
+    --theme-name: "Ledger Mono";
+    --theme-icon-bg: linear-gradient(135deg, #F2F3F5 0%, #CBCED4 100%);
+    --theme-icon-accent: #2C3544;
+}

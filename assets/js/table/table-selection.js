@@ -205,6 +205,12 @@
 
             selectAllCheckbox.checked = allChecked;
             selectAllCheckbox.indeterminate = someChecked && !allChecked;
+
+            // Hide "Select All" in bulk toolbar when all rows are already selected
+            const selectAllBtn = card.querySelector('[data-action="select-all"]');
+            if (selectAllBtn) {
+                selectAllBtn.style.display = (count >= allCheckboxes.length) ? 'none' : '';
+            }
         }
 
         // Update conditional bulk action button visibility

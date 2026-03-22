@@ -5,6 +5,31 @@ import (
 	"strconv"
 )
 
+// FilterColumnType identifies the input type rendered in the filter panel
+type FilterColumnType string
+
+const (
+	FilterTypeString  FilterColumnType = "string"
+	FilterTypeNumeric FilterColumnType = "numeric"
+	FilterTypeDate    FilterColumnType = "date"
+	FilterTypeMoney   FilterColumnType = "money"
+	FilterTypeStatus  FilterColumnType = "status"
+	FilterTypeToggle  FilterColumnType = "toggle"
+)
+
+// FilterOption is a single option for FilterTypeStatus columns (value:label pair)
+type FilterOption struct {
+	Value string
+	Label string
+}
+
+// ActiveFilter represents a currently-applied filter rendered as a chip
+type ActiveFilter struct {
+	Key          string // column key (matches TypedFilter.field)
+	Label        string // human-readable column label for display
+	DisplayValue string // human-readable filter value for display
+}
+
 // TableColumn defines a column in a data table
 type TableColumn struct {
 	Key      string // Data attribute key for sorting
@@ -14,6 +39,10 @@ type TableColumn struct {
 	MinWidth string // Optional minimum width (e.g., "100px") - column can grow but not shrink below this
 	Align    string // Optional horizontal alignment: "left" (default), "center", "right"
 	VAlign   string // Optional vertical alignment: "top" (default), "middle", "bottom"
+	// Filter panel configuration
+	Filterable    bool             // Whether this column appears in the filter panel
+	FilterType    FilterColumnType // Input type rendered in filter panel
+	FilterOptions []FilterOption   // For FilterTypeStatus: checkbox options
 }
 
 // ColumnGroup defines a group of columns with a shared parent header.
@@ -268,7 +297,7 @@ type ServerPagination struct {
 	SearchQuery   string // current search term (reflected in search input)
 	SortColumn    string // current sort column key
 	SortDirection string // current sort direction ("asc" or "desc")
-	FiltersJSON   string // current advanced filters (base64 encoded JSON)
+	FiltersJSON   string // current advanced filters (raw JSON string)
 	PaginationURL     string // base URL for HTMX page requests
 	PaginationBodyURL string // base URL for body-only targeted swap requests
 
@@ -278,6 +307,9 @@ type ServerPagination struct {
 	NextPageURL   string       // HTMX URL for next page button (offset mode)
 	PrevCursorURL string       // HTMX URL for prev button (cursor mode)
 	NextCursorURL string       // HTMX URL for next button (cursor mode)
+
+	// Active filter chips — populated by view controller from parsed filters
+	ActiveFilters []ActiveFilter
 }
 
 // PageNumber represents a single page button in the pagination UI
@@ -351,9 +383,6 @@ func (sp *ServerPagination) buildCursorURL(cursor, direction string) string {
 		}
 		url += "&dir=" + dir
 	}
-	if sp.FiltersJSON != "" {
-		url += "&filters=" + sp.FiltersJSON
-	}
 	return url
 }
 
@@ -370,9 +399,6 @@ func (sp *ServerPagination) buildPageURL(page int) string {
 			dir = "asc"
 		}
 		url += "&dir=" + dir
-	}
-	if sp.FiltersJSON != "" {
-		url += "&filters=" + sp.FiltersJSON
 	}
 	return url
 }
@@ -441,4 +467,16 @@ func buildPageNumbers(current, total int, urlBuilder func(int) string) []PageNum
 // itoa is a shorthand for strconv.Itoa
 func itoa(n int) string {
 	return strconv.Itoa(n)
+}
+
+// SortableKeys extracts the keys of all sortable columns.
+// Used by view handlers to build the allowed sort columns list.
+func SortableKeys(cols []TableColumn) []string {
+	var keys []string
+	for _, c := range cols {
+		if c.Sortable {
+			keys = append(keys, c.Key)
+		}
+	}
+	return keys
 }

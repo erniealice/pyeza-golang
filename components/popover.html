@@ -220,6 +220,21 @@ JS API:
 
         panel.setAttribute('data-position', this.position);
 
+        // Constrain height to available viewport space (10px margin)
+        var margin = 10;
+        var panelRect = panel.getBoundingClientRect();
+        var maxH;
+        if (this.position === 'top') {
+            maxH = rect.top - offset - margin;
+        } else if (this.position === 'bottom' || !this.position) {
+            maxH = window.innerHeight - rect.bottom - offset - margin;
+        } else {
+            maxH = window.innerHeight - panelRect.top - margin;
+        }
+        if (maxH > 0) {
+            panel.style.maxHeight = Math.max(maxH, 120) + 'px';
+        }
+
         // Arrow — point towards trigger center
         if (this.arrow) this._positionArrow();
     };

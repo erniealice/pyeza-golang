@@ -88,6 +88,24 @@ JavaScript:
     {{end}}{{end}}
     {{template "table-toolbar" .}}
     {{end}}
+    {{if .ServerPagination}}{{if .ServerPagination.ActiveFilters}}
+    <div class="chip-group" role="list">
+      {{range .ServerPagination.ActiveFilters}}
+      <span class="chip sm" data-filter-key="{{.Key}}" role="listitem">
+        <span class="chip-label">{{.Label}}: {{.DisplayValue}}</span>
+        <button type="button" class="chip-dismiss" data-dismiss-filter="{{.Key}}" aria-label="Remove {{.Label}} filter">
+          {{template "icon-x" $}}
+        </button>
+      </span>
+      {{end}}
+      <button type="button" class="chip sm" data-clear-all-filters>Clear all</button>
+    </div>
+    {{end}}{{end}}
+    {{if .ServerPagination}}
+    <input type="hidden" name="filters" value="{{.ServerPagination.FiltersJSON}}">
+    <input type="hidden" name="search" value="{{.ServerPagination.SearchQuery}}">
+    <input type="hidden" name="tz" value="">
+    {{end}}
     {{template "table-content" .}}
     {{if not .Minimal}}
     <div id="{{.ID}}-footer">
@@ -100,7 +118,21 @@ JavaScript:
     {{template "table-footer-full" .}}
     {{end}}
     </div>
-    <div id="{{.ID}}-meta" hidden></div>
+    <div id="{{.ID}}-meta" hidden
+  {{if .ServerPagination}}{{if .ServerPagination.Enabled}}
+  data-current-page="{{.ServerPagination.CurrentPage}}"
+  data-page-size="{{.ServerPagination.PageSize}}"
+  data-total-rows="{{.ServerPagination.TotalRows}}"
+  data-search="{{.ServerPagination.SearchQuery}}"
+  data-sort-column="{{.ServerPagination.SortColumn}}"
+  data-sort-direction="{{.ServerPagination.SortDirection}}"
+  data-has-next="{{.ServerPagination.HasNextPage}}"
+  data-has-prev="{{.ServerPagination.HasPrevPage}}"
+  data-next-cursor="{{.ServerPagination.NextCursor}}"
+  data-prev-cursor="{{.ServerPagination.PrevCursor}}"
+  data-filters="{{.ServerPagination.FiltersJSON}}"
+  {{end}}{{end}}
+></div>
     {{end}}
 </div>
 {{end}}
@@ -183,6 +215,10 @@ JavaScript:
                     <span class="filter-panel-title">{{if .Labels.FilterConditions}}{{.Labels.FilterConditions}}{{else}}Filter Conditions{{end}}</span>
                     <button type="button" class="filter-clear-all">{{if .Labels.ClearAll}}{{.Labels.ClearAll}}{{else}}Clear All{{end}}</button>
                 </div>
+                {{/* Filter column metadata — read by table-filters.js to build typed conditions */}}
+                <script type="application/json" id="{{.ID}}-filter-meta">
+                {{filterColumnsJSON .Columns}}
+                </script>
                 <div class="filter-conditions" id="{{.ID}}-filter-conditions">
                     {{/* Filter rows will be added dynamically by JS */}}
                 </div>
@@ -857,6 +893,7 @@ JavaScript:
     data-has-next="{{.ServerPagination.HasNextPage}}"
     data-has-prev="{{.ServerPagination.HasPrevPage}}"
     data-next-cursor="{{.ServerPagination.NextCursor}}"
-    data-prev-cursor="{{.ServerPagination.PrevCursor}}">
+    data-prev-cursor="{{.ServerPagination.PrevCursor}}"
+    data-filters="{{.ServerPagination.FiltersJSON}}">
 </div>
 {{end}}

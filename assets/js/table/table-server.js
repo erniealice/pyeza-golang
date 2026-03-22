@@ -128,6 +128,15 @@
             }
         }
 
+        // Handle timezone param (sent when filter contains date values)
+        if (overrides.tz !== undefined) {
+            if (overrides.tz && overrides.tz !== 'UTC') {
+                params.set('tz', overrides.tz);
+            } else {
+                params.delete('tz');
+            }
+        }
+
         // Rebuild URL with updated params
         url.search = params.toString();
 
@@ -341,39 +350,11 @@
         const filters = overrides.filters !== undefined ? overrides.filters : (tableCard.dataset.filters || '');
         if (filters) browserUrl.searchParams.set('filters', filters);
 
+        // Timezone (only when non-default)
+        const tz = overrides.tz !== undefined ? overrides.tz : '';
+        if (tz && tz !== 'UTC') browserUrl.searchParams.set('tz', tz);
+
         history.replaceState(null, '', browserUrl.toString());
-    }
-
-    /**
-     * Encode filter conditions to base64 JSON for server transmission.
-     *
-     * @param {Array} conditions - Array of filter condition objects
-     * @returns {string} - Base64 encoded JSON string
-     */
-    function encodeFilters(conditions) {
-        try {
-            const json = JSON.stringify(conditions);
-            return btoa(json);
-        } catch (e) {
-            console.error('[TableServer] Error encoding filters:', e);
-            return '';
-        }
-    }
-
-    /**
-     * Decode filter conditions from base64 JSON.
-     *
-     * @param {string} encoded - Base64 encoded JSON string
-     * @returns {Array} - Array of filter condition objects
-     */
-    function decodeFilters(encoded) {
-        try {
-            const json = atob(encoded);
-            return JSON.parse(json);
-        } catch (e) {
-            console.error('[TableServer] Error decoding filters:', e);
-            return [];
-        }
     }
 
     /**
@@ -402,8 +383,6 @@
         getPaginationMode,
         executeServerRequest,
         applyPaginationMeta,
-        encodeFilters,
-        decodeFilters,
         captureFocusIdentity,
         restoreFocusIdentity
     };

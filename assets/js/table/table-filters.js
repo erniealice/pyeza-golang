@@ -7,6 +7,7 @@
 
     function init() {
         initFilters();
+        initChipHandlers();
     }
 
     function initFilters() {
@@ -33,8 +34,8 @@
             const clearBtn = panel.querySelector('.filter-clear');
             const applyBtn = panel.querySelector('.filter-apply');
 
-            // Get columns from table headers
-            const columns = getTableColumns(table);
+            // Get columns from JSON metadata block (with fallback to header scan)
+            const columns = getTableColumns(tableCard, table);
 
             // Add condition button
             if (addBtn) {
@@ -49,6 +50,8 @@
                     conditionsContainer.innerHTML = '';
                     if (isServerMode) {
                         // Server-side clear filters
+                        var filterInput = tableCard.querySelector('input[name="filters"]');
+                        if (filterInput) filterInput.value = '';
                         if (window.TableServer && typeof htmx !== 'undefined') {
                             window.TableServer.executeServerRequest(tableCard, {
                                 filters: '',  // Empty string removes filters param
@@ -68,6 +71,8 @@
                     conditionsContainer.innerHTML = '';
                     if (isServerMode) {
                         // Server-side clear filters
+                        var filterInput = tableCard.querySelector('input[name="filters"]');
+                        if (filterInput) filterInput.value = '';
                         if (window.TableServer && typeof htmx !== 'undefined') {
                             window.TableServer.executeServerRequest(tableCard, {
                                 filters: '',  // Empty string removes filters param
@@ -86,18 +91,26 @@
 
             // Apply filters button
             if (applyBtn) {
-                applyBtn.addEventListener('click', () => {
-                    const conditions = getFilterConditions(conditionsContainer);
+                applyBtn.addEventListener('click', function() {
+                    var conditions = getFilterConditions(conditionsContainer);
 
                     if (isServerMode) {
-                        // Server-side apply filters
-                        const encodedFilters = window.TableServer ?
-                            window.TableServer.encodeFilters(conditions) : '';
+                        // Build FilterRequest JSON (AND-only, no OR logic)
+                        var filterRequest = { filters: conditions };
+                        var filtersJSON = JSON.stringify(filterRequest);
 
+                        // Update the hidden filter input
+                        var filterInput = tableCard.querySelector('input[name="filters"]');
+                        if (filterInput) {
+                            filterInput.value = filtersJSON;
+                        }
+
+                        // POST via HTMX
                         if (window.TableServer && typeof htmx !== 'undefined') {
                             window.TableServer.executeServerRequest(tableCard, {
-                                filters: encodedFilters,
-                                page: 1  // Reset to page 1 when filters change
+                                filters: filtersJSON,
+                                page: 1,
+                                tz: Intl.DateTimeFormat().resolvedOptions().timeZone
                             });
                         }
                     } else {
@@ -116,107 +129,126 @@
         });
     }
 
-    function getTableColumns(table) {
-        const headers = table.querySelectorAll('thead th[data-sort]');
+    function getTableColumns(tableCard, table) {
+        // Read filterable columns from the JSON metadata block
+        if (tableCard) {
+            const tableId = table ? table.id : (tableCard.querySelector('.data-table') || {}).id;
+            if (tableId) {
+                const metaEl = document.getElementById(tableId + '-filter-meta');
+                if (metaEl) {
+                    try {
+                        const cols = JSON.parse(metaEl.textContent);
+                        if (cols && cols.length > 0) return cols;
+                    } catch (e) { /* fall through to header scan */ }
+                }
+            }
+        }
+        // Fallback: read from sortable column headers (legacy / non-filterable tables)
+        const headers = table ? table.querySelectorAll('thead th[data-sort]') : [];
         return Array.from(headers).map(th => {
-            // Get only the label text, not the sort icons
             const labelEl = th.querySelector('.column-label');
             const label = labelEl ? labelEl.textContent.trim() : th.textContent.trim();
-            return {
-                key: th.dataset.sort,
-                label: label
-            };
+            return { key: th.dataset.sort, label: label, type: 'string', options: [] };
         });
     }
 
-    function addFilterCondition(container, columns, logic = 'and') {
+    function addFilterCondition(container, columns) {
         const row = document.createElement('div');
         row.className = 'filter-row';
-
-        // Logic connector (only if not first row)
-        if (container.children.length > 0) {
-            const logicDiv = document.createElement('div');
-            logicDiv.className = 'filter-logic';
-            logicDiv.innerHTML = `
-                <button type="button" class="filter-logic-connector ${logic === 'and' ? 'active' : ''}" data-logic="and">AND</button>
-                <button type="button" class="filter-logic-connector ${logic === 'or' ? 'active' : ''}" data-logic="or">OR</button>
-            `;
-            container.appendChild(logicDiv);
-
-            // Logic toggle
-            logicDiv.querySelectorAll('.filter-logic-connector').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    logicDiv.querySelectorAll('.filter-logic-connector').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-        }
 
         // Column select
         const columnSelect = document.createElement('select');
         columnSelect.className = 'filter-column';
         columnSelect.innerHTML = '<option value="">Select column...</option>' +
-            columns.map(col => `<option value="${col.key}">${col.label}</option>`).join('');
+            columns.map(col => '<option value="' + col.key + '" data-type="' + (col.type || 'string') + '" data-options=\'' + JSON.stringify(col.options || []) + '\'>' + col.label + '</option>').join('');
 
-        // Operator select
-        const operatorSelect = document.createElement('select');
-        operatorSelect.className = 'filter-operator';
-        operatorSelect.innerHTML = `
-            <option value="contains">contains</option>
-            <option value="equals">equals</option>
-            <option value="starts_with">starts with</option>
-            <option value="ends_with">ends with</option>
-            <option value="not_equals">not equals</option>
-            <option value="is_empty">is empty</option>
-            <option value="is_not_empty">is not empty</option>
-        `;
+        // Value container — rebuilt when column changes
+        const valueContainer = document.createElement('div');
+        valueContainer.className = 'filter-value-container';
 
-        // Value input
-        const valueInput = document.createElement('input');
-        valueInput.type = 'text';
-        valueInput.className = 'filter-value';
-        valueInput.placeholder = 'Value...';
+        function buildValueInput(type, options) {
+            valueContainer.innerHTML = '';
+            if (type === 'status') {
+                (options || []).forEach(function(opt) {
+                    var label = document.createElement('label');
+                    label.className = 'filter-option-checkbox';
+                    label.innerHTML = '<input type="checkbox" class="filter-value-checkbox" value="' + opt.value + '"> ' + opt.label;
+                    valueContainer.appendChild(label);
+                });
+            } else if (type === 'date') {
+                valueContainer.innerHTML = '<input type="date" class="filter-value filter-date-from" placeholder="From">' +
+                    '<input type="date" class="filter-value filter-date-to" placeholder="To">';
+            } else if (type === 'numeric' || type === 'money') {
+                valueContainer.innerHTML = '<input type="number" step="any" class="filter-value" placeholder="Value...">';
+            } else {
+                valueContainer.innerHTML = '<input type="text" class="filter-value" placeholder="Value...">';
+            }
+        }
+
+        buildValueInput('string', []);
+
+        columnSelect.addEventListener('change', function() {
+            var opt = columnSelect.selectedOptions[0];
+            var type = opt ? opt.dataset.type || 'string' : 'string';
+            var options = [];
+            try { options = opt && opt.dataset.options ? JSON.parse(opt.dataset.options) : []; } catch(e) {}
+            buildValueInput(type, options);
+        });
 
         // Remove button
-        const removeBtn = document.createElement('button');
+        var removeBtn = document.createElement('button');
         removeBtn.type = 'button';
         removeBtn.className = 'filter-row-remove';
         removeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-        removeBtn.addEventListener('click', () => {
-            // Remove logic connector if exists
-            const prevElement = row.previousElementSibling;
-            if (prevElement && prevElement.classList.contains('filter-logic')) {
-                prevElement.remove();
-            }
+        removeBtn.addEventListener('click', function() {
             row.remove();
         });
 
         row.appendChild(columnSelect);
-        row.appendChild(operatorSelect);
-        row.appendChild(valueInput);
+        row.appendChild(valueContainer);
         row.appendChild(removeBtn);
-
         container.appendChild(row);
     }
 
     function getFilterConditions(container) {
-        const conditions = [];
-        const rows = container.querySelectorAll('.filter-row');
+        var conditions = [];
+        var rows = container.querySelectorAll('.filter-row');
 
-        rows.forEach((row, index) => {
-            const column = row.querySelector('.filter-column')?.value;
-            const operator = row.querySelector('.filter-operator')?.value;
-            const value = row.querySelector('.filter-value')?.value;
+        rows.forEach(function(row) {
+            var columnEl = row.querySelector('.filter-column');
+            var column = columnEl ? columnEl.value : '';
+            if (!column) return;
 
-            if (column) {
-                let logic = 'and';
-                const logicEl = row.previousElementSibling;
-                if (logicEl && logicEl.classList.contains('filter-logic')) {
-                    const activeLogic = logicEl.querySelector('.filter-logic-connector.active');
-                    logic = activeLogic ? activeLogic.dataset.logic : 'and';
+            var opt = columnEl.selectedOptions[0];
+            var type = opt ? (opt.dataset.type || 'string') : 'string';
+            var filterType = null;
+
+            if (type === 'status') {
+                var checked = Array.from(row.querySelectorAll('.filter-value-checkbox:checked')).map(function(cb) { return cb.value; });
+                if (checked.length > 0) {
+                    filterType = { statusFilter: { values: checked } };
                 }
+            } else if (type === 'date') {
+                var from = (row.querySelector('.filter-date-from') || {}).value || '';
+                var to = (row.querySelector('.filter-date-to') || {}).value || '';
+                if (from || to) {
+                    var df = { operator: from && to ? 3 : (from ? 2 : 1), value: from || to };
+                    if (from && to) df.rangeEnd = to;
+                    filterType = { dateFilter: df };
+                }
+            } else if (type === 'numeric') {
+                var val = (row.querySelector('.filter-value') || {}).value || '';
+                if (val !== '') filterType = { numberFilter: { value: parseFloat(val), operator: 0 } };
+            } else if (type === 'money') {
+                var val = (row.querySelector('.filter-value') || {}).value || '';
+                if (val !== '') filterType = { moneyFilter: { amount: parseFloat(val), operator: 0 } };
+            } else {
+                var val = (row.querySelector('.filter-value') || {}).value || '';
+                if (val) filterType = { stringFilter: { value: val, operator: 2 } };
+            }
 
-                conditions.push({ column, operator, value, logic });
+            if (filterType) {
+                conditions.push(Object.assign({ field: column }, filterType));
             }
         });
 
@@ -237,8 +269,18 @@
                 let matches = null;
 
                 conditions.forEach((condition, index) => {
-                    const cellValue = (row.dataset[condition.column] || '').toLowerCase();
-                    const filterValue = condition.value.toLowerCase();
+                    // Support both legacy shape {column, value, operator} and new shape {field, stringFilter...}
+                    const col = condition.column || condition.field || '';
+                    let filterValue = '';
+                    if (condition.value !== undefined) {
+                        filterValue = condition.value;
+                    } else if (condition.stringFilter) {
+                        filterValue = condition.stringFilter.value || '';
+                    } else if (condition.statusFilter) {
+                        filterValue = (condition.statusFilter.values || []).join(',');
+                    }
+                    const cellValue = (row.dataset[col] || '').toLowerCase();
+                    filterValue = (filterValue || '').toLowerCase();
 
                     let conditionMatches = false;
 
@@ -268,8 +310,6 @@
 
                     if (index === 0) {
                         matches = conditionMatches;
-                    } else if (condition.logic === 'or') {
-                        matches = matches || conditionMatches;
                     } else {
                         matches = matches && conditionMatches;
                     }
@@ -311,10 +351,66 @@
         }
     }
 
+    function initChipHandlers() {
+        // Event delegation — handles chips rendered server-side on page load
+        // and after each swap (chips are inside the table-card which is swapped)
+        document.addEventListener('click', function(e) {
+            // Dismiss single filter chip
+            var dismissBtn = e.target.closest('[data-dismiss-filter]');
+            if (dismissBtn) {
+                var tableCard = dismissBtn.closest('.table-card');
+                if (!tableCard || !window.TableServer) return;
+
+                var keyToRemove = dismissBtn.dataset.dismissFilter;
+                var filterInput = tableCard.querySelector('input[name="filters"]');
+                var filtersJSON = filterInput ? filterInput.value : '';
+                var filterRequest = { filters: [] };
+
+                if (filtersJSON) {
+                    try {
+                        filterRequest = JSON.parse(filtersJSON);
+                    } catch (ex) { /* ignore malformed */ }
+                }
+
+                filterRequest.filters = (filterRequest.filters || []).filter(function(f) {
+                    return f.field !== keyToRemove;
+                });
+
+                var newFiltersJSON = filterRequest.filters.length > 0
+                    ? JSON.stringify(filterRequest)
+                    : '';
+
+                if (filterInput) filterInput.value = newFiltersJSON;
+
+                window.TableServer.executeServerRequest(tableCard, {
+                    filters: newFiltersJSON,
+                    page: 1
+                });
+                return;
+            }
+
+            // Clear all filters button
+            var clearAllBtn = e.target.closest('[data-clear-all-filters]');
+            if (clearAllBtn) {
+                var tableCard = clearAllBtn.closest('.table-card');
+                if (!tableCard || !window.TableServer) return;
+
+                var filterInput = tableCard.querySelector('input[name="filters"]');
+                if (filterInput) filterInput.value = '';
+
+                window.TableServer.executeServerRequest(tableCard, {
+                    filters: '',
+                    page: 1
+                });
+            }
+        });
+    }
+
     // Expose module
     window.TableFilters = {
         init,
         initFilters,
+        initChipHandlers,
         getTableColumns,
         addFilterCondition,
         getFilterConditions,

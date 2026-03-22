@@ -460,6 +460,72 @@
 }
 
 /* ========================================
+   FILTER CHIP DISMISS BUTTON
+   The X button on individual active-filter chips.
+   Rendered as: <button class="chip-dismiss" data-dismiss-filter="key">
+   ======================================== */
+
+.chip-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: color 0.15s ease, background 0.15s ease;
+    line-height: var(--leading-none);
+}
+
+.chip-dismiss:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.chip-dismiss:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.125rem var(--accent-sage-light);
+}
+
+.chip-dismiss svg {
+    width: 0.625rem;
+    height: 0.625rem;
+    pointer-events: none;
+}
+
+/* ========================================
+   FILTER CHIPS CLEAR-ALL BUTTON
+   Rendered as: <button class="chip sm" data-clear-all-filters>
+   Inherits .chip and .sm base styles; override to look like a
+   plain text action rather than a selectable chip.
+   ======================================== */
+
+.chip[data-clear-all-filters] {
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+.chip[data-clear-all-filters]:hover {
+    border-color: transparent;
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.chip[data-clear-all-filters]:focus {
+    outline: none;
+    border-color: transparent;
+    box-shadow: 0 0 0 0.125rem var(--accent-sage-light);
+}
+
+/* ========================================
    RESPONSIVE ADJUSTMENTS
    ======================================== */
 
