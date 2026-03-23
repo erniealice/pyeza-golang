@@ -1,0 +1,138 @@
+{{/*
+================================================================================
+CALENDAR MONTH VIEW
+================================================================================
+Renders a full month calendar grid with event chips in each day cell.
+Up to 3 events shown per cell; overflow is indicated by a "+N more" link.
+
+Usage:
+    {{template "calendar-month" .}}
+
+Required data (CalendarMonthData):
+    .Year          int     — e.g. 2026
+    .Month         int     — 1–12
+    .MonthName     string  — e.g. "March 2026"
+    .Weeks         []CalendarWeek  — 4–6 rows, each with 7 CalendarDay entries
+    .Today         CalendarDate    — {Year, Month, Day} for highlighting today
+    .PrevMonthURL  string  — hx-get URL for previous month
+    .NextMonthURL  string  — hx-get URL for next month
+    .TodayURL      string  — hx-get URL to jump to current month
+    .ViewMode      string  — "month" (used by calendar-header)
+    .MonthViewURL  string  — URL for month view toggle button
+    .WeekViewURL   string  — URL for week view toggle button
+    .DayViewURL    string  — URL for day view toggle button
+    .HXTarget      string  — HTMX swap target (default: "#calendar")
+
+CalendarWeek:
+    .Days []CalendarDay
+
+CalendarDay:
+    .Date         CalendarDate — {Year, Month, Day}
+    .IsToday      bool
+    .IsOtherMonth bool
+    .Events       []CalendarEvent — shown in order; first 3 rendered as chips
+    .MoreCount    int  — events beyond the 3 visible (>0 shows "+N more")
+    .DayURL       string — URL for navigating to day view when cell is clicked
+
+CalendarEvent:
+    .ID        string
+    .Name      string
+    .StartTime string — "10:00 AM"
+    .EndTime   string — "11:30 AM"
+    .Status    string — "confirmed" | "tentative" | "cancelled"
+    .DetailURL string
+    .HXTarget  string — override swap target for event link (optional)
+================================================================================
+*/}}
+
+{{define "calendar-month"}}
+{{$target := "#calendar"}}
+{{if .HXTarget}}{{$target = .HXTarget}}{{end}}
+
+<div
+    id="calendar"
+    class="calendar calendar--month"
+    role="application"
+    aria-label="Calendar, {{.MonthName}}">
+
+    {{/* ── Toolbar ─────────────────────────────────────────────────────── */}}
+    {{template "calendar-header" (dict
+        "RangeLabel"  .MonthName
+        "PrevURL"     .PrevMonthURL
+        "NextURL"     .NextMonthURL
+        "TodayURL"    .TodayURL
+        "ViewMode"    "month"
+        "MonthViewURL" .MonthViewURL
+        "WeekViewURL"  .WeekViewURL
+        "DayViewURL"   .DayViewURL
+        "HXTarget"    $target
+    )}}
+
+    {{/* ── Day-name header row ─────────────────────────────────────────── */}}
+    <div class="calendar-day-headers" role="row" aria-hidden="true">
+        <div class="calendar-day-header"><span class="calendar-day-name">Sun</span></div>
+        <div class="calendar-day-header"><span class="calendar-day-name">Mon</span></div>
+        <div class="calendar-day-header"><span class="calendar-day-name">Tue</span></div>
+        <div class="calendar-day-header"><span class="calendar-day-name">Wed</span></div>
+        <div class="calendar-day-header"><span class="calendar-day-name">Thu</span></div>
+        <div class="calendar-day-header"><span class="calendar-day-name">Fri</span></div>
+        <div class="calendar-day-header"><span class="calendar-day-name">Sat</span></div>
+    </div>
+
+    {{/* ── Month grid ───────────────────────────────────────────────────── */}}
+    <div class="calendar-month-grid" role="grid" aria-label="{{.MonthName}}">
+
+        {{range .Weeks}}
+        {{range .Days}}
+
+        {{/* Build modifier classes */}}
+        {{$cellClass := "calendar-cell"}}
+        {{if .IsToday}}{{$cellClass = printf "%s calendar-cell--today" $cellClass}}{{end}}
+        {{if .IsOtherMonth}}{{$cellClass = printf "%s calendar-cell--other-month" $cellClass}}{{end}}
+
+        <div
+            class="{{$cellClass}}"
+            role="gridcell"
+            tabindex="0"
+            aria-label="{{.Date.Month}}/{{.Date.Day}}/{{.Date.Year}}{{if .IsToday}}, today{{end}}{{if gt (len .Events) 0}}, {{len .Events}} event{{if gt (len .Events) 1}}s{{end}}{{end}}"
+            data-date="{{printf "%04d-%02d-%02d" .Date.Year .Date.Month .Date.Day}}"
+            {{if .DayURL}}
+            data-url="{{.DayURL}}"
+            hx-get="{{.DayURL}}"
+            hx-target="{{$target}}"
+            hx-swap="outerHTML"
+            hx-push-url="true"
+            {{end}}>
+
+            {{/* Date number */}}
+            <span class="calendar-cell-date" aria-hidden="true">{{.Date.Day}}</span>
+
+            {{/* Event chips — first 3 */}}
+            {{range $i, $ev := .Events}}
+            {{if lt $i 3}}
+            {{template "calendar-event-chip" $ev}}
+            {{end}}
+            {{end}}
+
+            {{/* Overflow link */}}
+            {{if gt .MoreCount 0}}
+            <a
+                class="calendar-more-link"
+                href="{{.DayURL}}"
+                aria-label="{{.MoreCount}} more events on {{.Date.Month}}/{{.Date.Day}}"
+                hx-get="{{.DayURL}}"
+                hx-target="{{$target}}"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                +{{.MoreCount}} more
+            </a>
+            {{end}}
+
+        </div>
+        {{end}}
+        {{end}}
+
+    </div>{{/* .calendar-month-grid */}}
+
+</div>{{/* .calendar */}}
+{{end}}

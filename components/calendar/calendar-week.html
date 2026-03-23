@@ -1,0 +1,167 @@
+{{/*
+================================================================================
+CALENDAR WEEK VIEW
+================================================================================
+Renders a time-grid week view with 7 day columns. Events are positioned
+absolutely by start/end time using inline style top/height values calculated
+server-side using the CalendarEvent.TopPct / HeightPct fields.
+
+Usage:
+    {{template "calendar-week" .}}
+
+Required data (CalendarWeekData):
+    .RangeLabel    string         — e.g. "Mar 23–29, 2026"
+    .Days          []CalendarWeekDay — 7 entries, Sunday–Saturday
+    .HourStart     int            — first visible hour (e.g. 7 for 7 AM)
+    .HourEnd       int            — last visible hour (e.g. 21 for 9 PM)
+    .Hours         []CalendarHour — hour labels for the time column
+    .PrevWeekURL   string         — hx-get for previous week
+    .NextWeekURL   string         — hx-get for next week
+    .TodayURL      string         — hx-get for current week
+    .MonthViewURL  string
+    .WeekViewURL   string
+    .DayViewURL    string
+    .HXTarget      string         — HTMX swap target (default: "#calendar")
+
+CalendarWeekDay:
+    .Date          CalendarDate   — {Year, Month, Day}
+    .DayName       string         — "Mon", "Tue", …
+    .IsToday       bool
+    .Events        []CalendarWeekEvent
+    .DayURL        string         — URL to navigate to day view
+
+CalendarHour:
+    .Hour   int    — 0–23
+    .Label  string — "7 AM", "8 AM", … "9 PM"
+
+CalendarWeekEvent:
+    .ID        string
+    .Name      string
+    .StartTime string  — display "10:00 AM"
+    .EndTime   string  — display "11:30 AM"
+    .Status    string  — "confirmed" | "tentative" | "cancelled"
+    .DetailURL string
+    .TopPct    float64 — 0–100: percentage offset from top of column (server-computed)
+    .HeightPct float64 — 0–100: percentage height relative to total visible hours (server-computed)
+    .IsCompact bool    — true when duration ≤ 30 min (renders single-line compact layout)
+    .HXTarget  string  — override swap target for event (optional)
+================================================================================
+*/}}
+
+{{define "calendar-week"}}
+{{$target := "#calendar"}}
+{{if .HXTarget}}{{$target = .HXTarget}}{{end}}
+
+<div
+    id="calendar"
+    class="calendar calendar--week"
+    role="application"
+    aria-label="Calendar week of {{.RangeLabel}}"
+    data-hour-start="{{.HourStart}}">
+
+    {{/* ── Toolbar ─────────────────────────────────────────────────────── */}}
+    {{template "calendar-header" (dict
+        "RangeLabel"   .RangeLabel
+        "PrevURL"      .PrevWeekURL
+        "NextURL"      .NextWeekURL
+        "TodayURL"     .TodayURL
+        "ViewMode"     "week"
+        "MonthViewURL" .MonthViewURL
+        "WeekViewURL"  .WeekViewURL
+        "DayViewURL"   .DayViewURL
+        "HXTarget"     $target
+    )}}
+
+    {{/* ── Day-name + date header row ─────────────────────────────────── */}}
+    <div class="calendar-day-headers" role="row">
+
+        {{/* Time gutter spacer */}}
+        <div class="calendar-day-header-gutter" aria-hidden="true"></div>
+
+        {{range .Days}}
+        <div class="calendar-day-header{{if .IsToday}} calendar-day-header--today{{end}}"
+             role="columnheader"
+             aria-label="{{.DayName}} {{.Date.Month}}/{{.Date.Day}}{{if .IsToday}}, today{{end}}">
+            <span class="calendar-day-name">{{.DayName}}</span>
+            <a
+                class="calendar-day-num"
+                href="{{.DayURL}}"
+                aria-label="View {{.DayName}} {{.Date.Month}}/{{.Date.Day}}"
+                hx-get="{{.DayURL}}"
+                hx-target="{{$target}}"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                {{.Date.Day}}
+            </a>
+        </div>
+        {{end}}
+
+    </div>
+
+    {{/* ── Scrollable time body ─────────────────────────────────────────── */}}
+    <div class="calendar-time-body" role="presentation">
+
+        {{/* Time labels column */}}
+        <div class="calendar-time-column" aria-hidden="true">
+            {{range .Hours}}
+            <div class="calendar-time-slot-label">
+                <span>{{.Label}}</span>
+            </div>
+            {{end}}
+        </div>
+
+        {{/* Day columns */}}
+        <div class="calendar-columns" role="row">
+
+            {{range .Days}}
+            <div
+                class="calendar-column"
+                role="gridcell"
+                aria-label="{{.DayName}} {{.Date.Month}}/{{.Date.Day}}"
+                data-date="{{printf "%04d-%02d-%02d" .Date.Year .Date.Month .Date.Day}}">
+
+                {{/* Current time indicator (JS positions it via .style.top) */}}
+                {{if .IsToday}}
+                <div class="calendar-current-time" aria-hidden="true">
+                    <div class="calendar-current-time-line"></div>
+                </div>
+                {{end}}
+
+                {{/* Hour slot grid lines — absolutely positioned at computed % offsets */}}
+                <div class="calendar-slot-lines" aria-hidden="true">
+                    {{$totalHours := sub $.HourEnd $.HourStart}}
+                    {{range $.Hours}}
+                    {{$offsetPct := mul (div (sub .Hour $.HourStart) $totalHours) 100}}
+                    <div class="calendar-slot-line" style="top: {{printf "%.4f" $offsetPct}}%;"></div>
+                    {{end}}
+                </div>
+
+                {{/* Events */}}
+                {{range .Events}}
+                {{$evTarget := $target}}
+                {{if .HXTarget}}{{$evTarget = .HXTarget}}{{end}}
+
+                <a
+                    class="calendar-event calendar-event--{{.Status}}{{if .IsCompact}} calendar-event--compact{{end}}"
+                    href="{{.DetailURL}}"
+                    title="{{.Name}} · {{.StartTime}}–{{.EndTime}}"
+                    aria-label="{{.Name}}, {{.StartTime}} to {{.EndTime}}, {{.Status}}"
+                    style="top: {{printf "%.4f" .TopPct}}%; height: {{printf "%.4f" .HeightPct}}%;"
+                    hx-get="{{.DetailURL}}"
+                    hx-target="{{$evTarget}}"
+                    hx-swap="innerHTML"
+                    hx-push-url="true">
+                    <span class="calendar-event-name">{{.Name}}</span>
+                    <span class="calendar-event-time">{{.StartTime}}–{{.EndTime}}</span>
+                </a>
+                {{end}}
+
+            </div>
+            {{end}}
+
+        </div>{{/* .calendar-columns */}}
+
+    </div>{{/* .calendar-time-body */}}
+
+</div>{{/* .calendar */}}
+{{end}}

@@ -1,0 +1,38 @@
+{{/*
+================================================================================
+CALENDAR EVENT CHIP COMPONENT
+================================================================================
+Small event indicator used inside month-view day cells.
+Renders a colored dot + truncated event name, status-coded.
+
+Usage:
+    {{template "calendar-event-chip" .}}
+
+Required data (CalendarEvent):
+    .ID        string  — unique event ID
+    .Name      string  — event display name
+    .StartTime string  — "10:00 AM"
+    .Status    string  — "confirmed" | "tentative" | "cancelled"
+    .DetailURL string  — URL to navigate to on click
+
+Optional data:
+    .HXTarget  string  — HTMX swap target (defaults to "#main-content")
+================================================================================
+*/}}
+
+{{define "calendar-event-chip"}}
+{{$target := "#main-content"}}
+{{if .HXTarget}}{{$target = .HXTarget}}{{end}}
+<a
+    class="calendar-event-chip calendar-event-chip--{{.Status}}"
+    href="{{.DetailURL}}"
+    title="{{.Name}} — {{.StartTime}}"
+    aria-label="{{.Name}}, {{.StartTime}}, {{.Status}}"
+    hx-get="{{.DetailURL}}"
+    hx-target="{{$target}}"
+    hx-swap="innerHTML"
+    hx-push-url="true">
+    <span class="calendar-event-chip-dot" aria-hidden="true"></span>
+    <span class="calendar-event-chip-name">{{.Name}}</span>
+</a>
+{{end}}

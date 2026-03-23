@@ -1,0 +1,167 @@
+{{/*
+================================================================================
+CALENDAR DAY VIEW
+================================================================================
+Renders a single-day time grid. Larger event blocks show name, time range,
+and optional location/organiser detail. The current-time indicator is always
+visible when the current day is displayed.
+
+Usage:
+    {{template "calendar-day" .}}
+
+Required data (CalendarDayData):
+    .Date          CalendarDate   — {Year, Month, Day}
+    .DayLabel      string         — e.g. "Monday, March 23, 2026"
+    .IsToday       bool
+    .Hours         []CalendarHour — hour labels {Hour int, Label string}
+    .HourStart     int            — first visible hour (e.g. 7)
+    .HourEnd       int            — last visible hour  (e.g. 21)
+    .Events        []CalendarDayEvent
+    .PrevDayURL    string         — hx-get for previous day
+    .NextDayURL    string         — hx-get for next day
+    .TodayURL      string
+    .MonthViewURL  string
+    .WeekViewURL   string
+    .DayViewURL    string
+    .HXTarget      string         — HTMX swap target (default: "#calendar")
+
+CalendarHour:
+    .Hour   int    — 0–23
+    .Label  string — "7 AM", …
+
+CalendarDayEvent:
+    .ID        string
+    .Name      string
+    .StartTime string  — "10:00 AM"
+    .EndTime   string  — "11:30 AM"
+    .Status    string  — "confirmed" | "tentative" | "cancelled"
+    .Location  string  — optional (e.g. "Room 3", "Online")
+    .Organizer string  — optional (e.g. "Maria Santos")
+    .DetailURL string
+    .TopPct    float64 — 0–100: percentage offset from top (server-computed)
+    .HeightPct float64 — 0–100: percentage height (server-computed)
+    .IsCompact bool    — true when duration ≤ 30 min
+    .HXTarget  string  — override swap target (optional)
+================================================================================
+*/}}
+
+{{define "calendar-day"}}
+{{$target := "#calendar"}}
+{{if .HXTarget}}{{$target = .HXTarget}}{{end}}
+
+<div
+    id="calendar"
+    class="calendar calendar--day"
+    role="application"
+    aria-label="Calendar, {{.DayLabel}}"
+    data-hour-start="{{.HourStart}}">
+
+    {{/* ── Toolbar ─────────────────────────────────────────────────────── */}}
+    {{template "calendar-header" (dict
+        "RangeLabel"   .DayLabel
+        "PrevURL"      .PrevDayURL
+        "NextURL"      .NextDayURL
+        "TodayURL"     .TodayURL
+        "ViewMode"     "day"
+        "MonthViewURL" .MonthViewURL
+        "WeekViewURL"  .WeekViewURL
+        "DayViewURL"   .DayViewURL
+        "HXTarget"     $target
+    )}}
+
+    {{/* ── Day column header ──────────────────────────────────────────── */}}
+    <div class="calendar-day-headers" role="row">
+        <div class="calendar-day-header-gutter" aria-hidden="true"></div>
+        <div
+            class="calendar-day-header{{if .IsToday}} calendar-day-header--today{{end}}"
+            role="columnheader"
+            aria-label="{{.DayLabel}}{{if .IsToday}}, today{{end}}">
+            {{/* No day-name needed — full label is in toolbar */}}
+            <span class="calendar-day-num{{if .IsToday}} calendar-day-num--today{{end}}">
+                {{.Date.Day}}
+            </span>
+        </div>
+    </div>
+
+    {{/* ── Scrollable time body ─────────────────────────────────────────── */}}
+    <div class="calendar-time-body" role="presentation">
+
+        {{/* Time labels */}}
+        <div class="calendar-time-column" aria-hidden="true">
+            {{range .Hours}}
+            <div class="calendar-time-slot-label">
+                <span>{{.Label}}</span>
+            </div>
+            {{end}}
+        </div>
+
+        {{/* Single day column */}}
+        <div class="calendar-columns" role="row">
+            <div
+                class="calendar-column"
+                role="gridcell"
+                aria-label="{{.DayLabel}}"
+                data-date="{{printf "%04d-%02d-%02d" .Date.Year .Date.Month .Date.Day}}">
+
+                {{/* Current time indicator */}}
+                {{if .IsToday}}
+                <div class="calendar-current-time" aria-hidden="true">
+                    <div class="calendar-current-time-line"></div>
+                </div>
+                {{end}}
+
+                {{/* Hour grid lines — absolutely positioned at computed % offsets */}}
+                <div class="calendar-slot-lines" aria-hidden="true">
+                    {{$totalHours := sub $.HourEnd $.HourStart}}
+                    {{range $.Hours}}
+                    {{$offsetPct := mul (div (sub .Hour $.HourStart) $totalHours) 100}}
+                    <div class="calendar-slot-line" style="top: {{printf "%.4f" $offsetPct}}%;"></div>
+                    {{end}}
+                </div>
+
+                {{/* Empty state */}}
+                {{if not .Events}}
+                <div class="calendar-empty">
+                    {{template "icon-calendar" .}}
+                    <p class="calendar-empty-title">No events scheduled</p>
+                    <p class="calendar-empty-desc">This day is clear.</p>
+                </div>
+                {{end}}
+
+                {{/* Events */}}
+                {{range .Events}}
+                {{$evTarget := $target}}
+                {{if .HXTarget}}{{$evTarget = .HXTarget}}{{end}}
+
+                <a
+                    class="calendar-event calendar-event--{{.Status}}{{if .IsCompact}} calendar-event--compact{{end}}"
+                    href="{{.DetailURL}}"
+                    title="{{.Name}} · {{.StartTime}}–{{.EndTime}}"
+                    aria-label="{{.Name}}, {{.StartTime}} to {{.EndTime}}, {{.Status}}{{if .Location}}, {{.Location}}{{end}}"
+                    style="top: {{printf "%.4f" .TopPct}}%; height: {{printf "%.4f" .HeightPct}}%;"
+                    hx-get="{{.DetailURL}}"
+                    hx-target="{{$evTarget}}"
+                    hx-swap="innerHTML"
+                    hx-push-url="true">
+
+                    <span class="calendar-event-name">{{.Name}}</span>
+                    <span class="calendar-event-time">{{.StartTime}}–{{.EndTime}}</span>
+
+                    {{if and (not .IsCompact) .Location}}
+                    <span class="calendar-event-detail">{{.Location}}</span>
+                    {{end}}
+
+                    {{if and (not .IsCompact) .Organizer}}
+                    <span class="calendar-event-detail">{{.Organizer}}</span>
+                    {{end}}
+
+                </a>
+                {{end}}
+
+            </div>
+        </div>{{/* .calendar-columns */}}
+
+    </div>{{/* .calendar-time-body */}}
+
+</div>{{/* .calendar */}}
+{{end}}

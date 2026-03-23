@@ -1,0 +1,119 @@
+{{/*
+================================================================================
+CALENDAR HEADER COMPONENT
+================================================================================
+Shared navigation toolbar rendered at the top of every calendar view.
+Contains: prev/next navigation, date range label, today button, view toggle.
+
+Usage:
+    {{template "calendar-header" .}}
+
+Required data (CalendarHeaderData):
+    .RangeLabel   string  — e.g. "March 2026" or "Mar 23–29, 2026"
+    .PrevURL      string  — HTMX hx-get URL for previous period
+    .NextURL      string  — HTMX hx-get URL for next period
+    .TodayURL     string  — HTMX hx-get URL for today
+    .ViewMode     string  — "month" | "week" | "day"
+    .MonthViewURL string  — URL for month view
+    .WeekViewURL  string  — URL for week view
+    .DayViewURL   string  — URL for day view
+    .HXTarget     string  — HTMX swap target selector (default: "#calendar")
+================================================================================
+*/}}
+
+{{define "calendar-header"}}
+{{$target := "#calendar"}}
+{{if .HXTarget}}{{$target = .HXTarget}}{{end}}
+
+<div class="calendar-toolbar" role="toolbar" aria-label="Calendar navigation">
+
+    {{/* Left: prev/next + today */}}
+    <div class="calendar-toolbar-left">
+
+        {{/* Today */}}
+        <button
+            type="button"
+            class="calendar-today-btn"
+            aria-label="Go to today"
+            hx-get="{{.TodayURL}}"
+            hx-target="{{$target}}"
+            hx-swap="outerHTML"
+            hx-push-url="true">
+            Today
+        </button>
+
+        {{/* Prev / Next */}}
+        <div class="calendar-nav" role="group" aria-label="Navigate periods">
+            <button
+                type="button"
+                class="calendar-nav-btn"
+                aria-label="Previous"
+                hx-get="{{.PrevURL}}"
+                hx-target="{{$target}}"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                {{template "icon-chevron-left" .}}
+            </button>
+            <button
+                type="button"
+                class="calendar-nav-btn"
+                aria-label="Next"
+                hx-get="{{.NextURL}}"
+                hx-target="{{$target}}"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                {{template "icon-chevron-right" .}}
+            </button>
+        </div>
+
+        {{/* Date range label */}}
+        <span class="calendar-range-label" aria-live="polite" aria-atomic="true">
+            {{.RangeLabel}}
+        </span>
+    </div>
+
+    {{/* Right: view toggle */}}
+    <div class="calendar-toolbar-right">
+        <div class="calendar-view-toggle" role="group" aria-label="Calendar view">
+
+            <button
+                type="button"
+                class="calendar-view-btn{{if eq .ViewMode "month"}} active{{end}}"
+                data-view="month"
+                aria-pressed="{{if eq .ViewMode "month"}}true{{else}}false{{end}}"
+                hx-get="{{.MonthViewURL}}"
+                hx-target="{{$target}}"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Month
+            </button>
+
+            <button
+                type="button"
+                class="calendar-view-btn{{if eq .ViewMode "week"}} active{{end}}"
+                data-view="week"
+                aria-pressed="{{if eq .ViewMode "week"}}true{{else}}false{{end}}"
+                hx-get="{{.WeekViewURL}}"
+                hx-target="{{$target}}"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Week
+            </button>
+
+            <button
+                type="button"
+                class="calendar-view-btn{{if eq .ViewMode "day"}} active{{end}}"
+                data-view="day"
+                aria-pressed="{{if eq .ViewMode "day"}}true{{else}}false{{end}}"
+                hx-get="{{.DayViewURL}}"
+                hx-target="{{$target}}"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Day
+            </button>
+
+        </div>
+    </div>
+
+</div>
+{{end}}
