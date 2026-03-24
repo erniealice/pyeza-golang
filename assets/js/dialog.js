@@ -27,9 +27,8 @@
     // ========================================
 
     function setBackgroundInert(inert) {
-        // Only inert the sidebar — #main-content contains the dialog itself,
-        // so setting inert on it would block the dialog controls.
-        // The dialog overlay already prevents interaction with background content.
+        // Only inert the sidebar — the dialog overlay + focus-trap handles the rest.
+        // Note: inerting <main> causes <body> to intercept pointer events on dialog buttons.
         var sidebar = document.getElementById('sidebar');
         if (sidebar) {
             if (inert) {

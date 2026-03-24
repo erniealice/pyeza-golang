@@ -42,9 +42,8 @@
     // ========================================
 
     function setBackgroundInert(inert) {
-        // Only inert the sidebar — #main-content contains the sheet itself,
-        // so setting inert on it would block the sheet form fields.
-        // The sheet overlay already prevents interaction with background content.
+        // Only inert the sidebar — the sheet overlay + focus-trap handles the rest.
+        // Note: inerting <main> causes <body> to intercept pointer events on sheet buttons.
         var sidebar = document.getElementById('sidebar');
         if (sidebar) {
             if (inert) {

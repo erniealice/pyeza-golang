@@ -62,12 +62,12 @@ Classes automatically applied:
 
 <div id="{{$id}}" class="sheet sheet--{{$variant}}">
     <div class="sheet-overlay"></div>
-    <div class="sheet-panel sheet-panel--{{$panelWidth}}" role="dialog">
+    <div class="sheet-panel sheet-panel--{{$panelWidth}}" role="dialog" aria-modal="true"{{if .Title}} aria-labelledby="{{$id}}-title"{{end}}>
         {{if .Header}}
         <div class="sheet-header">
             <div class="sheet-drag-handle"></div>
             {{if .Title}}
-            <h2 class="sheet-title">{{.Title}}</h2>
+            <h2 id="{{$id}}-title" class="sheet-title">{{.Title}}</h2>
             {{end}}
             <div class="sheet-header-actions">
                 {{if .HeaderActions}}

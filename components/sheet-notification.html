@@ -35,9 +35,9 @@ HTMX Events:
 {{define "sheet-notification"}}
 <div class="sheet sheet-notification" id="notificationSheet">
     <div class="sheet-overlay" id="notificationSheetOverlay"></div>
-    <div class="sheet-panel sheet-panel-sm" role="dialog">
+    <div class="sheet-panel sheet-panel-sm" role="dialog" aria-modal="true" aria-labelledby="notificationSheet-title">
         <div class="sheet-header">
-            <h2 class="sheet-title">{{.CommonLabels.Notifications.Title}}</h2>
+            <h2 id="notificationSheet-title" class="sheet-title">{{.CommonLabels.Notifications.Title}}</h2>
             <div class="sheet-header-actions">
                 <button class="sheet-mark-all" id="markAllRead" title="{{.CommonLabels.Notifications.MarkAllRead}}">
                     {{template "icon-check-square"}}

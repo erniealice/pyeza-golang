@@ -392,9 +392,9 @@ JavaScript:
     {{/* Multi-level headers with column groups */}}
     <thead>
         <tr class="column-group-header">
-            <th class="column-group-spacer" rowspan="2"></th>
+            <th class="column-group-spacer" rowspan="2" scope="col"></th>
             {{range .ColumnGroups}}
-            <th class="column-group-label" colspan="{{len .Columns}}">{{.Label}}</th>
+            <th class="column-group-label" colspan="{{len .Columns}}" scope="colgroup">{{.Label}}</th>
             {{end}}
         </tr>
         <tr class="column-sub-header">
@@ -403,7 +403,7 @@ JavaScript:
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
+            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
                 {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
                 {{if .Sortable}}
                 <span class="sort-indicator">
@@ -421,7 +421,7 @@ JavaScript:
     <thead>
         <tr>
             {{if .ShowCheckbox}}
-            <th class="row-checkbox">
+            <th scope="col" class="row-checkbox">
                 <input type="checkbox"
                        id="{{.ID}}-select-all"
                        class="select-all-checkbox"
@@ -433,7 +433,7 @@ JavaScript:
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
+            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
                 {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
                 {{if .Sortable}}
                 <span class="sort-indicator">
@@ -444,7 +444,7 @@ JavaScript:
             </th>
             {{end}}
             {{if .ShowActions}}
-            <th class="actions-column">{{.Labels.Actions}}</th>
+            <th scope="col" class="actions-column">{{.Labels.Actions}}</th>
             {{end}}
         </tr>
     </thead>
