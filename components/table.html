@@ -198,7 +198,7 @@ JavaScript:
     </button>
 
     {{/* Mobile Backdrop (closes actions sheet) */}}
-    <div class="toolbar-mobile-backdrop" onclick="this.closest('.table-toolbar').classList.remove('actions-open')"></div>
+    <div class="toolbar-mobile-backdrop" role="button" tabindex="0" aria-label="Close menu" onclick="this.closest('.table-toolbar').classList.remove('actions-open')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.closest('.table-toolbar').classList.remove('actions-open')}"></div>
 
     {{/* Toolbar Actions */}}
     <div class="toolbar-actions">
@@ -360,6 +360,7 @@ JavaScript:
         {{else if .PrimaryAction.ActionURL}}
         <button type="button"
                 class="btn-primary toolbar-primary-action"
+                aria-haspopup="dialog"
                 hx-get="{{.PrimaryAction.ActionURL}}"
                 hx-target="#sheetContent"
                 hx-swap="innerHTML"

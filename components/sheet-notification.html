@@ -49,10 +49,10 @@ HTMX Events:
             </div>
         </div>
 
-        <div class="sheet-tabs">
-            <button class="sheet-tab active" data-filter="all">{{.CommonLabels.Notifications.Tabs.All}}</button>
-            <button class="sheet-tab" data-filter="unread">{{.CommonLabels.Notifications.Tabs.Unread}}</button>
-            <button class="sheet-tab" data-filter="alert">{{.CommonLabels.Notifications.Tabs.Alerts}}</button>
+        <div class="sheet-tabs" role="tablist" aria-label="Notification filters">
+            <button class="sheet-tab active" data-filter="all" role="tab" aria-selected="true" tabindex="0">{{.CommonLabels.Notifications.Tabs.All}}</button>
+            <button class="sheet-tab" data-filter="unread" role="tab" aria-selected="false" tabindex="-1">{{.CommonLabels.Notifications.Tabs.Unread}}</button>
+            <button class="sheet-tab" data-filter="alert" role="tab" aria-selected="false" tabindex="-1">{{.CommonLabels.Notifications.Tabs.Alerts}}</button>
         </div>
 
         <div class="sheet-content">
