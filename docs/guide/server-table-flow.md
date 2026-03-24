@@ -279,4 +279,4 @@ When adding server-side table support to a new entity:
 | `packages/{domain}/routes.go` | Add POST table route constant |
 | `packages/{domain}/routes_config.go` | Add `TableURL string` to entity routes struct |
 | `apps/{app}/internal/presentation/{entity}/module.go` | Wire NewTableView, register POST route |
-| `packages/espyna-golang-ryta/.../adapter/entity/{entity}.go` | Call BuildFilterWhere, COUNT(*) OVER(), allowlisted ORDER BY |
+| `packages/espyna-golang/.../adapter/entity/{entity}.go` | Call BuildFilterWhere, COUNT(*) OVER(), allowlisted ORDER BY |

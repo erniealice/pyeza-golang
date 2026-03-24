@@ -145,8 +145,8 @@ html,
     --font-display: 'Lexend Exa', 'Figtree', sans-serif;
 }
 
-/* Ryta Minimal (Lexend Exa everywhere — clean, geometric, modern) */
-[data-font="ryta-minimal"] {
+/* Ichizen Minimal (Lexend Exa everywhere — clean, geometric, modern) */
+[data-font="ichizen-minimal"] {
     --font-body: 'Lexend Exa', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-display: 'Lexend Exa', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }

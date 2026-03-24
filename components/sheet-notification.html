@@ -49,10 +49,10 @@ HTMX Events:
             </div>
         </div>
 
-        <div class="sheet-tabs" role="tablist" aria-label="Notification filters">
-            <button class="sheet-tab active" data-filter="all" role="tab" aria-selected="true" tabindex="0">{{.CommonLabels.Notifications.Tabs.All}}</button>
-            <button class="sheet-tab" data-filter="unread" role="tab" aria-selected="false" tabindex="-1">{{.CommonLabels.Notifications.Tabs.Unread}}</button>
-            <button class="sheet-tab" data-filter="alert" role="tab" aria-selected="false" tabindex="-1">{{.CommonLabels.Notifications.Tabs.Alerts}}</button>
+        <div class="sheet-tabs" role="group" aria-label="{{.CommonLabels.Notifications.Title}}">
+            <button type="button" class="sheet-tab active" data-filter="all" aria-pressed="true">{{.CommonLabels.Notifications.Tabs.All}}</button>
+            <button type="button" class="sheet-tab" data-filter="unread" aria-pressed="false">{{.CommonLabels.Notifications.Tabs.Unread}}</button>
+            <button type="button" class="sheet-tab" data-filter="alert" aria-pressed="false">{{.CommonLabels.Notifications.Tabs.Alerts}}</button>
         </div>
 
         <div class="sheet-content">
@@ -99,6 +99,12 @@ HTMX Events:
     function getItemsEl() { return document.getElementById('notificationItems'); }
 
     let notifications = [];
+    let currentFilter = 'all';
+
+    function getFilterButtons() {
+        const sheet = getSheet();
+        return sheet ? Array.from(sheet.querySelectorAll('.sheet-tab')) : [];
+    }
 
     function open() {
         const sheet = getSheet();
@@ -152,29 +158,55 @@ HTMX Events:
     }
 
     function formatTime(timestamp) {
+        const locale = document.documentElement.lang || undefined;
+        const rtf = (typeof Intl !== 'undefined' && Intl.RelativeTimeFormat)
+            ? new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+            : null;
         const now = new Date();
         const date = new Date(timestamp);
         const diffMin = Math.floor((now - date) / 60000);
-        if (diffMin < 1) return 'Just now';
-        if (diffMin < 60) return diffMin + ' min ago';
+        if (!rtf) return date.toLocaleString(locale);
+        if (diffMin < 1) return rtf.format(0, 'minute');
+        if (diffMin < 60) return rtf.format(-diffMin, 'minute');
         const diffHour = Math.floor(diffMin / 60);
-        if (diffHour < 24) return diffHour + ' hour' + (diffHour > 1 ? 's' : '') + ' ago';
+        if (diffHour < 24) return rtf.format(-diffHour, 'hour');
         const diffDay = Math.floor(diffHour / 24);
-        if (diffDay < 7) return diffDay + ' day' + (diffDay > 1 ? 's' : '') + ' ago';
-        return date.toLocaleDateString();
+        if (diffDay < 7) return rtf.format(-diffDay, 'day');
+        return date.toLocaleDateString(locale);
+    }
+
+    function updateFilterButtons() {
+        getFilterButtons().forEach(function(btn) {
+            const active = btn.dataset.filter === currentFilter;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
+    function getVisibleNotifications() {
+        if (currentFilter === 'unread') {
+            return notifications.filter(function(n) { return !n.read; });
+        }
+        if (currentFilter === 'alert') {
+            return notifications.filter(function(n) { return n.type === 'alert'; });
+        }
+        return notifications;
     }
 
     function renderNotifications() {
         const itemsEl = getItemsEl();
         const emptyEl = getEmptyEl();
+        const visibleNotifications = getVisibleNotifications();
         if (!itemsEl) return;
 
-        if (notifications.length === 0) {
+        updateFilterButtons();
+
+        if (visibleNotifications.length === 0) {
             itemsEl.innerHTML = '';
             if (emptyEl) emptyEl.style.display = 'flex';
         } else {
             if (emptyEl) emptyEl.style.display = 'none';
-            itemsEl.innerHTML = notifications.map(n => `
+            itemsEl.innerHTML = visibleNotifications.map(n => `
                 <a href="${n.actionUrl || '#'}" class="sheet-card${n.read ? '' : ' unread'}">
                     <div class="sheet-card-icon ${n.type || 'info'}">
                         {{template "icon-bell"}}
@@ -235,6 +267,13 @@ HTMX Events:
 
         if (e.target.closest('#notificationSheetOverlay')) {
             close();
+            return;
+        }
+
+        const filterBtn = e.target.closest('.sheet-tab');
+        if (filterBtn) {
+            currentFilter = filterBtn.dataset.filter || 'all';
+            renderNotifications();
             return;
         }
     });

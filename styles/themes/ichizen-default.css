@@ -1,12 +1,12 @@
 /*
  * ==========================================================================
- * THEME: RYTA DEFAULT
- * Official Ryta brand theme — deep indigo primary from ryta-v1.svg (#3D0DDA)
+ * THEME: ICHIZEN DEFAULT
+ * Official Ichizen brand theme — deep indigo primary from ichizen-v1.svg (#3D0DDA)
  * Clean, professional, modern — neutral whites with vibrant indigo accents
  * Think: SaaS dashboard, brand-forward admin, polished product UI
  * ==========================================================================
  */
-[data-theme="ryta-default"] {
+[data-theme="ichizen-default"] {
     /* Backgrounds — clean white with faint indigo tint */
     --bg-base: #FAFAFD;
     --bg-sidebar: #F3F2FA;
@@ -21,7 +21,7 @@
     --text-muted: #8E88A4;
     --text-inverse: #FFFFFF;
 
-    /* Primary Accent — Ryta brand indigo from SVG */
+    /* Primary Accent — Ichizen brand indigo from SVG */
     --accent-primary: #3D0DDA;
     --accent-primary-light: #EEEBFC;
     --accent-primary-dark: #2F0AAD;
@@ -120,7 +120,7 @@
     --app-color-ledger-light: #F0FDF4;
 
     /* Theme Meta */
-    --theme-name: "Ryta Default";
+    --theme-name: "Ichizen Default";
     --theme-icon-bg: linear-gradient(135deg, #FAFAFD 0%, #E2DFF0 100%);
     --theme-icon-accent: #3D0DDA;
 }

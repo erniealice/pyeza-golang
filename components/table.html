@@ -93,12 +93,12 @@ JavaScript:
       {{range .ServerPagination.ActiveFilters}}
       <span class="chip sm" data-filter-key="{{.Key}}" role="listitem">
         <span class="chip-label">{{.Label}}: {{.DisplayValue}}</span>
-        <button type="button" class="chip-dismiss" data-dismiss-filter="{{.Key}}" aria-label="Remove {{.Label}} filter">
+        <button type="button" class="chip-dismiss" data-dismiss-filter="{{.Key}}" aria-label="{{$.Labels.Clear}} {{.Label}}">
           {{template "icon-x" $}}
         </button>
       </span>
       {{end}}
-      <button type="button" class="chip sm" data-clear-all-filters>Clear all</button>
+      <button type="button" class="chip sm" data-clear-all-filters>{{$.Labels.ClearAll}}</button>
     </div>
     {{end}}{{end}}
     {{if .ServerPagination}}
@@ -186,8 +186,8 @@ JavaScript:
                id="{{.ID}}-search"
                class="toolbar-search-input"
                data-table="{{.ID}}"
-               aria-label="{{if .Labels.SearchPlaceholder}}{{.Labels.SearchPlaceholder}}{{else}}Search{{end}}"
-               placeholder="{{if .Labels.SearchPlaceholder}}{{.Labels.SearchPlaceholder}}{{else}}Search...{{end}}"
+               aria-label="{{.Labels.Search}}"
+               placeholder="{{.Labels.SearchPlaceholder}}"
                {{if .ServerPagination}}{{if .ServerPagination.SearchQuery}} value="{{.ServerPagination.SearchQuery}}"{{end}}{{end}}>
     </div>
     {{end}}
@@ -207,13 +207,13 @@ JavaScript:
         <div class="toolbar-dropdown" data-dropdown="filters">
             <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
                 {{template "icon-filter" .}}
-                <span>{{if .Labels.Filters}}{{.Labels.Filters}}{{else}}Filters{{end}}</span>
+                <span>{{.Labels.Filters}}</span>
                 {{template "icon-chevron-down" .}}
             </button>
             <div class="toolbar-dropdown-panel filter-panel">
                 <div class="filter-panel-header">
-                    <span class="filter-panel-title">{{if .Labels.FilterConditions}}{{.Labels.FilterConditions}}{{else}}Filter Conditions{{end}}</span>
-                    <button type="button" class="filter-clear-all">{{if .Labels.ClearAll}}{{.Labels.ClearAll}}{{else}}Clear All{{end}}</button>
+                    <span class="filter-panel-title">{{.Labels.FilterConditions}}</span>
+                    <button type="button" class="filter-clear-all">{{.Labels.ClearAll}}</button>
                 </div>
                 {{/* Filter column metadata — read by table-filters.js to build typed conditions */}}
                 <script type="application/json" id="{{.ID}}-filter-meta">
@@ -224,11 +224,11 @@ JavaScript:
                 </div>
                 <button type="button" class="filter-add-condition" data-table="{{.ID}}">
                     {{template "icon-plus" .}}
-                    <span>{{if .Labels.AddCondition}}{{.Labels.AddCondition}}{{else}}Add condition{{end}}</span>
+                    <span>{{.Labels.AddCondition}}</span>
                 </button>
                 <div class="filter-panel-footer">
-                    <button type="button" class="btn btn-secondary filter-clear">{{if .Labels.Clear}}{{.Labels.Clear}}{{else}}Clear{{end}}</button>
-                    <button type="button" class="btn btn-primary filter-apply">{{if .Labels.ApplyFilters}}{{.Labels.ApplyFilters}}{{else}}Apply Filters{{end}}</button>
+                    <button type="button" class="btn btn-secondary filter-clear">{{.Labels.Clear}}</button>
+                    <button type="button" class="btn btn-primary filter-apply">{{.Labels.ApplyFilters}}</button>
                 </div>
             </div>
         </div>
@@ -239,7 +239,7 @@ JavaScript:
         <div class="toolbar-dropdown" data-dropdown="sort">
             <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
                 {{template "icon-arrow-up-down" .}}
-                <span>{{if .Labels.Sort}}{{.Labels.Sort}}{{else}}Sort{{end}}</span>
+                <span>{{.Labels.Sort}}</span>
                 {{template "icon-chevron-down" .}}
             </button>
             <div class="toolbar-dropdown-menu sort-menu">
@@ -267,7 +267,7 @@ JavaScript:
         <div class="toolbar-dropdown" data-dropdown="columns">
             <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
                 {{template "icon-columns" .}}
-                <span>{{if .Labels.Columns}}{{.Labels.Columns}}{{else}}Columns{{end}}</span>
+                <span>{{.Labels.Columns}}</span>
                 {{template "icon-chevron-down" .}}
             </button>
             <div class="toolbar-dropdown-menu columns-menu">
@@ -286,7 +286,7 @@ JavaScript:
         <div class="toolbar-dropdown" data-dropdown="export">
             <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
                 {{template "icon-download" .}}
-                <span>{{if .Labels.Export}}{{.Labels.Export}}{{else}}Export{{end}}</span>
+                <span>{{.Labels.Export}}</span>
                 {{template "icon-chevron-down" .}}
             </button>
             <div class="toolbar-dropdown-menu export-menu">
@@ -305,22 +305,22 @@ JavaScript:
         {{/* Density Button */}}
         {{if .ShowDensity}}
         <div class="toolbar-dropdown" data-dropdown="density">
-            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true" aria-label="{{if .Labels.DensityLabel}}{{.Labels.DensityLabel}}{{else}}Row density{{end}}">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true" aria-label="{{.Labels.DensityLabel}}">
                 {{template "icon-density" .}}
                 {{template "icon-chevron-down" .}}
             </button>
             <div class="toolbar-dropdown-menu density-menu">
                 <div class="density-option active" data-density="default" data-table="{{.ID}}">
                     <span class="density-preview density-preview--default"></span>
-                    <span class="density-label">{{if .Labels.DensityDefault}}{{.Labels.DensityDefault}}{{else}}Default{{end}}</span>
+                    <span class="density-label">{{.Labels.DensityDefault}}</span>
                 </div>
                 <div class="density-option" data-density="comfortable" data-table="{{.ID}}">
                     <span class="density-preview density-preview--comfortable"></span>
-                    <span class="density-label">{{if .Labels.DensityComfortable}}{{.Labels.DensityComfortable}}{{else}}Comfortable{{end}}</span>
+                    <span class="density-label">{{.Labels.DensityComfortable}}</span>
                 </div>
                 <div class="density-option" data-density="compact" data-table="{{.ID}}">
                     <span class="density-preview density-preview--compact"></span>
-                    <span class="density-label">{{if .Labels.DensityCompact}}{{.Labels.DensityCompact}}{{else}}Compact{{end}}</span>
+                    <span class="density-label">{{.Labels.DensityCompact}}</span>
                 </div>
             </div>
         </div>
@@ -427,7 +427,7 @@ JavaScript:
                        id="{{.ID}}-select-all"
                        class="select-all-checkbox"
                        data-table="{{.ID}}"
-                       aria-label="{{if .Labels.SelectAll}}{{.Labels.SelectAll}}{{else}}Select all rows{{end}}">
+                       aria-label="{{.Labels.SelectAll}}">
             </th>
             {{end}}
             {{range .Columns}}
@@ -641,34 +641,34 @@ JavaScript:
     {{/* Entries selector - left */}}
     {{if .ShowEntries}}
     <div class="footer-entries">
-        <span>{{if .Labels.Show}}{{.Labels.Show}}{{else}}Show{{end}}</span>
-        <select id="{{.ID}}-entries" class="entries-selector" data-table="{{.ID}}" aria-label="{{if .Labels.EntriesPerPage}}{{.Labels.EntriesPerPage}}{{else}}Entries per page{{end}}">
+        <span>{{.Labels.Show}}</span>
+        <select id="{{.ID}}-entries" class="entries-selector" data-table="{{.ID}}" aria-label="{{.Labels.EntriesPerPage}}">
             <option value="10">10</option>
             <option value="25" selected>25</option>
             <option value="50">50</option>
             <option value="100">100</option>
         </select>
-        <span>{{if .Labels.Entries}}{{.Labels.Entries}}{{else}}entries{{end}}</span>
+        <span>{{.Labels.Entries}}</span>
     </div>
     {{end}}
     {{/* Info - center */}}
     <div class="footer-info">
-        {{if .Labels.Showing}}{{.Labels.Showing}}{{else}}Showing{{end}}
+        {{.Labels.Showing}}
         <strong><span id="{{.ID}}-start">1</span></strong>
-        {{if .Labels.To}}{{.Labels.To}}{{else}}to{{end}}
+        {{.Labels.To}}
         <strong><span id="{{.ID}}-end">25</span></strong>
-        {{if .Labels.Of}}{{.Labels.Of}}{{else}}of{{end}}
+        {{.Labels.Of}}
         <strong><span id="{{.ID}}-total">{{len .Rows}}</span></strong>
-        {{if .Labels.EntriesLabel}}{{.Labels.EntriesLabel}}{{else}}entries{{end}}
+        {{.Labels.EntriesLabel}}
     </div>
     {{/* Pagination - right */}}
     <div class="footer-pagination" id="{{.ID}}-pagination">
         <button class="pagination-btn pagination-prev" disabled data-table="{{.ID}}">
-            &laquo; {{if .Labels.Prev}}{{.Labels.Prev}}{{else}}Prev{{end}}
+            &laquo; {{.Labels.Prev}}
         </button>
         <button class="pagination-page active" data-page="1" data-table="{{.ID}}">1</button>
         <button class="pagination-btn pagination-next" data-table="{{.ID}}">
-            {{if .Labels.Next}}{{.Labels.Next}}{{else}}Next{{end}} &raquo;
+            {{.Labels.Next}} &raquo;
         </button>
     </div>
 </div>
@@ -686,27 +686,27 @@ JavaScript:
     {{/* Entries selector - left (server-mode) */}}
     {{if .ShowEntries}}
     <div class="footer-entries">
-        <span>{{if .Labels.Show}}{{.Labels.Show}}{{else}}Show{{end}}</span>
-        <select id="{{.ID}}-entries" class="entries-selector server-entries-selector" data-table="{{.ID}}" aria-label="{{if .Labels.EntriesPerPage}}{{.Labels.EntriesPerPage}}{{else}}Entries per page{{end}}">
+        <span>{{.Labels.Show}}</span>
+        <select id="{{.ID}}-entries" class="entries-selector server-entries-selector" data-table="{{.ID}}" aria-label="{{.Labels.EntriesPerPage}}">
             <option value="10"{{if eq $pageSize 10}} selected{{end}}>10</option>
             <option value="25"{{if eq $pageSize 25}} selected{{end}}>25</option>
             <option value="50"{{if eq $pageSize 50}} selected{{end}}>50</option>
             <option value="100"{{if eq $pageSize 100}} selected{{end}}>100</option>
         </select>
-        <span>{{if .Labels.Entries}}{{.Labels.Entries}}{{else}}entries{{end}}</span>
+        <span>{{.Labels.Entries}}</span>
     </div>
     {{end}}
 
     {{/* Info - center (offset mode: "Showing X to Y of Z entries") */}}
     {{if eq $mode "offset"}}
     <div class="footer-info">
-        {{if .Labels.Showing}}{{.Labels.Showing}}{{else}}Showing{{end}}
+        {{.Labels.Showing}}
         <strong>{{$sp.StartRow}}</strong>
-        {{if .Labels.To}}{{.Labels.To}}{{else}}to{{end}}
+        {{.Labels.To}}
         <strong>{{$sp.EndRow}}</strong>
-        {{if .Labels.Of}}{{.Labels.Of}}{{else}}of{{end}}
+        {{.Labels.Of}}
         <strong>{{$sp.TotalRows}}</strong>
-        {{if .Labels.EntriesLabel}}{{.Labels.EntriesLabel}}{{else}}entries{{end}}
+        {{.Labels.EntriesLabel}}
     </div>
     {{end}}
 
@@ -723,7 +723,7 @@ JavaScript:
             <button class="pagination-btn pagination-prev{{if not $sp.HasPrevPage}} disabled{{end}}"
                     {{if not $sp.HasPrevPage}}disabled{{end}}
                     data-table="{{.ID}}">
-                &laquo; {{if .Labels.Prev}}{{.Labels.Prev}}{{else}}Prev{{end}}
+                &laquo; {{.Labels.Prev}}
             </button>
 
             {{/* Pre-computed page number buttons */}}
@@ -741,20 +741,20 @@ JavaScript:
             <button class="pagination-btn pagination-next{{if not $sp.HasNextPage}} disabled{{end}}"
                     {{if not $sp.HasNextPage}}disabled{{end}}
                     data-table="{{.ID}}">
-                {{if .Labels.Next}}{{.Labels.Next}}{{else}}Next{{end}} &raquo;
+                {{.Labels.Next}} &raquo;
             </button>
         {{else}}
             {{/* Cursor mode: only prev/next buttons */}}
             <button class="pagination-btn pagination-prev{{if not $sp.HasPrevPage}} disabled{{end}}"
                     {{if not $sp.HasPrevPage}}disabled{{end}}
                     data-table="{{.ID}}">
-                &laquo; {{if .Labels.Prev}}{{.Labels.Prev}}{{else}}Prev{{end}}
+                &laquo; {{.Labels.Prev}}
             </button>
 
             <button class="pagination-btn pagination-next{{if not $sp.HasNextPage}} disabled{{end}}"
                     {{if not $sp.HasNextPage}}disabled{{end}}
                     data-table="{{.ID}}">
-                {{if .Labels.Next}}{{.Labels.Next}}{{else}}Next{{end}} &raquo;
+                {{.Labels.Next}} &raquo;
             </button>
         {{end}}
     </div>

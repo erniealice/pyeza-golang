@@ -245,7 +245,7 @@ type ThemeOptionLabels struct {
 	PaperInk       string `json:"paperInk"`
 	PeachFizz      string `json:"peachFizz"`
 	ModernRetail   string `json:"modernRetail"`
-	RytaDefault    string `json:"rytaDefault"`
+	IchizenDefault    string `json:"ichizenDefault"`
 	SalonBlush     string `json:"salonBlush"`
 	LedgerMono     string `json:"ledgerMono"`
 	BrutalistInk   string `json:"brutalistInk"`
@@ -283,7 +283,7 @@ type FontOptionLabels struct {
 	Rounded   string `json:"rounded"`
 	Condensed string `json:"condensed"`
 	Exa         string `json:"exa"`
-	RytaMinimal string `json:"rytaMinimal"`
+	IchizenMinimal string `json:"ichizenMinimal"`
 }
 
 type HelpPaneLabels struct {

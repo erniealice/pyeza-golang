@@ -67,7 +67,7 @@
 <a href="{{.Href}}" class="{{$classes}}"
     {{- if .ID }} id="{{.ID}}"{{end -}}
     {{- if .Title }} title="{{.Title}}"{{end -}}
-    {{- if and (not .Label) (or (eq $variant "action") (eq $variant "icon")) }}{{if .Title}} aria-label="{{.Title}}"{{else if .Label}} aria-label="{{.Label}}"{{end}}{{end -}}
+    {{- if and (not .Label) (or (eq $variant "action") (eq $variant "icon")) }} aria-label="{{or .Title .ActionType .Icon .ID}}"{{end -}}
     {{- if $disabled }} aria-disabled="true" tabindex="-1"{{end -}}
     {{- range $key, $val := .Data }} data-{{$key}}="{{$val}}"{{end -}}
 >
@@ -110,7 +110,7 @@
 <button type="{{$type}}" class="{{$classes}}"
     {{- if .ID }} id="{{.ID}}"{{end -}}
     {{- if .Title }} title="{{.Title}}"{{end -}}
-    {{- if and (not .Label) (or (eq $variant "action") (eq $variant "icon")) }}{{if .Title}} aria-label="{{.Title}}"{{else if .Label}} aria-label="{{.Label}}"{{end}}{{end -}}
+    {{- if and (not .Label) (or (eq $variant "action") (eq $variant "icon")) }} aria-label="{{or .Title .ActionType .Icon .ID}}"{{end -}}
     {{- if $disabled }} disabled{{end -}}
     {{- range $key, $val := .Data }} data-{{$key}}="{{$val}}"{{end -}}
 >

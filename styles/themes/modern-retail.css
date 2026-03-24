@@ -2,7 +2,7 @@
  * ==========================================================================
  * THEME: MODERN RETAIL
  * Vibrant indigo primary with a clean, blue-tinted neutral palette
- * Matches RYTA brand identity — logo infinity symbol in #4318D9
+ * Matches ICHIZEN brand identity — logo infinity symbol in #4318D9
  * ==========================================================================
  */
 [data-theme="modern-retail"] {
@@ -20,7 +20,7 @@
     --text-muted: #8E8A9D;
     --text-inverse: #FFFFFF;
 
-    /* Primary Accent — vibrant indigo from RYTA logo */
+    /* Primary Accent — vibrant indigo from ICHIZEN logo */
     --accent-primary: #4318D9;
     --accent-primary-light: #EDE9FC;
     --accent-primary-dark: #3712B5;
