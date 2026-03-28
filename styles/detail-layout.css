@@ -67,6 +67,11 @@
     overflow-y: auto;
     min-height: 0;
 }
+.tab-scroll--table {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 
 @media (max-width: 768px) {
     .detail-body { padding: var(--spacing-xl); }
