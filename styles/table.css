@@ -48,6 +48,12 @@
     border-bottom: 1px solid var(--border-light);
     gap: 1rem;
     flex-wrap: wrap;
+    min-height: var(--table-toolbar-height);
+}
+
+.table-bulk-toolbar,
+.table-toolbar {
+    box-sizing: border-box;
 }
 
 /* Toolbar Search */
@@ -701,6 +707,10 @@
 }
 
 .data-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg-base);
     text-align: left;
     padding: 0.875rem 1.5rem;
     font-size: var(--text-sm);
@@ -2208,7 +2218,8 @@ body.density-comfortable .action-buttons {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1.5rem;
+    padding: 1rem 1.5rem;
+    min-height: var(--table-toolbar-height);
     background: var(--accent-terracotta-light);
     border-bottom: 1px solid var(--accent-terracotta);
     gap: 1rem;

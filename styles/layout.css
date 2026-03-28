@@ -142,6 +142,9 @@
     --spacing-4xl: 2rem;      /* 32px — section spacers */
     --spacing-5xl: 2.5rem;    /* 40px — page-level spacing */
 
+    /* Component dimensions — structural heights for layout stability */
+    --table-toolbar-height: 4.5625rem;  /* 73px — table toolbar + bulk toolbar min-height */
+
     /* Icon sizes — structural dimensions for SVG/icon elements */
     --icon-2xs: 0.875rem;   /* 14px — inline icons, breadcrumbs, badges */
     --icon-xs:  1rem;       /* 16px — table cell icons, small actions */

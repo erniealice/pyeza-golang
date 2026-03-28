@@ -277,6 +277,11 @@
                     // P1: restore focus after swap
                     restoreFocusIdentity(tableCard, focusIdentity);
 
+                    // Clear bulk selections — prevent stale IDs from previous page
+                    if (window.TableSelection) {
+                        window.TableSelection.initBulkSelection();
+                    }
+
                     console.log('[TableServer] Targeted swap complete for:', baseId);
                 })
                 .catch(function(err) {

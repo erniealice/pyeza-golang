@@ -98,9 +98,13 @@
             // Remove the meta carrier (its job is done)
             metaEl.remove();
 
-            // Re-init ONLY pagination (footer was OOB-swapped, needs new event listeners)
+            // Re-init pagination (footer was OOB-swapped, needs new event listeners)
             if (window.TablePagination) {
                 window.TablePagination.init();
+            }
+            // Clear bulk selections — prevent stale IDs from previous page
+            if (window.TableSelection) {
+                window.TableSelection.initBulkSelection();
             }
             return; // Skip full re-init — toolbar modules are untouched
         }

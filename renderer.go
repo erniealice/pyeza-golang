@@ -280,7 +280,8 @@ func (r *HTMLRenderer) initFromFS() error {
 			if readErr != nil {
 				return readErr
 			}
-			_, parseErr := r.templates.Parse(string(content))
+			var parseErr error
+			r.templates, parseErr = r.templates.Parse(string(content))
 			if parseErr != nil {
 				return fmt.Errorf("parsing %s: %w", path, parseErr)
 			}

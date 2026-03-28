@@ -706,7 +706,9 @@
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 6rem);
 }
 
 /* Collapsed state - menu appears to the right */
@@ -728,6 +730,13 @@
     letter-spacing: var(--sidebar-ls-section);
     color: var(--text-muted);
     border-bottom: var(--border-width) solid var(--border-light);
+    flex-shrink: 0;
+}
+
+.app-switcher-groups {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .app-switcher-close {
@@ -760,6 +769,9 @@
     grid-template-columns: 1fr 1fr;
     gap: 0.25rem; /* 4px */
     padding: 0.5rem; /* 8px */
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .app-switcher-grid.app-switcher-grid--cols-1 {

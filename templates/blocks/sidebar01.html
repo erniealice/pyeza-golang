@@ -41,25 +41,27 @@
                     {{template "icon-x" .}}
                 </button>
             </div>
-            {{range .Sidebar.AppGroups}}
-            {{$groupHasActive := false}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{$groupHasActive = true}}{{end}}{{end}}
-            <div class="app-switcher-group{{if $groupHasActive}} open{{end}}">
-                <button class="app-switcher-group-title" type="button" aria-expanded="{{if $groupHasActive}}true{{else}}false{{end}}">
-                    <span>{{.Title}}</span>
-                    <span class="app-switcher-group-chevron">{{template "icon-chevron-down" $}}</span>
-                </button>
-                <div class="app-switcher-group-items">
-                    {{range .Apps}}
-                    <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem">
-                        <div class="app-option-icon app-icon--{{.Key}}">
-                            {{renderContent .Icon $}}
-                        </div>
-                        <span class="app-option-name">{{.Label}}</span>
+            <div class="app-switcher-groups">
+                {{range .Sidebar.AppGroups}}
+                {{$groupHasActive := false}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{$groupHasActive = true}}{{end}}{{end}}
+                <div class="app-switcher-group{{if $groupHasActive}} open{{end}}">
+                    <button class="app-switcher-group-title" type="button" aria-expanded="{{if $groupHasActive}}true{{else}}false{{end}}">
+                        <span>{{.Title}}</span>
+                        <span class="app-switcher-group-chevron">{{template "icon-chevron-down" $}}</span>
                     </button>
-                    {{end}}
+                    <div class="app-switcher-group-items">
+                        {{range .Apps}}
+                        <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem">
+                            <div class="app-option-icon app-icon--{{.Key}}">
+                                {{renderContent .Icon $}}
+                            </div>
+                            <span class="app-option-name">{{.Label}}</span>
+                        </button>
+                        {{end}}
+                    </div>
                 </div>
+                {{end}}
             </div>
-            {{end}}
         </div>
     </div>
     {{else if .Sidebar.Apps}}

@@ -48,12 +48,15 @@
             if (!tableState.has(tableId)) {
                 tableState.set(tableId, {
                     selectedIds: new Set(),
+                    allResultsSelected: false,
                     eventListeners: []
                 });
             } else {
-                // Reset selectedIds on re-initialization
+                // Reset state on re-initialization
                 tableState.get(tableId).selectedIds.clear();
-                console.log('[TableSelection] Cleared selectedIds for table:', tableId);
+                tableState.get(tableId).allResultsSelected = false;
+                card.setAttribute('data-bulk-mode', 'false');
+                console.log('[TableSelection] Cleared state for table:', tableId);
             }
 
             const state = tableState.get(tableId);
@@ -73,6 +76,16 @@
                     } else {
                         state.selectedIds.delete(rowId);
                         e.target.closest('tr').classList.remove('selected');
+                        // Deselecting any row exits cross-page "all results" mode
+                        if (state.allResultsSelected) {
+                            state.allResultsSelected = false;
+                            // Drop cross-page IDs — rebuild from visible checked rows
+                            state.selectedIds.clear();
+                            table.querySelectorAll('.row-select-checkbox:checked').forEach(function(cb) {
+                                state.selectedIds.add(cb.dataset.rowId);
+                            });
+                            console.log('[TableSelection] Exited allResultsSelected mode, rebuilt page selection:', state.selectedIds.size);
+                        }
                     }
                     updateBulkSelectionUI(card, state.selectedIds, selectedCountEl, selectAllCheckbox, table);
                 }
@@ -96,6 +109,12 @@
                             row.classList.remove('selected');
                         }
                     });
+                    // Unchecking header checkbox exits cross-page mode
+                    if (!selectAllCheckbox.checked && state.allResultsSelected) {
+                        state.allResultsSelected = false;
+                        state.selectedIds.clear(); // Drop cross-page IDs
+                        console.log('[TableSelection] Exited allResultsSelected mode via header checkbox');
+                    }
                     updateBulkSelectionUI(card, state.selectedIds, selectedCountEl, selectAllCheckbox, table);
                 };
                 selectAllCheckbox.addEventListener('change', selectAllHandler);
@@ -112,10 +131,16 @@
                 listeners.push({ element: cancelBtn, type: 'click', handler: cancelHandler });
             }
 
+            // Store original "Select all" label for dynamic text updates
+            if (selectAllBtn && !selectAllBtn.dataset.originalLabel) {
+                selectAllBtn.dataset.originalLabel = selectAllBtn.textContent.trim();
+            }
+
             // Select all button in bulk toolbar
             if (selectAllBtn) {
                 const selectAllBtnHandler = () => {
                     const checkboxes = table.querySelectorAll('.row-select-checkbox');
+                    // Check all visible rows
                     checkboxes.forEach(cb => {
                         cb.checked = true;
                         const rowId = cb.dataset.rowId;
@@ -123,6 +148,21 @@
                         cb.closest('tr').classList.add('selected');
                     });
                     if (selectAllCheckbox) selectAllCheckbox.checked = true;
+
+                    // In server-pagination mode, fetch ALL result IDs across pages
+                    const isServerPaginated = card.dataset.serverPagination === 'true';
+                    const totalRows = parseInt(card.dataset.totalRows) || 0;
+                    if (isServerPaginated && totalRows > checkboxes.length) {
+                        state.allResultsSelected = true;
+                        console.log('[TableSelection] Entering allResultsSelected mode, total:', totalRows);
+                        // Optimistically show total count while fetching
+                        if (selectedCountEl) selectedCountEl.textContent = totalRows;
+                        // Fetch all IDs from the server
+                        fetchAllResultIds(card, state).then(function() {
+                            updateBulkSelectionUI(card, state.selectedIds, selectedCountEl, selectAllCheckbox, table);
+                        });
+                    }
+
                     updateBulkSelectionUI(card, state.selectedIds, selectedCountEl, selectAllCheckbox, table);
                 };
                 selectAllBtn.addEventListener('click', selectAllBtnHandler);
@@ -144,7 +184,8 @@
                         detail: {
                             action: action,
                             selectedIds: selectedArray,
-                            tableId: tableId
+                            tableId: tableId,
+                            allResultsSelected: state.allResultsSelected || false
                         },
                         bubbles: true
                     });
@@ -178,26 +219,69 @@
         state.eventListeners = [];
     }
 
+    /**
+     * Fetch all result IDs from server for cross-page "select all".
+     * Uses the table's pagination endpoint with size=totalRows, then
+     * extracts IDs from the HTML response via DOMParser.
+     */
+    function fetchAllResultIds(card, state) {
+        var bodyURL = card.dataset.paginationBodyUrl || card.dataset.paginationUrl;
+        if (!bodyURL || !window.TableServer) return Promise.resolve();
+
+        var totalRows = parseInt(card.dataset.totalRows) || 0;
+        var overrides = { page: 1, size: totalRows };
+
+        // Preserve active filters
+        var filters = card.dataset.filters;
+        if (filters) overrides.filters = filters;
+
+        var url = window.TableServer.buildServerPaginationURL(card, overrides, bodyURL);
+        console.log('[TableSelection] Fetching all result IDs from:', url);
+
+        return fetch(url)
+            .then(function(response) {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.text();
+            })
+            .then(function(html) {
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var allRows = doc.querySelectorAll('tr[data-id]');
+                allRows.forEach(function(row) {
+                    state.selectedIds.add(row.dataset.id);
+                });
+                console.log('[TableSelection] Fetched all result IDs, count:', state.selectedIds.size);
+            })
+            .catch(function(err) {
+                console.error('[TableSelection] Failed to fetch all result IDs:', err);
+                state.allResultsSelected = false;
+            });
+    }
+
     function updateBulkSelectionUI(card, selectedIds, selectedCountEl, selectAllCheckbox, table) {
         const count = selectedIds.size;
+        const tableId = card.id.replace('-card', '');
+        const state = tableState.get(tableId);
+        const isServerPaginated = card.dataset.serverPagination === 'true';
+        const totalRows = parseInt(card.dataset.totalRows) || 0;
 
-        console.log('[TableSelection] updateBulkSelectionUI - count:', count, 'selectedIds:', Array.from(selectedIds));
+        // When all results selected cross-page, show total; otherwise page count
+        const displayCount = (state && state.allResultsSelected) ? Math.max(totalRows, count) : count;
+
+        console.log('[TableSelection] updateBulkSelectionUI - count:', count, 'displayCount:', displayCount, 'allResultsSelected:', state?.allResultsSelected);
 
         // Update count display
         if (selectedCountEl) {
-            selectedCountEl.textContent = count;
+            selectedCountEl.textContent = displayCount;
         }
 
         // Show/hide bulk toolbar based on selection
-        if (count > 0) {
-            console.log('[TableSelection] Setting data-bulk-mode="true" for card:', card.id);
+        if (displayCount > 0) {
             card.setAttribute('data-bulk-mode', 'true');
         } else {
-            console.log('[TableSelection] Setting data-bulk-mode="false" for card:', card.id);
             card.setAttribute('data-bulk-mode', 'false');
         }
 
-        // Update select all checkbox state
+        // Update select all checkbox state and "Select all" button
         if (selectAllCheckbox) {
             const allCheckboxes = table.querySelectorAll('.row-select-checkbox');
             const allChecked = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(cb => cb.checked);
@@ -206,10 +290,26 @@
             selectAllCheckbox.checked = allChecked;
             selectAllCheckbox.indeterminate = someChecked && !allChecked;
 
-            // Hide "Select All" in bulk toolbar when all rows are already selected
             const selectAllBtn = card.querySelector('[data-action="select-all"]');
             if (selectAllBtn) {
-                selectAllBtn.style.display = (count >= allCheckboxes.length) ? 'none' : '';
+                if (state && state.allResultsSelected) {
+                    // All results selected cross-page — hide button
+                    selectAllBtn.style.display = 'none';
+                } else if (isServerPaginated && allChecked && totalRows > allCheckboxes.length) {
+                    // All page rows checked but more exist — show "Select all {total}"
+                    const label = selectAllBtn.dataset.originalLabel || 'Select all';
+                    selectAllBtn.textContent = label + ' ' + totalRows;
+                    selectAllBtn.style.display = '';
+                } else if (allChecked) {
+                    // Client-side table or total equals page — hide
+                    selectAllBtn.style.display = 'none';
+                } else {
+                    // Partial selection — restore original label
+                    if (selectAllBtn.dataset.originalLabel) {
+                        selectAllBtn.textContent = selectAllBtn.dataset.originalLabel;
+                    }
+                    selectAllBtn.style.display = '';
+                }
             }
         }
 
@@ -229,11 +329,21 @@
         const conditionalButtons = bulkToolbar.querySelectorAll('[data-requires-attr]');
         if (conditionalButtons.length === 0) return;
 
+        const tableId = card.id.replace('-card', '');
+        const state = tableState.get(tableId);
+
         conditionalButtons.forEach(button => {
             const requiredAttr = button.dataset.requiresAttr;
 
             if (selectedIds.size === 0) {
                 // No selection - button visibility controlled by toolbar visibility
+                button.style.display = '';
+                return;
+            }
+
+            // When all results selected cross-page, show all action buttons
+            // (server validates per-item; we can't check off-page row attributes)
+            if (state && state.allResultsSelected) {
                 button.style.display = '';
                 return;
             }
@@ -261,6 +371,11 @@
     function clearAllSelections(table, card, selectedIds, selectedCountEl, selectAllCheckbox) {
         console.log('[TableSelection] clearAllSelections called - selectedIds before:', Array.from(selectedIds));
         selectedIds.clear();
+
+        // Reset cross-page selection state
+        const tableId = card.id.replace('-card', '');
+        const state = tableState.get(tableId);
+        if (state) state.allResultsSelected = false;
 
         const checkboxes = table.querySelectorAll('.row-select-checkbox');
         checkboxes.forEach(cb => {
@@ -297,6 +412,7 @@
             tableState.forEach((state, tableId) => {
                 result[tableId] = {
                     selectedIds: Array.from(state.selectedIds),
+                    allResultsSelected: state.allResultsSelected,
                     listenerCount: state.eventListeners.length
                 };
             });

@@ -482,7 +482,7 @@ JavaScript:
     {{range .Cells}}
     <td{{if .Label}} data-label="{{.Label}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}};{{end}}vertical-align: {{$rowVAlign}}">
         {{if eq .Type "name"}}
-        {{if .Href}}<a href="{{.Href}}" class="item-name-link">{{.Value}}</a>{{else}}<span class="item-name">{{.Value}}</span>{{end}}
+        {{if .Href}}<a href="{{.Href}}" class="item-name-link" hx-push-url="true">{{.Value}}</a>{{else}}<span class="item-name">{{.Value}}</span>{{end}}
         {{if .Alert}}<span class="alert-icon">{{template "icon-alert-triangle" .}}</span>{{end}}
         {{else if eq .Type "badge"}}
         {{$badgeClass := "status-badge"}}
@@ -497,7 +497,7 @@ JavaScript:
         {{end}}
         <span class="{{$badgeClass}} {{.Variant}}">{{.Value}}</span>
         {{else if eq .Type "link"}}
-        <a href="{{.Href}}" class="table-link">{{.Value}}</a>
+        <a href="{{.Href}}" class="table-link" hx-push-url="true">{{.Value}}</a>
         {{else if eq .Type "html"}}
         {{.HTML}}
         {{else if eq .Type "author"}}
@@ -553,7 +553,7 @@ JavaScript:
         <div class="action-buttons">
             {{range .Actions}}
             {{if .Href}}
-            <a href="{{.Href}}" class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}">
+            <a href="{{.Href}}" class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}" hx-push-url="true">
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
                 {{if eq .Type "manage"}}{{template "icon-shield" $}}{{end}}
