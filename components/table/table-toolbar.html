@@ -1,0 +1,254 @@
+{{/*
+    Table Toolbar
+    =============
+    Search, Filters, Sort, Columns, Export, Density, Import, Primary Action.
+    Includes bulk selection toolbar.
+*/}}
+
+{{/* TABLE BULK TOOLBAR - Shown when rows are selected */}}
+{{define "table-bulk-toolbar"}}
+<div class="table-bulk-toolbar hidden" data-table="{{.ID}}">
+    <div class="bulk-toolbar-left">
+        <button type="button" class="bulk-cancel-btn" data-action="cancel-selection" aria-label="{{if .BulkActions.CancelLabel}}{{.BulkActions.CancelLabel}}{{else}}Cancel selection{{end}}">
+            {{template "icon-x" .}}
+        </button>
+        <span class="bulk-selected-count">
+            <strong><span class="selected-count">0</span></strong>
+            {{if .BulkActions.SelectedLabel}}{{.BulkActions.SelectedLabel}}{{else}}selected{{end}}
+        </span>
+        <button type="button" class="bulk-select-all-btn" data-action="select-all">
+            {{if .BulkActions.SelectAllLabel}}{{.BulkActions.SelectAllLabel}}{{else}}Select all{{end}}
+        </button>
+    </div>
+    <div class="bulk-toolbar-actions">
+        {{range .BulkActions.Actions}}
+        <button type="button" class="bulk-action-btn{{if eq .Variant "danger"}} bulk-action-danger{{else if eq .Variant "primary"}} bulk-action-primary{{else if eq .Variant "warning"}} bulk-action-warning{{end}}" data-bulk-action="{{.Key}}"{{if .Endpoint}} data-endpoint="{{.Endpoint}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}{{if .ExtraParamsJSON}} data-extra-params="{{.ExtraParamsJSON}}"{{end}}{{if .RequiresDataAttr}} data-requires-attr="{{.RequiresDataAttr}}"{{end}}>
+            {{if eq .Icon "icon-trash"}}{{template "icon-trash" $}}{{end}}
+            {{if eq .Icon "icon-archive"}}{{template "icon-archive" $}}{{end}}
+            {{if eq .Icon "icon-download"}}{{template "icon-download" $}}{{end}}
+            {{if eq .Icon "icon-copy"}}{{template "icon-copy" $}}{{end}}
+            {{if eq .Icon "icon-edit"}}{{template "icon-edit" $}}{{end}}
+            {{if eq .Icon "icon-eye"}}{{template "icon-eye" $}}{{end}}
+            {{if eq .Icon "icon-check"}}{{template "icon-check" $}}{{end}}
+            {{if eq .Icon "icon-user"}}{{template "icon-user" $}}{{end}}
+            {{if eq .Icon "icon-user-minus"}}{{template "icon-user-minus" $}}{{end}}
+            {{if eq .Icon "icon-user-plus"}}{{template "icon-user-plus" $}}{{end}}
+            {{if eq .Icon "icon-user-check"}}{{template "icon-user-check" $}}{{end}}
+            {{if eq .Icon "icon-user-search"}}{{template "icon-user-search" $}}{{end}}
+            {{if eq .Icon "icon-shield"}}{{template "icon-shield" $}}{{end}}
+            <span>{{.Label}}</span>
+        </button>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/* TABLE TOOLBAR - Search, Filters, Sort, Columns, Export */}}
+{{define "table-toolbar"}}
+<div class="table-toolbar" data-table="{{.ID}}">
+    {{/* Search Input */}}
+    {{if .ShowSearch}}
+    <div class="toolbar-search">
+        {{template "icon-search" .}}
+        <input type="text"
+               id="{{.ID}}-search"
+               class="toolbar-search-input"
+               data-table="{{.ID}}"
+               aria-label="{{.Labels.Search}}"
+               placeholder="{{.Labels.SearchPlaceholder}}"
+               {{if .ServerPagination}}{{if .ServerPagination.SearchQuery}} value="{{.ServerPagination.SearchQuery}}"{{end}}{{end}}>
+    </div>
+    {{end}}
+
+    {{/* Mobile Options Toggle (visible only on mobile) */}}
+    <button type="button" class="toolbar-mobile-toggle" onclick="this.closest('.table-toolbar').classList.toggle('actions-open')" aria-label="More options">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+    </button>
+
+    {{/* Mobile Backdrop (closes actions sheet) */}}
+    <div class="toolbar-mobile-backdrop" role="button" tabindex="0" aria-label="Close menu" onclick="this.closest('.table-toolbar').classList.remove('actions-open')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.closest('.table-toolbar').classList.remove('actions-open')}"></div>
+
+    {{/* Toolbar Actions */}}
+    <div class="toolbar-actions">
+        {{/* Filters Button */}}
+        {{if .ShowFilters}}
+        <div class="toolbar-dropdown" data-dropdown="filters">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
+                {{template "icon-filter" .}}
+                <span>{{.Labels.Filters}}</span>
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-panel filter-panel">
+                <div class="filter-panel-header">
+                    <span class="filter-panel-title">{{.Labels.FilterConditions}}</span>
+                    <button type="button" class="filter-clear-all">{{.Labels.ClearAll}}</button>
+                </div>
+                {{/* Filter column metadata — read by table-filters.js to build typed conditions */}}
+                <script type="application/json" id="{{.ID}}-filter-meta">
+                {{filterColumnsJSON .Columns}}
+                </script>
+                <div class="filter-conditions" id="{{.ID}}-filter-conditions">
+                    {{/* Filter rows will be added dynamically by JS */}}
+                </div>
+                <button type="button" class="filter-add-condition" data-table="{{.ID}}">
+                    {{template "icon-plus" .}}
+                    <span>{{.Labels.AddCondition}}</span>
+                </button>
+                <div class="filter-panel-footer">
+                    <button type="button" class="btn btn-secondary filter-clear">{{.Labels.Clear}}</button>
+                    <button type="button" class="btn btn-primary filter-apply">{{.Labels.ApplyFilters}}</button>
+                </div>
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Sort Button */}}
+        {{if .ShowSort}}
+        <div class="toolbar-dropdown" data-dropdown="sort">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
+                {{template "icon-arrow-up-down" .}}
+                <span>{{.Labels.Sort}}</span>
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-menu sort-menu">
+                {{range .Columns}}
+                {{if .Sortable}}
+                <div class="sort-option" data-sort="{{.Key}}">
+                    <span class="sort-option-label">{{.Label}}</span>
+                    <div class="sort-option-direction">
+                        <button type="button" class="sort-dir-btn" data-direction="asc" aria-label="Sort ascending">
+                            {{template "icon-arrow-up" $}}
+                        </button>
+                        <button type="button" class="sort-dir-btn" data-direction="desc" aria-label="Sort descending">
+                            {{template "icon-arrow-down" $}}
+                        </button>
+                    </div>
+                </div>
+                {{end}}
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Columns Button */}}
+        {{if .ShowColumns}}
+        <div class="toolbar-dropdown" data-dropdown="columns">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
+                {{template "icon-columns" .}}
+                <span>{{.Labels.Columns}}</span>
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-menu columns-menu">
+                {{range $index, $col := .Columns}}
+                <label class="column-toggle">
+                    <input type="checkbox" checked data-column="{{$col.Key}}" data-index="{{$index}}">
+                    <span>{{$col.Label}}</span>
+                </label>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Export Button */}}
+        {{if .ShowExport}}
+        <div class="toolbar-dropdown" data-dropdown="export">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true">
+                {{template "icon-download" .}}
+                <span>{{.Labels.Export}}</span>
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-menu export-menu">
+                <button type="button" class="export-option" data-format="csv">
+                    {{template "icon-file-text" .}}
+                    <span>Export as CSV</span>
+                </button>
+                <button type="button" class="export-option" data-format="excel">
+                    {{template "icon-file-spreadsheet" .}}
+                    <span>Export as Excel</span>
+                </button>
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Density Button */}}
+        {{if .ShowDensity}}
+        <div class="toolbar-dropdown" data-dropdown="density">
+            <button type="button" class="toolbar-btn" aria-expanded="false" aria-haspopup="true" aria-label="{{.Labels.DensityLabel}}">
+                {{template "icon-density" .}}
+                {{template "icon-chevron-down" .}}
+            </button>
+            <div class="toolbar-dropdown-menu density-menu">
+                <div class="density-option active" data-density="default" data-table="{{.ID}}">
+                    <span class="density-preview density-preview--default"></span>
+                    <span class="density-label">{{.Labels.DensityDefault}}</span>
+                </div>
+                <div class="density-option" data-density="comfortable" data-table="{{.ID}}">
+                    <span class="density-preview density-preview--comfortable"></span>
+                    <span class="density-label">{{.Labels.DensityComfortable}}</span>
+                </div>
+                <div class="density-option" data-density="compact" data-table="{{.ID}}">
+                    <span class="density-preview density-preview--compact"></span>
+                    <span class="density-label">{{.Labels.DensityCompact}}</span>
+                </div>
+            </div>
+        </div>
+        {{end}}
+
+        {{/* Import Action Button */}}
+        {{if .ImportAction}}
+        {{if .ImportAction.ActionURL}}
+        <button type="button"
+                class="toolbar-btn toolbar-import-btn"
+                hx-get="{{.ImportAction.ActionURL}}"
+                hx-target="#sheetContent"
+                hx-swap="innerHTML"
+                hx-push-url="false"
+                onclick="Sheet.open('{{.ImportAction.Label}}')">
+            {{if eq .ImportAction.Icon "icon-upload"}}{{template "icon-upload" .}}{{end}}
+            {{.ImportAction.Label}}
+        </button>
+        {{else}}
+        <a href="{{.ImportAction.Href}}" class="toolbar-btn toolbar-import-btn">
+            {{template "icon-upload" .}}
+            {{.ImportAction.Label}}
+        </a>
+        {{end}}
+        {{end}}
+
+        {{/* Primary Action Button */}}
+        {{if .PrimaryAction}}
+        {{if .PrimaryAction.Disabled}}
+        <button type="button"
+                class="btn-primary toolbar-primary-action disabled"
+                disabled
+                title="{{.PrimaryAction.DisabledTooltip}}">
+            {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
+            {{.PrimaryAction.Label}}
+        </button>
+        {{else if .PrimaryAction.ActionURL}}
+        <button type="button"
+                class="btn-primary toolbar-primary-action"
+                aria-haspopup="dialog"
+                hx-get="{{.PrimaryAction.ActionURL}}"
+                hx-target="#sheetContent"
+                hx-swap="innerHTML"
+                hx-push-url="false"
+                onclick="Sheet.open('{{.PrimaryAction.Label}}')">
+            {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
+            {{.PrimaryAction.Label}}
+        </button>
+        {{else}}
+        <a href="{{.PrimaryAction.Href}}" class="btn-primary toolbar-primary-action">
+            {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
+            {{.PrimaryAction.Label}}
+        </a>
+        {{end}}
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{/* TABLE HEADER (Legacy - kept for backwards compatibility) */}}
+{{define "table-header"}}
+{{template "table-toolbar" .}}
+{{end}}

@@ -139,16 +139,16 @@ html,
     --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
 }
 
-/* Exa (Lexend Exa headings + Figtree body) */
+/* Exa (Bricolage Grotesque headings + Figtree body) */
 [data-font="exa"] {
     --font-body: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-display: 'Lexend Exa', 'Figtree', sans-serif;
+    --font-display: 'Bricolage Grotesque', 'Figtree', sans-serif;
 }
 
-/* Ichizen Minimal (Lexend Exa everywhere — clean, geometric, modern) */
+/* Ichizen Minimal (Bricolage Grotesque everywhere — quirky, geometric, editorial) */
 [data-font="ichizen-minimal"] {
-    --font-body: 'Lexend Exa', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-display: 'Lexend Exa', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* ==========================================================================

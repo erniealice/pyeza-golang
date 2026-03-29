@@ -1,0 +1,65 @@
+{{/*
+    Table Row Actions
+    =================
+    Action buttons (view, edit, delete, etc.) rendered in the actions column.
+    Includes desktop icon buttons and mobile dropdown menu.
+*/}}
+
+{{/* TABLE ROW ACTIONS - Action buttons for a row */}}
+{{define "table-row-actions"}}
+<div class="action-buttons">
+    {{range .}}
+    <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}"
+            aria-label="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
+            data-action="{{.Action}}"
+            {{if .Disabled}}disabled{{end}}
+            {{if .DataID}}data-id="{{.DataID}}"{{end}}
+            {{if .URL}}{{if eq .Action "edit"}}data-edit-url="{{.URL}}"{{else if eq .Action "delete"}}data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}}data-activate-url="{{.URL}}"{{else if eq .Action "download"}}data-download-url="{{.URL}}"{{else if eq .Action "send-email"}}data-send-email-url="{{.URL}}"{{end}}{{end}}
+            {{if .DrawerTitle}}data-drawer-title="{{.DrawerTitle}}"{{end}}
+            {{if .ItemName}}data-item-name="{{.ItemName}}"{{end}}
+            {{if .ConfirmTitle}}data-confirm-title="{{.ConfirmTitle}}"{{end}}
+            {{if .ConfirmMessage}}data-confirm-message="{{.ConfirmMessage}}"{{end}}>
+        {{if eq .Type "view"}}{{template "icon-eye" $}}
+        {{else if eq .Type "preview"}}{{template "icon-eye" $}}
+        {{else if eq .Type "edit"}}{{template "icon-edit" $}}
+        {{else if eq .Type "manage"}}{{template "icon-shield" $}}
+        {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+        {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
+        {{else if eq .Type "activate"}}{{template "icon-play" $}}
+        {{else if eq .Type "delete"}}{{template "icon-trash" $}}
+        {{else if eq .Type "download"}}{{template "icon-download" $}}
+        {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+        {{else if eq .Type "mail"}}{{template "icon-mail" $}}
+        {{else if eq .Type "check"}}{{template "icon-check" $}}
+        {{end}}
+    </button>
+    {{end}}
+</div>
+{{/* Mobile dropdown version */}}
+<div class="action-dropdown">
+    <button type="button" class="action-dropdown-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="action-menu-{{if .}}{{(index . 0).DataID}}{{end}}">
+        Actions
+        {{template "icon-chevron-down"}}
+    </button>
+    <div class="action-dropdown-menu" id="action-menu-{{if .}}{{(index . 0).DataID}}{{end}}" role="menu">
+        {{range .}}
+        <button type="button" class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" role="menuitem" data-action="{{.Action}}" {{if .Disabled}}aria-label="{{.DisabledTooltip}}"{{end}} {{if .DataID}}data-id="{{.DataID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .Disabled}} disabled{{end}}>
+            {{if eq .Type "view"}}{{template "icon-eye" $}}
+            {{else if eq .Type "preview"}}{{template "icon-eye" $}}
+            {{else if eq .Type "edit"}}{{template "icon-edit" $}}
+            {{else if eq .Type "manage"}}{{template "icon-shield" $}}
+            {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+            {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
+            {{else if eq .Type "activate"}}{{template "icon-play" $}}
+            {{else if eq .Type "delete"}}{{template "icon-trash" $}}
+            {{else if eq .Type "download"}}{{template "icon-download" $}}
+            {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+            {{else if eq .Type "mail"}}{{template "icon-mail" $}}
+            {{else if eq .Type "check"}}{{template "icon-check" $}}
+            {{end}}
+            {{.Label}}
+        </button>
+        {{end}}
+    </div>
+</div>
+{{end}}

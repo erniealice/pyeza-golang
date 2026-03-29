@@ -15,6 +15,8 @@ const (
 	FilterTypeMoney   FilterColumnType = "money"
 	FilterTypeStatus  FilterColumnType = "status"
 	FilterTypeToggle  FilterColumnType = "toggle"
+	FilterTypeEmail   FilterColumnType = "email"
+	FilterTypePhone   FilterColumnType = "phone"
 )
 
 // FilterOption is a single option for FilterTypeStatus columns (value:label pair)
@@ -59,9 +61,18 @@ type SelectOption struct {
 	Selected bool   // Whether this option is selected
 }
 
+// PersonData holds a single person's display info for person cell types
+type PersonData struct {
+	Name     string // Full name (first + last)
+	Src      string // Avatar image URL (optional)
+	Fallback string // Initials fallback (e.g., "JD")
+	Color    string // Avatar color: terracotta, sage, navy, amber, plum (auto-assigned from Name if empty)
+	Status   string // Avatar status dot: online, offline, busy, away (optional)
+}
+
 // TableCell defines a cell value with optional formatting
 type TableCell struct {
-	Type      string        // Cell type: "text", "badge", "name", "link", "chips", "html", "author", "input", "select", "money", "datetime"
+	Type      string        // Cell type: "text", "badge", "name", "link", "chips", "html", "author", "input", "select", "money", "datetime", "single-person", "multi-person", "email", "phone", "number"
 	Value     string        // Text value to display
 	Variant   string        // For badges: variant class (e.g., "success", "error", "warning")
 	BadgeType string        // For badges: badge type ("status", "count", "type") - defaults to "status"
@@ -88,6 +99,12 @@ type TableCell struct {
 	// Select fields for "select" type
 	SelectName string         // Form field name attribute
 	Options    []SelectOption // Dropdown options
+	// Person fields for "single-person" and "multi-person" types
+	Person  *PersonData  // For "single-person": the person to display
+	Persons []PersonData // For "multi-person": list of people to display
+	// Number fields for "number" type
+	NumberPrefix string // Prefix text (e.g., "#")
+	NumberSuffix string // Suffix text (e.g., "units", "%")
 }
 
 // ApplyColumnStyles copies alignment, width, minWidth, vAlign, and label from columns to cells in all rows.

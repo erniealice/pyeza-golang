@@ -180,6 +180,10 @@
                     '<input type="date" class="filter-value filter-date-to" placeholder="To">';
             } else if (type === 'numeric' || type === 'money') {
                 valueContainer.innerHTML = '<input type="number" step="any" class="filter-value" placeholder="Value...">';
+            } else if (type === 'email') {
+                valueContainer.innerHTML = '<input type="email" class="filter-value" placeholder="Email...">';
+            } else if (type === 'phone') {
+                valueContainer.innerHTML = '<input type="tel" class="filter-value" placeholder="Phone...">';
             } else {
                 valueContainer.innerHTML = '<input type="text" class="filter-value" placeholder="Value...">';
             }
@@ -242,6 +246,9 @@
             } else if (type === 'money') {
                 var val = (row.querySelector('.filter-value') || {}).value || '';
                 if (val !== '') filterType = { moneyFilter: { amount: parseFloat(val), operator: 0 } };
+            } else if (type === 'email' || type === 'phone') {
+                var val = (row.querySelector('.filter-value') || {}).value || '';
+                if (val) filterType = { stringFilter: { value: val, operator: 2 } };
             } else {
                 var val = (row.querySelector('.filter-value') || {}).value || '';
                 if (val) filterType = { stringFilter: { value: val, operator: 2 } };

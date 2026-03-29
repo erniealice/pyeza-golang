@@ -313,6 +313,8 @@ func (r *HTMLRenderer) Init() error {
 			filepath.Join(sharedDir, "icons", "*.html"),
 			filepath.Join(sharedDir, "partials", "*.html"),
 			filepath.Join(sharedDir, "components", "*.html"),
+			filepath.Join(sharedDir, "components", "calendar", "*.html"),
+			filepath.Join(sharedDir, "components", "table", "*.html"),
 			filepath.Join(sharedDir, "templates", "*.html"),
 			filepath.Join(sharedDir, "templates", "blocks", "*.html"),
 		}

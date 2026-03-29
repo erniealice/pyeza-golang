@@ -1,0 +1,132 @@
+{{/*
+    Table Footer
+    ============
+    Client-side and server-side pagination footers.
+    Includes entries selector, info display, and page navigation.
+*/}}
+
+{{/* TABLE FOOTER FULL - Entries selector, info, and pagination (client-side) */}}
+{{define "table-footer-full"}}
+<div class="table-footer">
+    {{/* Entries selector - left */}}
+    {{if .ShowEntries}}
+    <div class="footer-entries">
+        <span>{{.Labels.Show}}</span>
+        <select id="{{.ID}}-entries" class="entries-selector" data-table="{{.ID}}" aria-label="{{.Labels.EntriesPerPage}}">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span>{{.Labels.Entries}}</span>
+    </div>
+    {{end}}
+    {{/* Info - center */}}
+    <div class="footer-info">
+        {{.Labels.Showing}}
+        <strong><span id="{{.ID}}-start">1</span></strong>
+        {{.Labels.To}}
+        <strong><span id="{{.ID}}-end">25</span></strong>
+        {{.Labels.Of}}
+        <strong><span id="{{.ID}}-total">{{len .Rows}}</span></strong>
+        {{.Labels.EntriesLabel}}
+    </div>
+    {{/* Pagination - right */}}
+    <div class="footer-pagination" id="{{.ID}}-pagination">
+        <button class="pagination-btn pagination-prev" disabled data-table="{{.ID}}">
+            &laquo; {{.Labels.Prev}}
+        </button>
+        <button class="pagination-page active" data-page="1" data-table="{{.ID}}">1</button>
+        <button class="pagination-btn pagination-next" data-table="{{.ID}}">
+            {{.Labels.Next}} &raquo;
+        </button>
+    </div>
+</div>
+{{end}}
+
+{{/* TABLE FOOTER SERVER - Server-side pagination with HTMX */}}
+{{/* All display values (StartRow, EndRow, PageNumbers, URLs) are pre-computed by Go. */}}
+{{/* Call ServerPagination.BuildDisplay() before rendering to populate these fields. */}}
+{{define "table-footer-server"}}
+{{$sp := .ServerPagination}}
+{{$pageSize := $sp.PageSize}}
+{{$mode := $sp.Mode}}
+
+<div class="table-footer">
+    {{/* Entries selector - left (server-mode) */}}
+    {{if .ShowEntries}}
+    <div class="footer-entries">
+        <span>{{.Labels.Show}}</span>
+        <select id="{{.ID}}-entries" class="entries-selector server-entries-selector" data-table="{{.ID}}" aria-label="{{.Labels.EntriesPerPage}}">
+            <option value="10"{{if eq $pageSize 10}} selected{{end}}>10</option>
+            <option value="25"{{if eq $pageSize 25}} selected{{end}}>25</option>
+            <option value="50"{{if eq $pageSize 50}} selected{{end}}>50</option>
+            <option value="100"{{if eq $pageSize 100}} selected{{end}}>100</option>
+        </select>
+        <span>{{.Labels.Entries}}</span>
+    </div>
+    {{end}}
+
+    {{/* Info - center (offset mode: "Showing X to Y of Z entries") */}}
+    {{if eq $mode "offset"}}
+    <div class="footer-info">
+        {{.Labels.Showing}}
+        <strong>{{$sp.StartRow}}</strong>
+        {{.Labels.To}}
+        <strong>{{$sp.EndRow}}</strong>
+        {{.Labels.Of}}
+        <strong>{{$sp.TotalRows}}</strong>
+        {{.Labels.EntriesLabel}}
+    </div>
+    {{end}}
+
+    {{/* Pagination buttons - right */}}
+    <div class="footer-pagination" id="{{.ID}}-pagination">
+        {{if eq $mode "offset"}}
+            {{/* Offset mode: prev + page numbers + next */}}
+            {{/* Note: No hx-get on these buttons — JS (table-pagination.js) handles all
+                 server-side requests via executeServerRequest() which also manages the
+                 browser URL. Adding hx-get would cause double requests and URL conflicts
+                 with the inherited hx-push-url="true" on <body>. */}}
+
+            {{/* Previous button */}}
+            <button class="pagination-btn pagination-prev{{if not $sp.HasPrevPage}} disabled{{end}}"
+                    {{if not $sp.HasPrevPage}}disabled{{end}}
+                    data-table="{{.ID}}">
+                &laquo; {{.Labels.Prev}}
+            </button>
+
+            {{/* Pre-computed page number buttons */}}
+            {{range $sp.PageNumbers}}
+                {{if .Ellipsis}}
+                <span class="pagination-ellipsis">&hellip;</span>
+                {{else}}
+                <button class="pagination-page{{if .Active}} active{{end}}"
+                        data-page="{{.Number}}"
+                        data-table="{{$.ID}}">{{.Number}}</button>
+                {{end}}
+            {{end}}
+
+            {{/* Next button */}}
+            <button class="pagination-btn pagination-next{{if not $sp.HasNextPage}} disabled{{end}}"
+                    {{if not $sp.HasNextPage}}disabled{{end}}
+                    data-table="{{.ID}}">
+                {{.Labels.Next}} &raquo;
+            </button>
+        {{else}}
+            {{/* Cursor mode: only prev/next buttons */}}
+            <button class="pagination-btn pagination-prev{{if not $sp.HasPrevPage}} disabled{{end}}"
+                    {{if not $sp.HasPrevPage}}disabled{{end}}
+                    data-table="{{.ID}}">
+                &laquo; {{.Labels.Prev}}
+            </button>
+
+            <button class="pagination-btn pagination-next{{if not $sp.HasNextPage}} disabled{{end}}"
+                    {{if not $sp.HasNextPage}}disabled{{end}}
+                    data-table="{{.ID}}">
+                {{.Labels.Next}} &raquo;
+            </button>
+        {{end}}
+    </div>
+</div>
+{{end}}

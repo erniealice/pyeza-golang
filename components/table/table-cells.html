@@ -1,0 +1,171 @@
+{{/*
+    Table Cell Types
+    ================
+    Named templates for each table cell type. Called from table-data-row
+    via {{template "table-cell-TYPE" .}} where . is the TableCell struct.
+
+    Available cell types:
+        table-cell-name         — Name with optional alert icon, clickable link
+        table-cell-badge        — Status/count/type badge with variant
+        table-cell-link         — Clickable hyperlink
+        table-cell-html         — Raw HTML content
+        table-cell-author       — Two-line author (name + date)
+        table-cell-chips        — Multi-chip display with overflow toggle
+        table-cell-input        — Editable input with prefix/suffix
+        table-cell-select       — Dropdown select with options
+        table-cell-money        — Currency amount with code prefix
+        table-cell-datetime     — Pre-formatted date/time
+        table-cell-single-person — Avatar + full name inline
+        table-cell-multi-person — Avatar chip pills with overflow
+        table-cell-email        — Mail icon + mailto link
+        table-cell-phone        — Phone icon + tel link
+        table-cell-number       — Numeric display with prefix/suffix
+*/}}
+
+{{/* NAME CELL */}}
+{{define "table-cell-name"}}
+{{if .Href}}<a href="{{.Href}}" class="item-name-link" hx-push-url="true">{{.Value}}</a>{{else}}<span class="item-name">{{.Value}}</span>{{end}}
+{{if .Alert}}<span class="alert-icon">{{template "icon-alert-triangle" .}}</span>{{end}}
+{{end}}
+
+{{/* BADGE CELL */}}
+{{define "table-cell-badge"}}
+{{$badgeClass := "status-badge"}}
+{{if .BadgeType}}
+    {{- if eq .BadgeType "status" -}}
+    {{$badgeClass = "status-badge"}}
+    {{- else if eq .BadgeType "count" -}}
+    {{$badgeClass = "count-badge"}}
+    {{- else if eq .BadgeType "type" -}}
+    {{$badgeClass = "type-badge"}}
+    {{- end -}}
+{{end}}
+<span class="{{$badgeClass}} {{.Variant}}">{{.Value}}</span>
+{{end}}
+
+{{/* LINK CELL */}}
+{{define "table-cell-link"}}
+<a href="{{.Href}}" class="table-link" hx-push-url="true">{{.Value}}</a>
+{{end}}
+
+{{/* HTML CELL */}}
+{{define "table-cell-html"}}
+{{.HTML}}
+{{end}}
+
+{{/* AUTHOR CELL */}}
+{{define "table-cell-author"}}
+<div class="author-cell">
+    <span class="author-name">{{.Value}}</span>
+    <span class="author-date">{{.Variant}}</span>
+</div>
+{{end}}
+
+{{/* CHIPS CELL */}}
+{{define "table-cell-chips"}}
+{{$chipCount := len .Chips}}
+{{$maxVisible := 3}}
+{{$hasOverflow := gt $chipCount $maxVisible}}
+<div class="table-cell-chips"{{if $hasOverflow}} data-chip-expandable="true"{{end}}>
+    {{range $i, $chip := .Chips}}<span class="table-chip{{if ge $i $maxVisible}} chip-hidden{{end}}">{{$chip.Label}}</span>{{end}}
+    {{if $hasOverflow}}
+    <button type="button" class="chip-expand-toggle" onclick="this.parentElement.classList.toggle('expanded')" aria-label="Show all {{$chipCount}} items">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="expand-text">+{{sub $chipCount $maxVisible}} more</span>
+        <span class="collapse-text">Less</span>
+    </button>
+    {{end}}
+</div>
+{{end}}
+
+{{/* INPUT CELL */}}
+{{define "table-cell-input"}}
+<div class="table-cell-input">
+    {{if .InputPrefix}}<span class="input-prefix">{{.InputPrefix}}</span>{{end}}
+    <input type="{{if .InputType}}{{.InputType}}{{else}}text{{end}}"
+           name="{{.InputName}}"
+           value="{{.Value}}"
+           class="matrix-input"
+           aria-label="{{if .Label}}{{.Label}}{{else}}{{.InputName}}{{end}}"
+           step="any">
+    {{if .InputSuffix}}<span class="input-suffix">{{.InputSuffix}}</span>{{end}}
+</div>
+{{end}}
+
+{{/* SELECT CELL */}}
+{{define "table-cell-select"}}
+<select name="{{.SelectName}}" class="matrix-select" aria-label="{{if .Label}}{{.Label}}{{else}}{{.SelectName}}{{end}}">
+    {{range .Options}}
+    <option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>
+    {{end}}
+</select>
+{{end}}
+
+{{/* MONEY CELL */}}
+{{define "table-cell-money"}}
+<span class="money-cell">
+    {{if .Currency}}<span class="money-currency">{{.Currency}}</span>{{end}}
+    <span class="money-amount">{{.Value}}</span>
+</span>
+{{end}}
+
+{{/* DATETIME CELL */}}
+{{define "table-cell-datetime"}}
+<span class="datetime-cell">{{.Value}}</span>
+{{end}}
+
+{{/* SINGLE PERSON CELL */}}
+{{define "table-cell-single-person"}}
+{{if .Person}}
+<div class="person-cell">
+    {{template "avatar" dict "Name" .Person.Name "Src" .Person.Src "Fallback" .Person.Fallback "Color" .Person.Color "Status" .Person.Status "Size" "xs"}}
+    <span class="person-name">{{.Person.Name}}</span>
+</div>
+{{end}}
+{{end}}
+
+{{/* MULTI PERSON CELL */}}
+{{define "table-cell-multi-person"}}
+{{$personCount := len .Persons}}
+{{$maxVisible := 3}}
+{{$hasOverflow := gt $personCount $maxVisible}}
+<div class="multi-person-cell"{{if $hasOverflow}} data-person-expandable="true"{{end}}>
+    <div class="multi-person-list">
+        {{range $i, $p := .Persons}}<div class="person-chip{{if ge $i $maxVisible}} person-chip-hidden{{end}}">
+            {{template "avatar" dict "Name" $p.Name "Src" $p.Src "Fallback" $p.Fallback "Color" $p.Color "Status" $p.Status "Size" "xs"}}
+            <span class="person-chip-name">{{$p.Name}}</span>
+        </div>{{end}}
+    </div>
+    {{if $hasOverflow}}
+    <button type="button" class="person-expand-toggle" onclick="this.closest('.multi-person-cell').classList.toggle('expanded')" aria-label="Show all {{$personCount}} people">
+        <span class="expand-text">+{{sub $personCount $maxVisible}} more</span>
+        <span class="collapse-text">Less</span>
+    </button>
+    {{end}}
+</div>
+{{end}}
+
+{{/* EMAIL CELL */}}
+{{define "table-cell-email"}}
+<a href="mailto:{{.Value}}" class="email-cell">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cell-icon"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    <span>{{.Value}}</span>
+</a>
+{{end}}
+
+{{/* PHONE CELL */}}
+{{define "table-cell-phone"}}
+<a href="tel:{{.Value}}" class="phone-cell">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cell-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <span>{{.Value}}</span>
+</a>
+{{end}}
+
+{{/* NUMBER CELL */}}
+{{define "table-cell-number"}}
+<span class="number-cell">
+    {{if .NumberPrefix}}<span class="number-prefix">{{.NumberPrefix}}</span>{{end}}
+    <span class="number-value">{{.Value}}</span>
+    {{if .NumberSuffix}}<span class="number-suffix">{{.NumberSuffix}}</span>{{end}}
+</span>
+{{end}}

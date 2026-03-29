@@ -1857,6 +1857,19 @@ button.sort-btn {
         opacity: 0.7;
     }
 
+    /* Person Cells */
+    .data-table td:has(.multi-person-cell) {
+        grid-column: 1 / -1;
+    }
+
+    .data-table .person-chip {
+        padding: 0.0625rem var(--spacing-2xs) 0.0625rem 0.0625rem;
+    }
+
+    .data-table .person-chip-name {
+        font-size: var(--text-2xs);
+    }
+
     /* Action Buttons: Even-spaced bottom bar */
     .data-table td:has(.action-buttons),
     .data-table td:has(.action-btn) {
@@ -2600,4 +2613,164 @@ body.density-comfortable .action-buttons {
     white-space: nowrap;
     color: var(--text-secondary, #6b7280);
     font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   SINGLE PERSON CELL
+   ============================================================ */
+
+.person-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.person-cell .person-name {
+    font-weight: var(--font-weight-medium);
+    font-size: var(--text-md);
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+/* ============================================================
+   MULTI PERSON CELL
+   ============================================================ */
+
+.multi-person-cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+}
+
+.multi-person-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2xs);
+}
+
+.person-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    padding: 0.125rem var(--spacing-xs) 0.125rem 0.125rem;
+    background: var(--bg-hover);
+    border: var(--border-width) solid var(--border-light);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+}
+
+.person-chip-name {
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    line-height: var(--leading-none);
+}
+
+.person-chip-hidden {
+    display: none;
+}
+
+.multi-person-cell.expanded .person-chip-hidden {
+    display: inline-flex;
+}
+
+.person-expand-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: var(--text-xs);
+    color: var(--accent-primary);
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+}
+
+.person-expand-toggle:hover {
+    text-decoration: underline;
+}
+
+.person-expand-toggle .collapse-text {
+    display: none;
+}
+
+.multi-person-cell.expanded .person-expand-toggle .expand-text {
+    display: none;
+}
+
+.multi-person-cell.expanded .person-expand-toggle .collapse-text {
+    display: inline;
+}
+
+/* ============================================================
+   EMAIL CELL
+   ============================================================ */
+
+.email-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+}
+
+.email-cell:hover {
+    text-decoration: underline;
+}
+
+.email-cell .cell-icon {
+    width: var(--icon-2xs);
+    height: var(--icon-2xs);
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+/* ============================================================
+   PHONE CELL
+   ============================================================ */
+
+.phone-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.phone-cell:hover {
+    color: var(--accent-primary);
+}
+
+.phone-cell .cell-icon {
+    width: var(--icon-2xs);
+    height: var(--icon-2xs);
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+/* ============================================================
+   NUMBER CELL
+   ============================================================ */
+
+.number-cell {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.number-prefix {
+    color: var(--text-muted);
+    font-size: 0.85em;
+}
+
+.number-value {
+    font-weight: var(--font-weight-medium);
+}
+
+.number-suffix {
+    color: var(--text-muted);
+    font-size: 0.85em;
 }
