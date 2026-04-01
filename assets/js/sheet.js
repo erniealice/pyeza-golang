@@ -181,7 +181,7 @@
             // of window.location.reload() avoids a race where the full-page
             // reload interrupts the close() CSS transition and the sheet
             // appears to stay open.
-            setTimeout(function() { refreshTable(); }, 100);
+            setTimeout(function() { refreshTable(); }, 400);
         } else {
             // Handle error
             const errorMessage = xhr.getResponseHeader('HX-Error-Message') || 'An error occurred. Please try again.';
