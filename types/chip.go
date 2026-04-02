@@ -8,6 +8,37 @@ import (
 // ChipData holds label for a single chip in table cell display
 type ChipData struct {
 	Label string
+	Color string // hex color code e.g. "#3B82F6"
+}
+
+// BuildChipCellFromChips creates a chips-type TableCell from a slice of ChipData.
+// Shows up to maxVisible chips; the rest become overflow count.
+// ChipTooltip contains all labels joined by ", ".
+func BuildChipCellFromChips(chips []ChipData, maxVisible int) TableCell {
+	if len(chips) == 0 {
+		return TableCell{Type: "chips"}
+	}
+
+	var labels []string
+	for _, c := range chips {
+		labels = append(labels, c.Label)
+	}
+
+	var visible []ChipData
+	var overflow int
+	if len(chips) <= maxVisible {
+		visible = chips
+	} else {
+		visible = chips[:maxVisible]
+		overflow = len(chips) - maxVisible
+	}
+
+	return TableCell{
+		Type:         "chips",
+		Chips:        visible,
+		ChipOverflow: overflow,
+		ChipTooltip:  strings.Join(labels, ", "),
+	}
 }
 
 // BuildChipCellFromLabels creates a chips-type TableCell from a slice of label

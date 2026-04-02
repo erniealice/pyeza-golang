@@ -43,7 +43,7 @@
     </label>
     {{end}}
 
-    <div class="auto-complete" id="{{.ID}}" data-search-url="{{.SearchURL}}">
+    <div class="auto-complete" id="{{.ID}}" data-search-url="{{.SearchURL}}" data-min-chars="{{.MinChars}}">
         <div class="auto-complete-trigger" tabindex="0" role="combobox"
              aria-haspopup="listbox" aria-expanded="false" aria-owns="{{.ID}}-listbox"
              {{if .Label}}aria-labelledby="{{.ID}}-label"{{end}}>
@@ -84,6 +84,7 @@
                 {{end}}
             </div>
             <div class="auto-complete-empty">{{if .NoResults}}{{.NoResults}}{{else}}No results found{{end}}</div>
+            <div class="auto-complete-hint">{{if .MinCharsHint}}{{.MinCharsHint}}{{else}}Type at least {{.MinChars}} characters to search...{{end}}</div>
             <div class="auto-complete-loading">
                 <span class="auto-complete-spinner"></span>
                 <span>Searching...</span>
@@ -103,6 +104,8 @@
 
     const searchURL = container.dataset.searchUrl;
     const isActionMode = !!searchURL;
+    const minChars = parseInt(container.dataset.minChars, 10) || 0;
+    const hintEl = container.querySelector('.auto-complete-hint');
 
     const trigger = container.querySelector('.auto-complete-trigger');
     const display = container.querySelector('.auto-complete-display');
@@ -158,10 +161,17 @@
         emptyState.classList.remove('visible');
         loadingState.classList.remove('visible');
 
+        if (hintEl) hintEl.classList.remove('visible');
+
         if (isActionMode) {
             // Action mode: clear results and fetch from server
             results.innerHTML = '';
-            doSearch('');
+            if (minChars > 0) {
+                // Show hint until user types enough characters
+                if (hintEl) hintEl.classList.add('visible');
+            } else {
+                doSearch('');
+            }
         } else {
             // Filter mode: show all pre-rendered options
             allOptions.forEach(function(opt) {
@@ -252,8 +262,18 @@
     searchInput.addEventListener('input', function() {
         if (isActionMode) {
             clearTimeout(debounceTimer);
+            var val = searchInput.value.trim();
+            if (minChars > 0 && val.length < minChars) {
+                // Not enough characters — show hint, clear results
+                results.innerHTML = '';
+                emptyState.classList.remove('visible');
+                loadingState.classList.remove('visible');
+                if (hintEl) hintEl.classList.add('visible');
+                return;
+            }
+            if (hintEl) hintEl.classList.remove('visible');
             debounceTimer = setTimeout(function() {
-                doSearch(searchInput.value);
+                doSearch(val);
             }, 300);
         } else {
             filterOptions(searchInput.value);

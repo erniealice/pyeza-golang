@@ -23,6 +23,7 @@
     border: var(--border-width) solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-card);
+    box-shadow: var(--input-shadow);  /* ghost border in borderless mode (data-border="none") */
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -274,6 +275,23 @@
 }
 
 .auto-complete-empty.visible {
+    display: block;
+}
+
+/* --------------------------------------------------------------------------
+   MIN CHARS HINT
+   -------------------------------------------------------------------------- */
+
+.auto-complete-hint {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-md);
+    font-style: italic;
+    display: none;
+}
+
+.auto-complete-hint.visible {
     display: block;
 }
 

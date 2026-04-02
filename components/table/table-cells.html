@@ -67,7 +67,7 @@
 {{$maxVisible := 3}}
 {{$hasOverflow := gt $chipCount $maxVisible}}
 <div class="table-cell-chips"{{if $hasOverflow}} data-chip-expandable="true"{{end}}>
-    {{range $i, $chip := .Chips}}<span class="table-chip{{if ge $i $maxVisible}} chip-hidden{{end}}">{{$chip.Label}}</span>{{end}}
+    {{range $i, $chip := .Chips}}<span class="table-chip{{if ge $i $maxVisible}} chip-hidden{{end}}"{{if $chip.Color}} style="background-color: {{$chip.Color}}; color: #fff; border-color: {{$chip.Color}}"{{end}}>{{$chip.Label}}</span>{{end}}
     {{if $hasOverflow}}
     <button type="button" class="chip-expand-toggle" onclick="this.parentElement.classList.toggle('expanded')" aria-label="Show all {{$chipCount}} items">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
