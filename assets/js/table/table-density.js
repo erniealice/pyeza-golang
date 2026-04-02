@@ -13,9 +13,12 @@
         const densityMenus = document.querySelectorAll('.density-menu');
 
         // Restore saved density on page load (page-level setting)
+        // Falls back to data-default-density on <html> (theme-level default)
         const savedDensity = getDensityPreference();
-        if (savedDensity) {
-            setDensity(savedDensity);
+        const defaultDensity = document.documentElement.dataset.defaultDensity || 'default';
+        const effectiveDensity = savedDensity || defaultDensity;
+        if (effectiveDensity && effectiveDensity !== 'default') {
+            setDensity(effectiveDensity);
         }
 
         densityMenus.forEach(menu => {

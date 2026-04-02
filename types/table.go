@@ -275,6 +275,7 @@ type TableConfig struct {
 	ShowColumns          bool               // Show column visibility toggle in toolbar
 	ShowExport           bool               // Show export dropdown (CSV/Excel) in toolbar
 	ShowDensity          bool               // Show row density toggle in toolbar
+	DefaultDensity       string             // Default density: "default", "comfortable", "compact" (defaults to "default")
 	ShowEntries          bool               // Show entries selector in footer
 	ShowActions          bool               // Show actions column
 	DefaultSortColumn    string             // Column key for default sort (e.g., "name")
