@@ -119,7 +119,10 @@
 {{if .Person}}
 <div class="person-cell">
     {{template "avatar" dict "Name" .Person.Name "Src" .Person.Src "Fallback" .Person.Fallback "Color" .Person.Color "Status" .Person.Status "Size" "xs"}}
-    <span class="person-name">{{.Person.Name}}</span>
+    <div class="person-info">
+        <span class="person-name">{{.Person.Name}}</span>
+        {{if .Person.Email}}<span class="person-email">{{.Person.Email}}</span>{{end}}
+    </div>
 </div>
 {{end}}
 {{end}}

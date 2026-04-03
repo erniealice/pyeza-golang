@@ -2625,10 +2625,22 @@ body.density-comfortable .action-buttons {
     gap: var(--spacing-xs);
 }
 
+.person-cell .person-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
 .person-cell .person-name {
     font-weight: var(--font-weight-medium);
     font-size: var(--text-md);
     color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.person-cell .person-email {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
     white-space: nowrap;
 }
 

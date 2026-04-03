@@ -64,6 +64,7 @@ type SelectOption struct {
 // PersonData holds a single person's display info for person cell types
 type PersonData struct {
 	Name     string // Full name (first + last)
+	Email    string // Email address (optional, shown below name)
 	Src      string // Avatar image URL (optional)
 	Fallback string // Initials fallback (e.g., "JD")
 	Color    string // Avatar color: terracotta, sage, navy, amber, plum (auto-assigned from Name if empty)

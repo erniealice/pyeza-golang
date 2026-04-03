@@ -20,7 +20,6 @@
     {{if .ActionURL}}
     <button type="button" class="dialog-btn dialog-btn-confirm dialog-btn-{{.Variant}}"
             hx-post="{{.ActionURL}}"
-            hx-confirm="true"
             data-dialog-confirm>
         {{.ConfirmText}}
     </button>
