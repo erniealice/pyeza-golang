@@ -130,7 +130,11 @@ JavaScript:
 {{/* TABLE CONTENT - The actual table element with thead and tbody */}}
 {{define "table-content"}}
 <div class="table-scroll-wrapper">
+{{$caption := .Caption}}
+{{if and (not $caption) .Title}}{{$caption = .Title}}{{end}}
+{{if not $caption}}{{$caption = "Data table"}}{{end}}
 <table class="data-table{{if .ColumnGroups}} data-table-grouped{{end}}{{if .FixedLayout}} data-table-fixed{{end}}" id="{{.ID}}"{{if .DefaultSortColumn}} data-default-sort="{{.DefaultSortColumn}}" data-default-direction="{{if .DefaultSortDirection}}{{.DefaultSortDirection}}{{else}}asc{{end}}"{{end}}>
+    <caption class="visually-hidden">{{$caption}}</caption>
     {{if .ColumnGroups}}
     {{/* Multi-level headers with column groups */}}
     <thead>
@@ -247,7 +251,7 @@ JavaScript:
         <div class="action-buttons">
             {{range .Actions}}
             {{if .Href}}
-            <a href="{{.Href}}" class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}" hx-push-url="true">
+            <a href="{{.Href}}" class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-push-url="true">
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
                 {{if eq .Type "manage"}}{{template "icon-shield" $}}{{end}}
@@ -260,7 +264,7 @@ JavaScript:
                 {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
             </a>
             {{else}}
-            <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}" aria-label="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" data-action="{{.Action}}"{{if .Disabled}} disabled{{end}}{{if $.ID}} data-id="{{$.ID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .DrawerTitle}} data-drawer-title="{{.DrawerTitle}}"{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}>
+            <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}" aria-label="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}}{{if .Disabled}} disabled{{end}}{{if $.ID}} data-id="{{$.ID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .DrawerTitle}} data-drawer-title="{{.DrawerTitle}}"{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}>
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "preview"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
@@ -347,7 +351,7 @@ JavaScript:
     {{end}}
     {{if .ShowActions}}
     <td>
-        {{template "table-row-actions" .Actions}}
+        {{template "table-row-actions" (dict "Actions" .Actions "RowID" .ID)}}
     </td>
     {{end}}
 </tr>

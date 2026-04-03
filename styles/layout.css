@@ -134,13 +134,16 @@
     --spacing-2xs: 0.25rem;   /* 4px  — tight internal padding */
     --spacing-xs:  0.375rem;  /* 6px  — badge padding, small gaps */
     --spacing-sm:  0.5rem;    /* 8px  — compact element gaps */
+    --spacing-sm-tight: 0.625rem; /* 10px — tight action/control gaps */
     --spacing-md:  0.75rem;   /* 12px — standard padding, form gaps */
+    --spacing-lg-tight: 0.875rem; /* 14px — compact card/activity gaps */
     --spacing-lg:  1rem;      /* 16px — card padding, section gaps */
     --spacing-xl:  1.25rem;   /* 20px — between sections */
     --spacing-2xl: 1.5rem;    /* 24px — info grid gaps, generous padding */
     --spacing-3xl: 1.75rem;   /* 28px — detail body padding */
     --spacing-4xl: 2rem;      /* 32px — section spacers */
     --spacing-5xl: 2.5rem;    /* 40px — page-level spacing */
+    --spacing-6xl: 3rem;      /* 48px — deep indentation */
 
     /* Component dimensions — structural heights for layout stability */
     --table-toolbar-height: 4.5625rem;  /* 73px — table toolbar + bulk toolbar min-height */

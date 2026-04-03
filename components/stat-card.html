@@ -25,7 +25,9 @@ USAGE:
     Used in: index3.html dashboard
 ======================================== */}}
 {{define "stat-card"}}
-<div class="stat-card stat-card--{{.Color}}">
+{{$testID := .TestID}}
+{{if and (not $testID) .Label}}{{$testID = printf "stat-%s" (slugify .Label)}}{{end}}
+<div class="stat-card stat-card--{{.Color}}"{{if $testID}} data-testid="{{$testID}}"{{end}}>
     <div class="stat-header">
         <div class="stat-icon" data-icon="{{.Icon}}"></div>
         {{if .Trend}}
@@ -50,7 +52,9 @@ USAGE:
     For use when iterating over data
 ======================================== */}}
 {{define "stat-card-inline"}}
-<div class="stat-card">
+{{$testID := .TestID}}
+{{if and (not $testID) .Label}}{{$testID = printf "stat-%s" (slugify .Label)}}{{end}}
+<div class="stat-card"{{if $testID}} data-testid="{{$testID}}"{{end}}>
     <div class="stat-header">
         <div class="stat-icon">
             {{.IconHTML}}
