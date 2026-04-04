@@ -160,13 +160,6 @@ func getDefaultFuncMap() template.FuncMap {
 			}
 			return key
 		},
-		// slugify converts a string to a lowercase, hyphen-separated slug
-		// Usage: {{slugify "Total Clients"}} => "total-clients"
-		"slugify": func(s string) string {
-			s = strings.ToLower(strings.TrimSpace(s))
-			s = strings.ReplaceAll(s, " ", "-")
-			return s
-		},
 		// filterColumnsJSON serializes filterable columns as a JSON array for use
 		// in inert <script type="application/json"> blocks in table templates.
 		// Only columns with Filterable==true are included.

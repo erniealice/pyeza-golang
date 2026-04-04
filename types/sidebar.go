@@ -162,6 +162,8 @@ type SidebarLabels struct {
 	MovementsIcon             string `json:"movements_icon"`
 	RevenueLabel              string `json:"revenue_label"`
 	RevenueIcon               string `json:"revenue_icon"`
+	RevenueReportLabel        string `json:"revenue_report_label"`
+	RevenueReportIcon         string `json:"revenue_report_icon"`
 	CostOfSalesLabel          string `json:"cost_of_sales_label"`
 	CostOfSalesIcon           string `json:"cost_of_sales_icon"`
 	GrossProfitLabel          string `json:"gross_profit_label"`
@@ -338,6 +340,8 @@ func DefaultSidebarLabels() SidebarLabels {
 		MovementsIcon:             "icon-repeat",
 		RevenueLabel:              "Revenue",
 		RevenueIcon:               "icon-trending-up",
+		RevenueReportLabel:        "Revenue Analysis",
+		RevenueReportIcon:         "icon-bar-chart",
 		CostOfSalesLabel:          "Cost of Sales",
 		CostOfSalesIcon:           "icon-package",
 		GrossProfitLabel:          "Gross Profit",

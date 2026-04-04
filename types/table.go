@@ -151,7 +151,7 @@ type TableAction struct {
 	Type            string // Action type: "view", "edit", "clone", "delete", "download"
 	Label           string // Tooltip/aria-label text
 	Action          string // data-action value for JS handling
-	TestID          string // Optional test hook override (falls back to action/type + row ID)
+	TestID          string // Optional data-testid override; auto-generated from Action/Type + row ID if empty
 	Href            string // Optional href for link-based actions
 	URL             string // Action URL for HTMX calls (used as edit-url or delete-url based on type)
 	DrawerTitle     string // Title for the form drawer (edit actions)
@@ -160,7 +160,6 @@ type TableAction struct {
 	ConfirmMessage  string // Custom message for confirmation dialog
 	Disabled        bool   // If true, action is disabled (grayed out, not clickable)
 	DisabledTooltip string // Tooltip shown when hovering over disabled action
-	TestID          string // Optional data-testid override; auto-generated from Action/Type + row ID if empty
 }
 
 // TableRow defines a row in the table

@@ -126,6 +126,7 @@
 
     function setSelected(value, label) {
         hiddenInput.value = value;
+        hiddenInput.setAttribute('value', value); // sync attribute so MutationObservers fire
         display.innerHTML = value
             ? '<span class="auto-complete-value">' + escapeHTML(label) + '</span>'
             : '<span class="auto-complete-placeholder">' + escapeHTML(placeholder) + '</span>';
@@ -192,6 +193,16 @@
     // --- Action mode: server-side search ---
 
     function doSearch(query) {
+        // Re-read the search URL from the dataset each time so that external scripts
+        // (e.g. a client autocomplete that appends ?client_id=…) are respected.
+        var currentSearchURL = container.dataset.searchUrl;
+        if (!currentSearchURL) {
+            // No URL set yet (e.g. waiting for a parent selection) — show empty state.
+            loadingState.classList.remove('visible');
+            emptyState.classList.add('visible');
+            return;
+        }
+
         if (abortController) abortController.abort();
         abortController = new AbortController();
 
@@ -199,7 +210,7 @@
         emptyState.classList.remove('visible');
         results.innerHTML = '';
 
-        var url = searchURL + (searchURL.includes('?') ? '&' : '?') + 'q=' + encodeURIComponent(query);
+        var url = currentSearchURL + (currentSearchURL.includes('?') ? '&' : '?') + 'q=' + encodeURIComponent(query);
 
         fetch(url, { signal: abortController.signal })
             .then(function(r) { return r.json(); })
