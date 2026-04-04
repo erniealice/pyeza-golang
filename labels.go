@@ -2,26 +2,26 @@ package pyeza
 
 // CommonLabels holds translatable strings for common/shared ui.
 type CommonLabels struct {
-	Sidebar       SidebarLabels       `json:"sidebar"`
-	Header        HeaderLabels        `json:"header"`
-	Notifications NotificationLabels  `json:"notifications"`
-	Settings      SettingsLabels      `json:"settings"`
-	Theme         ThemeLabels         `json:"theme"`
-	HelpPane      HelpPaneLabels      `json:"helpPane"`
-	Table         CommonTableLabels   `json:"table"`
-	Pagination    PaginationLabels    `json:"pagination"`
-	Buttons       ButtonLabels        `json:"buttons"`
-	Actions       ActionLabels        `json:"actions"`
-	Bulk          BulkLabels          `json:"bulk"`
-	Status        StatusLabels        `json:"status"`
-	Empty         EmptyLabels         `json:"empty"`
-	Loading       LoadingLabels       `json:"loading"`
-	Errors        ErrorLabels         `json:"errors"`
-	Dropdown      DropdownLabels      `json:"dropdown"`
-	Integration   IntegrationLabels   `json:"integration"`
-	Card          CardLabels          `json:"card"`
-	Tabs          TabLabels           `json:"tabs"`
-	Audit         AuditLabels         `json:"audit"`
+	Sidebar       SidebarLabels      `json:"sidebar"`
+	Header        HeaderLabels       `json:"header"`
+	Notifications NotificationLabels `json:"notifications"`
+	Settings      SettingsLabels     `json:"settings"`
+	Theme         ThemeLabels        `json:"theme"`
+	HelpPane      HelpPaneLabels     `json:"helpPane"`
+	Table         CommonTableLabels  `json:"table"`
+	Pagination    PaginationLabels   `json:"pagination"`
+	Buttons       ButtonLabels       `json:"buttons"`
+	Actions       ActionLabels       `json:"actions"`
+	Bulk          BulkLabels         `json:"bulk"`
+	Status        StatusLabels       `json:"status"`
+	Empty         EmptyLabels        `json:"empty"`
+	Loading       LoadingLabels      `json:"loading"`
+	Errors        ErrorLabels        `json:"errors"`
+	Dropdown      DropdownLabels     `json:"dropdown"`
+	Integration   IntegrationLabels  `json:"integration"`
+	Card          CardLabels         `json:"card"`
+	Tabs          TabLabels          `json:"tabs"`
+	Audit         AuditLabels        `json:"audit"`
 }
 
 // TabLabels holds shared tab label strings used across all domain packages
@@ -149,8 +149,8 @@ type SidebarUsersLabels struct {
 }
 
 type SidebarReportsLabels struct {
-	Title       string `json:"title"`
-	Quote       string `json:"quote"`
+	Title        string `json:"title"`
+	Quote        string `json:"quote"`
 	AwardChanges string `json:"awardChanges"`
 }
 
@@ -223,16 +223,16 @@ type SettingsBillingLabels struct {
 }
 
 type ThemeLabels struct {
-	Title         string                `json:"title"`
-	Toggle        string                `json:"toggle"`
-	ChangeTheme   string                `json:"changeTheme"`
-	Themes        ThemeOptionLabels     `json:"themes"`
-	FontFamily    string                `json:"fontFamily"`
-	Fonts         FontOptionLabels      `json:"fonts"`
-	Density       ThemeDensityLabels    `json:"density"`
-	Radius        ThemeRadiusLabels     `json:"radius"`
-	Border        ThemeBorderLabels     `json:"border"`
-	ResetDefaults string                `json:"resetDefaults"`
+	Title         string             `json:"title"`
+	Toggle        string             `json:"toggle"`
+	ChangeTheme   string             `json:"changeTheme"`
+	Themes        ThemeOptionLabels  `json:"themes"`
+	FontFamily    string             `json:"fontFamily"`
+	Fonts         FontOptionLabels   `json:"fonts"`
+	Density       ThemeDensityLabels `json:"density"`
+	Radius        ThemeRadiusLabels  `json:"radius"`
+	Border        ThemeBorderLabels  `json:"border"`
+	ResetDefaults string             `json:"resetDefaults"`
 }
 
 type ThemeOptionLabels struct {
@@ -245,7 +245,7 @@ type ThemeOptionLabels struct {
 	PaperInk       string `json:"paperInk"`
 	PeachFizz      string `json:"peachFizz"`
 	ModernRetail   string `json:"modernRetail"`
-	IchizenDefault    string `json:"ichizenDefault"`
+	IchizenDefault string `json:"ichizenDefault"`
 	SalonBlush     string `json:"salonBlush"`
 	LedgerMono     string `json:"ledgerMono"`
 	BrutalistInk   string `json:"brutalistInk"`
@@ -277,12 +277,12 @@ type ThemeBorderLabels struct {
 }
 
 type FontOptionLabels struct {
-	Default   string `json:"default"`
-	Serif     string `json:"serif"`
-	Mono      string `json:"mono"`
-	Rounded   string `json:"rounded"`
-	Condensed string `json:"condensed"`
-	Exa         string `json:"exa"`
+	Default        string `json:"default"`
+	Serif          string `json:"serif"`
+	Mono           string `json:"mono"`
+	Rounded        string `json:"rounded"`
+	Condensed      string `json:"condensed"`
+	Exa            string `json:"exa"`
 	IchizenMinimal string `json:"ichizenMinimal"`
 }
 
@@ -292,45 +292,45 @@ type HelpPaneLabels struct {
 }
 
 type CommonTableLabels struct {
-	Search            string              `json:"search"`
-	SearchPlaceholder string              `json:"searchPlaceholder"`
-	Filters           string              `json:"filters"`
-	FilterConditions  string              `json:"filterConditions"`
-	ClearAll          string              `json:"clearAll"`
-	AddCondition      string              `json:"addCondition"`
-	Clear             string              `json:"clear"`
-	ApplyFilters      string              `json:"applyFilters"`
-	Sort              string              `json:"sort"`
-	Ascending         string              `json:"ascending"`
-	Descending        string              `json:"descending"`
-	Columns           string              `json:"columns"`
-	Export            string              `json:"export"`
-	ExportCsv         string              `json:"exportCsv"`
-	ExportExcel       string              `json:"exportExcel"`
-	Density           TableDensityLabels  `json:"density"`
-	SelectAll         string              `json:"selectAll"`
-	SelectRow         string              `json:"selectRow"`
-	Actions           string              `json:"actions"`
-	Show              string              `json:"show"`
-	Entries           string              `json:"entries"`
-	Showing           string              `json:"showing"`
-	To                string              `json:"to"`
-	Of                string              `json:"of"`
-	EntriesLabel      string              `json:"entriesLabel"`
-	ColumnsLabel      TableColumnLabels   `json:"columnsLabel"`
+	Search            string             `json:"search"`
+	SearchPlaceholder string             `json:"searchPlaceholder"`
+	Filters           string             `json:"filters"`
+	FilterConditions  string             `json:"filterConditions"`
+	ClearAll          string             `json:"clearAll"`
+	AddCondition      string             `json:"addCondition"`
+	Clear             string             `json:"clear"`
+	ApplyFilters      string             `json:"applyFilters"`
+	Sort              string             `json:"sort"`
+	Ascending         string             `json:"ascending"`
+	Descending        string             `json:"descending"`
+	Columns           string             `json:"columns"`
+	Export            string             `json:"export"`
+	ExportCsv         string             `json:"exportCsv"`
+	ExportExcel       string             `json:"exportExcel"`
+	Density           TableDensityLabels `json:"density"`
+	SelectAll         string             `json:"selectAll"`
+	SelectRow         string             `json:"selectRow"`
+	Actions           string             `json:"actions"`
+	Show              string             `json:"show"`
+	Entries           string             `json:"entries"`
+	Showing           string             `json:"showing"`
+	To                string             `json:"to"`
+	Of                string             `json:"of"`
+	EntriesLabel      string             `json:"entriesLabel"`
+	ColumnsLabel      TableColumnLabels  `json:"columnsLabel"`
 }
 
 type TableColumnLabels struct {
-	Name    string `json:"name"`
-	Email   string `json:"email"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
 	Division string `json:"division"`
-	Office  string `json:"office"`
-	Status  string `json:"status"`
-	Slug    string `json:"slug"`
-	Town    string `json:"town"`
-	State   string `json:"state"`
-	Country string `json:"country"`
-	Phone   string `json:"phone"`
+	Office   string `json:"office"`
+	Status   string `json:"status"`
+	Slug     string `json:"slug"`
+	Town     string `json:"town"`
+	State    string `json:"state"`
+	Country  string `json:"country"`
+	Phone    string `json:"phone"`
 }
 
 type TableDensityLabels struct {

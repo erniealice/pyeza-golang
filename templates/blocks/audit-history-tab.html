@@ -41,8 +41,12 @@ Data: .AuditEntries, .AuditHasNext, .AuditNextCursor, .AuditHistoryURL, .CommonL
                 </td>
                 <td class="audit-details">
                     {{if .FieldChanges}}
+                    {{$detailID := printf "audit-details-%v" .ID}}
                     <button class="btn btn-ghost btn-xs audit-expand-btn"
-                            onclick="this.closest('tr').nextElementSibling.classList.toggle('hidden')"
+                            data-audit-details-target="{{$detailID}}"
+                            aria-controls="{{$detailID}}"
+                            aria-expanded="false"
+                            onclick="toggleAuditDetails(this)"
                             type="button">
                         {{$labels.Details}}
                     </button>
@@ -50,7 +54,8 @@ Data: .AuditEntries, .AuditHasNext, .AuditNextCursor, .AuditHistoryURL, .CommonL
                 </td>
             </tr>
             {{if .FieldChanges}}
-            <tr class="audit-diff-row hidden">
+            {{$detailID := printf "audit-details-%v" .ID}}
+            <tr id="{{$detailID}}" class="audit-diff-row hidden" aria-hidden="true">
                 <td colspan="5">
                     <div class="audit-diff">
                         <table class="table table--compact table--audit-diff">
@@ -95,4 +100,23 @@ Data: .AuditEntries, .AuditHasNext, .AuditNextCursor, .AuditHistoryURL, .CommonL
     </div>
     {{end}}
 </div>
+<script>
+window.toggleAuditDetails = window.toggleAuditDetails || function(button) {
+    if (!button) {
+        return;
+    }
+    var targetId = button.getAttribute('data-audit-details-target');
+    if (!targetId) {
+        return;
+    }
+    var row = document.getElementById(targetId);
+    if (!row) {
+        return;
+    }
+    var isHidden = row.classList.toggle('hidden');
+    var expanded = !isHidden;
+    button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    row.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+};
+</script>
 {{end}}

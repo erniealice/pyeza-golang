@@ -151,6 +151,7 @@ type TableAction struct {
 	Type            string // Action type: "view", "edit", "clone", "delete", "download"
 	Label           string // Tooltip/aria-label text
 	Action          string // data-action value for JS handling
+	TestID          string // Optional test hook override (falls back to action/type + row ID)
 	Href            string // Optional href for link-based actions
 	URL             string // Action URL for HTMX calls (used as edit-url or delete-url based on type)
 	DrawerTitle     string // Title for the form drawer (edit actions)
@@ -175,12 +176,12 @@ type TableRow struct {
 
 // TableRowGroup represents a group of rows with a collapsible header
 type TableRowGroup struct {
-	ID         string            // Group identifier
-	Title      string            // Group title/header
-	Subtitle   string            // Optional subtitle for the group
-	Collapsed  bool              // Whether the group is collapsed by default
-	Rows       []TableRow        // Rows in this group
-	DataAttrs  map[string]string // Data attributes for the group
+	ID        string            // Group identifier
+	Title     string            // Group title/header
+	Subtitle  string            // Optional subtitle for the group
+	Collapsed bool              // Whether the group is collapsed by default
+	Rows      []TableRow        // Rows in this group
+	DataAttrs map[string]string // Data attributes for the group
 }
 
 // TableEmptyState defines the empty state message
@@ -196,10 +197,10 @@ type TableLabels struct {
 	Search            string
 	SearchPlaceholder string
 	// Toolbar buttons
-	Filters          string
-	Sort             string
-	Columns          string
-	Export           string
+	Filters string
+	Sort    string
+	Columns string
+	Export  string
 	// Filter panel
 	FilterConditions string
 	ClearAll         string
@@ -214,15 +215,15 @@ type TableLabels struct {
 	// Footer/Pagination
 	EntriesPerPage string // Accessible label for the entries-per-page selector
 	Show           string
-	Entries      string
-	Showing      string
-	To           string
-	Of           string
-	EntriesLabel string
-	SelectAll    string
-	Actions      string
-	Prev         string
-	Next         string
+	Entries        string
+	Showing        string
+	To             string
+	Of             string
+	EntriesLabel   string
+	SelectAll      string
+	Actions        string
+	Prev           string
+	Next           string
 }
 
 // PrimaryAction defines a primary action button for the table toolbar
@@ -303,22 +304,22 @@ type ImportAction struct {
 // ServerPagination holds server-side pagination state
 // When enabled, search, sort, and filter operations are handled server-side
 type ServerPagination struct {
-	Enabled       bool   // true = server-side, false/nil = client-side (default)
-	Mode          string // "offset" (page numbers) or "cursor" (keyset, prev/next only)
-	PageSize      int    // current page size
-	CurrentPage   int    // current page number (offset mode)
-	TotalRows     int    // total matching rows (offset mode; optional for cursor)
-	TotalPages    int    // pre-calculated total pages (offset mode)
-	StartRow      int    // pre-calculated first row number on current page (1-based, for display)
-	EndRow        int    // pre-calculated last row number on current page (for display)
-	HasNextPage   bool   // more rows forward?
-	HasPrevPage   bool   // more rows backward?
-	NextCursor    string // cursor mode: cursor token for next page (base64 encoded)
-	PrevCursor    string // cursor mode: cursor token for previous page (base64 encoded)
-	SearchQuery   string // current search term (reflected in search input)
-	SortColumn    string // current sort column key
-	SortDirection string // current sort direction ("asc" or "desc")
-	FiltersJSON   string // current advanced filters (raw JSON string)
+	Enabled           bool   // true = server-side, false/nil = client-side (default)
+	Mode              string // "offset" (page numbers) or "cursor" (keyset, prev/next only)
+	PageSize          int    // current page size
+	CurrentPage       int    // current page number (offset mode)
+	TotalRows         int    // total matching rows (offset mode; optional for cursor)
+	TotalPages        int    // pre-calculated total pages (offset mode)
+	StartRow          int    // pre-calculated first row number on current page (1-based, for display)
+	EndRow            int    // pre-calculated last row number on current page (for display)
+	HasNextPage       bool   // more rows forward?
+	HasPrevPage       bool   // more rows backward?
+	NextCursor        string // cursor mode: cursor token for next page (base64 encoded)
+	PrevCursor        string // cursor mode: cursor token for previous page (base64 encoded)
+	SearchQuery       string // current search term (reflected in search input)
+	SortColumn        string // current sort column key
+	SortDirection     string // current sort direction ("asc" or "desc")
+	FiltersJSON       string // current advanced filters (raw JSON string)
 	PaginationURL     string // base URL for HTMX page requests
 	PaginationBodyURL string // base URL for body-only targeted swap requests
 

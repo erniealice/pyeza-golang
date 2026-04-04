@@ -11,8 +11,8 @@ import (
 
 // assetMapping defines a source file and its relative destination path
 type assetMapping struct {
-	srcRelPath  string // relative to componentsDir
-	dstRelPath  string // relative to targetDir
+	srcRelPath string // relative to componentsDir
+	dstRelPath string // relative to targetDir
 }
 
 // CopyStyles copies all component CSS assets to the target directory.

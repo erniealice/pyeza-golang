@@ -119,6 +119,35 @@ func getDefaultFuncMap() template.FuncMap {
 		"list": func(values ...any) []any {
 			return values
 		},
+		// slugify converts arbitrary label text into a stable kebab-case token
+		// for ids, data-testid hooks, and similar non-user-facing attributes.
+		"slugify": func(value any) string {
+			raw := strings.TrimSpace(fmt.Sprint(value))
+			if raw == "" {
+				return ""
+			}
+			normalized := strings.ToLower(raw)
+			normalized = strings.NewReplacer(
+				"&", " and ",
+				"/", " ",
+				"\\", " ",
+				"_", " ",
+				"-", " ",
+				".", " ",
+				",", " ",
+				":", " ",
+				";", " ",
+				"(", " ",
+				")", " ",
+				"[", " ",
+				"]", " ",
+				"{", " ",
+				"}", " ",
+				"'", "",
+				"\"", "",
+			).Replace(normalized)
+			return strings.Join(strings.Fields(normalized), "-")
+		},
 		// t looks up a translation key from a Messages map.
 		// Safe for sub-templates called via dict where .T() is unavailable.
 		// Falls back to returning the key itself if not found.

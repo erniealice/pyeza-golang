@@ -105,6 +105,7 @@
             <a href="{{.Href}}"
                class="nav-item{{if eq .Key $.Sidebar.ActiveSubNav}} active{{end}}"
                {{if eq .Key $.Sidebar.ActiveSubNav}}aria-current="page"{{end}}
+               aria-label="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}"
                data-tooltip="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}">
                 <span class="nav-icon">{{renderContent .Icon $}}</span>
                 <span class="nav-text">{{.Label}}</span>
@@ -114,6 +115,7 @@
             <a href="{{.Href}}"
                class="nav-item nav-item--child{{if eq .Key $.Sidebar.ActiveSubNav}} active{{end}}"
                {{if eq .Key $.Sidebar.ActiveSubNav}}aria-current="page"{{end}}
+               aria-label="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}"
                data-tooltip="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}">
                 <span class="nav-icon">{{renderContent .Icon $}}</span>
                 <span class="nav-text">{{.Label}}</span>
