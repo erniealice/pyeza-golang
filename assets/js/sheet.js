@@ -175,13 +175,19 @@
             // Show success toast
             showToast('Changes saved successfully.', 'success');
 
-            // Refresh the table after a brief delay to reflect the new data.
-            // The delay allows HTMX to finish processing the HX-Trigger
-            // header before the refresh starts.  Using refreshTable() instead
-            // of window.location.reload() avoids a race where the full-page
-            // reload interrupts the close() CSS transition and the sheet
-            // appears to stay open.
-            setTimeout(function() { refreshTable(); }, 400);
+            // Extract the target table ID from the HX-Trigger response header.
+            // HTMXSuccess sends: {"formSuccess":true,"refreshTable":"clients-table"}
+            var targetTableID = null;
+            try {
+                var triggerHeader = xhr.getResponseHeader('HX-Trigger');
+                if (triggerHeader) {
+                    var parsed = JSON.parse(triggerHeader);
+                    targetTableID = parsed.refreshTable || null;
+                }
+            } catch (e) { /* ignore parse errors */ }
+
+            // Refresh the table after a brief delay to let the close animation start.
+            setTimeout(function() { refreshTable(targetTableID); }, 400);
         } else {
             // Handle error
             const errorMessage = xhr.getResponseHeader('HX-Error-Message') || 'An error occurred. Please try again.';
@@ -283,13 +289,20 @@
 
     /**
      * Trigger table refresh via HTMX
+     * @param {string|null} tableID - Optional table ID from HX-Trigger header (e.g. "clients-table")
      */
-    function refreshTable() {
+    function refreshTable(tableID) {
         // Dispatch custom event for table refresh
-        document.dispatchEvent(new CustomEvent('refreshTable'));
+        document.dispatchEvent(new CustomEvent('refreshTable', { detail: { tableID: tableID } }));
 
-        // Find table card with a refresh URL
-        const tableCard = document.querySelector('.table-card[data-refresh-url]');
+        // Find table card — prefer targeted lookup by ID, fall back to first match
+        var tableCard = null;
+        if (tableID) {
+            tableCard = document.getElementById(tableID + '-card') || document.getElementById(tableID);
+        }
+        if (!tableCard) {
+            tableCard = document.querySelector('.table-card[data-refresh-url]');
+        }
         if (tableCard && typeof htmx !== 'undefined') {
             const refreshUrl = tableCard.dataset.refreshUrl;
             if (refreshUrl) {

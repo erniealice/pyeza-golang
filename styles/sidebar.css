@@ -544,68 +544,68 @@
     stroke: white;
 }
 
-.app-icon--users {
-    background: linear-gradient(135deg, var(--app-color-users) 0%, var(--app-color-users-dark) 100%);
+.app-icon--user {
+    background: linear-gradient(135deg, var(--app-color-user) 0%, var(--app-color-user-dark) 100%);
 }
 
-.app-icon--clients {
-    background: linear-gradient(135deg, var(--app-color-clients) 0%, var(--app-color-clients-dark) 100%);
+.app-icon--client {
+    background: linear-gradient(135deg, var(--app-color-client) 0%, var(--app-color-client-dark) 100%);
 }
 
 .app-icon--inventory {
     background: linear-gradient(135deg, var(--app-color-inventory) 0%, var(--app-color-inventory-dark) 100%);
 }
 
-.app-icon--services {
-    background: linear-gradient(135deg, var(--app-color-services) 0%, var(--app-color-services-dark) 100%);
+.app-icon--service {
+    background: linear-gradient(135deg, var(--app-color-service) 0%, var(--app-color-service-dark) 100%);
 }
 
-.app-icon--locations {
-    background: linear-gradient(135deg, var(--app-color-locations) 0%, var(--app-color-locations-dark) 100%);
+.app-icon--location {
+    background: linear-gradient(135deg, var(--app-color-location) 0%, var(--app-color-location-dark) 100%);
 }
 
-.app-icon--assets {
-    background: linear-gradient(135deg, var(--app-color-assets) 0%, var(--app-color-assets-dark) 100%);
+.app-icon--asset {
+    background: linear-gradient(135deg, var(--app-color-asset) 0%, var(--app-color-asset-dark) 100%);
 }
 
-.app-icon--suppliers {
-    background: linear-gradient(135deg, var(--app-color-suppliers) 0%, var(--app-color-suppliers-dark) 100%);
+.app-icon--supplier {
+    background: linear-gradient(135deg, var(--app-color-supplier) 0%, var(--app-color-supplier-dark) 100%);
 }
 
-.app-icon--sales {
-    background: linear-gradient(135deg, var(--app-color-sales) 0%, var(--app-color-sales-dark) 100%);
+.app-icon--sale {
+    background: linear-gradient(135deg, var(--app-color-sale) 0%, var(--app-color-sale-dark) 100%);
 }
 
-.app-icon--purchases {
-    background: linear-gradient(135deg, var(--app-color-purchases) 0%, var(--app-color-purchases-dark) 100%);
+.app-icon--purchase {
+    background: linear-gradient(135deg, var(--app-color-purchase) 0%, var(--app-color-purchase-dark) 100%);
 }
 
-.app-icon--expenses {
-    background: linear-gradient(135deg, var(--app-color-expenses) 0%, var(--app-color-expenses-dark) 100%);
+.app-icon--expense {
+    background: linear-gradient(135deg, var(--app-color-expense) 0%, var(--app-color-expense-dark) 100%);
 }
 
 .app-icon--cash {
     background: linear-gradient(135deg, var(--app-color-cash) 0%, var(--app-color-cash-dark) 100%);
 }
 
-.app-icon--reports {
-    background: linear-gradient(135deg, var(--app-color-reports) 0%, var(--app-color-reports-dark) 100%);
+.app-icon--report {
+    background: linear-gradient(135deg, var(--app-color-report) 0%, var(--app-color-report-dark) 100%);
 }
 
 .app-icon--admin {
     background: linear-gradient(135deg, var(--app-color-admin) 0%, var(--app-color-admin-dark) 100%);
 }
 
-.app-icon--jobs {
-    background: linear-gradient(135deg, var(--app-color-jobs) 0%, var(--app-color-jobs-dark) 100%);
+.app-icon--job {
+    background: linear-gradient(135deg, var(--app-color-job) 0%, var(--app-color-job-dark) 100%);
 }
 
 .app-icon--payroll {
     background: linear-gradient(135deg, var(--app-color-payroll) 0%, var(--app-color-payroll-dark) 100%);
 }
 
-.app-icon--loans {
-    background: linear-gradient(135deg, var(--app-color-loans) 0%, var(--app-color-loans-dark) 100%);
+.app-icon--loan {
+    background: linear-gradient(135deg, var(--app-color-loan) 0%, var(--app-color-loan-dark) 100%);
 }
 
 .app-icon--equity {
@@ -851,20 +851,20 @@
 }
 
 /* Non-active app options: colored icons on light backgrounds */
-.app-option:not(.active) .app-icon--users {
-    background: var(--app-color-users-light);
+.app-option:not(.active) .app-icon--user {
+    background: var(--app-color-user-light);
 }
-.app-option:not(.active) .app-icon--users svg {
-    color: var(--app-color-users);
-    stroke: var(--app-color-users);
+.app-option:not(.active) .app-icon--user svg {
+    color: var(--app-color-user);
+    stroke: var(--app-color-user);
 }
 
-.app-option:not(.active) .app-icon--clients {
-    background: var(--app-color-clients-light);
+.app-option:not(.active) .app-icon--client {
+    background: var(--app-color-client-light);
 }
-.app-option:not(.active) .app-icon--clients svg {
-    color: var(--app-color-clients);
-    stroke: var(--app-color-clients);
+.app-option:not(.active) .app-icon--client svg {
+    color: var(--app-color-client);
+    stroke: var(--app-color-client);
 }
 
 .app-option:not(.active) .app-icon--inventory {
@@ -875,60 +875,60 @@
     stroke: var(--app-color-inventory);
 }
 
-.app-option:not(.active) .app-icon--services {
-    background: var(--app-color-services-light);
+.app-option:not(.active) .app-icon--service {
+    background: var(--app-color-service-light);
 }
-.app-option:not(.active) .app-icon--services svg {
-    color: var(--app-color-services);
-    stroke: var(--app-color-services);
-}
-
-.app-option:not(.active) .app-icon--locations {
-    background: var(--app-color-locations-light);
-}
-.app-option:not(.active) .app-icon--locations svg {
-    color: var(--app-color-locations);
-    stroke: var(--app-color-locations);
+.app-option:not(.active) .app-icon--service svg {
+    color: var(--app-color-service);
+    stroke: var(--app-color-service);
 }
 
-.app-option:not(.active) .app-icon--assets {
-    background: var(--app-color-assets-light);
+.app-option:not(.active) .app-icon--location {
+    background: var(--app-color-location-light);
 }
-.app-option:not(.active) .app-icon--assets svg {
-    color: var(--app-color-assets);
-    stroke: var(--app-color-assets);
-}
-
-.app-option:not(.active) .app-icon--suppliers {
-    background: var(--app-color-suppliers-light);
-}
-.app-option:not(.active) .app-icon--suppliers svg {
-    color: var(--app-color-suppliers);
-    stroke: var(--app-color-suppliers);
+.app-option:not(.active) .app-icon--location svg {
+    color: var(--app-color-location);
+    stroke: var(--app-color-location);
 }
 
-.app-option:not(.active) .app-icon--sales {
-    background: var(--app-color-sales-light);
+.app-option:not(.active) .app-icon--asset {
+    background: var(--app-color-asset-light);
 }
-.app-option:not(.active) .app-icon--sales svg {
-    color: var(--app-color-sales);
-    stroke: var(--app-color-sales);
-}
-
-.app-option:not(.active) .app-icon--purchases {
-    background: var(--app-color-purchases-light);
-}
-.app-option:not(.active) .app-icon--purchases svg {
-    color: var(--app-color-purchases);
-    stroke: var(--app-color-purchases);
+.app-option:not(.active) .app-icon--asset svg {
+    color: var(--app-color-asset);
+    stroke: var(--app-color-asset);
 }
 
-.app-option:not(.active) .app-icon--expenses {
-    background: var(--app-color-expenses-light);
+.app-option:not(.active) .app-icon--supplier {
+    background: var(--app-color-supplier-light);
 }
-.app-option:not(.active) .app-icon--expenses svg {
-    color: var(--app-color-expenses);
-    stroke: var(--app-color-expenses);
+.app-option:not(.active) .app-icon--supplier svg {
+    color: var(--app-color-supplier);
+    stroke: var(--app-color-supplier);
+}
+
+.app-option:not(.active) .app-icon--sale {
+    background: var(--app-color-sale-light);
+}
+.app-option:not(.active) .app-icon--sale svg {
+    color: var(--app-color-sale);
+    stroke: var(--app-color-sale);
+}
+
+.app-option:not(.active) .app-icon--purchase {
+    background: var(--app-color-purchase-light);
+}
+.app-option:not(.active) .app-icon--purchase svg {
+    color: var(--app-color-purchase);
+    stroke: var(--app-color-purchase);
+}
+
+.app-option:not(.active) .app-icon--expense {
+    background: var(--app-color-expense-light);
+}
+.app-option:not(.active) .app-icon--expense svg {
+    color: var(--app-color-expense);
+    stroke: var(--app-color-expense);
 }
 
 .app-option:not(.active) .app-icon--cash {
@@ -939,12 +939,12 @@
     stroke: var(--app-color-cash);
 }
 
-.app-option:not(.active) .app-icon--reports {
-    background: var(--app-color-reports-light);
+.app-option:not(.active) .app-icon--report {
+    background: var(--app-color-report-light);
 }
-.app-option:not(.active) .app-icon--reports svg {
-    color: var(--app-color-reports);
-    stroke: var(--app-color-reports);
+.app-option:not(.active) .app-icon--report svg {
+    color: var(--app-color-report);
+    stroke: var(--app-color-report);
 }
 
 .app-option:not(.active) .app-icon--admin {
@@ -955,12 +955,12 @@
     stroke: var(--app-color-admin);
 }
 
-.app-option:not(.active) .app-icon--jobs {
-    background: var(--app-color-jobs-light);
+.app-option:not(.active) .app-icon--job {
+    background: var(--app-color-job-light);
 }
-.app-option:not(.active) .app-icon--jobs svg {
-    color: var(--app-color-jobs);
-    stroke: var(--app-color-jobs);
+.app-option:not(.active) .app-icon--job svg {
+    color: var(--app-color-job);
+    stroke: var(--app-color-job);
 }
 
 .app-option:not(.active) .app-icon--payroll {
@@ -971,12 +971,12 @@
     stroke: var(--app-color-payroll);
 }
 
-.app-option:not(.active) .app-icon--loans {
-    background: var(--app-color-loans-light);
+.app-option:not(.active) .app-icon--loan {
+    background: var(--app-color-loan-light);
 }
-.app-option:not(.active) .app-icon--loans svg {
-    color: var(--app-color-loans);
-    stroke: var(--app-color-loans);
+.app-option:not(.active) .app-icon--loan svg {
+    color: var(--app-color-loan);
+    stroke: var(--app-color-loan);
 }
 
 .app-option:not(.active) .app-icon--equity {

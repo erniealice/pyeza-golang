@@ -159,6 +159,7 @@ type TableAction struct {
 	ConfirmMessage  string // Custom message for confirmation dialog
 	Disabled        bool   // If true, action is disabled (grayed out, not clickable)
 	DisabledTooltip string // Tooltip shown when hovering over disabled action
+	TestID          string // Optional data-testid override; auto-generated from Action/Type + row ID if empty
 }
 
 // TableRow defines a row in the table
@@ -262,6 +263,7 @@ type BulkActionsConfig struct {
 type TableConfig struct {
 	ID                   string             // Table ID
 	Title                string             // Table title (legacy, not displayed in toolbar)
+	Caption              string             // Accessible caption for screen readers (falls back to Title, then "Data table")
 	CardClass            string             // Additional class for table-card
 	RefreshURL           string             // URL to fetch table partial for HTMX refresh (e.g., "/action/user/user-division/table")
 	Columns              []TableColumn      // Column definitions (single-level headers)
