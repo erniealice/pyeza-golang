@@ -57,6 +57,9 @@
 }
 
 /* Toolbar Search */
+.toolbar-search-spacer {
+    flex: 1;
+}
 .toolbar-search {
     display: flex;
     align-items: center;
@@ -2450,6 +2453,13 @@ body.density-comfortable .action-buttons {
 .column-group-spacer {
     background: var(--bg-base) !important;
     border-right: 1px solid var(--border-light);
+    text-align: left;
+    min-width: 12.5rem;
+}
+/* First data cell in grouped tables — left-align the name column */
+.data-table-grouped td:first-child {
+    text-align: left;
+    min-width: 12.5rem;
 }
 
 .column-group-label {

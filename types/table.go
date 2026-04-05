@@ -289,6 +289,7 @@ type TableConfig struct {
 	PrimaryAction        *PrimaryAction     // Optional primary action button in toolbar
 	BulkActions          *BulkActionsConfig // Optional bulk selection configuration
 	FixedLayout          bool               // When true, use table-layout: fixed (columns respect declared widths exactly)
+	NameColumnLabel      string             // Optional header label for the auto-generated name column (first column). Blank = no label.
 	ServerPagination     *ServerPagination  // Optional server-side pagination configuration (nil = client-side mode)
 }
 

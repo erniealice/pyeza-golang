@@ -139,7 +139,7 @@ JavaScript:
     {{/* Multi-level headers with column groups */}}
     <thead>
         <tr class="column-group-header">
-            <th class="column-group-spacer" rowspan="2" scope="col"></th>
+            <th class="column-group-spacer" rowspan="2" scope="col">{{if .NameColumnLabel}}<span class="column-label">{{.NameColumnLabel}}</span>{{end}}</th>
             {{range .ColumnGroups}}
             <th class="column-group-label" colspan="{{len .Columns}}" scope="colgroup">{{.Label}}</th>
             {{end}}

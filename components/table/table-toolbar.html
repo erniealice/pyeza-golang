@@ -46,7 +46,7 @@
 {{/* TABLE TOOLBAR - Search, Filters, Sort, Columns, Export */}}
 {{define "table-toolbar"}}
 <div class="table-toolbar" data-table="{{.ID}}">
-    {{/* Search Input */}}
+    {{/* Search Input (or spacer to keep actions right-aligned) */}}
     {{if .ShowSearch}}
     <div class="toolbar-search">
         {{template "icon-search" .}}
@@ -58,6 +58,8 @@
                placeholder="{{.Labels.SearchPlaceholder}}"
                {{if .ServerPagination}}{{if .ServerPagination.SearchQuery}} value="{{.ServerPagination.SearchQuery}}"{{end}}{{end}}>
     </div>
+    {{else}}
+    <div class="toolbar-search-spacer"></div>
     {{end}}
 
     {{/* Mobile Options Toggle (visible only on mobile) */}}
