@@ -2147,6 +2147,37 @@ button.sort-btn {
 }
 
 /* ========================================
+   TABLE TOTALS FOOTER (tfoot)
+   ======================================== */
+
+.data-table tfoot.table-totals {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+}
+
+.data-table tfoot.table-totals td.table-total-cell {
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border-top: 2px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+
+/* Density overrides for tfoot */
+body.density-compact .data-table tfoot.table-totals td.table-total-cell {
+    padding: 0.5rem 1rem !important;
+    font-size: var(--text-xs) !important;
+}
+
+body.density-comfortable .data-table tfoot.table-totals td.table-total-cell {
+    padding: 1rem 1.5rem !important;
+    font-size: var(--text-base) !important;
+}
+
+/* ========================================
    PAGE-LEVEL DENSITY VARIANTS
    ======================================== */
 

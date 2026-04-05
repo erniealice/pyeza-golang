@@ -170,6 +170,14 @@ type SidebarLabels struct {
 	GrossProfitIcon           string `json:"gross_profit_icon"`
 	ExpensesReportLabel       string `json:"expenses_report_label"`
 	ExpensesReportIcon        string `json:"expenses_report_icon"`
+	ExpenditureReportLabel    string `json:"expenditure_report_label"`
+	ExpenditureReportIcon     string `json:"expenditure_report_icon"`
+	DisbursementReportLabel   string `json:"disbursement_report_label"`
+	DisbursementReportIcon    string `json:"disbursement_report_icon"`
+	ReceivablesAgingReportLabel string `json:"receivables_aging_report_label"`
+	ReceivablesAgingReportIcon  string `json:"receivables_aging_report_icon"`
+	CollectionSummaryReportLabel string `json:"collection_summary_report_label"`
+	CollectionSummaryReportIcon  string `json:"collection_summary_report_icon"`
 	NetProfitLabel            string `json:"net_profit_label"`
 	NetProfitIcon             string `json:"net_profit_icon"`
 	LocationsActiveIcon       string `json:"locations_active_icon"`
@@ -348,7 +356,15 @@ func DefaultSidebarLabels() SidebarLabels {
 		GrossProfitIcon:           "icon-bar-chart",
 		ExpensesReportLabel:       "Expenses",
 		ExpensesReportIcon:        "icon-file-minus",
-		NetProfitLabel:            "Net Profit",
+		ExpenditureReportLabel:    "Expenditure Analysis",
+		ExpenditureReportIcon:     "icon-bar-chart",
+		DisbursementReportLabel:      "Disbursement Report",
+		DisbursementReportIcon:       "icon-bar-chart",
+		ReceivablesAgingReportLabel:  "Receivables Aging",
+		ReceivablesAgingReportIcon:   "icon-clock",
+		CollectionSummaryReportLabel: "Collection Summary",
+		CollectionSummaryReportIcon:  "icon-bar-chart",
+		NetProfitLabel:               "Net Profit",
 		NetProfitIcon:             "icon-dollar-sign",
 		LocationsActiveIcon:       "icon-map-pin",
 		LocationsInactiveIcon:     "icon-map-pin",

@@ -209,6 +209,15 @@ JavaScript:
             {{template "table-empty-row" $}}
         {{end}}
     </tbody>
+    {{if .TotalsRow}}
+    <tfoot class="table-totals">
+        <tr>
+            {{range .TotalsRow}}
+            <td class="table-total-cell"{{if .Align}} style="text-align: {{.Align}};"{{end}}>{{.Value}}</td>
+            {{end}}
+        </tr>
+    </tfoot>
+    {{end}}
 </table>
 </div>
 {{end}}

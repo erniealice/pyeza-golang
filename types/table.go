@@ -291,6 +291,7 @@ type TableConfig struct {
 	FixedLayout          bool               // When true, use table-layout: fixed (columns respect declared widths exactly)
 	NameColumnLabel      string             // Optional header label for the auto-generated name column (first column). Blank = no label.
 	ServerPagination     *ServerPagination  // Optional server-side pagination configuration (nil = client-side mode)
+	TotalsRow            []TableCell        // Optional totals row rendered in <tfoot> (e.g. for accounting reports)
 }
 
 // ImportAction defines the import button configuration
