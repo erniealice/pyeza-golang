@@ -12,6 +12,38 @@
         </button>
     </div>
 
+    {{if gt (len .Sidebar.AvailableWorkspaces) 1}}
+    <div class="workspace-switcher">
+        <button type="button" class="workspace-switcher-btn" onclick="this.nextElementSibling.classList.toggle('hidden')" aria-haspopup="listbox">
+            <span class="workspace-icon">{{template "icon-briefcase" .}}</span>
+            <span class="workspace-name">{{.Sidebar.CurrentWorkspace.Name}}</span>
+            <span class="workspace-chevron">{{template "icon-chevron-down" .}}</span>
+        </button>
+        <div class="workspace-dropdown hidden">
+            {{range .Sidebar.AvailableWorkspaces}}
+            {{if ne .ID $.Sidebar.CurrentWorkspace.ID}}
+            <form method="POST" action="{{$.Sidebar.SwitchWorkspaceURL}}" class="workspace-option-form">
+                <input type="hidden" name="workspace_id" value="{{.ID}}">
+                <button type="submit" class="workspace-option"
+                        hx-post="{{$.Sidebar.SwitchWorkspaceURL}}"
+                        hx-vals='{"workspace_id": "{{.ID}}"}'
+                        hx-swap="none">
+                    <span class="workspace-option-name">{{.Name}}</span>
+                </button>
+            </form>
+            {{end}}
+            {{end}}
+        </div>
+    </div>
+    {{else if .Sidebar.CurrentWorkspace.Name}}
+    <div class="workspace-switcher">
+        <div class="workspace-switcher-btn workspace-single">
+            <span class="workspace-icon">{{template "icon-briefcase" .}}</span>
+            <span class="workspace-name">{{.Sidebar.CurrentWorkspace.Name}}</span>
+        </div>
+    </div>
+    {{end}}
+
     {{if eq .Sidebar.AppDisplayMode "grouped"}}
     <!-- Grouped App Switcher -->
     <div class="app-switcher" id="appSwitcher">

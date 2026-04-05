@@ -56,6 +56,14 @@
     box-sizing: border-box;
 }
 
+/* Toolbar Prefix (optional slot rendered before search) */
+.toolbar-prefix {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+}
+
 /* Toolbar Search */
 .toolbar-search-spacer {
     flex: 1;
@@ -2161,7 +2169,7 @@ button.sort-btn {
     font-size: var(--text-sm);
     color: var(--text-primary);
     background: var(--bg-card);
-    border-top: 2px solid var(--border-color);
+    box-shadow: inset 0 2px 0 var(--border-color);
     padding: 0.75rem 1rem;
     white-space: nowrap;
 }

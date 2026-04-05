@@ -13,6 +13,17 @@ type SidebarConfig struct {
 	AppGridColumns int    // 1 = single column, 2 = two columns (default)
 	AppDisplayMode string // "" or "dropdown" = dropdown grid; "accordion" = grouped accordion
 	AppGroups      []SidebarAppGroup
+
+	// Workspace switcher — populated per-request from WorkspaceLoader
+	CurrentWorkspace    SidebarWorkspace
+	AvailableWorkspaces []SidebarWorkspace
+	SwitchWorkspaceURL  string
+}
+
+// SidebarWorkspace is a workspace entry for the sidebar workspace switcher.
+type SidebarWorkspace struct {
+	ID   string
+	Name string
 }
 
 // SidebarAppGroup is a named group of apps for accordion display mode.

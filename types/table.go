@@ -262,6 +262,7 @@ type BulkActionsConfig struct {
 // TableConfig holds all configuration for the table component
 type TableConfig struct {
 	ID                   string             // Table ID
+	ToolbarPrefix        template.HTML      // Optional HTML rendered at the start of the toolbar (before search)
 	Title                string             // Table title (legacy, not displayed in toolbar)
 	Caption              string             // Accessible caption for screen readers (falls back to Title, then "Data table")
 	CardClass            string             // Additional class for table-card

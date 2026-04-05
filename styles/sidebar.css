@@ -1246,3 +1246,124 @@
     }
 }
 
+/* ========================================
+   WORKSPACE SWITCHER
+   ======================================== */
+
+.workspace-switcher {
+    padding: 0.5rem 0.75rem;
+    border-bottom: var(--border-width) solid var(--border);
+}
+
+.sidebar.collapsed .workspace-switcher {
+    display: none;
+}
+
+.workspace-switcher-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    width: 100%;
+    padding: 0.375rem 0.5rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    transition: background var(--transition-fast);
+}
+
+.workspace-switcher-btn:hover {
+    background: var(--bg-hover);
+}
+
+.workspace-single {
+    cursor: default;
+}
+
+.workspace-single:hover {
+    background: var(--bg-card);
+}
+
+.workspace-icon {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.workspace-icon svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.workspace-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--font-weight-medium);
+    text-align: left;
+}
+
+.workspace-chevron {
+    flex-shrink: 0;
+    width: 0.875rem;
+    height: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+.workspace-chevron svg {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+.workspace-dropdown {
+    margin-top: 0.25rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-sidebar);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+}
+
+.workspace-dropdown.hidden {
+    display: none;
+}
+
+.workspace-option-form {
+    margin: 0;
+}
+
+.workspace-option {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    text-align: left;
+    transition: background var(--transition-fast);
+}
+
+.workspace-option:hover {
+    background: var(--bg-hover);
+}
+
+.workspace-option-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+

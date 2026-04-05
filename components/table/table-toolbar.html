@@ -46,6 +46,11 @@
 {{/* TABLE TOOLBAR - Search, Filters, Sort, Columns, Export */}}
 {{define "table-toolbar"}}
 <div class="table-toolbar" data-table="{{.ID}}">
+    {{/* Toolbar Prefix (optional: filter button + chips from report pages) */}}
+    {{if .ToolbarPrefix}}
+    <div class="toolbar-prefix">{{.ToolbarPrefix}}</div>
+    {{end}}
+
     {{/* Search Input (or spacer to keep actions right-aligned) */}}
     {{if .ShowSearch}}
     <div class="toolbar-search">
