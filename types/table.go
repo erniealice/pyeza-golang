@@ -263,6 +263,8 @@ type BulkActionsConfig struct {
 type TableConfig struct {
 	ID                   string             // Table ID
 	ToolbarPrefix        template.HTML      // Optional HTML rendered at the start of the toolbar (before search)
+	ToolbarPrefixTemplate string             // Template name to render via renderContent (preferred over ToolbarPrefix)
+	ToolbarPrefixData     any                // Data passed to ToolbarPrefixTemplate
 	Title                string             // Table title (legacy, not displayed in toolbar)
 	Caption              string             // Accessible caption for screen readers (falls back to Title, then "Data table")
 	CardClass            string             // Additional class for table-card

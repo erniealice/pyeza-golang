@@ -47,7 +47,9 @@
 {{define "table-toolbar"}}
 <div class="table-toolbar" data-table="{{.ID}}">
     {{/* Toolbar Prefix (optional: filter button + chips from report pages) */}}
-    {{if .ToolbarPrefix}}
+    {{if .ToolbarPrefixTemplate}}
+    <div class="toolbar-prefix">{{renderContent .ToolbarPrefixTemplate .ToolbarPrefixData}}</div>
+    {{else if .ToolbarPrefix}}
     <div class="toolbar-prefix">{{.ToolbarPrefix}}</div>
     {{end}}
 
