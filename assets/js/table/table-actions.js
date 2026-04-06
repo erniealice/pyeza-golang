@@ -110,6 +110,82 @@
                 showRowActionDialog(confirmTitle, confirmMessage, 'Activate', 'primary', url);
             }
 
+            // Handle Undo button
+            const undoBtn = e.target.closest('.action-btn[data-action="undo"]');
+            if (undoBtn) {
+                e.preventDefault();
+                const id = undoBtn.dataset.id;
+                const undoUrl = undoBtn.dataset.activateUrl;
+                const itemName = undoBtn.dataset.itemName || 'this item';
+                const confirmTitle = undoBtn.dataset.confirmTitle || 'Revert to Draft';
+                const confirmMessage = undoBtn.dataset.confirmMessage || `Are you sure you want to revert ${itemName} to draft?`;
+
+                if (!undoUrl || !id) {
+                    console.warn('Undo button missing data-activate-url or data-id');
+                    return;
+                }
+
+                const url = undoUrl + (undoUrl.includes('?') ? '&' : '?') + 'id=' + id;
+                showRowActionDialog(confirmTitle, confirmMessage, 'Revert', 'warning', url);
+            }
+
+            // Handle Complete button
+            const completeBtn = e.target.closest('.action-btn[data-action="complete"]');
+            if (completeBtn) {
+                e.preventDefault();
+                const id = completeBtn.dataset.id;
+                const completeUrl = completeBtn.dataset.deactivateUrl;
+                const itemName = completeBtn.dataset.itemName || 'this item';
+                const confirmTitle = completeBtn.dataset.confirmTitle || 'Mark as Complete';
+                const confirmMessage = completeBtn.dataset.confirmMessage || `Are you sure you want to complete ${itemName}?`;
+
+                if (!completeUrl || !id) {
+                    console.warn('Complete button missing data-deactivate-url or data-id');
+                    return;
+                }
+
+                const url = completeUrl + (completeUrl.includes('?') ? '&' : '?') + 'id=' + id;
+                showRowActionDialog(confirmTitle, confirmMessage, 'Complete', 'warning', url);
+            }
+
+            // Handle Cancel button
+            const cancelBtn = e.target.closest('.action-btn[data-action="cancel"]');
+            if (cancelBtn) {
+                e.preventDefault();
+                const id = cancelBtn.dataset.id;
+                const cancelUrl = cancelBtn.dataset.deactivateUrl;
+                const itemName = cancelBtn.dataset.itemName || 'this item';
+                const confirmTitle = cancelBtn.dataset.confirmTitle || 'Cancel';
+                const confirmMessage = cancelBtn.dataset.confirmMessage || `Are you sure you want to cancel ${itemName}?`;
+
+                if (!cancelUrl || !id) {
+                    console.warn('Cancel button missing data-deactivate-url or data-id');
+                    return;
+                }
+
+                const url = cancelUrl + (cancelUrl.includes('?') ? '&' : '?') + 'id=' + id;
+                showRowActionDialog(confirmTitle, confirmMessage, 'Cancel', 'danger', url);
+            }
+
+            // Handle Reclassify button
+            const reclassifyBtn = e.target.closest('.action-btn[data-action="reclassify"]');
+            if (reclassifyBtn) {
+                e.preventDefault();
+                const id = reclassifyBtn.dataset.id;
+                const reclassifyUrl = reclassifyBtn.dataset.activateUrl;
+                const itemName = reclassifyBtn.dataset.itemName || 'this item';
+                const confirmTitle = reclassifyBtn.dataset.confirmTitle || 'Reclassify to Draft';
+                const confirmMessage = reclassifyBtn.dataset.confirmMessage || `Are you sure you want to reclassify ${itemName}?`;
+
+                if (!reclassifyUrl || !id) {
+                    console.warn('Reclassify button missing data-activate-url or data-id');
+                    return;
+                }
+
+                const url = reclassifyUrl + (reclassifyUrl.includes('?') ? '&' : '?') + 'id=' + id;
+                showRowActionDialog(confirmTitle, confirmMessage, 'Reclassify', 'primary', url);
+            }
+
             // Handle Download button (direct GET — opens in new tab or triggers download)
             const downloadBtn = e.target.closest('.action-btn[data-action="download"]');
             if (downloadBtn) {

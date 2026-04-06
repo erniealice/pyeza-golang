@@ -15,26 +15,24 @@
             {{if .TestID}}data-testid="{{.TestID}}"{{else if $.RowID}}data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}"{{end}}
             {{if .Disabled}}disabled{{end}}
             {{if $.RowID}}data-id="{{$.RowID}}"{{end}}
-            {{if .URL}}{{if eq .Action "edit"}}data-edit-url="{{.URL}}"{{else if eq .Action "delete"}}data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}}data-activate-url="{{.URL}}"{{else if eq .Action "complete"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "cancel"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "reclassify"}}data-activate-url="{{.URL}}"{{else if eq .Action "download"}}data-download-url="{{.URL}}"{{else if eq .Action "send-email"}}data-send-email-url="{{.URL}}"{{end}}{{end}}
+            {{if .URL}}{{if eq .Action "edit"}}data-edit-url="{{.URL}}"{{else if eq .Action "delete"}}data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}}data-activate-url="{{.URL}}"{{else if eq .Action "undo"}}data-activate-url="{{.URL}}"{{else if eq .Action "download"}}data-download-url="{{.URL}}"{{else if eq .Action "send-email"}}data-send-email-url="{{.URL}}"{{end}}{{end}}
             {{if .DrawerTitle}}data-drawer-title="{{.DrawerTitle}}"{{end}}
             {{if .ItemName}}data-item-name="{{.ItemName}}"{{end}}
             {{if .ConfirmTitle}}data-confirm-title="{{.ConfirmTitle}}"{{end}}
             {{if .ConfirmMessage}}data-confirm-message="{{.ConfirmMessage}}"{{end}}>
         {{if eq .Type "view"}}{{template "icon-eye" $}}
-        {{else if eq .Type "preview"}}{{template "icon-eye" $}}
         {{else if eq .Type "edit"}}{{template "icon-edit" $}}
-        {{else if eq .Type "manage"}}{{template "icon-shield" $}}
-        {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+        {{else if eq .Type "undo"}}{{template "icon-undo" $}}
         {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
         {{else if eq .Type "activate"}}{{template "icon-play" $}}
         {{else if eq .Type "delete"}}{{template "icon-trash" $}}
         {{else if eq .Type "download"}}{{template "icon-download" $}}
-        {{else if eq .Type "archive"}}{{template "icon-archive" $}}
         {{else if eq .Type "mail"}}{{template "icon-mail" $}}
         {{else if eq .Type "check"}}{{template "icon-check" $}}
-        {{else if eq .Type "complete"}}{{template "icon-check-circle" $}}
-        {{else if eq .Type "cancel"}}{{template "icon-x-circle" $}}
-        {{else if eq .Type "reclassify"}}{{template "icon-rotate-ccw" $}}
+        {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+        {{else if eq .Type "manage"}}{{template "icon-shield" $}}
+        {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+        {{else if eq .Type "preview"}}{{template "icon-eye" $}}
         {{end}}
     </button>
     {{end}}
@@ -47,22 +45,20 @@
     </button>
     <div class="action-dropdown-menu" id="action-menu-{{.RowID}}" role="menu">
         {{range .Actions}}
-        <button type="button" class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" role="menuitem" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}-mobile"{{else if $.RowID}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}-mobile"{{end}} {{if .Disabled}}aria-label="{{.DisabledTooltip}}"{{end}} {{if $.RowID}}data-id="{{$.RowID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "complete"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "cancel"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "reclassify"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .Disabled}} disabled{{end}}>
+        <button type="button" class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" role="menuitem" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}-mobile"{{else if $.RowID}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}-mobile"{{end}} {{if .Disabled}}aria-label="{{.DisabledTooltip}}"{{end}} {{if $.RowID}}data-id="{{$.RowID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "undo"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .Disabled}} disabled{{end}}>
             {{if eq .Type "view"}}{{template "icon-eye" $}}
-            {{else if eq .Type "preview"}}{{template "icon-eye" $}}
             {{else if eq .Type "edit"}}{{template "icon-edit" $}}
-            {{else if eq .Type "manage"}}{{template "icon-shield" $}}
-            {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+            {{else if eq .Type "undo"}}{{template "icon-undo" $}}
             {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
             {{else if eq .Type "activate"}}{{template "icon-play" $}}
             {{else if eq .Type "delete"}}{{template "icon-trash" $}}
             {{else if eq .Type "download"}}{{template "icon-download" $}}
-            {{else if eq .Type "archive"}}{{template "icon-archive" $}}
             {{else if eq .Type "mail"}}{{template "icon-mail" $}}
             {{else if eq .Type "check"}}{{template "icon-check" $}}
-            {{else if eq .Type "complete"}}{{template "icon-check-circle" $}}
-            {{else if eq .Type "cancel"}}{{template "icon-x-circle" $}}
-            {{else if eq .Type "reclassify"}}{{template "icon-rotate-ccw" $}}
+            {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+            {{else if eq .Type "manage"}}{{template "icon-shield" $}}
+            {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+            {{else if eq .Type "preview"}}{{template "icon-eye" $}}
             {{end}}
             {{.Label}}
         </button>
