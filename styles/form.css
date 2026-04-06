@@ -312,7 +312,7 @@
    ========================================================================== */
 
 .form-section {
-    margin-bottom: 2rem; /* 32px */
+    margin-bottom: 0;
 }
 
 .form-section:last-child {
@@ -752,3 +752,71 @@
         margin-bottom: 0.5rem; /* 8px */
     }
 }
+
+/* Settings row: input + toggles in a single row */
+.form-row-settings {
+    grid-template-columns: 30% 35% 35%;
+    align-items: start;
+}
+
+.form-group-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group-toggle .form-label {
+    margin-bottom: 0;
+}
+
+.form-group-toggle .toggle-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+/* Info icon tooltip in form labels */
+.form-info-icon {
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+    position: relative;
+    color: var(--text-muted);
+    opacity: 0.6;
+    transition: opacity 0.15s ease;
+    vertical-align: middle;
+    margin-left: 0.25rem;
+}
+
+.form-info-icon:hover {
+    opacity: 1;
+    color: var(--text-primary);
+}
+
+.form-info-icon svg {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+.form-info-icon[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-inverse, #1a1a2e);
+    color: var(--text-inverse, #fff);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md, 0.375rem);
+    font-size: var(--text-xs);
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: normal;
+    width: max-content;
+    max-width: 16rem;
+    z-index: 100;
+    pointer-events: none;
+    line-height: 1.4;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+

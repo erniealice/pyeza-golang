@@ -2565,12 +2565,12 @@ body.density-comfortable .action-buttons {
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: var(--tracking-normal);
-    border-bottom: 1px solid var(--border);
+    border-bottom: none;
     background: var(--bg-base);
     border-left: 1px solid var(--border-light);
     position: sticky;
     z-index: 2;
-    box-shadow: 0 -2px 0 0 var(--bg-base), inset 0 -1px 0 0 var(--border);
+    box-shadow: 0 -2px 0 0 var(--bg-base), 0 1px 0 0 var(--border);
 }
 
 .column-group-header th {

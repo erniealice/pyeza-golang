@@ -297,6 +297,11 @@
     border-top: 1px solid var(--border-light);
 }
 
+/* Form section spacing — add gap between non-first sections */
+.sheet-body .form-section + .form-row ~ .form-section {
+    margin-top: 1.5rem;
+}
+
 /* Form section title */
 .sheet-form .sheet-content .form-section-title {
     font-size: var(--text-sm);
