@@ -163,6 +163,7 @@ JavaScript:
             {{end}}
         </tr>
     </thead>
+    <script>setTimeout(function(){var r=document.querySelector('.column-group-header');if(!r)return;var h=r.offsetHeight-1;if(h>0){document.querySelectorAll('.column-sub-header th').forEach(function(el){el.style.top=h+'px'})}},50);</script>
     {{else}}
     {{/* Standard single-level headers */}}
     <thead>

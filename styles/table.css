@@ -2542,6 +2542,9 @@ body.density-comfortable .action-buttons {
     border-right: 1px solid var(--border-light);
     text-align: left;
     min-width: 12.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 4;
 }
 /* First data cell in grouped tables — left-align the name column */
 .data-table-grouped td:first-child {
@@ -2565,6 +2568,15 @@ body.density-comfortable .action-buttons {
     border-bottom: 1px solid var(--border);
     background: var(--bg-base);
     border-left: 1px solid var(--border-light);
+    position: sticky;
+    z-index: 2;
+    box-shadow: 0 -2px 0 0 var(--bg-base);
+}
+
+.column-group-header th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
 }
 
 .column-sub-header th:last-child {
