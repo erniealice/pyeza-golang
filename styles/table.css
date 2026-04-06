@@ -2119,9 +2119,19 @@ button.sort-btn {
     border-radius: 0.0625rem;
 }
 
-/* Compact - lines close together */
-.density-preview--compact {
+/* Dense - tightest (was compact) */
+.density-preview--dense {
     gap: 0.125rem;
+}
+
+.density-preview--dense::before,
+.density-preview--dense::after {
+    content: '';
+}
+
+/* Compact - between dense and default */
+.density-preview--compact {
+    gap: 0.1875rem;
 }
 
 .density-preview--compact::before,
@@ -2175,8 +2185,13 @@ button.sort-btn {
 }
 
 /* Density overrides for tfoot */
-body.density-compact .data-table tfoot.table-totals td.table-total-cell {
+body.density-dense .data-table tfoot.table-totals td.table-total-cell {
     padding: 0.5rem 1rem !important;
+    font-size: var(--text-xs) !important;
+}
+
+body.density-compact .data-table tfoot.table-totals td.table-total-cell {
+    padding: 0.625rem 1.25rem !important;
     font-size: var(--text-xs) !important;
 }
 
@@ -2189,21 +2204,38 @@ body.density-comfortable .data-table tfoot.table-totals td.table-total-cell {
    PAGE-LEVEL DENSITY VARIANTS
    ======================================== */
 
-/* Compact Density */
-body.density-compact .data-table th,
-body.density-compact .data-table thead th {
+/* Dense Density - was "compact", tightest rows */
+body.density-dense .data-table th,
+body.density-dense .data-table thead th {
     padding: 0.625rem 1rem !important;
     font-size: var(--text-xs) !important;
 }
 
-body.density-compact .data-table td,
-body.density-compact .data-table tbody td {
+body.density-dense .data-table td,
+body.density-dense .data-table tbody td {
     padding: 0.5rem 1rem !important;
     font-size: var(--text-sm) !important;
 }
 
-body.density-compact .data-table .row-checkbox {
+body.density-dense .data-table .row-checkbox {
     padding-left: 0.75rem !important;
+}
+
+/* Compact Density - between dense and default */
+body.density-compact .data-table th,
+body.density-compact .data-table thead th {
+    padding: 0.75rem 1.25rem !important;
+    font-size: var(--text-sm) !important;
+}
+
+body.density-compact .data-table td,
+body.density-compact .data-table tbody td {
+    padding: 0.625rem 1.25rem !important;
+    font-size: var(--text-sm) !important;
+}
+
+body.density-compact .data-table .row-checkbox {
+    padding-left: 0.875rem !important;
 }
 
 /* Default Density (base styles already defined) */
@@ -2233,20 +2265,36 @@ body.density-comfortable .data-table tbody td {
    DENSITY - ACTION BUTTONS
    ======================================== */
 
-/* Compact Density - Smaller action buttons */
-body.density-compact .action-btn {
+/* Dense Density - was compact, smaller action buttons */
+body.density-dense .action-btn {
     width: 1.5rem !important;
     height: 1.5rem !important;
     border-radius: var(--radius-sm) !important;
 }
 
-body.density-compact .action-btn svg {
+body.density-dense .action-btn svg {
     width: 0.875rem !important;
     height: 0.875rem !important;
 }
 
-body.density-compact .action-buttons {
+body.density-dense .action-buttons {
     gap: 0.125rem !important;
+}
+
+/* Compact Density - between dense and default */
+body.density-compact .action-btn {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+body.density-compact .action-btn svg {
+    width: 1rem !important;
+    height: 1rem !important;
+}
+
+body.density-compact .action-buttons {
+    gap: 0.25rem !important;
 }
 
 /* Comfortable Density - Slightly larger action buttons */

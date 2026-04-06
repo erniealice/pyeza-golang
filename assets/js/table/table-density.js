@@ -56,6 +56,7 @@
     }
 
     function getCurrentDensity() {
+        if (document.body.classList.contains('density-dense')) return 'dense';
         if (document.body.classList.contains('density-compact')) return 'compact';
         if (document.body.classList.contains('density-comfortable')) return 'comfortable';
         return 'default';
@@ -63,7 +64,7 @@
 
     function setDensity(density) {
         // Remove all density classes from body
-        document.body.classList.remove('density-compact', 'density-default', 'density-comfortable');
+        document.body.classList.remove('density-dense', 'density-compact', 'density-default', 'density-comfortable');
 
         // Add the selected density class to body
         document.body.classList.add(`density-${density}`);

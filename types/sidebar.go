@@ -159,12 +159,12 @@ type SidebarLabels struct {
 	UsersInactiveIcon         string `json:"users_inactive_icon"`
 	UsersRolesLabel           string `json:"users_roles_label"`
 	UsersRolesIcon            string `json:"users_roles_icon"`
-	SalesOngoingLabel         string `json:"sales_ongoing_label"`
-	SalesOngoingIcon          string `json:"sales_ongoing_icon"`
-	SalesCompleteLabel        string `json:"sales_complete_label"`
-	SalesCompleteIcon         string `json:"sales_complete_icon"`
-	SalesCancelledLabel       string `json:"sales_cancelled_label"`
-	SalesCancelledIcon        string `json:"sales_cancelled_icon"`
+	RevenueDraftLabel         string `json:"revenue_draft_label"`
+	RevenueDraftIcon          string `json:"revenue_draft_icon"`
+	RevenueCompleteLabel      string `json:"revenue_complete_label"`
+	RevenueCompleteIcon       string `json:"revenue_complete_icon"`
+	RevenueCancelledLabel     string `json:"revenue_cancelled_label"`
+	RevenueCancelledIcon      string `json:"revenue_cancelled_icon"`
 	PriceListsActiveIcon      string `json:"price_lists_active_icon"`
 	PriceListsInactiveIcon    string `json:"price_lists_inactive_icon"`
 	MasterlistLabel           string `json:"masterlist_label"`
@@ -345,12 +345,12 @@ func DefaultSidebarLabels() SidebarLabels {
 		UsersInactiveIcon:         "icon-user-minus",
 		UsersRolesLabel:           "Roles",
 		UsersRolesIcon:            "icon-shield",
-		SalesOngoingLabel:         "Ongoing",
-		SalesOngoingIcon:          "icon-shopping-bag",
-		SalesCompleteLabel:        "Complete",
-		SalesCompleteIcon:         "icon-check-circle",
-		SalesCancelledLabel:       "Cancelled",
-		SalesCancelledIcon:        "icon-x-circle",
+		RevenueDraftLabel:         "Draft",
+		RevenueDraftIcon:          "icon-shopping-bag",
+		RevenueCompleteLabel:      "Complete",
+		RevenueCompleteIcon:       "icon-check-circle",
+		RevenueCancelledLabel:     "Cancelled",
+		RevenueCancelledIcon:      "icon-x-circle",
 		PriceListsActiveIcon:      "icon-tag",
 		PriceListsInactiveIcon:    "icon-tag",
 		MasterlistLabel:           "Masterlist",

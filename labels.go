@@ -335,6 +335,7 @@ type TableColumnLabels struct {
 
 type TableDensityLabels struct {
 	Title       string `json:"title"`
+	Dense       string `json:"dense"`
 	Default     string `json:"default"`
 	Comfortable string `json:"comfortable"`
 	Compact     string `json:"compact"`

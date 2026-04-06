@@ -208,6 +208,7 @@ type TableLabels struct {
 	ApplyFilters     string
 	// Density options
 	DensityLabel       string // Accessible label for the density toolbar button
+	DensityDense       string
 	DensityDefault     string
 	DensityComfortable string
 	DensityCompact     string

@@ -187,6 +187,14 @@
                 {{template "icon-chevron-down" .}}
             </button>
             <div class="toolbar-dropdown-menu density-menu">
+                <div class="density-option{{if eq .DefaultDensity "dense"}} active{{end}}" data-density="dense" data-table="{{.ID}}">
+                    <span class="density-preview density-preview--dense"></span>
+                    <span class="density-label">{{.Labels.DensityDense}}</span>
+                </div>
+                <div class="density-option{{if eq .DefaultDensity "compact"}} active{{end}}" data-density="compact" data-table="{{.ID}}">
+                    <span class="density-preview density-preview--compact"></span>
+                    <span class="density-label">{{.Labels.DensityCompact}}</span>
+                </div>
                 <div class="density-option{{if or (eq .DefaultDensity "") (eq .DefaultDensity "default")}} active{{end}}" data-density="default" data-table="{{.ID}}">
                     <span class="density-preview density-preview--default"></span>
                     <span class="density-label">{{.Labels.DensityDefault}}</span>
@@ -194,10 +202,6 @@
                 <div class="density-option{{if eq .DefaultDensity "comfortable"}} active{{end}}" data-density="comfortable" data-table="{{.ID}}">
                     <span class="density-preview density-preview--comfortable"></span>
                     <span class="density-label">{{.Labels.DensityComfortable}}</span>
-                </div>
-                <div class="density-option{{if eq .DefaultDensity "compact"}} active{{end}}" data-density="compact" data-table="{{.ID}}">
-                    <span class="density-preview density-preview--compact"></span>
-                    <span class="density-label">{{.Labels.DensityCompact}}</span>
                 </div>
             </div>
         </div>
