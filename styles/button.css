@@ -374,6 +374,25 @@
 }
 
 /* ========================================
+   WARNING BUTTON
+   ======================================== */
+
+.btn-warning,
+.btn.btn-warning {
+    background: var(--status-warning);
+    color: var(--text-inverse);
+}
+.btn-warning:hover,
+.btn.btn-warning:hover {
+    background: var(--status-warning);
+    opacity: 0.9;
+}
+.btn-warning:active,
+.btn.btn-warning:active {
+    opacity: 0.8;
+}
+
+/* ========================================
    GHOST BUTTON
    ======================================== */
 
@@ -423,6 +442,19 @@
 .btn.btn-sm svg {
     width: 0.875rem; /* 14px */
     height: 0.875rem;
+}
+
+/* Extra Small */
+.btn-xs,
+.btn.btn-xs {
+    font-size: var(--text-xs);
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    gap: var(--spacing-2xs);
+}
+.btn-xs svg,
+.btn.btn-xs svg {
+    width: var(--icon-2xs);
+    height: var(--icon-2xs);
 }
 
 /* Large */
@@ -578,8 +610,8 @@
 .btn-loading.btn.btn-secondary::after,
 .btn-loading.btn-outline::after,
 .btn-loading.btn.btn-outline::after,
-.btn-loading.btn--ghost::after,
-.btn-loading.btn.btn--ghost::after {
+.btn-loading.btn-ghost::after,
+.btn-loading.btn.btn-ghost::after {
     border-top-color: var(--text-secondary);
 }
 

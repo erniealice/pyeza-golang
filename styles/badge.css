@@ -144,6 +144,42 @@
     background: var(--status-info);
 }
 
+/* Danger status (alias for error) */
+.status-badge.danger {
+    background: var(--status-error-light);
+    color: var(--status-error);
+}
+.status-badge.danger .status-dot {
+    background: var(--status-error);
+}
+
+/* Default status (neutral/muted) */
+.status-badge.default {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+}
+.status-badge.default .status-dot {
+    background: var(--text-muted);
+}
+
+/* Primary status (accent-primary) */
+.status-badge.primary {
+    background: var(--accent-primary-light);
+    color: var(--accent-primary);
+}
+.status-badge.primary .status-dot {
+    background: var(--accent-primary);
+}
+
+/* Secondary status (muted sidebar) */
+.status-badge.secondary {
+    background: var(--bg-sidebar);
+    color: var(--text-muted);
+}
+.status-badge.secondary .status-dot {
+    background: var(--text-muted);
+}
+
 /* ========================================
    COUNT BADGE
    ======================================== */
