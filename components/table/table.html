@@ -150,7 +150,7 @@ JavaScript:
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
+            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}{{if .WidthClass}} {{.WidthClass}}{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{else}}{{if .WidthClass}}class="{{.WidthClass}}"{{end}}{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}}{{if or .Width .MinWidth .Align}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}"{{end}}>
                 {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
                 {{if .Sortable}}
                 <span class="sort-indicator">
@@ -181,7 +181,7 @@ JavaScript:
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}">
+            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}{{if .WidthClass}} {{.WidthClass}}{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{else}}{{if .WidthClass}}class="{{.WidthClass}}"{{end}}{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}}{{if or .Width .MinWidth .Align}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}"{{end}}>
                 {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
                 {{if .Sortable}}
                 <span class="sort-indicator">
@@ -236,7 +236,7 @@ JavaScript:
     </td>
     {{end}}
     {{range .Cells}}
-    <td{{if .Label}} data-label="{{.Label}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}};{{end}}vertical-align: {{$rowVAlign}}">
+    <td{{if .Label}} data-label="{{.Label}}"{{end}}{{if .WidthClass}} class="{{.WidthClass}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}};{{end}}vertical-align: {{$rowVAlign}}">
         {{if eq .Type "name"}}{{template "table-cell-name" .}}
         {{else if eq .Type "badge"}}{{template "table-cell-badge" .}}
         {{else if eq .Type "link"}}{{template "table-cell-link" .}}

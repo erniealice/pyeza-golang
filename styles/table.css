@@ -1058,6 +1058,29 @@ button.sort-btn {
     color: var(--accent-terracotta);
 }
 
+/* ═══════════════════════════════════════════════════════
+   COLUMN WIDTH SCALE (density-responsive)
+   ═══════════════════════════════════════════════════════
+   Use on <th> or <td> via TableColumn.WidthClass in Go.
+   All values in rem — scale with data-density setting.
+   Round up: 130px → col-3xl (140px at default density).
+   ═══════════════════════════════════════════════════════ */
+
+.col-2xs { width: 2.5rem; }
+.col-xs  { width: 3.125rem; }
+.col-sm  { width: 3.75rem; }
+.col-md  { width: 5rem; }
+.col-lg  { width: 6.25rem; }
+.col-xl  { width: 6.875rem; }
+.col-2xl { width: 7.5rem; }
+.col-3xl { width: 8.75rem; }
+.col-4xl { width: 9.375rem; }
+.col-5xl { width: 10rem; }
+.col-6xl { width: 11.25rem; }
+.col-7xl { width: 12.5rem; }
+.col-8xl { width: 15rem; }
+.col-9xl { width: 18.75rem; }
+
 /* ========================================
    TABLE FOOTER
    ======================================== */

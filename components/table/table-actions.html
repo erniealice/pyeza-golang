@@ -11,6 +11,7 @@
     {{range .Actions}}
     <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}"
             aria-label="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
+            title="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
             data-action="{{.Action}}"
             {{if .TestID}}data-testid="{{.TestID}}"{{else if $.RowID}}data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}"{{end}}
             {{if .Disabled}}disabled{{end}}

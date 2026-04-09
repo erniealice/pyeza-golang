@@ -34,13 +34,14 @@ type ActiveFilter struct {
 
 // TableColumn defines a column in a data table
 type TableColumn struct {
-	Key      string // Data attribute key for sorting
-	Label    string // Column header label
-	Sortable bool   // Whether column is sortable
-	Width    string // Optional fixed width (e.g., "200px", "20%")
-	MinWidth string // Optional minimum width (e.g., "100px") - column can grow but not shrink below this
-	Align    string // Optional horizontal alignment: "left" (default), "center", "right"
-	VAlign   string // Optional vertical alignment: "top" (default), "middle", "bottom"
+	Key        string // Data attribute key for sorting
+	Label      string // Column header label
+	Sortable   bool   // Whether column is sortable
+	Width      string // Optional fixed width (e.g., "200px", "20%") — prefer WidthClass
+	WidthClass string // Optional density-responsive width class (e.g., "col-3xl") — preferred over Width
+	MinWidth   string // Optional minimum width (e.g., "100px") - column can grow but not shrink below this
+	Align      string // Optional horizontal alignment: "left" (default), "center", "right"
+	VAlign     string // Optional vertical alignment: "top" (default), "middle", "bottom"
 	// Filter panel configuration
 	Filterable    bool             // Whether this column appears in the filter panel
 	FilterType    FilterColumnType // Input type rendered in filter panel
@@ -80,11 +81,12 @@ type TableCell struct {
 	Alert     bool          // For name cells: show alert icon
 	Href      string        // For links: href attribute
 	HTML      template.HTML // For custom HTML content
-	Label     string        // Column label for mobile card view (set automatically from column via ApplyColumnStyles)
-	Align     string        // Horizontal alignment (set automatically from column, do not set manually)
-	VAlign    string        // Vertical alignment: "top" (default), "middle", "bottom"
-	Width     string        // Width (set automatically from column, do not set manually)
-	MinWidth  string        // MinWidth (set automatically from column, do not set manually)
+	Label      string        // Column label for mobile card view (set automatically from column via ApplyColumnStyles)
+	Align      string        // Horizontal alignment (set automatically from column, do not set manually)
+	VAlign     string        // Vertical alignment: "top" (default), "middle", "bottom"
+	Width      string        // Width (set automatically from column, do not set manually)
+	WidthClass string        // Density-responsive width class (set automatically from column, do not set manually)
+	MinWidth   string        // MinWidth (set automatically from column, do not set manually)
 	// Chip fields for "chips" type
 	Chips        []ChipData // For "chips" type: visible chip labels (max N)
 	ChipOverflow int        // Count of hidden chips beyond max visible
@@ -125,6 +127,9 @@ func ApplyColumnStyles(columns []TableColumn, rows []TableRow) {
 				}
 				if columns[j].Width != "" {
 					rows[i].Cells[j].Width = columns[j].Width
+				}
+				if columns[j].WidthClass != "" {
+					rows[i].Cells[j].WidthClass = columns[j].WidthClass
 				}
 				if columns[j].MinWidth != "" {
 					rows[i].Cells[j].MinWidth = columns[j].MinWidth

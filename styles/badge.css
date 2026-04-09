@@ -572,6 +572,8 @@
 .badge.badge--draft    { background: var(--accent-amber-light);   color: var(--accent-amber); }
 .badge.badge--inactive { background: var(--bg-sidebar);           color: var(--text-muted); }
 .badge.badge--archived { background: var(--bg-sidebar);           color: var(--text-muted); }
+.badge.badge--lg { font-size: var(--text-sm); padding: var(--spacing-xs) var(--spacing-sm); font-weight: var(--font-weight-semibold); }
+.badge.badge--default { background: var(--bg-muted); color: var(--text-secondary); }
 
 /* High contrast mode */
 @media (prefers-contrast: high) {
