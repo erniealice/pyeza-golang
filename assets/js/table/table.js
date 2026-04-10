@@ -26,49 +26,49 @@
 
     function init() {
         // Initialize all modules in order
-        if (window.TableDropdowns) {
-            window.TableDropdowns.init();
+        if (lf.TableDropdowns) {
+            lf.TableDropdowns.init();
         }
 
-        if (window.TableSearch) {
-            window.TableSearch.init();
+        if (lf.TableSearch) {
+            lf.TableSearch.init();
         }
 
-        if (window.TableSort) {
-            window.TableSort.init();
+        if (lf.TableSort) {
+            lf.TableSort.init();
         }
 
-        if (window.TableColumns) {
-            window.TableColumns.init();
+        if (lf.TableColumns) {
+            lf.TableColumns.init();
         }
 
-        if (window.TableFilters) {
-            window.TableFilters.init();
+        if (lf.TableFilters) {
+            lf.TableFilters.init();
         }
 
-        if (window.TableExport) {
-            window.TableExport.init();
+        if (lf.TableExport) {
+            lf.TableExport.init();
         }
 
-        if (window.TableDensity) {
-            window.TableDensity.init();
+        if (lf.TableDensity) {
+            lf.TableDensity.init();
         }
 
-        if (window.TablePagination) {
-            window.TablePagination.init();
+        if (lf.TablePagination) {
+            lf.TablePagination.init();
         }
 
-        if (window.TableSelection) {
-            window.TableSelection.init();
+        if (lf.TableSelection) {
+            lf.TableSelection.init();
         }
 
-        if (window.TableActions) {
-            window.TableActions.init();
+        if (lf.TableActions) {
+            lf.TableActions.init();
         }
 
         // Apply default sort after all modules are initialized
-        if (window.TableSort) {
-            window.TableSort.applyDefaultSort();
+        if (lf.TableSort) {
+            lf.TableSort.applyDefaultSort();
         }
     }
 
@@ -90,21 +90,21 @@
         if (metaEl) {
             const baseId = metaEl.id.replace('-meta', '');
             const card = document.getElementById(baseId + '-card');
-            if (card && window.TableServer) {
+            if (card && lf.TableServer) {
                 console.log('[HTMX] Targeted body swap detected for:', baseId);
                 // Apply metadata from OOB carrier to table-card data attributes
-                window.TableServer.applyPaginationMeta(card, metaEl);
+                lf.TableServer.applyPaginationMeta(card, metaEl);
             }
             // Remove the meta carrier (its job is done)
             metaEl.remove();
 
             // Re-init pagination (footer was OOB-swapped, needs new event listeners)
-            if (window.TablePagination) {
-                window.TablePagination.init();
+            if (lf.TablePagination) {
+                lf.TablePagination.init();
             }
             // Clear bulk selections — prevent stale IDs from previous page
-            if (window.TableSelection) {
-                window.TableSelection.initBulkSelection();
+            if (lf.TableSelection) {
+                lf.TableSelection.initBulkSelection();
             }
             return; // Skip full re-init — toolbar modules are untouched
         }
@@ -123,49 +123,50 @@
         }
     });
 
-    // Expose public API via window.TableToolbar for backwards compatibility
-    window.TableToolbar = {
+    // Expose public API via lf.TableToolbar for backwards compatibility
+    window.lf = window.lf || {};
+    window.lf.TableToolbar = {
         // Core utilities
         closeAllDropdowns: function() {
-            if (window.TableCore) return window.TableCore.closeAllDropdowns();
+            if (lf.TableCore) return lf.TableCore.closeAllDropdowns();
         },
         updateTableInfo: function(tableId) {
-            if (window.TableCore) return window.TableCore.updateTableInfo(tableId);
+            if (lf.TableCore) return lf.TableCore.updateTableInfo(tableId);
         },
 
         // Sort
         sortTable: function(tbody, column, direction) {
-            if (window.TableSort) return window.TableSort.sortTable(tbody, column, direction);
+            if (lf.TableSort) return lf.TableSort.sortTable(tbody, column, direction);
         },
         updateTableSortIndicators: function(table, column, direction) {
-            if (window.TableSort) return window.TableSort.updateTableSortIndicators(table, column, direction);
+            if (lf.TableSort) return lf.TableSort.updateTableSortIndicators(table, column, direction);
         },
         updateToolbarSortState: function(table, column, direction) {
-            if (window.TableSort) return window.TableSort.updateToolbarSortState(table, column, direction);
+            if (lf.TableSort) return lf.TableSort.updateToolbarSortState(table, column, direction);
         },
 
         // Filters
         applyFilters: function(table, conditions) {
-            if (window.TableFilters) return window.TableFilters.applyFilters(table, conditions);
+            if (lf.TableFilters) return lf.TableFilters.applyFilters(table, conditions);
         },
         clearFilters: function(table) {
-            if (window.TableFilters) return window.TableFilters.clearFilters(table);
+            if (lf.TableFilters) return lf.TableFilters.clearFilters(table);
         },
         getTableColumns: function(table) {
-            if (window.TableFilters) return window.TableFilters.getTableColumns(table);
+            if (lf.TableFilters) return lf.TableFilters.getTableColumns(table);
         },
 
         // Export
         exportToCSV: function(table, filename) {
-            if (window.TableExport) return window.TableExport.exportToCSV(table, filename);
+            if (lf.TableExport) return lf.TableExport.exportToCSV(table, filename);
         },
         exportToExcel: function(table, filename) {
-            if (window.TableExport) return window.TableExport.exportToExcel(table, filename);
+            if (lf.TableExport) return lf.TableExport.exportToExcel(table, filename);
         },
 
         // Density
         setDensity: function(density) {
-            if (window.TableDensity) return window.TableDensity.setDensity(density);
+            if (lf.TableDensity) return lf.TableDensity.setDensity(density);
         },
 
         // Dialog - now uses global dialog.js with HTMX
@@ -215,21 +216,21 @@
 
         // Selection
         clearAllSelections: function(table, card, selectedIds, selectedCountEl, selectAllCheckbox) {
-            if (window.TableSelection) return window.TableSelection.clearAllSelections(table, card, selectedIds, selectedCountEl, selectAllCheckbox);
+            if (lf.TableSelection) return lf.TableSelection.clearAllSelections(table, card, selectedIds, selectedCountEl, selectAllCheckbox);
         },
 
         // Pagination
         updatePagination: function(tableId) {
-            if (window.TablePagination) return window.TablePagination.update(tableId);
+            if (lf.TablePagination) return lf.TablePagination.update(tableId);
         },
         applyPagination: function(tableId) {
-            if (window.TablePagination) return window.TablePagination.apply(tableId);
+            if (lf.TablePagination) return lf.TablePagination.apply(tableId);
         },
         setRowFilterState: function(tableId, filterFn) {
-            if (window.TablePagination) return window.TablePagination.setRowFilterState(tableId, filterFn);
+            if (lf.TablePagination) return lf.TablePagination.setRowFilterState(tableId, filterFn);
         },
         getPaginationState: function(tableId) {
-            if (window.TableState) return window.TableState.pagination[tableId];
+            if (lf.TableState) return lf.TableState.pagination[tableId];
         }
     };
 

@@ -42,8 +42,8 @@
                     });
                 }
 
-                if (window.Sheet) {
-                    Sheet.open(drawerTitle);
+                if (lf.Sheet) {
+                    lf.Sheet.open(drawerTitle);
                 }
             }
 
@@ -285,8 +285,8 @@
      * Show confirmation dialog with a callback instead of actionUrl
      */
     function showRowActionDialogWithCallback(title, message, confirmLabel, variant, callback) {
-        if (window.TableDialog) {
-            window.TableDialog.showConfirmDialog({
+        if (lf.TableDialog) {
+            lf.TableDialog.showConfirmDialog({
                 title: title,
                 message: message,
                 confirmLabel: confirmLabel,
@@ -369,7 +369,7 @@
 
     /**
      * P1: Mobile action dropdown — open/close/escape/arrow-key pattern.
-     * Targets .row-actions-trigger buttons and their sibling .action-dropdown menus.
+     * Targets .action-dropdown-btn buttons and their sibling .action-dropdown-menu menus.
      * Uses event delegation so it works after HTMX swaps.
      */
     let mobileDropdownsInitialized = false;
@@ -380,20 +380,20 @@
 
         // Toggle on trigger click
         document.addEventListener('click', function(e) {
-            var trigger = e.target.closest('.row-actions-trigger');
+            var trigger = e.target.closest('.action-dropdown-btn');
             if (!trigger) return;
 
             e.stopPropagation();
-            var wrapper = trigger.closest('.action-dropdown, .row-actions-wrapper') || trigger.parentElement;
-            var menu = wrapper ? wrapper.querySelector('.action-dropdown-menu, .row-actions-menu, [role="menu"]') : null;
+            var wrapper = trigger.closest('.action-dropdown') || trigger.parentElement;
+            var menu = wrapper ? wrapper.querySelector('.action-dropdown-menu, [role="menu"]') : null;
             if (!menu) return;
 
             var isOpen = wrapper.classList.contains('open');
 
             // Close all other open action dropdowns first
-            document.querySelectorAll('.action-dropdown.open, .row-actions-wrapper.open').forEach(function(el) {
+            document.querySelectorAll('.action-dropdown.open').forEach(function(el) {
                 el.classList.remove('open');
-                var t = el.querySelector('.row-actions-trigger');
+                var t = el.querySelector('.action-dropdown-btn');
                 if (t) t.setAttribute('aria-expanded', 'false');
             });
 
@@ -408,10 +408,10 @@
 
         // Close all action dropdowns on outside click
         document.addEventListener('click', function(e) {
-            if (!e.target.closest('.action-dropdown, .row-actions-wrapper')) {
-                document.querySelectorAll('.action-dropdown.open, .row-actions-wrapper.open').forEach(function(el) {
+            if (!e.target.closest('.action-dropdown')) {
+                document.querySelectorAll('.action-dropdown.open').forEach(function(el) {
                     el.classList.remove('open');
-                    var t = el.querySelector('.row-actions-trigger');
+                    var t = el.querySelector('.action-dropdown-btn');
                     if (t) t.setAttribute('aria-expanded', 'false');
                 });
             }
@@ -419,11 +419,11 @@
 
         // Keyboard: Escape closes; ArrowDown/ArrowUp navigates items
         document.addEventListener('keydown', function(e) {
-            var activeWrapper = document.querySelector('.action-dropdown.open, .row-actions-wrapper.open');
+            var activeWrapper = document.querySelector('.action-dropdown.open');
             if (!activeWrapper) return;
 
-            var trigger = activeWrapper.querySelector('.row-actions-trigger');
-            var menu = activeWrapper.querySelector('.action-dropdown-menu, .row-actions-menu, [role="menu"]');
+            var trigger = activeWrapper.querySelector('.action-dropdown-btn');
+            var menu = activeWrapper.querySelector('.action-dropdown-menu, [role="menu"]');
             var items = menu ? Array.from(menu.querySelectorAll('a, button:not([disabled])')) : [];
 
             if (e.key === 'Escape') {
@@ -454,7 +454,8 @@
     }
 
     // Expose module
-    window.TableActions = {
+    window.lf = window.lf || {};
+    window.lf.TableActions = {
         init,
         initRowActions,
         initRowNavigation,

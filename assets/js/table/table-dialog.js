@@ -81,7 +81,8 @@
     }
 
     // Expose module
-    window.TableDialog = {
+    window.lf = window.lf || {};
+    window.lf.TableDialog = {
         showConfirmDialog
     };
 

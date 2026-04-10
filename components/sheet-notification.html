@@ -113,8 +113,8 @@ HTMX Events:
         document.body.style.overflow = 'hidden';
         // Install focus trap on the panel
         var panel = sheet.querySelector('.sheet-panel');
-        if (panel && window.FocusTrap) {
-            setTimeout(function() { window.FocusTrap.trapFocus(panel); }, 300);
+        if (panel && window.lf && lf.FocusTrap) {
+            setTimeout(function() { lf.FocusTrap.trapFocus(panel); }, 300);
         }
         fetchNotifications();
     }
@@ -124,7 +124,7 @@ HTMX Events:
         if (!sheet) return;
         // Release focus trap before closing
         var panel = sheet.querySelector('.sheet-panel');
-        if (panel && window.FocusTrap) window.FocusTrap.releaseFocus(panel);
+        if (panel && window.lf && lf.FocusTrap) lf.FocusTrap.releaseFocus(panel);
         sheet.classList.remove('open');
         document.body.style.overflow = '';
     }
@@ -301,7 +301,8 @@ HTMX Events:
         .catch(() => {});
 
     // Expose API
-    window.NotificationSheet = { open, close, refresh: fetchNotifications };
+    window.lf = window.lf || {};
+    window.lf.NotificationSheet = { open, close, refresh: fetchNotifications };
 })();
 </script>
 {{end}}

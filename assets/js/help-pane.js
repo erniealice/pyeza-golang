@@ -41,7 +41,7 @@
             helpToggleBtn.classList.add('active');
             helpToggleBtn.setAttribute('aria-expanded', 'true');
         }
-        localStorage.setItem('helpPaneOpen', 'true');
+        localStorage.setItem('lf-help-pane-open', 'true');
     }
 
     function closeHelpPane() {
@@ -54,7 +54,7 @@
             helpToggleBtn.classList.remove('active');
             helpToggleBtn.setAttribute('aria-expanded', 'false');
         }
-        localStorage.setItem('helpPaneOpen', 'false');
+        localStorage.setItem('lf-help-pane-open', 'false');
     }
 
     // Initialize event listeners on elements
@@ -74,7 +74,7 @@
 
     // Restore state from localStorage
     function restoreState() {
-        if (localStorage.getItem('helpPaneOpen') === 'true') {
+        if (localStorage.getItem('lf-help-pane-open') === 'true') {
             openHelpPane();
         }
     }
@@ -93,7 +93,7 @@
 
     // Check if state needs restoration and apply it
     function ensureState() {
-        const shouldBeOpen = localStorage.getItem('helpPaneOpen') === 'true';
+        const shouldBeOpen = localStorage.getItem('lf-help-pane-open') === 'true';
         const { helpPane, helpToggleBtn } = getElements();
 
         if (!helpPane) return;
@@ -124,7 +124,7 @@
     // Continuous background check - runs every 100ms to ensure state consistency
     // This is the most reliable approach for catching OOB swaps
     setInterval(function() {
-        const shouldBeOpen = localStorage.getItem('helpPaneOpen') === 'true';
+        const shouldBeOpen = localStorage.getItem('lf-help-pane-open') === 'true';
         const { helpPane, helpToggleBtn } = getElements();
 
         if (!helpPane) return;

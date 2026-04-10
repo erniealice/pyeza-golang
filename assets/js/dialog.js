@@ -47,7 +47,7 @@
         if (!dialog) return;
 
         // P0: release focus trap
-        if (window.FocusTrap) window.FocusTrap.releaseFocus(dialog);
+        if (window.lf && window.lf.FocusTrap) window.lf.FocusTrap.releaseFocus(dialog);
 
         dialog.classList.remove('visible');
 
@@ -101,7 +101,7 @@
             }
 
             // P0: install focus trap on the full overlay
-            if (window.FocusTrap) window.FocusTrap.trapFocus(dialog);
+            if (window.lf && window.lf.FocusTrap) window.lf.FocusTrap.trapFocus(dialog);
 
             // Move focus to first focusable element inside dialog
             var focusable = dialog.querySelector(
@@ -311,9 +311,9 @@
             subtree: true
         });
 
-        // Expose functions globally for Hyperscript/inline handlers
-        window.closeDialog = closeDialog;
-        window.openDialog = openDialog;
+        // Expose functions globally under lf namespace
+        window.lf = window.lf || {};
+        window.lf.Dialog = { open: openDialog, close: closeDialog };
     }
 
     // Initialize on DOM ready

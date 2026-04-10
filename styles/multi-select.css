@@ -210,6 +210,11 @@
     color: var(--text-primary);
 }
 
+.multi-select-search:focus-visible {
+    box-shadow: 0 0 0 0.125rem var(--accent-primary-light);
+    border-radius: var(--radius-sm, 0.25rem);
+}
+
 .multi-select-search::placeholder {
     color: var(--text-muted);
     opacity: 0.7;

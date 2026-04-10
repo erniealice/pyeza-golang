@@ -399,7 +399,8 @@
     }, 100);
 
     // Expose API for external use
-    window.NotificationDrawer = {
+    window.lf = window.lf || {};
+    window.lf.NotificationDrawer = {
         open: openDrawer,
         close: closeDrawer,
         toggle: toggleDrawer,

@@ -193,6 +193,11 @@
     color: var(--text-primary);
 }
 
+.auto-complete-search:focus-visible {
+    box-shadow: 0 0 0 0.125rem var(--accent-primary-light);
+    border-radius: var(--radius-sm, 0.25rem);
+}
+
 .auto-complete-search::placeholder {
     color: var(--text-muted);
     opacity: 0.7;

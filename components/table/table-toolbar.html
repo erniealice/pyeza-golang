@@ -216,7 +216,7 @@
                 hx-target="#sheetContent"
                 hx-swap="innerHTML"
                 hx-push-url="false"
-                onclick="Sheet.open('{{.ImportAction.Label}}')">
+                onclick="lf.Sheet.open('{{.ImportAction.Label}}')">
             {{if eq .ImportAction.Icon "icon-upload"}}{{template "icon-upload" .}}{{end}}
             {{.ImportAction.Label}}
         </button>
@@ -246,7 +246,7 @@
                 hx-target="#sheetContent"
                 hx-swap="innerHTML"
                 hx-push-url="false"
-                onclick="Sheet.open('{{.PrimaryAction.Label}}')">
+                onclick="lf.Sheet.open('{{.PrimaryAction.Label}}')">
             {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
             {{.PrimaryAction.Label}}
         </button>

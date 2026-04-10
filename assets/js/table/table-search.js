@@ -23,7 +23,7 @@
             const tbody = table.querySelector('tbody');
             const rows = tbody ? tbody.querySelectorAll('tr[data-id]') : [];
 
-            const debounce = window.TableCore ? window.TableCore.debounce : function(fn, wait) {
+            const debounce = lf.TableCore ? lf.TableCore.debounce : function(fn, wait) {
                 let timeout;
                 return function(...args) {
                     clearTimeout(timeout);
@@ -36,8 +36,8 @@
                 input.addEventListener('input', debounce(function() {
                     const searchTerm = this.value.trim();
 
-                    if (window.TableServer && typeof htmx !== 'undefined') {
-                        window.TableServer.executeServerRequest(tableCard, {
+                    if (lf.TableServer && typeof htmx !== 'undefined') {
+                        lf.TableServer.executeServerRequest(tableCard, {
                             search: searchTerm,
                             page: 1  // Reset to page 1 when search changes
                         });
@@ -55,17 +55,17 @@
                     });
 
                     // Use pagination-aware update if available
-                    if (window.TableState && window.TableState.pagination[tableId]) {
-                        window.TableState.pagination[tableId].currentPage = 1;
-                        if (window.TablePagination) {
-                            window.TablePagination.apply(tableId);
+                    if (lf.TableState && lf.TableState.pagination[tableId]) {
+                        lf.TableState.pagination[tableId].currentPage = 1;
+                        if (lf.TablePagination) {
+                            lf.TablePagination.apply(tableId);
                         }
                     } else {
                         rows.forEach(row => {
                             row.style.display = row.dataset.filterHidden === 'true' ? 'none' : '';
                         });
-                        if (window.TableCore) {
-                            window.TableCore.updateTableInfo(tableId);
+                        if (lf.TableCore) {
+                            lf.TableCore.updateTableInfo(tableId);
                         }
                     }
                 }, 200));
@@ -74,6 +74,7 @@
     }
 
     // Expose module
-    window.TableSearch = { init };
+    window.lf = window.lf || {};
+    window.lf.TableSearch = { init };
 
 })();

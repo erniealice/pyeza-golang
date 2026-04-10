@@ -225,7 +225,8 @@
     }
 
     // Expose module for debugging
-    window.BulkAction = {
+    window.lf = window.lf || {};
+    window.lf.BulkAction = {
         handleBulkAction,
         executeBulkAction,
         refreshTable

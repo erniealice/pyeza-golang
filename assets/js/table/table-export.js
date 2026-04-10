@@ -32,8 +32,8 @@
                     exportToExcel(table, tableId);
                 }
 
-                if (window.TableCore) {
-                    window.TableCore.closeAllDropdowns();
+                if (lf.TableCore) {
+                    lf.TableCore.closeAllDropdowns();
                 }
             });
         });
@@ -96,7 +96,8 @@
     }
 
     // Expose module
-    window.TableExport = {
+    window.lf = window.lf || {};
+    window.lf.TableExport = {
         init,
         initExport,
         exportToCSV,

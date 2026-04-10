@@ -6,7 +6,8 @@
     'use strict';
 
     // Shared pagination state for all tables
-    window.TableState = {
+    window.lf = window.lf || {};
+    window.lf.TableState = {
         pagination: {}
     };
 
@@ -34,9 +35,9 @@
 
     // Utility: Update table info display
     function updateTableInfo(tableId) {
-        if (window.TableState.pagination[tableId]) {
-            if (window.TablePagination) {
-                window.TablePagination.apply(tableId);
+        if (lf.TableState.pagination[tableId]) {
+            if (lf.TablePagination) {
+                lf.TablePagination.apply(tableId);
             }
         } else {
             const table = document.getElementById(tableId);
@@ -57,7 +58,7 @@
     }
 
     // Expose utilities
-    window.TableCore = {
+    window.lf.TableCore = {
         debounce,
         closeAllDropdowns,
         updateTableInfo

@@ -75,8 +75,8 @@ type SidebarLabels struct {
 	ClientsAppIcon    string `json:"clients_app_icon"`
 	UsersAppLabel     string `json:"users_app_label"`
 	UsersAppIcon      string `json:"users_app_icon"`
-	SalesAppLabel     string `json:"sales_app_label"`
-	SalesAppIcon      string `json:"sales_app_icon"`
+	RevenueAppLabel   string `json:"revenue_app_label"`
+	RevenueAppIcon    string `json:"revenue_app_icon"`
 	InventoryAppLabel string `json:"inventory_app_label"`
 	InventoryAppIcon  string `json:"inventory_app_icon"`
 	ServicesAppLabel  string `json:"services_app_label"`
@@ -111,7 +111,7 @@ type SidebarLabels struct {
 	// Section titles
 	ClientsTitle       string `json:"clients_title"`
 	UsersTitle         string `json:"users_title"`
-	SalesTitle         string `json:"sales_title"`
+	RevenueTitle       string `json:"revenue_title"`
 	PurchasesTitle     string `json:"purchases_title"`
 	ExpensesTitle      string `json:"expenses_title"`
 	PriceListsTitle    string `json:"price_lists_title"`
@@ -224,8 +224,8 @@ type SidebarLabels struct {
 	PayablesAgingIcon         string `json:"payables_aging_icon"`
 	ReceivablesAgingLabel     string `json:"receivables_aging_label"`
 	ReceivablesAgingIcon      string `json:"receivables_aging_icon"`
-	SalesSummaryLabel         string `json:"sales_summary_label"`
-	SalesSummaryIcon          string `json:"sales_summary_icon"`
+	RevenueSummaryLabel       string `json:"revenue_summary_label"`
+	RevenueSummaryIcon        string `json:"revenue_summary_icon"`
 	PurchasesSummaryLabel     string `json:"purchases_summary_label"`
 	PurchasesSummaryIcon      string `json:"purchases_summary_icon"`
 	ExpensesSummaryLabel      string `json:"expenses_summary_label"`
@@ -267,8 +267,8 @@ func DefaultSidebarLabels() SidebarLabels {
 		ClientsAppIcon:    "icon-users",
 		UsersAppLabel:     "Users",
 		UsersAppIcon:      "icon-shield",
-		SalesAppLabel:     "Sales",
-		SalesAppIcon:      "icon-shopping-bag",
+		RevenueAppLabel:   "Sales",
+		RevenueAppIcon:    "icon-shopping-bag",
 		InventoryAppLabel: "Inventory",
 		InventoryAppIcon:  "icon-package",
 		ServicesAppLabel:  "Services",
@@ -301,7 +301,7 @@ func DefaultSidebarLabels() SidebarLabels {
 
 		ClientsTitle:       "Clients",
 		UsersTitle:         "Users",
-		SalesTitle:         "Sales",
+		RevenueTitle:       "Sales",
 		PurchasesTitle:     "Purchases",
 		ExpensesTitle:      "Expenses",
 		PriceListsTitle:    "Price Lists",
@@ -409,8 +409,8 @@ func DefaultSidebarLabels() SidebarLabels {
 		PayablesAgingIcon:         "icon-file-text",
 		ReceivablesAgingLabel:     "Receivables Aging",
 		ReceivablesAgingIcon:      "icon-file-text",
-		SalesSummaryLabel:         "Sales Summary",
-		SalesSummaryIcon:          "icon-bar-chart",
+		RevenueSummaryLabel:       "Sales Summary",
+		RevenueSummaryIcon:        "icon-bar-chart",
 		PurchasesSummaryLabel:     "Purchases Summary",
 		PurchasesSummaryIcon:      "icon-bar-chart",
 		ExpensesSummaryLabel:      "Expenses Summary",

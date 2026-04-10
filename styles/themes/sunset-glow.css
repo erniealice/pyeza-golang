@@ -83,9 +83,9 @@
     --app-color-supplier: #6B8EE0;
     --app-color-supplier-dark: #5578C8;
     --app-color-supplier-light: rgba(107, 142, 224, 0.15);
-    --app-color-sale: #70C1B3;
-    --app-color-sale-dark: #58A99B;
-    --app-color-sale-light: rgba(112, 193, 179, 0.15);
+    --app-color-revenue: #70C1B3;
+    --app-color-revenue-dark: #58A99B;
+    --app-color-revenue-light: rgba(112, 193, 179, 0.15);
     --app-color-purchase: #45B880;
     --app-color-purchase-dark: #35A068;
     --app-color-purchase-light: rgba(69, 184, 128, 0.15);

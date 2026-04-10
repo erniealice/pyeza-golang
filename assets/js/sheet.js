@@ -94,7 +94,7 @@
         // P0: install focus trap on the sheet panel; move focus inside after animation
         const panel = drawer.querySelector('.sheet-panel') || drawer;
         setTimeout(() => {
-            if (window.FocusTrap) window.FocusTrap.trapFocus(panel);
+            if (window.lf && window.lf.FocusTrap) window.lf.FocusTrap.trapFocus(panel);
 
             const content = getContent();
             if (content) {
@@ -118,7 +118,7 @@
 
         // P0: release focus trap
         const panel = drawer.querySelector('.sheet-panel') || drawer;
-        if (window.FocusTrap) window.FocusTrap.releaseFocus(panel);
+        if (window.lf && window.lf.FocusTrap) window.lf.FocusTrap.releaseFocus(panel);
 
         // Remove active/open classes
         drawer.classList.remove('active', 'open');
@@ -518,7 +518,8 @@
     // PUBLIC API
     // ========================================
 
-    window.Sheet = {
+    window.lf = window.lf || {};
+    window.lf.Sheet = {
         open: open,
         close: close,
         handleResponse: handleResponse,

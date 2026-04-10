@@ -572,8 +572,8 @@
     background: linear-gradient(135deg, var(--app-color-supplier) 0%, var(--app-color-supplier-dark) 100%);
 }
 
-.app-icon--sale {
-    background: linear-gradient(135deg, var(--app-color-sale) 0%, var(--app-color-sale-dark) 100%);
+.app-icon--revenue {
+    background: linear-gradient(135deg, var(--app-color-revenue) 0%, var(--app-color-revenue-dark) 100%);
 }
 
 .app-icon--purchase {
@@ -907,12 +907,12 @@
     stroke: var(--app-color-supplier);
 }
 
-.app-option:not(.active) .app-icon--sale {
-    background: var(--app-color-sale-light);
+.app-option:not(.active) .app-icon--revenue {
+    background: var(--app-color-revenue-light);
 }
-.app-option:not(.active) .app-icon--sale svg {
-    color: var(--app-color-sale);
-    stroke: var(--app-color-sale);
+.app-option:not(.active) .app-icon--revenue svg {
+    color: var(--app-color-revenue);
+    stroke: var(--app-color-revenue);
 }
 
 .app-option:not(.active) .app-icon--purchase {

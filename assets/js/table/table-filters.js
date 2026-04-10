@@ -52,8 +52,8 @@
                         // Server-side clear filters
                         var filterInput = tableCard.querySelector('input[name="filters"]');
                         if (filterInput) filterInput.value = '';
-                        if (window.TableServer && typeof htmx !== 'undefined') {
-                            window.TableServer.executeServerRequest(tableCard, {
+                        if (lf.TableServer && typeof htmx !== 'undefined') {
+                            lf.TableServer.executeServerRequest(tableCard, {
                                 filters: '',  // Empty string removes filters param
                                 page: 1
                             });
@@ -73,8 +73,8 @@
                         // Server-side clear filters
                         var filterInput = tableCard.querySelector('input[name="filters"]');
                         if (filterInput) filterInput.value = '';
-                        if (window.TableServer && typeof htmx !== 'undefined') {
-                            window.TableServer.executeServerRequest(tableCard, {
+                        if (lf.TableServer && typeof htmx !== 'undefined') {
+                            lf.TableServer.executeServerRequest(tableCard, {
                                 filters: '',  // Empty string removes filters param
                                 page: 1
                             });
@@ -83,8 +83,8 @@
                         // Client-side clear filters (existing behavior)
                         clearFilters(table);
                     }
-                    if (window.TableCore) {
-                        window.TableCore.closeAllDropdowns();
+                    if (lf.TableCore) {
+                        lf.TableCore.closeAllDropdowns();
                     }
                 });
             }
@@ -106,8 +106,8 @@
                         }
 
                         // POST via HTMX
-                        if (window.TableServer && typeof htmx !== 'undefined') {
-                            window.TableServer.executeServerRequest(tableCard, {
+                        if (lf.TableServer && typeof htmx !== 'undefined') {
+                            lf.TableServer.executeServerRequest(tableCard, {
                                 filters: filtersJSON,
                                 page: 1,
                                 tz: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -116,13 +116,13 @@
                     } else {
                         // Client-side apply filters (existing behavior)
                         applyFilters(table, conditions);
-                        if (window.TableCore) {
-                            window.TableCore.updateTableInfo(tableId);
+                        if (lf.TableCore) {
+                            lf.TableCore.updateTableInfo(tableId);
                         }
                     }
 
-                    if (window.TableCore) {
-                        window.TableCore.closeAllDropdowns();
+                    if (lf.TableCore) {
+                        lf.TableCore.closeAllDropdowns();
                     }
                 });
             }
@@ -327,10 +327,10 @@
         }
 
         // Update pagination if available, otherwise just show/hide rows
-        if (tableId && window.TableState && window.TableState.pagination[tableId]) {
-            window.TableState.pagination[tableId].currentPage = 1;
-            if (window.TablePagination) {
-                window.TablePagination.apply(tableId);
+        if (tableId && lf.TableState && lf.TableState.pagination[tableId]) {
+            lf.TableState.pagination[tableId].currentPage = 1;
+            if (lf.TablePagination) {
+                lf.TablePagination.apply(tableId);
             }
         } else {
             rows.forEach(row => {
@@ -348,10 +348,10 @@
         });
 
         // Update pagination if available
-        if (tableId && window.TableState && window.TableState.pagination[tableId]) {
-            window.TableState.pagination[tableId].currentPage = 1;
-            if (window.TablePagination) {
-                window.TablePagination.apply(tableId);
+        if (tableId && lf.TableState && lf.TableState.pagination[tableId]) {
+            lf.TableState.pagination[tableId].currentPage = 1;
+            if (lf.TablePagination) {
+                lf.TablePagination.apply(tableId);
             }
         } else {
             rows.forEach(row => row.style.display = '');
@@ -366,7 +366,7 @@
             var dismissBtn = e.target.closest('[data-dismiss-filter]');
             if (dismissBtn) {
                 var tableCard = dismissBtn.closest('.table-card');
-                if (!tableCard || !window.TableServer) return;
+                if (!tableCard || !lf.TableServer) return;
 
                 var keyToRemove = dismissBtn.dataset.dismissFilter;
                 var filterInput = tableCard.querySelector('input[name="filters"]');
@@ -389,7 +389,7 @@
 
                 if (filterInput) filterInput.value = newFiltersJSON;
 
-                window.TableServer.executeServerRequest(tableCard, {
+                lf.TableServer.executeServerRequest(tableCard, {
                     filters: newFiltersJSON,
                     page: 1
                 });
@@ -400,12 +400,12 @@
             var clearAllBtn = e.target.closest('[data-clear-all-filters]');
             if (clearAllBtn) {
                 var tableCard = clearAllBtn.closest('.table-card');
-                if (!tableCard || !window.TableServer) return;
+                if (!tableCard || !lf.TableServer) return;
 
                 var filterInput = tableCard.querySelector('input[name="filters"]');
                 if (filterInput) filterInput.value = '';
 
-                window.TableServer.executeServerRequest(tableCard, {
+                lf.TableServer.executeServerRequest(tableCard, {
                     filters: '',
                     page: 1
                 });
@@ -414,7 +414,8 @@
     }
 
     // Expose module
-    window.TableFilters = {
+    window.lf = window.lf || {};
+    window.lf.TableFilters = {
         init,
         initFilters,
         initChipHandlers,

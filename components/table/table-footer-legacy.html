@@ -40,7 +40,7 @@ Element IDs generated (without prefix):
     {{/* Entries selector - left */}}
     <div class="footer-entries">
         <span>{{if .Show}}{{.Show}}{{else}}Show{{end}}</span>
-        <select id="{{if .ID}}{{.ID}}-entries{{else}}entries{{end}}" class="entries-selector" data-table="{{.ID}}">
+        <select id="{{if .ID}}{{.ID}}-entries{{else}}entries{{end}}" class="entries-selector" data-table="{{.ID}}" aria-label="{{if .EntriesLabel}}{{.EntriesLabel}}{{else}}entries{{end}} per page">
             <option value="10">10</option>
             <option value="25" selected>25</option>
             <option value="50">50</option>

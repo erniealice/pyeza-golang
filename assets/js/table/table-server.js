@@ -270,16 +270,16 @@
                     }
 
                     // 4. Re-init pagination (footer was replaced, needs new event listeners)
-                    if (window.TablePagination) {
-                        window.TablePagination.init();
+                    if (lf.TablePagination) {
+                        lf.TablePagination.init();
                     }
 
                     // P1: restore focus after swap
                     restoreFocusIdentity(tableCard, focusIdentity);
 
                     // Clear bulk selections — prevent stale IDs from previous page
-                    if (window.TableSelection) {
-                        window.TableSelection.initBulkSelection();
+                    if (lf.TableSelection) {
+                        lf.TableSelection.initBulkSelection();
                     }
 
                     console.log('[TableServer] Targeted swap complete for:', baseId);
@@ -382,7 +382,8 @@
     }
 
     // Expose module
-    window.TableServer = {
+    window.lf = window.lf || {};
+    window.lf.TableServer = {
         buildServerPaginationURL,
         isServerPagination,
         getPaginationMode,

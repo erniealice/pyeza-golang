@@ -62,7 +62,7 @@
 
     function saveColumnPreference(tableId, columnKey, isVisible) {
         try {
-            const key = `table_columns_${tableId}`;
+            const key = `lf-table-columns-${tableId}`;
             const prefs = JSON.parse(localStorage.getItem(key) || '{}');
             prefs[columnKey] = isVisible;
             localStorage.setItem(key, JSON.stringify(prefs));
@@ -73,7 +73,7 @@
 
     function restoreColumnPreferences(tableId, table, checkboxes) {
         try {
-            const key = `table_columns_${tableId}`;
+            const key = `lf-table-columns-${tableId}`;
             const prefs = JSON.parse(localStorage.getItem(key) || '{}');
 
             checkboxes.forEach(checkbox => {
@@ -90,7 +90,8 @@
     }
 
     // Expose module
-    window.TableColumns = {
+    window.lf = window.lf || {};
+    window.lf.TableColumns = {
         init,
         initColumnVisibility,
         toggleColumn,

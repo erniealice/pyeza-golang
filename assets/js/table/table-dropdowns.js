@@ -19,8 +19,8 @@
     // Define handlers outside init so references are stable
     const clickOutsideHandler = function(e) {
         if (!e.target.closest('.toolbar-dropdown')) {
-            if (window.TableCore) {
-                window.TableCore.closeAllDropdowns();
+            if (lf.TableCore) {
+                lf.TableCore.closeAllDropdowns();
             }
             lastOpenTrigger = null;
         }
@@ -28,8 +28,8 @@
 
     const escapeKeyHandler = function(e) {
         if (e.key === 'Escape') {
-            if (window.TableCore) {
-                window.TableCore.closeAllDropdowns();
+            if (lf.TableCore) {
+                lf.TableCore.closeAllDropdowns();
             }
             // P2: restore focus to the trigger that opened the dropdown
             if (lastOpenTrigger && typeof lastOpenTrigger.focus === 'function') {
@@ -54,8 +54,8 @@
                 const isOpen = dropdown.classList.contains('open');
 
                 // Close all dropdowns
-                if (window.TableCore) {
-                    window.TableCore.closeAllDropdowns();
+                if (lf.TableCore) {
+                    lf.TableCore.closeAllDropdowns();
                 }
 
                 // Toggle current dropdown
@@ -89,6 +89,7 @@
     }
 
     // Expose module
-    window.TableDropdowns = { init };
+    window.lf = window.lf || {};
+    window.lf.TableDropdowns = { init };
 
 })();

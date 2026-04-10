@@ -9,7 +9,7 @@
     const appSwitcherBtn = document.getElementById('appSwitcherBtn');
     const appNav = document.getElementById('appNav');
 
-    const STORAGE_KEY = 'sidebarCollapsed';
+    const STORAGE_KEY = 'lf-sidebar-collapsed';
 
     // ========================================
     // Sidebar Toggle

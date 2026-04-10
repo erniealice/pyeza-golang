@@ -226,7 +226,7 @@
      */
     function fetchAllResultIds(card, state) {
         var bodyURL = card.dataset.paginationBodyUrl || card.dataset.paginationUrl;
-        if (!bodyURL || !window.TableServer) return Promise.resolve();
+        if (!bodyURL || !lf.TableServer) return Promise.resolve();
 
         var totalRows = parseInt(card.dataset.totalRows) || 0;
         var overrides = { page: 1, size: totalRows };
@@ -235,7 +235,7 @@
         var filters = card.dataset.filters;
         if (filters) overrides.filters = filters;
 
-        var url = window.TableServer.buildServerPaginationURL(card, overrides, bodyURL);
+        var url = lf.TableServer.buildServerPaginationURL(card, overrides, bodyURL);
         console.log('[TableSelection] Fetching all result IDs from:', url);
 
         return fetch(url)
@@ -397,7 +397,8 @@
     }
 
     // Expose module
-    window.TableSelection = {
+    window.lf = window.lf || {};
+    window.lf.TableSelection = {
         init,
         initBulkSelection,
         updateBulkSelectionUI,
@@ -421,7 +422,7 @@
     };
 
     // Expose cleanup function globally for debugging
-    window.__tableSelectionCleanupAll = function() {
+    window.lf.__tableSelectionCleanupAll = function() {
         console.log('[TableSelection] Cleaning up ALL table states');
         tableState.forEach((state, tableId) => {
             cleanupTable(tableId);

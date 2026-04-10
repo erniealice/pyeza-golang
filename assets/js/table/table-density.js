@@ -47,8 +47,8 @@
                     saveDensityPreference(density);
 
                     // Close dropdown
-                    if (window.TableCore) {
-                        window.TableCore.closeAllDropdowns();
+                    if (lf.TableCore) {
+                        lf.TableCore.closeAllDropdowns();
                     }
                 });
             });
@@ -77,7 +77,7 @@
 
     function saveDensityPreference(density) {
         try {
-            localStorage.setItem('page_density', density);
+            localStorage.setItem('lf-page-density', density);
         } catch (e) {
             console.warn('Could not save density preference', e);
         }
@@ -85,7 +85,7 @@
 
     function getDensityPreference() {
         try {
-            return localStorage.getItem('page_density');
+            return localStorage.getItem('lf-page-density');
         } catch (e) {
             console.warn('Could not get density preference', e);
             return null;
@@ -93,7 +93,8 @@
     }
 
     // Expose module
-    window.TableDensity = {
+    window.lf = window.lf || {};
+    window.lf.TableDensity = {
         init,
         initDensity,
         getCurrentDensity,

@@ -36,8 +36,9 @@ JS API:
 <script>
 (function() {
     'use strict';
-    if (window.__popoverInit) return;
-    window.__popoverInit = true;
+    window.lf = window.lf || {};
+    if (window.lf.__popoverInit) return;
+    window.lf.__popoverInit = true;
 
     /* ======================================================================
        Popover Class
@@ -333,7 +334,7 @@ JS API:
     /* ------------------------------------------------------------------
        Expose + Auto-init
        ------------------------------------------------------------------ */
-    window.Popover = Popover;
+    window.lf.Popover = Popover;
 
     function initPopovers() {
         document.querySelectorAll('[data-popover]').forEach(function(el) {

@@ -50,8 +50,8 @@
 
                     if (isServerMode) {
                         // Server-side sort
-                        if (window.TableServer && typeof htmx !== 'undefined') {
-                            window.TableServer.executeServerRequest(tableCard, {
+                        if (lf.TableServer && typeof htmx !== 'undefined') {
+                            lf.TableServer.executeServerRequest(tableCard, {
                                 sort: column,
                                 dir: direction,
                                 page: 1  // Reset to page 1 when sort changes
@@ -62,14 +62,14 @@
                         sortTable(tbody, column, direction);
 
                         // Reset pagination to page 1 and re-apply after sort
-                        if (window.TablePagination) {
-                            window.TablePagination.update(tableId);
+                        if (lf.TablePagination) {
+                            lf.TablePagination.update(tableId);
                         }
                     }
 
                     // Close dropdown
-                    if (window.TableCore) {
-                        window.TableCore.closeAllDropdowns();
+                    if (lf.TableCore) {
+                        lf.TableCore.closeAllDropdowns();
                     }
                 });
             });
@@ -109,8 +109,8 @@
 
                     if (isServerMode) {
                         // Server-side sort
-                        if (window.TableServer && typeof htmx !== 'undefined') {
-                            window.TableServer.executeServerRequest(tableCard, {
+                        if (lf.TableServer && typeof htmx !== 'undefined') {
+                            lf.TableServer.executeServerRequest(tableCard, {
                                 sort: column,
                                 dir: direction,
                                 page: 1  // Reset to page 1 when sort changes
@@ -121,8 +121,8 @@
                         sortTable(tbody, column, direction);
 
                         // Reset pagination to page 1 and re-apply after sort
-                        if (window.TablePagination && table.id) {
-                            window.TablePagination.update(table.id);
+                        if (lf.TablePagination && table.id) {
+                            lf.TablePagination.update(table.id);
                         }
                     }
                 });
@@ -213,14 +213,15 @@
             sortTable(tbody, column, direction);
 
             // Re-apply pagination after default sort (don't reset page for initial load)
-            if (window.TablePagination && table.id) {
-                window.TablePagination.apply(table.id);
+            if (lf.TablePagination && table.id) {
+                lf.TablePagination.apply(table.id);
             }
         });
     }
 
     // Expose module
-    window.TableSort = {
+    window.lf = window.lf || {};
+    window.lf.TableSort = {
         init,
         initSort,
         initHeaderSort,

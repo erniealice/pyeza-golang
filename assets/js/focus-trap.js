@@ -66,5 +66,6 @@
         }
     }
 
-    window.FocusTrap = { trapFocus: trapFocus, releaseFocus: releaseFocus };
+    window.lf = window.lf || {};
+    window.lf.FocusTrap = { trapFocus: trapFocus, releaseFocus: releaseFocus };
 })();

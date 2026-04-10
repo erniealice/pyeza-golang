@@ -2,7 +2,7 @@
 <!-- Mobile sidebar overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <aside class="sidebar" id="sidebar">
-    <script>if(localStorage.getItem('sidebarCollapsed')==='true')document.getElementById('sidebar').classList.add('collapsed');</script>
+    <script>if(localStorage.getItem('lf-sidebar-collapsed')==='true')document.getElementById('sidebar').classList.add('collapsed');</script>
     <div class="sidebar-header">
         <a href="{{.Sidebar.LogoURL}}" class="logo">
             <span class="logo-text">{{.Sidebar.LogoText}}</span>
@@ -49,6 +49,7 @@
     <div class="app-switcher" id="appSwitcher">
         <button class="app-switcher-btn" id="appSwitcherBtn"
                 aria-haspopup="menu" aria-expanded="false"
+                aria-label="{{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}{{end}}"
                 data-tooltip="{{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}{{end}}">
             <div class="app-switcher-icon app-icon--{{.Sidebar.ActiveApp}}">
                 {{range .Sidebar.AppGroups}}{{range .Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{renderContent .Icon $}}{{end}}{{end}}{{end}}
@@ -101,6 +102,7 @@
     <div class="app-switcher" id="appSwitcher">
         <button class="app-switcher-btn" id="appSwitcherBtn"
                 aria-haspopup="menu" aria-expanded="false"
+                aria-label="{{range .Sidebar.Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}"
                 data-tooltip="{{range .Sidebar.Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{.Label}}{{end}}{{end}}">
             <div class="app-switcher-icon app-icon--{{.Sidebar.ActiveApp}}">
                 {{range .Sidebar.Apps}}{{if eq .Key $.Sidebar.ActiveApp}}{{renderContent .Icon $}}{{end}}{{end}}

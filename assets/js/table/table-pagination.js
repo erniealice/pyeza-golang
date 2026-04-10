@@ -57,8 +57,8 @@
         // Entries selector change - trigger server request
         entriesSelector.addEventListener('change', function() {
             const newSize = parseInt(this.value);
-            if (window.TableServer && typeof htmx !== 'undefined') {
-                window.TableServer.executeServerRequest(tableCard, { size: newSize, page: 1 });
+            if (lf.TableServer && typeof htmx !== 'undefined') {
+                lf.TableServer.executeServerRequest(tableCard, { size: newSize, page: 1 });
             }
         });
 
@@ -71,15 +71,15 @@
                 if (paginationMode === 'offset') {
                     const currentPage = parseInt(tableCard.dataset.currentPage) || 1;
                     if (currentPage > 1) {
-                        if (window.TableServer && typeof htmx !== 'undefined') {
-                            window.TableServer.executeServerRequest(tableCard, { page: currentPage - 1 });
+                        if (lf.TableServer && typeof htmx !== 'undefined') {
+                            lf.TableServer.executeServerRequest(tableCard, { page: currentPage - 1 });
                         }
                     }
                 } else {
                     // Cursor mode
                     const hasPrev = tableCard.dataset.hasPrev === 'true';
-                    if (hasPrev && window.TableServer && typeof htmx !== 'undefined') {
-                        window.TableServer.executeServerRequest(tableCard, { cursorDirection: 'prev' });
+                    if (hasPrev && lf.TableServer && typeof htmx !== 'undefined') {
+                        lf.TableServer.executeServerRequest(tableCard, { cursorDirection: 'prev' });
                     }
                 }
             });
@@ -98,15 +98,15 @@
                         parseInt(tableCard.dataset.pageSize || 25)
                     );
                     if (currentPage < totalPages) {
-                        if (window.TableServer && typeof htmx !== 'undefined') {
-                            window.TableServer.executeServerRequest(tableCard, { page: currentPage + 1 });
+                        if (lf.TableServer && typeof htmx !== 'undefined') {
+                            lf.TableServer.executeServerRequest(tableCard, { page: currentPage + 1 });
                         }
                     }
                 } else {
                     // Cursor mode
                     const hasNext = tableCard.dataset.hasNext === 'true';
-                    if (hasNext && window.TableServer && typeof htmx !== 'undefined') {
-                        window.TableServer.executeServerRequest(tableCard, { cursorDirection: 'next' });
+                    if (hasNext && lf.TableServer && typeof htmx !== 'undefined') {
+                        lf.TableServer.executeServerRequest(tableCard, { cursorDirection: 'next' });
                     }
                 }
             });
@@ -120,8 +120,8 @@
                     const pageBtn = e.target.closest('.pagination-page');
                     if (pageBtn && !pageBtn.classList.contains('ellipsis')) {
                         const page = parseInt(pageBtn.dataset.page);
-                        if (!isNaN(page) && window.TableServer && typeof htmx !== 'undefined') {
-                            window.TableServer.executeServerRequest(tableCard, { page });
+                        if (!isNaN(page) && lf.TableServer && typeof htmx !== 'undefined') {
+                            lf.TableServer.executeServerRequest(tableCard, { page });
                         }
                     }
                 });
@@ -197,10 +197,10 @@
     function initClientPagination(tableCard, footer, entriesSelector, actualTableId, table) {
         // Initialize or update state for this table
         // Preserve existing pagination state if table was refreshed (e.g., after HTMX swap)
-        const existingState = window.TableState.pagination[actualTableId];
+        const existingState = lf.TableState.pagination[actualTableId];
         const entriesPerPage = parseInt(entriesSelector.value) || 25;
 
-        window.TableState.pagination[actualTableId] = {
+        lf.TableState.pagination[actualTableId] = {
             currentPage: existingState?.currentPage || 1,
             entriesPerPage: existingState?.entriesPerPage || entriesPerPage,
             tableId: actualTableId,
@@ -214,7 +214,7 @@
 
         // Entries selector change
         entriesSelector.addEventListener('change', function() {
-            const state = window.TableState.pagination[actualTableId];
+            const state = lf.TableState.pagination[actualTableId];
             state.entriesPerPage = parseInt(this.value);
             state.currentPage = 1; // Reset to first page
             applyPagination(actualTableId);
@@ -224,7 +224,7 @@
         const prevBtn = footer.querySelector('.pagination-prev');
         if (prevBtn) {
             prevBtn.addEventListener('click', function() {
-                const state = window.TableState.pagination[actualTableId];
+                const state = lf.TableState.pagination[actualTableId];
                 if (state.currentPage > 1) {
                     state.currentPage--;
                     applyPagination(actualTableId);
@@ -236,7 +236,7 @@
         const nextBtn = footer.querySelector('.pagination-next');
         if (nextBtn) {
             nextBtn.addEventListener('click', function() {
-                const state = window.TableState.pagination[actualTableId];
+                const state = lf.TableState.pagination[actualTableId];
                 const totalPages = getTotalPages(actualTableId);
                 if (state.currentPage < totalPages) {
                     state.currentPage++;
@@ -253,7 +253,7 @@
                 if (pageBtn && !pageBtn.classList.contains('ellipsis')) {
                     const page = parseInt(pageBtn.dataset.page);
                     if (!isNaN(page)) {
-                        window.TableState.pagination[actualTableId].currentPage = page;
+                        lf.TableState.pagination[actualTableId].currentPage = page;
                         applyPagination(actualTableId);
                     }
                 }
@@ -318,7 +318,7 @@
     }
 
     function getTotalPages(tableId) {
-        const state = window.TableState.pagination[tableId];
+        const state = lf.TableState.pagination[tableId];
         if (!state) return 1;
 
         const allRows = getAllDataRows(tableId);
@@ -328,7 +328,7 @@
     }
 
     function applyPagination(tableId) {
-        const state = window.TableState.pagination[tableId];
+        const state = lf.TableState.pagination[tableId];
         if (!state) return;
 
         const table = document.getElementById(tableId);
@@ -373,7 +373,7 @@
     }
 
     function updatePaginationUI(tableId, currentPage, totalPages, startIndex, endIndex, totalFiltered) {
-        const state = window.TableState.pagination[tableId];
+        const state = lf.TableState.pagination[tableId];
         if (!state || !state.footer) return;
 
         const footer = state.footer;
@@ -481,7 +481,7 @@
 
     // Public function to update pagination after filter/search
     function updatePagination(tableId) {
-        const state = window.TableState.pagination[tableId];
+        const state = lf.TableState.pagination[tableId];
         if (state) {
             state.currentPage = 1; // Reset to first page after filter
             applyPagination(tableId);
@@ -499,7 +499,8 @@
     }
 
     // Expose module
-    window.TablePagination = {
+    window.lf = window.lf || {};
+    window.lf.TablePagination = {
         init,
         initPagination,
         initServerPagination,

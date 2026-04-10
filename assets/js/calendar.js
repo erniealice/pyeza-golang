@@ -236,7 +236,8 @@
     // PUBLIC API
     // ========================================
 
-    window.Calendar = {
+    window.lf = window.lf || {};
+    window.lf.Calendar = {
         init:              init,
         updateCurrentTime: updateCurrentTime,
         setView:           setView

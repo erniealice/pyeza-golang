@@ -163,7 +163,7 @@
   .quick-links
   .read-more
   .sage
-  .sales
+  .revenue
   .terracotta
 
 ## carousel.css (13 classes)
@@ -1342,7 +1342,7 @@
 
 ### S
   .sage  (card.css)
-  .sales  (card.css)
+  .revenue  (card.css)
   .secondary  (empty-state.css)
   .section-badge  (badge.css)
   .selected  (chip.css)
