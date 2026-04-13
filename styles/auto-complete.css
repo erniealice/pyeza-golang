@@ -261,6 +261,12 @@
     display: none;
 }
 
+.auto-complete-option.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .auto-complete-option.focused {
     background: var(--bg-hover);
     outline: 2px solid var(--accent-primary);

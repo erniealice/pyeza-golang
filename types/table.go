@@ -134,6 +134,10 @@ func ApplyColumnStyles(columns []TableColumn, rows []TableRow) {
 				if columns[j].MinWidth != "" {
 					rows[i].Cells[j].MinWidth = columns[j].MinWidth
 				}
+				// Default right-align for money cells
+				if rows[i].Cells[j].Type == "money" && rows[i].Cells[j].Align == "" {
+					rows[i].Cells[j].Align = "right"
+				}
 			}
 		}
 	}

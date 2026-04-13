@@ -76,8 +76,8 @@
             <div class="auto-complete-results">
                 {{if .Options}}
                 {{range .Options}}
-                <div class="auto-complete-option{{if .Selected}} selected{{end}}"
-                     data-value="{{.Value}}" data-label="{{.Label}}" role="option">
+                <div class="auto-complete-option{{if .Selected}} selected{{end}}{{if .Disabled}} disabled{{end}}"
+                     data-value="{{.Value}}" data-label="{{.Label}}" role="option"{{if .Disabled}} aria-disabled="true"{{end}}>
                     {{.Label}}
                 </div>
                 {{end}}
@@ -297,7 +297,7 @@
     // --- Shared: keyboard navigation ---
 
     searchInput.addEventListener('keydown', function(e) {
-        var options = results.querySelectorAll('.auto-complete-option:not(.hidden)');
+        var options = results.querySelectorAll('.auto-complete-option:not(.hidden):not(.disabled)');
 
         if (e.key === 'ArrowDown') {
             e.preventDefault();
@@ -357,6 +357,7 @@
         allOptions.forEach(function(opt) {
             opt.addEventListener('click', function(e) {
                 e.stopPropagation();
+                if (this.classList.contains('disabled')) return;
                 setSelected(this.dataset.value, this.dataset.label);
             });
         });
