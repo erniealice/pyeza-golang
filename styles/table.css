@@ -2724,7 +2724,8 @@ body.density-comfortable .action-buttons {
 .money-cell {
     display: inline-flex;
     align-items: baseline;
-    gap: 4px;
+    justify-content: space-between;
+    width: 100%;
     font-variant-numeric: tabular-nums;
 }
 
@@ -2735,6 +2736,7 @@ body.density-comfortable .action-buttons {
 
 .money-amount {
     font-weight: var(--font-weight-medium);
+    margin-left: auto;
 }
 
 /* ============================================================

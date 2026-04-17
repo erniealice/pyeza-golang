@@ -7,10 +7,10 @@ import (
 	"strings"
 )
 
-// FormatMoney formats a raw amount into a display-ready money string.
+// formatMoney formats a raw amount into a display-ready money string.
 // If centMode is true, the amount is divided by 100 (e.g., 5000000 -> 50000.00).
 // Returns the formatted number string (e.g., "50,000.00") and the currency code separately.
-func FormatMoney(amount float64, currency string, centMode bool) (formatted string, curr string) {
+func formatMoney(amount float64, currency string, centMode bool) (formatted string, curr string) {
 	if centMode {
 		amount = amount / 100
 	}
@@ -43,7 +43,7 @@ func FormatMoney(amount float64, currency string, centMode bool) (formatted stri
 // The raw amount (in centavos if centMode is true) is formatted and stored in Value;
 // the Currency field is set for template rendering.
 func MoneyCell(amount float64, currency string, centMode bool) TableCell {
-	formatted, curr := FormatMoney(amount, currency, centMode)
+	formatted, curr := formatMoney(amount, currency, centMode)
 	return TableCell{
 		Type:     "money",
 		Value:    formatted,

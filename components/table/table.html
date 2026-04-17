@@ -214,7 +214,9 @@ JavaScript:
     <tfoot class="table-totals">
         <tr>
             {{range .TotalsRow}}
-            <td class="table-total-cell"{{if .Align}} style="text-align: {{.Align}};"{{end}}>{{.Value}}</td>
+            <td class="table-total-cell"{{if .Align}} style="text-align: {{.Align}};"{{end}}>
+                {{if eq .Type "money"}}{{template "table-cell-money" .}}{{else}}{{.Value}}{{end}}
+            </td>
             {{end}}
         </tr>
     </tfoot>

@@ -200,6 +200,8 @@ type SidebarLabels struct {
 	SuppliersActiveIcon       string `json:"suppliers_active_icon"`
 	SuppliersBlockedIcon      string `json:"suppliers_blocked_icon"`
 	SuppliersOnHoldIcon       string `json:"suppliers_on_hold_icon"`
+	SuppliersTagsLabel        string `json:"suppliers_tags_label"`
+	SuppliersTagsIcon         string `json:"suppliers_tags_icon"`
 	PlansActiveIcon           string `json:"plans_active_icon"`
 	PlansInactiveIcon         string `json:"plans_inactive_icon"`
 	ServicesActiveIcon        string `json:"services_active_icon"`
@@ -386,6 +388,8 @@ func DefaultSidebarLabels() SidebarLabels {
 		SuppliersActiveIcon:       "icon-truck",
 		SuppliersBlockedIcon:      "icon-x-circle",
 		SuppliersOnHoldIcon:       "icon-pause-circle",
+		SuppliersTagsLabel:        "Tags",
+		SuppliersTagsIcon:         "icon-tag",
 		PlansActiveIcon:           "icon-file-text",
 		PlansInactiveIcon:         "icon-file-minus",
 		ServicesActiveIcon:        "icon-layers",
