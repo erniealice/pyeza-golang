@@ -57,9 +57,10 @@ type ColumnGroup struct {
 
 // SelectOption defines a dropdown option for "select" type cells
 type SelectOption struct {
-	Value    string // Option value attribute
-	Label    string // Option display text
-	Selected bool   // Whether this option is selected
+	Value       string // Option value attribute
+	Label       string // Option display text
+	Selected    bool   // Whether this option is selected
+	Description string // Optional helper text — surfaced via data-description on <option>
 }
 
 // PersonData holds a single person's display info for person cell types

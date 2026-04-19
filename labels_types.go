@@ -447,16 +447,21 @@ type CardLabels struct {
 	ReadMore string `json:"readMore"`
 }
 
-// DurationUnitLabels holds singular and plural forms for duration unit display.
+// DurationUnitLabels holds duration unit display variants.
 // The DB stores the plural stem ("days", "weeks", "months", "years").
-// Use FormatDuration to pick the correct form at display time.
+// - Singular/Plural: count-aware display ("1 day" / "3 days") — used by FormatDuration.
+// - Select: type-selector form ("day(s)") — used by drawer form dropdowns.
 type DurationUnitLabels struct {
 	DaySingular   string `json:"daySingular"`
 	DayPlural     string `json:"dayPlural"`
+	DaySelect     string `json:"daySelect"`
 	WeekSingular  string `json:"weekSingular"`
 	WeekPlural    string `json:"weekPlural"`
+	WeekSelect    string `json:"weekSelect"`
 	MonthSingular string `json:"monthSingular"`
 	MonthPlural   string `json:"monthPlural"`
+	MonthSelect   string `json:"monthSelect"`
 	YearSingular  string `json:"yearSingular"`
 	YearPlural    string `json:"yearPlural"`
+	YearSelect    string `json:"yearSelect"`
 }
