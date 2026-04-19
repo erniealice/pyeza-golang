@@ -820,3 +820,28 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
+/* ==========================================================================
+   FORM CHARACTER COUNTER (textarea maxlength helper)
+   ========================================================================== */
+
+.form-char-counter {
+    display: block;
+    font-size: var(--text-xs); /* 12px */
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin-top: 0.125rem; /* 2px */
+    text-align: right;
+}
+
+.form-char-counter--ok {
+    color: var(--text-muted);
+}
+
+.form-char-counter--warning {
+    color: var(--status-warning);
+}
+
+.form-char-counter--error {
+    color: var(--status-error);
+    font-weight: var(--font-weight-medium);
+}

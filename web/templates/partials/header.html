@@ -6,7 +6,17 @@
         </div>
         <div class="greeting-text">
             <div class="greeting-title-row">
-                <h1>{{if .HeaderTitle}}{{.HeaderTitle}}{{else}}{{.Title}}{{end}}</h1>
+                <h1>
+                    {{if .HeaderBreadcrumb}}
+                        {{if .HeaderBreadcrumbURL}}
+                        <a href="{{.HeaderBreadcrumbURL}}" class="greeting-crumb-parent">{{.HeaderBreadcrumb}}</a>
+                        {{else}}
+                        <span class="greeting-crumb-parent">{{.HeaderBreadcrumb}}</span>
+                        {{end}}
+                        <span class="greeting-crumb-separator" aria-hidden="true">{{template "icon-chevron-right" .}}</span>
+                    {{end}}
+                    <span class="greeting-crumb-current">{{if .HeaderTitle}}{{.HeaderTitle}}{{else}}{{.Title}}{{end}}</span>
+                </h1>
                 {{if .HasHelp}}
                 <button class="help-toggle-btn" id="helpToggleBtn" aria-label="Toggle help pane" title="{{.CommonLabels.Header.ShowHelp}}">
                     {{template "icon-help" .}}

@@ -14,9 +14,11 @@ type PageData struct {
 	ActiveNav         string
 	ActiveSubNav      string // Active sub-navigation item (for sidebar sub-menus)
 	Sidebar           SidebarConfig
-	HeaderIcon        string
-	HeaderTitle       string
-	HeaderSubtitle    string
+	HeaderIcon          string
+	HeaderTitle         string
+	HeaderSubtitle      string
+	HeaderBreadcrumb    string // optional text shown above the title (e.g., "← Rate Card XYZ")
+	HeaderBreadcrumbURL string // optional href; when set, the breadcrumb renders as a link
 	SearchPlaceholder string
 	HasNotifications  bool
 	HelpContent       template.HTML     // Server-rendered markdown content for help pane

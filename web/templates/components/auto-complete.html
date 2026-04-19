@@ -15,8 +15,9 @@
         "Value" .SelectedStatus
         "SelectedLabel" .SelectedStatusLabel
     }}
-    Options format: []struct { Value string; Label string; Selected bool }
+    Options format: []struct { Value string; Label string; Selected bool; Description string }
     Options are rendered server-side and filtered client-side (no network requests).
+    Optional: "Description" per option — shown as a .form-hint below the trigger when selected.
 
     Mode 2: Action/Search (server-side, SearchURL provided)
     {{template "auto-complete" dict
@@ -77,7 +78,7 @@
                 {{if .Options}}
                 {{range .Options}}
                 <div class="auto-complete-option{{if .Selected}} selected{{end}}{{if .Disabled}} disabled{{end}}"
-                     data-value="{{.Value}}" data-label="{{.Label}}" role="option"{{if .Disabled}} aria-disabled="true"{{end}}>
+                     data-value="{{.Value}}" data-label="{{.Label}}" data-description="{{.Description}}" role="option"{{if .Disabled}} aria-disabled="true"{{end}}>
                     {{.Label}}
                 </div>
                 {{end}}
@@ -94,6 +95,7 @@
         <input type="hidden" name="{{.Name}}" class="auto-complete-input"
                value="{{.Value}}" {{if .Required}}required{{end}}>
     </div>
+    <div class="form-hint auto-complete-description" id="{{.ID}}-description" aria-live="polite"></div>
 </div>
 
 <script>
@@ -115,6 +117,7 @@
     const searchInput = container.querySelector('.auto-complete-search');
     const emptyState = container.querySelector('.auto-complete-empty');
     const loadingState = container.querySelector('.auto-complete-loading');
+    const descriptionEl = document.getElementById('{{.ID}}-description');
     const placeholder = '{{.Placeholder}}';
 
     let debounceTimer = null;
@@ -123,6 +126,16 @@
 
     // In filter mode, cache the pre-rendered options for client-side filtering
     const allOptions = isActionMode ? [] : Array.from(results.querySelectorAll('.auto-complete-option'));
+
+    function updateDescription(value) {
+        if (!descriptionEl || isActionMode) return;
+        var desc = '';
+        if (value) {
+            var match = allOptions.find(function(opt) { return opt.dataset.value === value; });
+            if (match) desc = match.dataset.description || '';
+        }
+        descriptionEl.textContent = desc;
+    }
 
     function setSelected(value, label) {
         hiddenInput.value = value;
@@ -139,7 +152,13 @@
             });
         }
 
+        updateDescription(value);
         closeDropdown();
+    }
+
+    // Show description for the initially selected value (filter mode only)
+    if (!isActionMode) {
+        updateDescription(hiddenInput.value);
     }
 
     function clearSelection() {

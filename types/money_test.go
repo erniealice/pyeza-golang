@@ -101,7 +101,7 @@ func TestFormatMoney(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			gotFormatted, gotCurrency := FormatMoney(tc.amount, tc.currency, tc.centMode)
+			gotFormatted, gotCurrency := formatMoney(tc.amount, tc.currency, tc.centMode)
 			if gotFormatted != tc.wantFormatted {
 				t.Errorf("FormatMoney(%v, %q, %v) formatted = %q, want %q",
 					tc.amount, tc.currency, tc.centMode, gotFormatted, tc.wantFormatted)
@@ -225,7 +225,7 @@ func TestFormatMoney_BoundaryValues(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			gotFormatted, gotCurrency := FormatMoney(tc.amount, tc.currency, tc.centMode)
+			gotFormatted, gotCurrency := formatMoney(tc.amount, tc.currency, tc.centMode)
 			// For max/min int64, just verify it doesn't panic and returns a non-empty string
 			if gotFormatted == "" {
 				t.Errorf("FormatMoney(%v, %q, %v) returned empty formatted string",

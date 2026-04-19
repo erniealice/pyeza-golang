@@ -65,8 +65,13 @@ Wrap form-groups in div.form-row for multi-column layouts:
         {{if .Disabled}}disabled{{end}}
         {{if .Readonly}}readonly{{end}}
         {{if .Rows}}rows="{{.Rows}}"{{else}}rows="4"{{end}}
+        {{if .MaxLength}}maxlength="{{.MaxLength}}"{{else}}maxlength="500"{{end}}
         {{if .Error}}aria-invalid="true" aria-describedby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-error"{{end}}
     >{{.Value}}</textarea>
+    {{/* Character counter — rendered unless MaxLength is explicitly 0 */}}
+    {{if ne .MaxLength 0}}
+    <span class="form-char-counter" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-counter" aria-live="polite"></span>
+    {{end}}
 
     {{else if eq .Type "select"}}
     {{/* ===== SELECT ===== */}}
@@ -82,9 +87,11 @@ Wrap form-groups in div.form-row for multi-column layouts:
         <option value="" disabled {{if not .Value}}selected{{end}}>{{.Placeholder}}</option>
         {{end}}
         {{range .Options}}
-        <option value="{{.Value}}" {{if .Selected}}selected{{end}}>{{.Label}}</option>
+        <option value="{{.Value}}" data-description="{{.Description}}" {{if or .Selected (and $.Value (eq .Value $.Value))}}selected{{end}}>{{.Label}}</option>
         {{end}}
     </select>
+    {{/* Per-option description hint — shown below the select when an option has a description */}}
+    <span class="form-hint form-select-description" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-description"></span>
 
     {{else}}
     {{/* ===== INPUT (text, email, tel, date, number, password, url) ===== */}}

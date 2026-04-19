@@ -448,16 +448,18 @@
             // A flag on the event prevents double-calling if HTMX is later
             // upgraded to 2.x where the attribute handler would also fire.
             document.body.addEventListener('htmx:afterRequest', function(e) {
-                var form = e.detail.elt;
-                if (form && (form.closest('#sheetContent') || form.closest('.form-drawer-content'))) {
-                    var submitBtn = form.querySelector('button[type="submit"]');
+                var elt = e.detail.elt;
+                if (!elt) return;
+                // Only real form submissions should trigger close/toast/refresh.
+                // In-sheet HTMX requests from selects/inputs (dependent dropdowns,
+                // auto-complete, etc.) must pass through without closing the sheet.
+                if (elt.tagName !== 'FORM') return;
+                if (elt.closest('#sheetContent') || elt.closest('.form-drawer-content')) {
+                    var submitBtn = elt.querySelector('button[type="submit"]');
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.classList.remove('btn-loading');
                     }
-                    // Guard against double invocation (attribute + global listener).
-                    // Do NOT set _sheetHandled here — let handleResponse() set it,
-                    // otherwise handleResponse() sees the flag and returns early.
                     if (!e.detail._sheetHandled) {
                         handleResponse(e);
                     }
