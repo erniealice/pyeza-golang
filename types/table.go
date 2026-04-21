@@ -55,12 +55,33 @@ type ColumnGroup struct {
 	Columns []TableColumn // Sub-columns within this group
 }
 
-// SelectOption defines a dropdown option for "select" type cells
+// SelectOption is the canonical dropdown option shape for pyeza form components.
+//
+// This single struct must carry EVERY field that the form-group select component
+// (components/form-group.html) and the auto-complete component
+// (components/auto-complete.html) may access on an option entry. The templates
+// unconditionally reference these fields via struct-field access (e.g.
+// `data-description="{{.Description}}"`) and Go's html/template errors hard —
+// not silently — when a referenced field is absent. That failure mode previously
+// caused drawer forms to stop rendering mid-way, dropping the sheet-form footer
+// (Save/Cancel buttons) from the browser output.
+//
+// Every view that previously declared a local SelectOption/PlanOption/etc. struct
+// feeding a form-group select or auto-complete should import this type instead of
+// redefining its own, so the field set stays in lockstep with the templates.
+//
+// Consumers:
+//   - form-group.html (Type="select"): Value, Label, Selected, Description
+//   - auto-complete.html (filter mode Options): Value, Label, Selected, Description, Disabled
+//   - TableCell Options (select-type table cells): Value, Label, Selected
 type SelectOption struct {
 	Value       string // Option value attribute
 	Label       string // Option display text
 	Selected    bool   // Whether this option is selected
-	Description string // Optional helper text — surfaced via data-description on <option>
+	Description string // Optional helper text — surfaced via data-description on <option>;
+	//        must be present (even if empty) because form-group.html always reads it.
+	Disabled bool // Whether this option is disabled (auto-complete only); renders
+	//        the `disabled` class + aria-disabled on the option entry.
 }
 
 // PersonData holds a single person's display info for person cell types

@@ -960,6 +960,27 @@ button.sort-btn {
     color: var(--accent-navy);
 }
 
+/* Disabled action buttons — keep pointer events so title tooltip fires on hover */
+.action-btn:disabled,
+.action-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none; /* legacy — native disabled swallows events anyway */
+}
+
+.action-btn[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: auto; /* override .disabled class so title tooltip fires on hover */
+}
+
+.action-btn:disabled:hover,
+.action-btn.disabled:hover,
+.action-btn[aria-disabled="true"]:hover {
+    background: transparent;
+    color: var(--text-muted);
+}
+
 /* ========================================
    ACTION DROPDOWN (MOBILE)
    ======================================== */
@@ -1048,6 +1069,19 @@ button.sort-btn {
     width: 1rem;
     height: 1rem;
     color: var(--text-muted);
+}
+
+.action-dropdown-item:disabled,
+.action-dropdown-item.disabled,
+.action-dropdown-item[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.action-dropdown-item:disabled:hover,
+.action-dropdown-item.disabled:hover,
+.action-dropdown-item[aria-disabled="true"]:hover {
+    background: transparent;
 }
 
 .action-dropdown-item.delete {

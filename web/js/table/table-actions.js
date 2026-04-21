@@ -8,6 +8,10 @@
     let rowActionsInitialized = false;
     let rowNavigationInitialized = false;
 
+    function isDisabled(btn) {
+        return btn && (btn.disabled || btn.getAttribute('aria-disabled') === 'true');
+    }
+
     function init() {
         initRowActions();
         initRowNavigation();
@@ -23,6 +27,7 @@
             // Handle Edit button
             const editBtn = e.target.closest('.action-btn[data-action="edit"]');
             if (editBtn) {
+                if (isDisabled(editBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = editBtn.dataset.id;
                 const editUrl = editBtn.dataset.editUrl;
@@ -50,6 +55,7 @@
             // Handle Delete button
             const deleteBtn = e.target.closest('.action-btn[data-action="delete"]');
             if (deleteBtn) {
+                if (isDisabled(deleteBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = deleteBtn.dataset.id;
                 const deleteUrl = deleteBtn.dataset.deleteUrl;
@@ -71,6 +77,7 @@
             // Handle Deactivate button
             const deactivateBtn = e.target.closest('.action-btn[data-action="deactivate"]');
             if (deactivateBtn) {
+                if (isDisabled(deactivateBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = deactivateBtn.dataset.id;
                 const deactivateUrl = deactivateBtn.dataset.deactivateUrl;
@@ -92,6 +99,7 @@
             // Handle Activate button
             const activateBtn = e.target.closest('.action-btn[data-action="activate"]');
             if (activateBtn) {
+                if (isDisabled(activateBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = activateBtn.dataset.id;
                 const activateUrl = activateBtn.dataset.activateUrl;
@@ -113,6 +121,7 @@
             // Handle Undo button
             const undoBtn = e.target.closest('.action-btn[data-action="undo"]');
             if (undoBtn) {
+                if (isDisabled(undoBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = undoBtn.dataset.id;
                 const undoUrl = undoBtn.dataset.activateUrl;
@@ -132,6 +141,7 @@
             // Handle Complete button
             const completeBtn = e.target.closest('.action-btn[data-action="complete"]');
             if (completeBtn) {
+                if (isDisabled(completeBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = completeBtn.dataset.id;
                 const completeUrl = completeBtn.dataset.deactivateUrl;
@@ -151,6 +161,7 @@
             // Handle Cancel button
             const cancelBtn = e.target.closest('.action-btn[data-action="cancel"]');
             if (cancelBtn) {
+                if (isDisabled(cancelBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = cancelBtn.dataset.id;
                 const cancelUrl = cancelBtn.dataset.deactivateUrl;
@@ -170,6 +181,7 @@
             // Handle Reclassify button
             const reclassifyBtn = e.target.closest('.action-btn[data-action="reclassify"]');
             if (reclassifyBtn) {
+                if (isDisabled(reclassifyBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = reclassifyBtn.dataset.id;
                 const reclassifyUrl = reclassifyBtn.dataset.activateUrl;
@@ -189,6 +201,7 @@
             // Handle Download button (direct GET — opens in new tab or triggers download)
             const downloadBtn = e.target.closest('.action-btn[data-action="download"]');
             if (downloadBtn) {
+                if (isDisabled(downloadBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = downloadBtn.dataset.id;
                 const downloadUrl = downloadBtn.dataset.downloadUrl;
@@ -216,6 +229,7 @@
             // Handle Send Email button (POST with dialog confirmation)
             const sendEmailBtn = e.target.closest('.action-btn[data-action="send-email"]');
             if (sendEmailBtn) {
+                if (isDisabled(sendEmailBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
                 const id = sendEmailBtn.dataset.id;
                 const sendEmailUrl = sendEmailBtn.dataset.sendEmailUrl;
