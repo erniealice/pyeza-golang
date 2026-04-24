@@ -15,6 +15,7 @@ USAGE:
     "Placeholder" ""        // Optional: placeholder text
     "Value" ""              // Optional: current value
     "Hint" ""               // Optional: help text below input
+    "Info" ""               // Optional: popover text surfaced via info button beside label
     "Required" false        // Optional: mark as required
     "Disabled" false        // Optional: disable input
     "Readonly" false        // Optional: readonly input
@@ -51,6 +52,17 @@ Wrap form-groups in div.form-row for multi-column layouts:
     {{if .Label}}
     <label class="form-label" {{if or .ID .Name}}for="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}>
         {{.Label}}{{if .Required}} <span class="form-required" aria-hidden="true">*</span>{{end}}
+        {{if .Info}}
+        <span class="form-label-info" data-popover data-popover-trigger="hover click" data-popover-position="top">
+            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" tabindex="0">
+                {{template "icon-info"}}
+            </button>
+            <div class="popover-panel form-label-info-panel" role="tooltip">
+                <div class="popover-arrow"></div>
+                {{.Info}}
+            </div>
+        </span>
+        {{end}}
     </label>
     {{end}}
 

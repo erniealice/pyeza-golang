@@ -52,6 +52,52 @@
     margin-left: 0.125rem; /* 2px */
 }
 
+/* Info button beside a form label — triggers a popover with field explanation.
+   The button renders as a small circular affordance so it reads as an icon
+   against the label text rather than a stray glyph. */
+.form-label-info {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    margin-left: 0.375rem; /* 6px */
+}
+.form-label-info-btn {
+    width: 1.125rem; /* 18px */
+    height: 1.125rem; /* 18px */
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: help;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.form-label-info-btn svg {
+    width: var(--icon-xs); /* 16px */
+    height: var(--icon-xs); /* 16px */
+    stroke-width: 2;
+    display: block;
+}
+.form-label-info-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+.form-label-info-btn:focus-visible {
+    outline: none;
+    color: var(--text-primary);
+    background: var(--bg-hover);
+    box-shadow: 0 0 0 0.125rem var(--accent-primary-light); /* 2px */
+}
+.form-label-info-panel {
+    max-width: 17.5rem; /* 280px */
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--text-primary);
+}
+
 /* ==========================================================================
    FORM INPUTS
    ========================================================================== */
@@ -683,6 +729,33 @@
     border: 0;
     opacity: 0;
     pointer-events: none;
+}
+
+/* ==========================================================================
+   COLOR PICKER SWATCHES (preset ring above the native color input)
+   ========================================================================== */
+
+.color-picker-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem; /* 6px */
+    margin-bottom: 0.5rem; /* 8px */
+}
+
+.color-picker-swatch {
+    width: 1.5rem;  /* 24px */
+    height: 1.5rem; /* 24px */
+    border: var(--border-width) solid var(--border);
+    border-radius: 0.375rem; /* 6px */
+    cursor: pointer;
+    padding: 0;
+    transition: transform var(--duration-fast);
+}
+
+.color-picker-swatch:hover,
+.color-picker-swatch:focus-visible {
+    transform: scale(1.1);
+    outline: none;
 }
 
 /* ==========================================================================

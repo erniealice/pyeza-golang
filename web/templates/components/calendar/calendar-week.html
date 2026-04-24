@@ -29,6 +29,7 @@ CalendarWeekDay:
     .IsToday       bool
     .Events        []CalendarWeekEvent
     .DayURL        string         — URL to navigate to day view
+    .NewEventURL   string         — base drawer URL; appended with "&at=HH:MM" per slot
 
 CalendarHour:
     .Hour   int    — 0–23
@@ -135,6 +136,71 @@ CalendarWeekEvent:
                     <div class="calendar-slot-line" style="top: {{printf "%.4f" $offsetPct}}%;"></div>
                     {{end}}
                 </div>
+
+                {{/* Hourly popover slots — one per hour with two half-hour options */}}
+                {{$colDay := .}}
+                {{$colTotalHours := sub $.HourEnd $.HourStart}}
+                {{$colHourHeight := div 100.0 $colTotalHours}}
+                {{range $.Hours}}
+                {{$offsetPct := mul (div (sub .Hour $.HourStart) $colTotalHours) 100}}
+                {{$hh := printf "%02d" .Hour}}
+                {{$label0 := printf "%s:00" $hh}}
+                {{$label30 := printf "%s:30" $hh}}
+                <div
+                    class="calendar-slot-popover"
+                    style="top: {{printf "%.4f" $offsetPct}}%; height: {{printf "%.4f" $colHourHeight}}%;"
+                    data-popover
+                    data-popover-position="bottom"
+                    data-popover-align="start"
+                    data-popover-trigger="click"
+                    data-popover-offset="4">
+                    <div class="calendar-slot-popover-trigger popover-trigger"
+                         role="button"
+                         aria-label="New event at {{.Label}} on {{$colDay.DayName}} {{$colDay.Date.Month}}/{{$colDay.Date.Day}}"
+                         tabindex="0"></div>
+                    <div class="popover-panel calendar-cell-popover" role="menu"
+                         aria-label="Slot actions">
+                        <div class="popover-arrow" aria-hidden="true"></div>
+                        {{if $colDay.DayURL}}
+                        <a
+                            class="calendar-cell-popover-action"
+                            role="menuitem"
+                            href="{{$colDay.DayURL}}"
+                            hx-get="{{$colDay.DayURL}}"
+                            hx-target="{{$target}}"
+                            hx-swap="outerHTML"
+                            hx-push-url="true">
+                            {{template "icon-calendar" .}}
+                            <span>View day</span>
+                        </a>
+                        {{end}}
+                        {{if $colDay.NewEventURL}}
+                        <a
+                            class="calendar-cell-popover-action"
+                            role="menuitem"
+                            href="{{$colDay.NewEventURL}}&at={{$label0}}"
+                            hx-get="{{$colDay.NewEventURL}}&at={{$label0}}"
+                            hx-target="#sheetContent"
+                            hx-swap="innerHTML"
+                            onclick="if(window.lf&&window.lf.Sheet){window.lf.Sheet.open();}">
+                            {{template "icon-plus" .}}
+                            <span>New event at {{$label0}}</span>
+                        </a>
+                        <a
+                            class="calendar-cell-popover-action"
+                            role="menuitem"
+                            href="{{$colDay.NewEventURL}}&at={{$label30}}"
+                            hx-get="{{$colDay.NewEventURL}}&at={{$label30}}"
+                            hx-target="#sheetContent"
+                            hx-swap="innerHTML"
+                            onclick="if(window.lf&&window.lf.Sheet){window.lf.Sheet.open();}">
+                            {{template "icon-plus" .}}
+                            <span>New event at {{$label30}}</span>
+                        </a>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
 
                 {{/* Events */}}
                 {{range .Events}}

@@ -827,6 +827,52 @@
 }
 
 /* ==========================================================================
+   EVENT TAG INDICATORS
+   ==========================================================================
+   Tag colored dots render inline after the chip/event name. Up to 3 dots,
+   with a "+N" overflow badge for longer tag lists. Dot background colors
+   come from the tag record and are applied via inline style (hex). The
+   primary tag's color drives a 4px left stripe on week/day event blocks,
+   also via inline style (see calendar-event-chip.html).
+   ========================================================================== */
+
+.calendar-event-chip__tags {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1, 2px);
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.calendar-event-chip__dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-round);
+    flex-shrink: 0;
+    /* background-color set via inline style from tag.Color */
+}
+
+.calendar-event-chip__overflow {
+    font-size: 10px;
+    color: var(--color-text-muted, #6b7280);
+    background: var(--color-surface-muted, #f3f4f6);
+    padding: 0 4px;
+    border-radius: 4px;
+    line-height: 1.4;
+    font-weight: var(--font-weight-medium);
+}
+
+/* Week/day event blocks carry their stripe via inline border-left. Since the
+   existing .calendar-event--confirmed|tentative|cancelled rules already set a
+   border-left using --border-width-accent, an inline border-left wins by
+   specificity order (inline style beats class rule). Nudge the inner padding
+   slightly so the stripe doesn't crowd the event name. */
+.calendar-event[style*="border-left"] {
+    padding-left: 6px;
+}
+
+/* ==========================================================================
    REDUCED MOTION
    ========================================================================== */
 

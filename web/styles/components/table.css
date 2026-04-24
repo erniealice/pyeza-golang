@@ -2399,6 +2399,13 @@ body.density-comfortable .action-buttons {
     display: flex;
 }
 
+/* Hide the per-row Actions column while the bulk toolbar is engaged —
+   bulk operations replace single-row actions. */
+.table-card[data-bulk-mode="true"] .actions-column,
+.table-card[data-bulk-mode="true"] .actions-cell {
+    display: none;
+}
+
 /* Bulk Toolbar Left Side */
 .bulk-toolbar-left {
     display: flex;

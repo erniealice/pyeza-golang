@@ -27,12 +27,14 @@ CalendarWeek:
     .Days []CalendarDay
 
 CalendarDay:
-    .Date         CalendarDate — {Year, Month, Day}
-    .IsToday      bool
-    .IsOtherMonth bool
-    .Events       []CalendarEvent — shown in order; first 3 rendered as chips
-    .MoreCount    int  — events beyond the 3 visible (>0 shows "+N more")
-    .DayURL       string — URL for navigating to day view when cell is clicked
+    .Date          CalendarDate — {Year, Month, Day}
+    .IsToday       bool
+    .IsOtherMonth  bool
+    .Events        []CalendarEvent — shown in order; first 3 rendered as chips
+    .MoreCount     int  — events beyond the 3 visible (>0 shows "+N more")
+    .DayURL        string — URL for navigating to day view when cell is clicked
+    .NewEventURL   string — URL for the drawer "new event" action (empty to hide)
+    .SuggestedTime string — "HH:MM" label shown after "New event at …"
 
 CalendarEvent:
     .ID        string
@@ -96,37 +98,80 @@ CalendarEvent:
             tabindex="0"
             aria-label="{{.Date.Month}}/{{.Date.Day}}/{{.Date.Year}}{{if .IsToday}}, today{{end}}{{if gt (len .Events) 0}}, {{len .Events}} event{{if gt (len .Events) 1}}s{{end}}{{end}}"
             data-date="{{printf "%04d-%02d-%02d" .Date.Year .Date.Month .Date.Day}}"
-            {{if .DayURL}}
-            data-url="{{.DayURL}}"
-            hx-get="{{.DayURL}}"
-            hx-target="{{$target}}"
-            hx-swap="outerHTML"
-            hx-push-url="true"
-            {{end}}>
+            data-popover
+            data-popover-position="bottom"
+            data-popover-align="start"
+            data-popover-trigger="click"
+            data-popover-offset="6">
 
-            {{/* Date number */}}
-            <span class="calendar-cell-date" aria-hidden="true">{{.Date.Day}}</span>
+            {{/* Cell body — acts as the popover trigger */}}
+            <div class="calendar-cell-body popover-trigger" role="button"
+                 aria-label="Open actions for {{.Date.Month}}/{{.Date.Day}}/{{.Date.Year}}">
 
-            {{/* Event chips — first 3 */}}
-            {{range $i, $ev := .Events}}
-            {{if lt $i 3}}
-            {{template "calendar-event-chip" $ev}}
-            {{end}}
-            {{end}}
+                {{/* Date number */}}
+                <span class="calendar-cell-date" aria-hidden="true">{{.Date.Day}}</span>
 
-            {{/* Overflow link */}}
-            {{if gt .MoreCount 0}}
-            <a
-                class="calendar-more-link"
-                href="{{.DayURL}}"
-                aria-label="{{.MoreCount}} more events on {{.Date.Month}}/{{.Date.Day}}"
-                hx-get="{{.DayURL}}"
-                hx-target="{{$target}}"
-                hx-swap="outerHTML"
-                hx-push-url="true">
-                +{{.MoreCount}} more
-            </a>
-            {{end}}
+                {{/* Event chips — first 3 */}}
+                {{range $i, $ev := .Events}}
+                {{if lt $i 3}}
+                {{template "calendar-event-chip" $ev}}
+                {{end}}
+                {{end}}
+
+                {{/* Overflow indicator (non-interactive inside trigger) */}}
+                {{if gt .MoreCount 0}}
+                <span class="calendar-more-link" aria-hidden="true">+{{.MoreCount}} more</span>
+                {{end}}
+            </div>
+
+            {{/* Floating action panel */}}
+            <div class="popover-panel calendar-cell-popover" role="menu"
+                 aria-label="Day actions">
+                <div class="popover-arrow" aria-hidden="true"></div>
+
+                {{if .DayURL}}
+                <a
+                    class="calendar-cell-popover-action"
+                    role="menuitem"
+                    href="{{.DayURL}}"
+                    hx-get="{{.DayURL}}"
+                    hx-target="{{$target}}"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
+                    {{template "icon-calendar" .}}
+                    <span>View day</span>
+                </a>
+                {{end}}
+
+                {{if and .NewEventURL (not .IsOtherMonth)}}
+                <a
+                    class="calendar-cell-popover-action"
+                    role="menuitem"
+                    href="{{.NewEventURL}}"
+                    hx-get="{{.NewEventURL}}"
+                    hx-target="#sheetContent"
+                    hx-swap="innerHTML"
+                    onclick="if(window.lf&&window.lf.Sheet){window.lf.Sheet.open();}">
+                    {{template "icon-plus" .}}
+                    <span>New event{{if .SuggestedTime}} at {{.SuggestedTime}}{{end}}</span>
+                </a>
+                {{end}}
+
+                {{if gt .MoreCount 0}}
+                <a
+                    class="calendar-cell-popover-action calendar-cell-popover-action--muted"
+                    role="menuitem"
+                    href="{{.DayURL}}"
+                    aria-label="{{.MoreCount}} more events on {{.Date.Month}}/{{.Date.Day}}"
+                    hx-get="{{.DayURL}}"
+                    hx-target="{{$target}}"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
+                    {{template "icon-more-vertical" .}}
+                    <span>+{{.MoreCount}} more</span>
+                </a>
+                {{end}}
+            </div>
 
         </div>
         {{end}}

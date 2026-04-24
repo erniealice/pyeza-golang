@@ -243,6 +243,92 @@
         setView:           setView
     };
 
+    // ========================================
+    // SUGGESTED-TIME HELPER
+    // ========================================
+
+    var BUSINESS_HOUR_START = 9;    // 09:00
+    var BUSINESS_HOUR_END   = 18;   // 18:00 (cap — past this, suggest 09:00)
+
+    /**
+     * Pads a number to two digits (string).
+     */
+    function pad2(n) {
+        n = Math.floor(n);
+        return (n < 10 ? '0' : '') + n;
+    }
+
+    /**
+     * Suggest a start time ("HH:MM") for a new event on `dateStr` (YYYY-MM-DD).
+     *
+     * - If `dateStr` is today:  round `new Date()` UP to the next half-hour.
+     *                           If the rounded time is past BUSINESS_HOUR_END,
+     *                           return "09:00" (caller may re-interpret for tomorrow).
+     * - If `dateStr` is past:   return "09:00".
+     * - If `dateStr` is future: return "09:00".
+     */
+    function suggestStartTime(dateStr) {
+        if (!dateStr || typeof dateStr !== 'string') {
+            return pad2(BUSINESS_HOUR_START) + ':00';
+        }
+
+        // Parse YYYY-MM-DD as a local-day (not UTC midnight).
+        var parts = dateStr.split('-');
+        if (parts.length !== 3) {
+            return pad2(BUSINESS_HOUR_START) + ':00';
+        }
+        var y = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10);
+        var d = parseInt(parts[2], 10);
+        if (isNaN(y) || isNaN(m) || isNaN(d)) {
+            return pad2(BUSINESS_HOUR_START) + ':00';
+        }
+
+        var target = new Date(y, m - 1, d);
+        var today  = new Date();
+        var todayY = today.getFullYear();
+        var todayM = today.getMonth();
+        var todayD = today.getDate();
+
+        var isToday = (target.getFullYear() === todayY &&
+                       target.getMonth()    === todayM &&
+                       target.getDate()     === todayD);
+
+        if (!isToday) {
+            // Past or future dates: business-hour start.
+            return pad2(BUSINESS_HOUR_START) + ':00';
+        }
+
+        // Today: round UP to the next half-hour boundary.
+        var h = today.getHours();
+        var mm = today.getMinutes();
+        if (mm === 0) {
+            // Already on an hour — do nothing.
+        } else if (mm <= 30) {
+            mm = 30;
+        } else {
+            mm = 0;
+            h += 1;
+        }
+        if (h >= 24) {
+            h = 0;
+            mm = 0;
+        }
+
+        // If we've rounded past business hours, fall back to 09:00.
+        if (h >= BUSINESS_HOUR_END) {
+            return pad2(BUSINESS_HOUR_START) + ':00';
+        }
+        // If current time is before business hours, prefer 09:00 too.
+        if (h < BUSINESS_HOUR_START) {
+            return pad2(BUSINESS_HOUR_START) + ':00';
+        }
+        return pad2(h) + ':' + pad2(mm);
+    }
+
+    window.lf.calendar = window.lf.calendar || {};
+    window.lf.calendar.suggestStartTime = suggestStartTime;
+
     // Auto-init on DOMContentLoaded
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

@@ -32,15 +32,44 @@
         "Required" true
         "NoResults" "No customers found"
     }}
-    SearchURL should accept ?q=searchterm and return JSON:
-    [{"value": "id-1", "label": "Display Name"}, ...]
+    SearchURL should accept ?q=searchterm and return JSON in one of two shapes:
+      Flat:    [{"value": "id-1", "label": "Display Name"}, ...]
+      Grouped: [{"group": "Schedule A", "options": [{"value": "...", "label": "..."}]}, ...]
+    Mode detection for the response is automatic: if the first entry has an
+    "options" array it is treated as grouped.
 
-    Mode detection: SearchURL present → action/search mode, otherwise → filter mode.
+    Mode 3: Grouped filter (client-side, OptionGroups provided)
+    {{template "auto-complete" dict
+        "ID" "price-plan-select"
+        "Name" "price_plan_id"
+        "Label" "Price Plan"
+        "Placeholder" "Select price plan..."
+        "SearchPlaceholder" "Filter..."
+        "OptionGroups" .PricePlanGroups
+        "Value" .PricePlanID
+        "SelectedLabel" .PricePlanLabel
+    }}
+    OptionGroups format: []SelectOptionGroup { GroupLabel; Options []SelectOption }
+    Group headers stay visible while any child option matches the filter.
+
+    Mode detection: SearchURL present → action/search mode; OptionGroups
+    present → grouped filter mode; otherwise → flat filter mode.
 */}}
 <div class="form-group">
     {{if .Label}}
     <label class="form-label" id="{{.ID}}-label" for="{{.ID}}-search">
         {{.Label}}{{if .Required}} <span class="form-required" aria-hidden="true">*</span>{{end}}
+        {{if .Info}}
+        <span class="form-label-info" data-popover data-popover-trigger="hover click" data-popover-position="top">
+            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" tabindex="0">
+                {{template "icon-info"}}
+            </button>
+            <div class="popover-panel form-label-info-panel" role="tooltip">
+                <div class="popover-arrow"></div>
+                {{.Info}}
+            </div>
+        </span>
+        {{end}}
     </label>
     {{end}}
 
@@ -75,7 +104,20 @@
                        placeholder="{{.SearchPlaceholder}}" autocomplete="off">
             </div>
             <div class="auto-complete-results">
-                {{if .Options}}
+                {{if .OptionGroups}}
+                {{range .OptionGroups}}
+                {{$groupLabel := .GroupLabel}}
+                <div class="auto-complete-group" data-group-label="{{$groupLabel}}">
+                    <div class="auto-complete-group-header" role="presentation">{{$groupLabel}}</div>
+                    {{range .Options}}
+                    <div class="auto-complete-option{{if .Selected}} selected{{end}}{{if .Disabled}} disabled{{end}}"
+                         data-value="{{.Value}}" data-label="{{.Label}}" data-description="{{.Description}}" data-group="{{$groupLabel}}" role="option"{{if .Disabled}} aria-disabled="true"{{end}}>
+                        {{.Label}}
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+                {{else if .Options}}
                 {{range .Options}}
                 <div class="auto-complete-option{{if .Selected}} selected{{end}}{{if .Disabled}} disabled{{end}}"
                      data-value="{{.Value}}" data-label="{{.Label}}" data-description="{{.Description}}" role="option"{{if .Disabled}} aria-disabled="true"{{end}}>
@@ -126,6 +168,20 @@
 
     // In filter mode, cache the pre-rendered options for client-side filtering
     const allOptions = isActionMode ? [] : Array.from(results.querySelectorAll('.auto-complete-option'));
+    // Cache group wrappers so we can hide a whole group (header + options) when
+    // none of its children match. Present in filter mode when OptionGroups is
+    // used, and (re)populated in action mode after a grouped response renders.
+    let allGroups = isActionMode ? [] : Array.from(results.querySelectorAll('.auto-complete-group'));
+
+    function updateGroupVisibility() {
+        allGroups.forEach(function(group) {
+            var anyVisible = Array.prototype.some.call(
+                group.querySelectorAll('.auto-complete-option'),
+                function(opt) { return !opt.classList.contains('hidden'); }
+            );
+            group.classList.toggle('hidden', !anyVisible);
+        });
+    }
 
     function updateDescription(value) {
         if (!descriptionEl || isActionMode) return;
@@ -197,6 +253,9 @@
             allOptions.forEach(function(opt) {
                 opt.classList.remove('hidden');
             });
+            allGroups.forEach(function(group) {
+                group.classList.remove('hidden');
+            });
             emptyState.classList.remove('visible');
         }
 
@@ -242,18 +301,45 @@
                     return;
                 }
 
+                // Grouped shape: [{group, options: [...]}]. Flat: [{value,label}].
+                var grouped = data[0] && Array.isArray(data[0].options);
                 var html = '';
-                for (var i = 0; i < data.length; i++) {
-                    var item = data[i];
-                    var sel = item.value === hiddenInput.value ? ' selected' : '';
-                    html += '<div class="auto-complete-option' + sel + '" '
-                        + 'data-value="' + escapeHTML(item.value) + '" '
-                        + 'data-label="' + escapeHTML(item.label) + '" '
-                        + 'role="option">'
-                        + escapeHTML(item.label)
-                        + '</div>';
+                if (grouped) {
+                    for (var g = 0; g < data.length; g++) {
+                        var grp = data[g];
+                        var groupLabel = grp.group || '';
+                        html += '<div class="auto-complete-group" data-group-label="' + escapeHTML(groupLabel) + '">'
+                            + '<div class="auto-complete-group-header" role="presentation">'
+                            + escapeHTML(groupLabel)
+                            + '</div>';
+                        var opts = grp.options || [];
+                        for (var j = 0; j < opts.length; j++) {
+                            var opt = opts[j];
+                            var selG = opt.value === hiddenInput.value ? ' selected' : '';
+                            html += '<div class="auto-complete-option' + selG + '" '
+                                + 'data-value="' + escapeHTML(opt.value) + '" '
+                                + 'data-label="' + escapeHTML(opt.label) + '" '
+                                + 'data-group="' + escapeHTML(groupLabel) + '" '
+                                + 'role="option">'
+                                + escapeHTML(opt.label)
+                                + '</div>';
+                        }
+                        html += '</div>';
+                    }
+                } else {
+                    for (var i = 0; i < data.length; i++) {
+                        var item = data[i];
+                        var sel = item.value === hiddenInput.value ? ' selected' : '';
+                        html += '<div class="auto-complete-option' + sel + '" '
+                            + 'data-value="' + escapeHTML(item.value) + '" '
+                            + 'data-label="' + escapeHTML(item.label) + '" '
+                            + 'role="option">'
+                            + escapeHTML(item.label)
+                            + '</div>';
+                    }
                 }
                 results.innerHTML = html;
+                allGroups = Array.from(results.querySelectorAll('.auto-complete-group'));
 
                 // Attach click handlers to dynamically created options
                 results.querySelectorAll('.auto-complete-option').forEach(function(opt) {
@@ -283,6 +369,7 @@
             if (matches) visibleCount++;
         });
 
+        updateGroupVisibility();
         emptyState.classList.toggle('visible', visibleCount === 0);
         focusedIndex = -1;
     }

@@ -52,6 +52,37 @@
                 }
             }
 
+            // Handle Clone / Duplicate button
+            // Reuses the Edit URL but appends ?clone=1 so the server returns a
+            // drawer form pre-populated from the source record, with FormAction
+            // pointing at AddURL and the name field suffixed " (Copy)".
+            const cloneBtn = e.target.closest('.action-btn[data-action="clone"], .action-dropdown-item[data-action="clone"]');
+            if (cloneBtn) {
+                if (isDisabled(cloneBtn)) { e.preventDefault(); return; }
+                e.preventDefault();
+                const id = cloneBtn.dataset.id;
+                const cloneUrl = cloneBtn.dataset.cloneUrl;
+                const drawerTitle = cloneBtn.dataset.drawerTitle || 'Duplicate';
+
+                if (!cloneUrl || !id) {
+                    console.warn('Clone button missing data-clone-url or data-id');
+                    return;
+                }
+
+                const url = cloneUrl + (cloneUrl.includes('?') ? '&' : '?') + 'clone=1';
+
+                if (typeof htmx !== 'undefined') {
+                    htmx.ajax('GET', url, {
+                        target: '#sheetContent',
+                        swap: 'innerHTML'
+                    });
+                }
+
+                if (lf.Sheet) {
+                    lf.Sheet.open(drawerTitle);
+                }
+            }
+
             // Handle Delete button
             const deleteBtn = e.target.closest('.action-btn[data-action="delete"]');
             if (deleteBtn) {

@@ -382,6 +382,10 @@ type ActionLabels struct {
 	Deactivate string `json:"deactivate"`
 	Approve    string `json:"approve"`
 	Export     string `json:"export"`
+	// CopySuffix feeds the flat-message key "actions.copySuffix" consumed by
+	// view.ViewContext.CopySuffix(); keep it on the struct so the lyngua
+	// audit tooling reports missing translations.
+	CopySuffix string `json:"copySuffix"`
 }
 
 type BulkLabels struct {
@@ -464,4 +468,12 @@ type DurationUnitLabels struct {
 	YearSingular  string `json:"yearSingular"`
 	YearPlural    string `json:"yearPlural"`
 	YearSelect    string `json:"yearSelect"`
+}
+
+// CurrencyOptionLabels holds the translated display names for each supported
+// currency code. Loaded from translations/en/common/common.json under the
+// "currency" key. Used by centymo.BuildCurrencyOptions via CurrencyLabelsFromCommon.
+type CurrencyOptionLabels struct {
+	PHP string `json:"php"`
+	USD string `json:"usd"`
 }

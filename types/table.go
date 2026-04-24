@@ -84,6 +84,15 @@ type SelectOption struct {
 	//        the `disabled` class + aria-disabled on the option entry.
 }
 
+// SelectOptionGroup bundles a set of SelectOptions under a shared header.
+// Passed to the auto-complete component via the OptionGroups param; each group
+// renders a non-selectable header above its options. Group headers stay
+// visible as long as at least one child option matches the active filter.
+type SelectOptionGroup struct {
+	GroupLabel string         // Header text shown above the group's options
+	Options    []SelectOption // Options belonging to this group
+}
+
 // PersonData holds a single person's display info for person cell types
 type PersonData struct {
 	Name     string // Full name (first + last)

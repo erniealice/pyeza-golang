@@ -2,8 +2,13 @@
 ================================================================================
 CALENDAR EVENT CHIP COMPONENT
 ================================================================================
-Small event indicator used inside month-view day cells.
-Renders a colored dot + truncated event name, status-coded.
+Small event indicator used inside month-view day cells. Optionally also used as
+the canonical renderer for week/day-view event blocks when the caller passes
+positioning fields (.TopPct / .HeightPct).
+
+Renders a colored dot + truncated event name, status-coded. Optional tag dots
+(up to 3) appear to the right of the name; when a primary tag is present in
+week/day mode, a 4px left stripe in the tag's color is applied inline.
 
 Usage:
     {{template "calendar-event-chip" .}}
@@ -12,27 +17,98 @@ Required data (CalendarEvent):
     .ID        string  — unique event ID
     .Name      string  — event display name
     .StartTime string  — "10:00 AM"
+    .EndTime   string  — "11:00 AM" (used by week/day variant's tooltip/aria)
     .Status    string  — "confirmed" | "tentative" | "cancelled"
     .DetailURL string  — URL to navigate to on click
 
 Optional data:
-    .HXTarget  string  — HTMX swap target (defaults to "#main-content")
+    .HXTarget  string  — HTMX swap target (defaults to "#main-content" in
+                         month mode; "#calendar" in week/day mode)
+    .Tags      []{Name,Color} — tags assigned to the event, ordered by
+                         assignment position. Color is a hex string like
+                         "#E53E3E". When empty, chip renders exactly as before
+                         — no dots, no stripe, no behavioral change. Up to 3
+                         dots are rendered; beyond that, 2 dots + "+N" badge.
+                         Tag names are folded into the chip's aria-label for
+                         screen readers.
+    .TopPct    float64 — week/day variant: absolute offset from column top (%)
+    .HeightPct float64 — week/day variant: height as % of visible hours
+    .IsCompact bool    — week/day variant: single-line compact rendering
 ================================================================================
 */}}
 
 {{define "calendar-event-chip"}}
-{{$target := "#main-content"}}
-{{if .HXTarget}}{{$target = .HXTarget}}{{end}}
-<a
-    class="calendar-event-chip calendar-event-chip--{{.Status}}"
-    href="{{.DetailURL}}"
-    title="{{.Name}} — {{.StartTime}}"
-    aria-label="{{.Name}}, {{.StartTime}}, {{.Status}}"
-    hx-get="{{.DetailURL}}"
-    hx-target="{{$target}}"
-    hx-swap="innerHTML"
-    hx-push-url="true">
-    <span class="calendar-event-chip-dot" aria-hidden="true"></span>
-    <span class="calendar-event-chip-name">{{.Name}}</span>
-</a>
+{{/* Detect week/day-view variant by presence of a non-zero height. */}}
+{{$isTimed := gt .HeightPct 0.0}}
+
+{{/* Build a tag-name suffix for aria-label when tags are present. */}}
+{{$tagNames := ""}}
+{{range $i, $tag := .Tags}}
+    {{if eq $i 0}}{{$tagNames = $tag.Name}}{{else}}{{$tagNames = printf "%s, %s" $tagNames $tag.Name}}{{end}}
+{{end}}
+
+{{if $isTimed}}
+    {{/* ── Week / Day variant ─────────────────────────────────────────── */}}
+    {{$target := "#calendar"}}
+    {{if .HXTarget}}{{$target = .HXTarget}}{{end}}
+    {{$stripeColor := ""}}
+    {{if gt (len .Tags) 0}}{{$stripeColor = (index .Tags 0).Color}}{{end}}
+    <a
+        class="calendar-event calendar-event--{{.Status}}{{if .IsCompact}} calendar-event--compact{{end}}"
+        href="{{.DetailURL}}"
+        title="{{.Name}} · {{.StartTime}}–{{.EndTime}}"
+        aria-label="{{.Name}}, {{.StartTime}} to {{.EndTime}}, {{.Status}}{{if $tagNames}}, tagged {{$tagNames}}{{end}}"
+        style="top: {{printf "%.4f" .TopPct}}%; height: {{printf "%.4f" .HeightPct}}%;{{if $stripeColor}} border-left: 4px solid {{$stripeColor}};{{end}}"
+        hx-get="{{.DetailURL}}"
+        hx-target="{{$target}}"
+        hx-swap="innerHTML"
+        hx-push-url="true">
+        <span class="calendar-event-name">{{.Name}}</span>
+        <span class="calendar-event-time">{{.StartTime}}{{if .EndTime}}–{{.EndTime}}{{end}}</span>
+        {{if gt (len .Tags) 0}}
+        <span class="calendar-event-chip__tags" aria-hidden="true">
+            {{range $i, $tag := .Tags}}
+                {{if lt $i 3}}
+                <span class="calendar-event-chip__dot" style="background-color: {{$tag.Color}};"></span>
+                {{end}}
+            {{end}}
+            {{if gt (len .Tags) 3}}
+            <span class="calendar-event-chip__overflow">+{{sub (len .Tags) 2}}</span>
+            {{end}}
+        </span>
+        {{end}}
+    </a>
+{{else}}
+    {{/* ── Month variant ──────────────────────────────────────────────── */}}
+    {{$target := "#main-content"}}
+    {{if .HXTarget}}{{$target = .HXTarget}}{{end}}
+    <a
+        class="calendar-event-chip calendar-event-chip--{{.Status}}"
+        href="{{.DetailURL}}"
+        title="{{.Name}} — {{.StartTime}}"
+        aria-label="{{.Name}}, {{.StartTime}}, {{.Status}}{{if $tagNames}}, tagged {{$tagNames}}{{end}}"
+        hx-get="{{.DetailURL}}"
+        hx-target="{{$target}}"
+        hx-swap="innerHTML"
+        hx-push-url="true">
+        <span class="calendar-event-chip-dot" aria-hidden="true"></span>
+        <span class="calendar-event-chip-name">{{.Name}}</span>
+        {{if gt (len .Tags) 0}}
+        <span class="calendar-event-chip__tags" aria-hidden="true">
+            {{if gt (len .Tags) 3}}
+                {{range $i, $tag := .Tags}}
+                    {{if lt $i 2}}
+                    <span class="calendar-event-chip__dot" style="background-color: {{$tag.Color}};"></span>
+                    {{end}}
+                {{end}}
+                <span class="calendar-event-chip__overflow">+{{sub (len .Tags) 2}}</span>
+            {{else}}
+                {{range .Tags}}
+                <span class="calendar-event-chip__dot" style="background-color: {{.Color}};"></span>
+                {{end}}
+            {{end}}
+        </span>
+        {{end}}
+    </a>
+{{end}}
 {{end}}
