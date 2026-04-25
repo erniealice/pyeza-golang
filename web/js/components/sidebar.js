@@ -250,16 +250,16 @@
         document.body.style.overflow = '';
     }
 
-    if (mobileToggle) {
-        mobileToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (sidebar.classList.contains('mobile-open')) {
-                closeMobileSidebar();
-            } else {
-                openMobileSidebar();
-            }
-        });
-    }
+    // #mobileMenuToggle lives inside #page-header which is OOB-swapped on every
+    // HTMX navigation — use document delegation so the handler survives swaps.
+    lf.on('click', '#mobileMenuToggle', function(e) {
+        e.stopPropagation();
+        if (sidebar && sidebar.classList.contains('mobile-open')) {
+            closeMobileSidebar();
+        } else {
+            openMobileSidebar();
+        }
+    });
 
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener('click', closeMobileSidebar);

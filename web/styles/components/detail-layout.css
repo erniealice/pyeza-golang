@@ -72,6 +72,16 @@
     flex-direction: column;
     overflow: hidden;
 }
+.detail-tab-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+.detail-tab-actions--bottom {
+    flex-shrink: 0;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: var(--border-width) solid var(--border);
+}
 
 @media (max-width: 768px) {
     .detail-body { padding: var(--spacing-xl); }

@@ -5,9 +5,6 @@
 (function() {
     'use strict';
 
-    // DOM Elements (will be fetched fresh via getElements)
-    const tabs = document.querySelectorAll('.notification-tab');
-
     // State
     let notifications = [];
     let currentFilter = 'all';
@@ -289,98 +286,70 @@
     }
 
     /**
-     * Get fresh references to DOM elements (for OOB swap handling)
+     * Get fresh references to DOM elements
      */
     function getElements() {
         return {
-            bellButton: document.querySelector('.header-btn[aria-label="Notifications"]'),
             drawer: document.getElementById('notificationDrawer'),
             overlay: document.getElementById('notificationOverlay'),
-            closeBtn: document.getElementById('notificationCloseBtn'),
-            markAllBtn: document.getElementById('markAllRead'),
             loadingEl: document.getElementById('notificationLoading'),
             emptyEl: document.getElementById('notificationEmpty'),
             itemsContainer: document.getElementById('notificationItems')
         };
     }
 
-    /**
-     * Initialize event listeners
-     */
-    function initEventListeners() {
-        const els = getElements();
+    // ============================================================
+    // Document-level event delegation — survives HTMX OOB swaps.
+    // #notificationBtn lives in #page-header which is OOB-swapped on
+    // every navigation; per-element binding dies with the old node.
+    // lf.on() binds once on document and matches via closest().
+    // ============================================================
 
-        // Bell button click
-        if (els.bellButton && !els.bellButton._notificationDrawerInitialized) {
-            els.bellButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                toggleDrawer();
-            });
-            els.bellButton._notificationDrawerInitialized = true;
-        }
+    // Bell button (in OOB-swapped #page-header — MUST use delegation)
+    lf.on('click', '#notificationBtn', function(e) {
+        e.preventDefault();
+        toggleDrawer();
+    });
 
-        // Close button click
-        if (els.closeBtn && !els.closeBtn._notificationDrawerInitialized) {
-            els.closeBtn.addEventListener('click', closeDrawer);
-            els.closeBtn._notificationDrawerInitialized = true;
-        }
+    // Close button (fixed portal, delegation for idiom consistency)
+    lf.on('click', '#notificationCloseBtn', closeDrawer);
 
-        // Overlay click
-        if (els.overlay && !els.overlay._notificationDrawerInitialized) {
-            els.overlay.addEventListener('click', closeDrawer);
-            els.overlay._notificationDrawerInitialized = true;
-        }
+    // Overlay click (fixed portal, delegation for idiom consistency)
+    lf.on('click', '#notificationOverlay', closeDrawer);
 
-        // Mark all read button
-        if (els.markAllBtn && !els.markAllBtn._notificationDrawerInitialized) {
-            els.markAllBtn.addEventListener('click', markAllAsRead);
-            els.markAllBtn._notificationDrawerInitialized = true;
-        }
+    // Mark all read (fixed portal, delegation for idiom consistency)
+    lf.on('click', '#markAllRead', markAllAsRead);
 
-        // Tab clicks (only attach if not already done)
-        tabs.forEach(tab => {
-            if (!tab._notificationDrawerInitialized) {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilter = this.dataset.filter;
-                    renderNotifications();
-                });
-                tab._notificationDrawerInitialized = true;
-            }
+    // Tab clicks (fixed portal, delegation matches .notification-tab)
+    lf.on('click', '.notification-tab', function() {
+        document.querySelectorAll('.notification-tab').forEach(function(t) {
+            t.classList.remove('active');
         });
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        renderNotifications();
+    });
 
-        // Escape key to close (only attach once)
-        if (!document._notificationDrawerEscapeInitialized) {
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && isOpen) {
-                    closeDrawer();
-                }
-            });
-            document._notificationDrawerEscapeInitialized = true;
+    // Escape key to close
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isOpen) {
+            closeDrawer();
         }
-    }
+    });
 
     /**
-     * Initialize
+     * Initialize — fetch initial badge count on page load.
+     * No event wiring needed here (all handled by lf.on above).
      */
     function init() {
-        const els = getElements();
-        if (!els.drawer || !els.overlay) {
-            console.warn('Notification drawer elements not found');
-            return;
-        }
-
-        initEventListeners();
-
         // Fetch initial badge count (without opening drawer)
         fetch('/api/notifications')
-            .then(response => response.json())
-            .then(data => {
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
                 notifications = data.notifications || [];
                 updateBadge();
             })
-            .catch(() => {});
+            .catch(function() {});
     }
 
     // Initialize when DOM is ready
@@ -389,14 +358,6 @@
     } else {
         init();
     }
-
-    // Periodic check to re-attach event listeners after OOB swaps
-    setInterval(function() {
-        const els = getElements();
-        if (els.drawer) {
-            initEventListeners();
-        }
-    }, 100);
 
     // Expose API for external use
     window.lf = window.lf || {};

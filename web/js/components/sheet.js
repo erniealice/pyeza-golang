@@ -206,31 +206,49 @@
     }
 
     /**
-     * Show error message in the drawer
+     * Show error message in the drawer.
+     *
+     * Renders the same markup as the Go-side `alert` component so existing
+     * alert.css styles apply uniformly. Sticky — does NOT auto-dismiss.
+     * htmx:afterSwap calls hideError() when fresh form content loads, which
+     * is the right time to clear: a successful retry replaces the form.
+     *
      * @param {string} message - The error message to display
      */
     function showError(message) {
         const content = getContent();
         if (!content) return;
 
-        // Look for existing error element or create one
-        let errorEl = content.querySelector('.form-drawer-error');
+        // Replace any existing alert so re-renders show the latest message.
+        const existing = content.querySelector('.sheet-error-alert');
+        if (existing) existing.remove();
 
-        if (!errorEl) {
-            errorEl = document.createElement('div');
-            errorEl.className = 'form-drawer-error';
-            // P2: announce errors immediately as an alert
-            errorEl.setAttribute('role', 'alert');
-            content.insertBefore(errorEl, content.firstChild);
-        }
+        const alertEl = document.createElement('div');
+        alertEl.className = 'alert alert-error alert-subtle sheet-error-alert';
+        alertEl.setAttribute('role', 'alert');
 
-        errorEl.textContent = message;
-        errorEl.classList.add('visible');
+        // Match the Go alert template's DOM: .alert-icon + .alert-body{.alert-title,.alert-message} + .alert-dismiss.
+        alertEl.innerHTML = [
+            '<div class="alert-icon">',
+            '  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',
+            '    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+            '  </svg>',
+            '</div>',
+            '<div class="alert-body">',
+            '  <div class="alert-message"></div>',
+            '</div>',
+            '<button type="button" class="alert-dismiss" aria-label="Dismiss alert">',
+            '  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',
+            '    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+            '  </svg>',
+            '</button>'
+        ].join('');
 
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-            errorEl.classList.remove('visible');
-        }, 5000);
+        // textContent (not innerHTML) — server-supplied error strings shouldn't get parsed as HTML.
+        alertEl.querySelector('.alert-message').textContent = message;
+        alertEl.querySelector('.alert-dismiss').addEventListener('click', () => alertEl.remove());
+
+        content.insertBefore(alertEl, content.firstChild);
     }
 
     /**
@@ -240,10 +258,8 @@
         const content = getContent();
         if (!content) return;
 
-        const errorEl = content.querySelector('.form-drawer-error');
-        if (errorEl) {
-            errorEl.classList.remove('visible');
-        }
+        const alertEl = content.querySelector('.sheet-error-alert');
+        if (alertEl) alertEl.remove();
     }
 
     /**

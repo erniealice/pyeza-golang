@@ -29,10 +29,12 @@
     {{/* Theme Switcher Script */}}
     <script src="/assets/js/theme-switcher.js?v={{.CacheVersion}}"></script>
 
-    {{/* Help Pane Script */}}
-    {{if .HasHelp}}
+    {{/* Help Pane Script — always loaded (not gated on HasHelp).
+         If gated, a user's first full-page load on a HasHelp=false page would never
+         load the script, and subsequent HTMX navigations to a HasHelp=true page
+         (which OOB-swap #helpPane but don't re-render page-end) would have no handler.
+         The script is small and safe to load on every page. */}}
     <script src="/assets/js/pyeza/help-pane.js?v={{.CacheVersion}}"></script>
-    {{end}}
 
     {{/* Toast Container + auto-dismiss script */}}
     {{template "toast-container" .}}

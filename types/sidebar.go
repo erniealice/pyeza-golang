@@ -138,6 +138,7 @@ type SidebarLabels struct {
 	PaidLabel     string `json:"paid_label"`
 	BlockedLabel  string `json:"blocked_label"`
 	OnHoldLabel   string `json:"on_hold_label"`
+	ProspectLabel string `json:"prospect_label"`
 	CompleteLabel string `json:"complete_label"`
 
 	// Purchase nav icons
@@ -153,6 +154,9 @@ type SidebarLabels struct {
 	// Unique nav item labels and icons
 	ClientsActiveIcon         string `json:"clients_active_icon"`
 	ClientsInactiveIcon       string `json:"clients_inactive_icon"`
+	ClientsProspectIcon       string `json:"clients_prospect_icon"`
+	ClientsBlockedIcon        string `json:"clients_blocked_icon"`
+	ClientsOnHoldIcon         string `json:"clients_on_hold_icon"`
 	ClientsTagsLabel          string `json:"clients_tags_label"`
 	ClientsTagsIcon           string `json:"clients_tags_icon"`
 	UsersActiveIcon           string `json:"users_active_icon"`
@@ -329,6 +333,7 @@ func DefaultSidebarLabels() SidebarLabels {
 		PaidLabel:     "Paid",
 		BlockedLabel:  "Blocked",
 		OnHoldLabel:   "On Hold",
+		ProspectLabel: "Prospect",
 		CompleteLabel: "Complete",
 
 		PurchasesPendingIcon:  "icon-clock",
@@ -341,6 +346,9 @@ func DefaultSidebarLabels() SidebarLabels {
 
 		ClientsActiveIcon:         "icon-user-check",
 		ClientsInactiveIcon:       "icon-user-minus",
+		ClientsProspectIcon:       "icon-user-plus",
+		ClientsBlockedIcon:        "icon-x-circle",
+		ClientsOnHoldIcon:         "icon-pause-circle",
 		ClientsTagsLabel:          "Tags",
 		ClientsTagsIcon:           "icon-tag",
 		UsersActiveIcon:           "icon-shield",

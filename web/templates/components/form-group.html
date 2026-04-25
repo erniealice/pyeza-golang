@@ -85,6 +85,38 @@ Wrap form-groups in div.form-row for multi-column layouts:
     <span class="form-char-counter" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-counter" aria-live="polite"></span>
     {{end}}
 
+    {{else if eq .Type "color"}}
+    {{/* ===== COLOR ===== */}}
+    {{/* Pairs a native input[type=color] swatch with a hex text input,
+         kept in sync by `pyeza-color-field.js` (initialized on
+         htmx:afterSwap so drawer-loaded forms also wire up). The text
+         input carries the form name so submissions post the actual hex
+         the user typed/picked, even if browsers normalize the swatch
+         (some lowercase/uppercase). Storing on .form-group via a
+         data-color-field marker lets the JS scope per instance, so
+         multiple color pickers on the same page don't collide. */}}
+    <div class="color-field-row" data-color-field>
+        <input type="color"
+               class="color-field-swatch"
+               data-color-swatch
+               value="{{if .Value}}{{.Value}}{{else}}#000000{{end}}"
+               aria-label="{{if .Label}}{{.Label}} swatch{{else}}Color swatch{{end}}"
+               {{if .Disabled}}disabled{{end}}>
+        <input type="text"
+               class="form-input color-field-hex{{if .Error}} is-invalid{{end}}"
+               data-color-hex
+               {{if or .ID .Name}}id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
+               {{if .Name}}name="{{.Name}}"{{end}}
+               {{if .Value}}value="{{.Value}}"{{end}}
+               {{if .Placeholder}}placeholder="{{.Placeholder}}"{{else}}placeholder="#000000"{{end}}
+               {{if .Required}}required aria-required="true"{{end}}
+               {{if .Disabled}}disabled{{end}}
+               {{if .Readonly}}readonly{{end}}
+               pattern="^#?[0-9A-Fa-f]{6}$"
+               autocomplete="off"
+               {{if .Error}}aria-invalid="true" aria-describedby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-error"{{end}}>
+    </div>
+
     {{else if eq .Type "select"}}
     {{/* ===== SELECT ===== */}}
     <select

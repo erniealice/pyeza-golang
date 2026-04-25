@@ -3,13 +3,20 @@
  *
  * Controls the help pane toggle behavior and keyboard shortcuts.
  * The help pane pushes main content to the left when opened.
- * Handles HTMX OOB swaps to maintain state across navigation.
+ *
+ * Binding model: document-level event delegation. Works across HTMX OOB
+ * swaps of the header (#helpToggleBtn) and the help pane (#helpPane,
+ * #helpPaneClose) without needing to re-attach listeners on every
+ * htmx:afterSwap. Also re-applies the persisted open state from
+ * localStorage on every htmx:afterSettle so an OOB-swapped fresh
+ * #helpPane reflects the previous user choice.
  */
 
 (function() {
     'use strict';
 
-    // Get fresh references to DOM elements
+    var STORAGE_KEY = 'lf-help-pane-open';
+
     function getElements() {
         return {
             helpToggleBtn: document.getElementById('helpToggleBtn'),
@@ -18,160 +25,100 @@
         };
     }
 
-    // Toggle help pane
-    function toggleHelpPane() {
-        const { helpPane } = getElements();
-        if (!helpPane) return;
+    function isOpen() {
+        var helpPane = document.getElementById('helpPane');
+        return !!(helpPane && helpPane.classList.contains('open'));
+    }
 
-        const isOpen = helpPane.classList.contains('open');
-        if (isOpen) {
+    function openHelpPane() {
+        var els = getElements();
+        if (!els.helpPane) return;
+        els.helpPane.classList.add('open');
+        document.body.classList.add('help-pane-open');
+        if (els.helpToggleBtn) {
+            els.helpToggleBtn.classList.add('active');
+            els.helpToggleBtn.setAttribute('aria-expanded', 'true');
+        }
+        localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function closeHelpPane() {
+        var els = getElements();
+        if (!els.helpPane) return;
+        els.helpPane.classList.remove('open');
+        document.body.classList.remove('help-pane-open');
+        if (els.helpToggleBtn) {
+            els.helpToggleBtn.classList.remove('active');
+            els.helpToggleBtn.setAttribute('aria-expanded', 'false');
+        }
+        localStorage.setItem(STORAGE_KEY, 'false');
+    }
+
+    function toggleHelpPane() {
+        if (isOpen()) {
             closeHelpPane();
         } else {
             openHelpPane();
         }
     }
 
-    function openHelpPane() {
-        const { helpToggleBtn, helpPane } = getElements();
-        if (!helpPane) return;
+    // Re-apply persisted open state to whatever #helpPane currently exists.
+    // Called on initial load and after every HTMX settle (which is when
+    // OOB-swapped #helpPane / #helpToggleBtn become live in the DOM).
+    function syncStateFromStorage() {
+        var shouldBeOpen = localStorage.getItem(STORAGE_KEY) === 'true';
+        var els = getElements();
+        if (!els.helpPane) return;
 
-        helpPane.classList.add('open');
-        document.body.classList.add('help-pane-open');
-        if (helpToggleBtn) {
-            helpToggleBtn.classList.add('active');
-            helpToggleBtn.setAttribute('aria-expanded', 'true');
-        }
-        localStorage.setItem('lf-help-pane-open', 'true');
-    }
-
-    function closeHelpPane() {
-        const { helpToggleBtn, helpPane } = getElements();
-        if (!helpPane) return;
-
-        helpPane.classList.remove('open');
-        document.body.classList.remove('help-pane-open');
-        if (helpToggleBtn) {
-            helpToggleBtn.classList.remove('active');
-            helpToggleBtn.setAttribute('aria-expanded', 'false');
-        }
-        localStorage.setItem('lf-help-pane-open', 'false');
-    }
-
-    // Initialize event listeners on elements
-    function initEventListeners() {
-        const { helpToggleBtn, helpPaneClose } = getElements();
-
-        if (helpToggleBtn && !helpToggleBtn._helpPaneInitialized) {
-            helpToggleBtn.addEventListener('click', toggleHelpPane);
-            helpToggleBtn._helpPaneInitialized = true;
-        }
-
-        if (helpPaneClose && !helpPaneClose._helpPaneInitialized) {
-            helpPaneClose.addEventListener('click', closeHelpPane);
-            helpPaneClose._helpPaneInitialized = true;
-        }
-    }
-
-    // Restore state from localStorage
-    function restoreState() {
-        if (localStorage.getItem('lf-help-pane-open') === 'true') {
-            openHelpPane();
-        }
-    }
-
-    // Initialize on page load
-    function init() {
-        const { helpToggleBtn, helpPane } = getElements();
-        if (!helpToggleBtn || !helpPane) return;
-
-        initEventListeners();
-        restoreState();
-    }
-
-    // Initial setup
-    init();
-
-    // Check if state needs restoration and apply it
-    function ensureState() {
-        const shouldBeOpen = localStorage.getItem('lf-help-pane-open') === 'true';
-        const { helpPane, helpToggleBtn } = getElements();
-
-        if (!helpPane) return;
-
-        const isCurrentlyOpen = helpPane.classList.contains('open');
-
-        // Only apply state if it doesn't match localStorage
-        if (shouldBeOpen && !isCurrentlyOpen) {
-            helpPane.classList.add('open');
+        var currentlyOpen = els.helpPane.classList.contains('open');
+        if (shouldBeOpen && !currentlyOpen) {
+            els.helpPane.classList.add('open');
             document.body.classList.add('help-pane-open');
-            if (helpToggleBtn) {
-                helpToggleBtn.classList.add('active');
-                helpToggleBtn.setAttribute('aria-expanded', 'true');
+            if (els.helpToggleBtn) {
+                els.helpToggleBtn.classList.add('active');
+                els.helpToggleBtn.setAttribute('aria-expanded', 'true');
             }
-        } else if (!shouldBeOpen && isCurrentlyOpen) {
-            helpPane.classList.remove('open');
+        } else if (!shouldBeOpen && currentlyOpen) {
+            els.helpPane.classList.remove('open');
             document.body.classList.remove('help-pane-open');
-            if (helpToggleBtn) {
-                helpToggleBtn.classList.remove('active');
-                helpToggleBtn.setAttribute('aria-expanded', 'false');
+            if (els.helpToggleBtn) {
+                els.helpToggleBtn.classList.remove('active');
+                els.helpToggleBtn.setAttribute('aria-expanded', 'false');
             }
         }
-
-        // Always ensure event listeners are attached
-        initEventListeners();
     }
 
-    // Continuous background check - runs every 100ms to ensure state consistency
-    // This is the most reliable approach for catching OOB swaps
-    setInterval(function() {
-        const shouldBeOpen = localStorage.getItem('lf-help-pane-open') === 'true';
-        const { helpPane, helpToggleBtn } = getElements();
-
-        if (!helpPane) return;
-
-        const isCurrentlyOpen = helpPane.classList.contains('open');
-
-        // Only fix if state doesn't match
-        if (shouldBeOpen !== isCurrentlyOpen) {
-            if (shouldBeOpen) {
-                helpPane.classList.add('open');
-                document.body.classList.add('help-pane-open');
-                if (helpToggleBtn) {
-                    helpToggleBtn.classList.add('active');
-                    helpToggleBtn.setAttribute('aria-expanded', 'true');
-                }
-            } else {
-                helpPane.classList.remove('open');
-                document.body.classList.remove('help-pane-open');
-                if (helpToggleBtn) {
-                    helpToggleBtn.classList.remove('active');
-                    helpToggleBtn.setAttribute('aria-expanded', 'false');
-                }
-            }
+    // Document-level event delegation — survives any HTMX swap.
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#helpToggleBtn')) {
+            e.preventDefault();
+            toggleHelpPane();
+            return;
         }
+        if (e.target.closest('#helpPaneClose')) {
+            e.preventDefault();
+            closeHelpPane();
+            return;
+        }
+    });
 
-        // Always re-initialize event listeners to catch OOB swaps
-        // even when visual state doesn't change
-        initEventListeners();
-    }, 100);
-
-    // Keyboard shortcut: ? to toggle help
+    // Keyboard shortcuts: ? toggles, Escape closes.
     document.addEventListener('keydown', function(e) {
-        // Skip if user is typing in an input
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
             return;
         }
-
-        // ? key (Shift + /)
         if (e.key === '?' || (e.shiftKey && e.key === '/')) {
             e.preventDefault();
             toggleHelpPane();
+            return;
         }
-
-        // Escape to close
-        const { helpPane } = getElements();
-        if (e.key === 'Escape' && helpPane && helpPane.classList.contains('open')) {
+        if (e.key === 'Escape' && isOpen()) {
             closeHelpPane();
         }
     });
+
+    // Sync state on first load and after every HTMX swap (OOB header
+    // and help-pane swaps land in the DOM by the time afterSettle fires).
+    syncStateFromStorage();
+    document.body.addEventListener('htmx:afterSettle', syncStateFromStorage);
 })();

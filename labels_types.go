@@ -403,6 +403,9 @@ type BulkLabels struct {
 type StatusLabels struct {
 	Active       string `json:"active"`
 	Inactive     string `json:"inactive"`
+	Blocked      string `json:"blocked"`
+	OnHold       string `json:"onHold"`
+	Prospect     string `json:"prospect"`
 	Pending      string `json:"pending"`
 	Draft        string `json:"draft"`
 	Approved     string `json:"approved"`
@@ -415,6 +418,19 @@ type StatusLabels struct {
 type EmptyLabels struct {
 	NoResults string `json:"noResults"`
 	NoData    string `json:"noData"`
+}
+
+// BadgeLabels holds short translatable values rendered as table badges
+// or inline status indicators across packages. Source of truth lives in
+// lyngua's shared.json under the "badges" subtree; loaded into
+// CommonLabels.Badges by composition.loadTranslations so any view across
+// any package can read e.g. .CommonLabels.Badges.Yes / .No.
+type BadgeLabels struct {
+	Allow        string `json:"allow"`
+	Deny         string `json:"deny"`
+	Yes          string `json:"yes"`
+	No           string `json:"no"`
+	NoPermission string `json:"noPermission"`
 }
 
 type LoadingLabels struct {

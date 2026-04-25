@@ -14,6 +14,7 @@ type CommonLabels struct {
 	Actions       ActionLabels       `json:"actions"`
 	Bulk          BulkLabels         `json:"bulk"`
 	Status        StatusLabels       `json:"status"`
+	Badges        BadgeLabels        `json:"badges"`
 	Empty         EmptyLabels        `json:"empty"`
 	Loading       LoadingLabels      `json:"loading"`
 	Errors        ErrorLabels        `json:"errors"`
