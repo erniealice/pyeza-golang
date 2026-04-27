@@ -481,6 +481,30 @@
                     }
                 }
             });
+
+            // HTMX history-restore guard. Backstop for the
+            // pushUrl:false fix in table-actions.js — if any other code path
+            // ever lets a drawer-state body snapshot enter history,
+            // popstate-restore will leave #sheet open with empty content
+            // because #sheet sits outside HTMX's #main-content swap target.
+            // Force-close the drawer here whenever a snapshot is restored.
+            document.body.addEventListener('htmx:historyRestore', function () {
+                var drawer = getDrawer();
+                if (!drawer) return;
+                if (drawer.classList.contains('open') || drawer.classList.contains('active')) {
+                    drawer.classList.remove('active', 'open');
+                    document.body.style.overflow = '';
+                    isOpen = false;
+                    setBackgroundInert(false);
+                    _opener = null;
+                    if (window.lf && window.lf.FocusTrap) {
+                        var panel = drawer.querySelector('.sheet-panel') || drawer;
+                        window.lf.FocusTrap.releaseFocus(panel);
+                    }
+                    var content = getContent();
+                    if (content) content.innerHTML = '';
+                }
+            });
         }
     }
 

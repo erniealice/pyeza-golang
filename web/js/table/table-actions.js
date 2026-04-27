@@ -43,7 +43,14 @@
                 if (typeof htmx !== 'undefined') {
                     htmx.ajax('GET', url, {
                         target: '#sheetContent',
-                        swap: 'innerHTML'
+                        swap: 'innerHTML',
+                        // pushUrl:false — drawer URLs must NOT enter browser
+                        // history. Without this, hx-boost on <body> pushes the
+                        // /action/ URL, htmx:beforeHistorySave snapshots the
+                        // <body> with #sheet.open + empty #sheetContent, and
+                        // back-nav restores that stale state because #sheet
+                        // lives outside #main-content (HTMX's swap target).
+                        pushUrl: false
                     });
                 }
 
@@ -74,7 +81,14 @@
                 if (typeof htmx !== 'undefined') {
                     htmx.ajax('GET', url, {
                         target: '#sheetContent',
-                        swap: 'innerHTML'
+                        swap: 'innerHTML',
+                        // pushUrl:false — drawer URLs must NOT enter browser
+                        // history. Without this, hx-boost on <body> pushes the
+                        // /action/ URL, htmx:beforeHistorySave snapshots the
+                        // <body> with #sheet.open + empty #sheetContent, and
+                        // back-nav restores that stale state because #sheet
+                        // lives outside #main-content (HTMX's swap target).
+                        pushUrl: false
                     });
                 }
 
