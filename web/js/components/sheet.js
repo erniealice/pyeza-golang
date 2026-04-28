@@ -152,12 +152,17 @@
      * @param {Event} event - The HTMX after-request event
      */
     function handleResponse(event) {
-        // Mark the event as handled so the global listener doesn't re-invoke us
-        // when the same event is also handled by an hx-on:: attribute (HTMX 2.x).
-        if (event.detail._sheetHandled) return;
+        // Dedupe: an inline hx-on::after-request attribute on the form AND the
+        // global body afterRequest listener both invoke handleResponse for the
+        // same submit. event.detail is shared between them, but in some HTMX
+        // versions a second event fires with a fresh detail object — guard on
+        // the xhr instance itself so a single XHR is processed exactly once.
+        var xhr = event.detail.xhr;
+        if (!xhr) return;
+        if (xhr._sheetHandled) return;
+        xhr._sheetHandled = true;
         event.detail._sheetHandled = true;
 
-        var xhr = event.detail.xhr;
         var successful = event.detail.successful;
 
         if (successful) {

@@ -49,3 +49,20 @@ func DateTimeCell(input string, to string, from ...string) TableCell {
 		Value: FormatDateTime(input, to, from...),
 	}
 }
+
+// DateTimeCellSplit creates a TableCell of type "datetime" with explicit date
+// and time portions. The template renders these stacked — date on top, time in
+// a smaller muted font below — matching the visual treatment of person/email
+// cells. Pass an empty `time` to fall back to single-line rendering with
+// `date` as the .Value.
+func DateTimeCellSplit(date, time string) TableCell {
+	if time == "" {
+		return TableCell{Type: "datetime", Value: date}
+	}
+	return TableCell{
+		Type:     "datetime",
+		Value:    date + " " + time, // legacy consumers reading .Value see the inline form
+		DateText: date,
+		TimeText: time,
+	}
+}

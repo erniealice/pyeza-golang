@@ -672,6 +672,103 @@
 }
 
 /* ==========================================================================
+   RADIO GROUP (form-radio + form-radio-group partials)
+   ========================================================================== */
+
+/* Fieldset wrapper — strips native chrome so the legend looks like a regular
+   form-label and the inner stack reads as a normal form-group block. */
+.form-radio-group-fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0; /* prevent fieldset's default grid blowout */
+}
+
+.form-radio-group-legend {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+}
+
+/* Vertical (default): stack options with the same gap form-group uses. */
+.form-radio-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem; /* 10px */
+}
+
+/* Horizontal: row layout, wrap on small viewports. */
+.form-radio-group-horizontal {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1.25rem; /* 20px — matches form-row gap */
+}
+
+/* Each option: radio circle on the left, title/description stacked on the
+   right. align-items: flex-start so the radio dot aligns with the title row,
+   not the visual center of (title + description). */
+.form-radio-option {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.625rem; /* 10px */
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: var(--text-base); /* 15px */
+}
+
+.form-radio-input {
+    width: 1.125rem; /* 18px */
+    height: 1.125rem;
+    /* Nudge the dot down so it visually centers with the title's cap height
+       instead of riding above it. */
+    margin-top: 0.125rem; /* 2px */
+    cursor: pointer;
+    accent-color: var(--accent-primary);
+    flex-shrink: 0;
+}
+
+.form-radio-input:focus-visible {
+    outline: var(--border-width-focus) solid var(--accent-primary);
+    outline-offset: var(--border-width-focus);
+}
+
+.form-radio-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem; /* 2px */
+    line-height: 1.4;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.form-radio-title {
+    display: block;
+    font-size: var(--text-base); /* 15px */
+    color: var(--text-primary);
+}
+
+.form-radio-description {
+    display: block;
+    font-size: var(--text-xs); /* 12px — visibly smaller than the 15px title */
+    font-weight: var(--font-weight-regular, 400);
+    color: var(--text-muted);
+    opacity: 0.85;
+    line-height: 1.4;
+    margin-top: 0.125rem; /* 2px — guarantees a break even if flex column fails */
+}
+
+/* Disabled state: dim everything and disable pointer cursor. */
+.form-radio-option.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.form-radio-option.is-disabled .form-radio-input {
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
    COLOR PICKER FIELD
    ========================================================================== */
 

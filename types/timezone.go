@@ -63,6 +63,24 @@ func FormatTimestampInTZ(ts *timestamppb.Timestamp, tz *time.Location, layout st
 	return FormatInTZ(t, tz, layout)
 }
 
+// FormatTimestampSplitInTZ returns the date and time portions of a proto
+// Timestamp formatted in tz, intended for stacked datetime table cells.
+// Date uses "Jan 02, 2006" and time uses "3:04 PM". Nil / proto-zero → "", "".
+func FormatTimestampSplitInTZ(ts *timestamppb.Timestamp, tz *time.Location) (date, timePart string) {
+	if ts == nil {
+		return "", ""
+	}
+	t := ts.AsTime()
+	if t.Unix() == 0 && t.Nanosecond() == 0 {
+		return "", ""
+	}
+	if tz == nil {
+		tz = time.UTC
+	}
+	local := t.In(tz)
+	return local.Format(DateReadable), local.Format(TimeOnly)
+}
+
 // ParseInTZ parses a layout-formatted string as a wall-clock time in tz.
 // Zero string → zero time, no error. Use this for form inputs where the user
 // types "2026-04-17 09:00" and tz is the selected display timezone.

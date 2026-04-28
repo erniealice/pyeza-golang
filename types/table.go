@@ -139,6 +139,11 @@ type TableCell struct {
 	// Number fields for "number" type
 	NumberPrefix string // Prefix text (e.g., "#")
 	NumberSuffix string // Suffix text (e.g., "units", "%")
+	// Datetime split fields for "datetime" type — when both populated, the
+	// template renders the cell stacked (date on top, time muted/smaller below).
+	// When empty, the template falls back to a single-line .Value rendering.
+	DateText string // Date portion (e.g., "Jan 02, 2026")
+	TimeText string // Time portion (e.g., "3:04 PM")
 }
 
 // ApplyColumnStyles copies alignment, width, minWidth, vAlign, and label from columns to cells in all rows.

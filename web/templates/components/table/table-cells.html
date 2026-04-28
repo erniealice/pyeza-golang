@@ -110,8 +110,21 @@
 {{end}}
 
 {{/* DATETIME CELL */}}
+{{/*
+    Renders stacked when both DateText and TimeText are populated (date on top,
+    time smaller and muted below — mirrors the person-name/person-email pattern).
+    Falls back to a single-line span when only .Value is set, preserving
+    backwards compatibility with date-only callers (DateTimeCell + DateReadable).
+*/}}
 {{define "table-cell-datetime"}}
+{{- if and .DateText .TimeText -}}
+<div class="cell-datetime">
+    <span class="cell-datetime__date">{{.DateText}}</span>
+    <span class="cell-datetime__time">{{.TimeText}}</span>
+</div>
+{{- else -}}
 <span class="datetime-cell">{{.Value}}</span>
+{{- end -}}
 {{end}}
 
 {{/* SINGLE PERSON CELL */}}

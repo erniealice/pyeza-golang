@@ -1,0 +1,114 @@
+{{/*
+================================================================================
+FORM RADIO COMPONENT
+================================================================================
+Two partials for radio inputs:
+
+  - form-radio          renders ONE <input type="radio"> + label + optional
+                        description. Useful when consumers need to interleave
+                        radios with other markup or build a custom layout.
+  - form-radio-group    renders a <fieldset>/<legend> with a list of
+                        form-radio entries. Preferred call site for most
+                        consumers — gives screen readers a group label,
+                        supports a hint, an info popover, and horizontal or
+                        vertical layouts.
+
+USAGE — single radio:
+---------------------
+{{template "form-radio" (dict
+    "Name" "scope"                 // radio group name (required)
+    "Value" "location"             // option value (required)
+    "Label" "Location-scoped"      // visible primary label (required)
+    "Description" "Reusable…"      // optional secondary line
+    "Checked" true                 // optional initial state
+    "Disabled" false               // optional disabled state
+    "ID" "scope-location"          // optional html id (auto: {Name}-{Value})
+)}}
+
+USAGE — radio group:
+--------------------
+{{template "form-radio-group" (dict
+    "Name" "scope"                 // shared radio group name (required)
+    "Label" "Scope"                // legend text (required)
+    "Hint" "Pick one"              // optional help text under legend
+    "Info" "Long explanation…"     // optional info popover beside legend
+    "Direction" "vertical"         // "vertical" (default) | "horizontal"
+    "Selected" "location"          // currently-selected value
+    "Options" .ScopeOptions        // []pyeza.RadioOption
+)}}
+
+OPTIONS FORMAT:
+---------------
+Each option is a `pyeza.RadioOption` (or any struct with matching fields):
+    { Value, Label, Description, Disabled }
+
+ACCESSIBILITY:
+--------------
+- <fieldset>/<legend> gives screen readers the group label.
+- Each option's <label for="…"> wires the click target to the input id.
+- Native browser behavior moves focus to the group via Tab, then arrow keys
+  cycle within the group (radios share the same `name`).
+- Disabled options carry both the native `disabled` attribute and
+  aria-disabled="true".
+================================================================================
+*/}}
+
+{{define "form-radio"}}
+{{$id := .ID}}
+{{if not $id}}{{$id = printf "%s-%s" .Name .Value}}{{end}}
+<label class="form-radio-option{{if .Disabled}} is-disabled{{end}}" for="{{$id}}">
+    <input type="radio"
+           class="form-radio-input"
+           id="{{$id}}"
+           name="{{.Name}}"
+           value="{{.Value}}"
+           {{if .Checked}}checked{{end}}
+           {{if .Disabled}}disabled aria-disabled="true"{{end}}>
+    <span class="form-radio-text">
+        <span class="form-radio-title">{{.Label}}</span>
+        {{if .Description}}
+        <span class="form-radio-description">{{.Description}}</span>
+        {{end}}
+    </span>
+</label>
+{{end}}
+
+{{define "form-radio-group"}}
+{{$name := .Name}}
+{{$selected := .Selected}}
+<fieldset class="form-group form-radio-group-fieldset">
+    {{if .Label}}
+    <legend class="form-label form-radio-group-legend">
+        {{.Label}}
+        {{if .Info}}
+        <span class="form-label-info" data-popover data-popover-trigger="hover click" data-popover-position="top">
+            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" tabindex="0">
+                {{template "icon-info"}}
+            </button>
+            <div class="popover-panel form-label-info-panel" role="tooltip">
+                <div class="popover-arrow"></div>
+                {{.Info}}
+            </div>
+        </span>
+        {{end}}
+    </legend>
+    {{end}}
+
+    <div class="form-radio-group{{if eq .Direction "horizontal"}} form-radio-group-horizontal{{else}} form-radio-group-vertical{{end}}">
+        {{range .Options}}
+        {{template "form-radio" (dict
+            "Name" $name
+            "Value" .Value
+            "Label" .Label
+            "Description" .Description
+            "Checked" (eq .Value $selected)
+            "Disabled" .Disabled
+        )}}
+        {{end}}
+    </div>
+
+    {{if .Hint}}
+    <span class="form-hint">{{.Hint}}</span>
+    {{end}}
+</fieldset>
+{{end}}

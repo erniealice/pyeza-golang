@@ -2790,6 +2790,31 @@ body.density-comfortable .action-buttons {
     font-variant-numeric: tabular-nums;
 }
 
+/*
+ * Stacked datetime rendering — used when TableCell.DateText + TimeText are both
+ * populated (see types.DateTimeCellSplit / FormatTimestampSplitInTZ). Mirrors
+ * the person-cell name/email visual treatment: primary text on top, smaller
+ * muted secondary below. Should fit within col-2xl / col-3xl column widths.
+ */
+.cell-datetime {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.cell-datetime__date {
+    font-size: var(--text-md);
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.cell-datetime__time {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
 /* ============================================================
    SINGLE PERSON CELL
    ============================================================ */
