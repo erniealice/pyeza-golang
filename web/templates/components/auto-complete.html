@@ -209,6 +209,23 @@
         }
 
         updateDescription(value);
+
+        // Notify the outside world. Two events:
+        //   1. Native `change` on the hidden input — dependent autocompletes /
+        //      generic form code listens for this.
+        //   2. A custom `auto-complete-change` event on the container — HTMX
+        //      `hx-trigger="auto-complete-change from:#…"` consumes this to
+        //      re-fetch dependent partials (e.g., the subscription drawer's
+        //      Spawn Jobs section per
+        //      `docs/plan/20260429-auto-spawn-jobs-from-subscription/plan.md §5.1`).
+        try {
+            hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+            container.dispatchEvent(new CustomEvent('auto-complete-change', {
+                bubbles: true,
+                detail: { value: value, label: label },
+            }));
+        } catch (_) { /* older browsers — best-effort */ }
+
         closeDropdown();
     }
 
