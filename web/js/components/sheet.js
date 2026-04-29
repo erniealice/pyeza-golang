@@ -194,18 +194,34 @@
             // Refresh the table after a brief delay to let the close animation start.
             setTimeout(function() { refreshTable(targetTableID); }, 400);
         } else {
-            // Handle error
-            const errorMessage = xhr.getResponseHeader('HX-Error-Message') || 'An error occurred. Please try again.';
-
-            // Dispatch error event
-            document.dispatchEvent(new CustomEvent('formError', {
-                detail: {
-                    xhr: xhr,
-                    message: errorMessage
+            // Soft block path: when the server signals a re-render via
+            // HX-Reswap + HX-Retarget (e.g. recognize-revenue idempotency
+            // banner returning 422), honor those headers and swap the
+            // response body in. The form's hx-swap="none" would otherwise
+            // discard the body and the user would see no feedback.
+            const reswap = xhr.getResponseHeader('HX-Reswap');
+            const retarget = xhr.getResponseHeader('HX-Retarget');
+            if (reswap && retarget && xhr.responseText) {
+                const targetEl = document.querySelector(retarget);
+                if (targetEl) {
+                    if (reswap === 'outerHTML') {
+                        targetEl.outerHTML = xhr.responseText;
+                    } else if (reswap === 'innerHTML') {
+                        targetEl.innerHTML = xhr.responseText;
+                    }
+                    // Re-process HTMX attributes on the swapped DOM.
+                    if (window.htmx && typeof window.htmx.process === 'function') {
+                        window.htmx.process(document.querySelector(retarget) || document.body);
+                    }
+                    return;
                 }
-            }));
+            }
 
-            // Show error in drawer
+            // Default error path
+            const errorMessage = xhr.getResponseHeader('HX-Error-Message') || 'An error occurred. Please try again.';
+            document.dispatchEvent(new CustomEvent('formError', {
+                detail: { xhr: xhr, message: errorMessage }
+            }));
             showError(errorMessage);
         }
     }
