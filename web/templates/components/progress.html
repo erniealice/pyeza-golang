@@ -1,0 +1,55 @@
+{{/*
+================================================================================
+PYEZA-PROGRESS — Linear Progress Meter Primitive
+================================================================================
+A native <progress> element with a styled wrapper. NO JS — the browser exposes
+ARIA progressbar semantics for free.
+
+BEM class root: pyeza-progress
+
+USAGE:
+    {{template "pyeza-progress" (dict
+        "Value"          3
+        "Max"            5
+        "Label"          "Visits used"
+        "Color"          "success"
+        "ShowValueLabel" true
+        "TestID"         "subscription-entitlement-meter")}}
+
+PARAMETERS:
+    Value          - Current value (int).
+    Max            - Upper bound (int). Defaults to 100 when zero/empty.
+    Label          - Optional caption above the track.
+    Color          - BEM modifier suffix: primary | success | warning | danger | info | "" (default neutral).
+    ShowValueLabel - Render trailing "{Value} / {Max}" caption.
+    Modifiers      - Additional BEM modifiers (e.g. "compact", "inline").
+    TestID         - Optional data-testid on the wrapper.
+
+ACCESSIBILITY:
+    Native <progress> emits aria-valuenow / aria-valuemin / aria-valuemax for free.
+    The label and value caption are linked via aria-describedby when both are present.
+================================================================================
+*/}}
+
+{{define "pyeza-progress"}}
+{{- $max := .Max -}}
+{{- if le $max 0 -}}{{- $max = 100 -}}{{- end -}}
+{{- $value := .Value -}}
+{{- if lt $value 0 -}}{{- $value = 0 -}}{{- end -}}
+{{- if gt $value $max -}}{{- $value = $max -}}{{- end -}}
+<div class="pyeza-progress
+    {{- if .Color}} pyeza-progress--{{.Color}}{{end -}}
+    {{- range .Modifiers}} pyeza-progress--{{.}}{{end -}}
+    "
+    {{- if .TestID}} data-testid="{{.TestID}}"{{end}}>
+    {{if or .Label .ShowValueLabel}}
+    <div class="pyeza-progress__caption">
+        {{if .Label}}<span class="pyeza-progress__label">{{.Label}}</span>{{end}}
+        {{if .ShowValueLabel}}<span class="pyeza-progress__value">{{$value}} / {{$max}}</span>{{end}}
+    </div>
+    {{end}}
+    <progress class="pyeza-progress__track"
+        max="{{$max}}"
+        value="{{$value}}">{{$value}} / {{$max}}</progress>
+</div>
+{{end}}

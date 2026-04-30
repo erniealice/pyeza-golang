@@ -1,0 +1,67 @@
+{{/*
+================================================================================
+PYEZA-INFO-SECTIONS — Multi-Section Titled Info Grid Primitive
+================================================================================
+A stack of titled sections, each rendered as a definition list (<dl>) by default.
+Callers may swap any section's body via CustomBody (pre-rendered HTML).
+
+BEM class root: pyeza-info-sections
+Elements:  __heading, __grid, __section, __section-title, __list, __row, __label, __value
+Modifiers: --compact, --bordered, etc. (callers compose their own)
+
+USAGE:
+    {{template "pyeza-info-sections" (dict
+        "Heading"  "Subscription Details"
+        "Sections" (list
+            (dict "Title" "Schedule"
+                  "Rows"  .ScheduleRows)
+            (dict "Title" "Billing"
+                  "Rows"  .BillingRows
+                  "Modifiers" (list "highlight"))
+            (dict "Title"      "Notes"
+                  "CustomBody" .NotesParagraphHTML))
+        "TestID"   "subscription-info-sections")}}
+
+PARAMETERS:
+    Heading    - Optional top-level heading (h3).
+    Sections   - List of sections. Each has:
+                   Title      : Section heading (h4) — optional
+                   Rows       : []InfoRow {Label, Value: template.HTML}
+                   CustomBody : Optional template.HTML — replaces default <dl>
+                   Modifiers  : Optional list of BEM modifier suffixes
+                   TestID     : Optional data-testid on the section
+    Modifiers  - Optional BEM modifiers on the wrapper.
+    TestID     - Optional data-testid on the wrapper.
+================================================================================
+*/}}
+
+{{define "pyeza-info-sections"}}
+<section class="pyeza-info-sections
+    {{- range .Modifiers}} pyeza-info-sections--{{.}}{{end -}}
+    "
+    {{- if .TestID}} data-testid="{{.TestID}}"{{end}}>
+    {{if .Heading}}<h3 class="pyeza-info-sections__heading">{{.Heading}}</h3>{{end}}
+    <div class="pyeza-info-sections__grid">
+        {{range .Sections}}
+        <div class="pyeza-info-sections__section
+            {{- range .Modifiers}} pyeza-info-sections__section--{{.}}{{end -}}
+            "
+            {{- if .TestID}} data-testid="{{.TestID}}"{{end}}>
+            {{if .Title}}<h4 class="pyeza-info-sections__section-title">{{.Title}}</h4>{{end}}
+            {{if .CustomBody}}
+                {{.CustomBody}}
+            {{else}}
+                <dl class="pyeza-info-sections__list">
+                    {{range .Rows}}
+                    <div class="pyeza-info-sections__row">
+                        <dt class="pyeza-info-sections__label">{{.Label}}</dt>
+                        <dd class="pyeza-info-sections__value">{{.Value}}</dd>
+                    </div>
+                    {{end}}
+                </dl>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+</section>
+{{end}}

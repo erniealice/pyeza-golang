@@ -1,0 +1,135 @@
+/*
+ * ==========================================================================
+ * PYEZA-INFO-SECTIONS — Multi-Section Titled Info Grid Primitive
+ * ==========================================================================
+ * Stack of titled sections. Each section renders a definition list of
+ * label/value pairs by default; CustomBody swaps the body for arbitrary HTML.
+ *
+ * BEM class root: pyeza-info-sections
+ * Elements:  __heading, __grid, __section, __section-title, __list, __row,
+ *            __label, __value
+ * Modifiers: --compact (callers may compose --bordered, --muted, etc.)
+ *
+ * Mobile: sections collapse to a single column; rows stack label-over-value.
+ * ==========================================================================
+ */
+
+.pyeza-info-sections {
+    display: block;
+    font-family: var(--font-body);
+    color: var(--text-primary);
+}
+
+.pyeza-info-sections__heading {
+    margin: 0 0 var(--spacing-xl) 0;
+    padding-bottom: var(--spacing-md);
+    border-bottom: var(--border-width) solid var(--border-light);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.pyeza-info-sections__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--spacing-2xl);
+}
+
+.pyeza-info-sections__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.pyeza-info-sections__section-title {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-normal);
+    color: var(--text-muted);
+}
+
+.pyeza-info-sections__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin: 0;
+    padding: 0;
+}
+
+.pyeza-info-sections__row {
+    display: grid;
+    grid-template-columns: minmax(8rem, 1fr) 2fr;
+    gap: var(--spacing-md);
+    align-items: baseline;
+}
+
+.pyeza-info-sections__label {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+}
+
+.pyeza-info-sections__value {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+/* ========================================
+   MODIFIER — compact
+   ======================================== */
+
+.pyeza-info-sections--compact .pyeza-info-sections__section {
+    padding: var(--spacing-md) var(--spacing-lg);
+    gap: var(--spacing-sm);
+}
+
+.pyeza-info-sections--compact .pyeza-info-sections__list {
+    gap: var(--spacing-sm);
+}
+
+/* ========================================
+   MODIFIER — flush
+   Strip card chrome — for nesting inside an existing card / drawer.
+   ======================================== */
+
+.pyeza-info-sections--flush .pyeza-info-sections__section {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+/* ========================================
+   RESPONSIVE
+   Single column + stacked rows on small viewports.
+   ======================================== */
+
+@media (max-width: 768px) {
+    .pyeza-info-sections__grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .pyeza-info-sections__row {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xs);
+    }
+
+    .pyeza-info-sections__label {
+        font-size: var(--text-xs);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-normal);
+        color: var(--text-muted);
+    }
+}

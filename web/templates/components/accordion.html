@@ -1,0 +1,58 @@
+{{/*
+================================================================================
+PYEZA-ACCORDION — Generic Collapsible Section Primitive
+================================================================================
+A native <details>/<summary> disclosure widget. NO JS — the browser handles
+expand/collapse and ARIA state automatically.
+
+BEM class root: pyeza-accordion
+
+USAGE:
+    {{template "pyeza-accordion" (dict
+        "Title"         "Cycle 1 — May 2026"
+        "OpenByDefault" true
+        "Body"          .CycleBodyHTML
+        "Meta"          .StatusBadgeHTML
+        "TestID"        "subscription-cycle-accordion"
+        "DataAttrs"     (dict "cycle-index" "1")
+        "Modifiers"     (list "compact"))}}
+
+PARAMETERS:
+    Title          - Plain-text header text (rendered in <summary>).
+    TitleHTML      - Optional pre-rendered HTML title; overrides Title when set.
+    Meta           - Optional trailing-meta HTML (status badge, count, timestamp).
+    Body           - Collapsible content (HTML).
+    OpenByDefault  - Boolean — render expanded on first paint.
+    BodyID         - Optional id on the body region (for hx-target / aria links).
+    TestID         - Optional data-testid on the outer <details>.
+    DataAttrs      - Optional map of extra data-* attributes (keys in kebab-case).
+    Modifiers      - Optional list of BEM modifier suffixes.
+
+ACCESSIBILITY:
+    The native <details>/<summary> pair handles aria-expanded automatically and
+    is keyboard-navigable out of the box (Enter / Space toggle). No additional
+    ARIA wiring is needed.
+================================================================================
+*/}}
+
+{{define "pyeza-accordion"}}
+<details class="pyeza-accordion{{range .Modifiers}} pyeza-accordion--{{.}}{{end}}"
+    {{- if .OpenByDefault}} open{{end}}
+    {{- if .TestID}} data-testid="{{.TestID}}"{{end}}
+    {{- range $k, $v := .DataAttrs}} data-{{$k}}="{{$v}}"{{end}}>
+    <summary class="pyeza-accordion__header">
+        <span class="pyeza-accordion__chevron" aria-hidden="true"></span>
+        <span class="pyeza-accordion__title">
+            {{- if .TitleHTML -}}
+                {{.TitleHTML}}
+            {{- else -}}
+                {{.Title}}
+            {{- end -}}
+        </span>
+        {{if .Meta}}<span class="pyeza-accordion__meta">{{.Meta}}</span>{{end}}
+    </summary>
+    <div class="pyeza-accordion__body"{{if .BodyID}} id="{{.BodyID}}"{{end}}>
+        {{.Body}}
+    </div>
+</details>
+{{end}}

@@ -1,0 +1,161 @@
+/*
+ * ==========================================================================
+ * PYEZA-ACCORDION — Generic Collapsible Section Primitive
+ * ==========================================================================
+ * Native <details>/<summary> disclosure widget. No JS.
+ *
+ * BEM class root: pyeza-accordion
+ * Elements:  __header, __chevron, __title, __meta, __body
+ * Modifiers: --compact, --bordered (consumers may add their own)
+ * ==========================================================================
+ */
+
+.pyeza-accordion {
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color var(--duration-base) var(--ease-default);
+}
+
+.pyeza-accordion + .pyeza-accordion {
+    margin-top: var(--spacing-md);
+}
+
+.pyeza-accordion[open] {
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Hide the default disclosure marker — we render our own chevron. */
+.pyeza-accordion > summary {
+    list-style: none;
+}
+.pyeza-accordion > summary::-webkit-details-marker {
+    display: none;
+}
+
+.pyeza-accordion__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    cursor: pointer;
+    user-select: none;
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    transition: background var(--duration-base) var(--ease-default);
+}
+
+.pyeza-accordion__header:hover {
+    background: var(--bg-hover);
+}
+
+.pyeza-accordion__header:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: -2px;
+}
+
+.pyeza-accordion__chevron {
+    display: inline-block;
+    width: 0.625rem;
+    height: 0.625rem;
+    flex-shrink: 0;
+    border-right: 2px solid var(--text-secondary);
+    border-bottom: 2px solid var(--text-secondary);
+    transform: rotate(-45deg);
+    transition: transform var(--duration-base) var(--ease-default);
+}
+
+.pyeza-accordion[open] > .pyeza-accordion__header .pyeza-accordion__chevron {
+    transform: rotate(45deg);
+}
+
+.pyeza-accordion__title {
+    flex: 1 1 auto;
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    min-width: 0;
+}
+
+.pyeza-accordion__meta {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.pyeza-accordion__body {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: var(--border-width) solid var(--border-light);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+}
+
+/* ========================================
+   MODIFIER — compact
+   Tighter padding for dense lists (e.g. cycle accordions).
+   ======================================== */
+
+.pyeza-accordion--compact .pyeza-accordion__header {
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.pyeza-accordion--compact .pyeza-accordion__body {
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+/* ========================================
+   MODIFIER — flush
+   Remove outer card chrome — for nesting inside an existing card.
+   ======================================== */
+
+.pyeza-accordion--flush {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+.pyeza-accordion--flush[open] {
+    box-shadow: none;
+}
+
+.pyeza-accordion--flush + .pyeza-accordion--flush {
+    border-top: var(--border-width) solid var(--border-light);
+    margin-top: 0;
+}
+
+/* ========================================
+   ACCESSIBILITY — Reduced Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .pyeza-accordion,
+    .pyeza-accordion__header,
+    .pyeza-accordion__chevron {
+        transition: none;
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .pyeza-accordion__header {
+        padding: var(--spacing-md) var(--spacing-lg);
+        gap: var(--spacing-sm);
+    }
+
+    .pyeza-accordion__body {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .pyeza-accordion__title {
+        font-size: var(--text-md);
+    }
+}

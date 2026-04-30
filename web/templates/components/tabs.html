@@ -15,7 +15,8 @@ USAGE:
 
 PARAMETERS:
     Items     - Array of tab items, each with:
-                  - Key      : Unique identifier (used for URL/data-tab)
+                  - Key      : Canonical identifier (state matching, data-tab, aria-controls)
+                  - URLSlug  : Optional tier-resolved URL slug (data-tab-slug). Falls back to Key when empty.
                   - Label    : Display text
                   - Href     : Link URL (optional, for link-based tabs)
                   - Icon     : Icon template name (optional)
@@ -57,7 +58,7 @@ ACCESSIBILITY:
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             aria-controls="tabContent"
             tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
-            data-tab="{{.Key}}"
+            data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             hx-get="{{.HxGet}}"
             hx-target="#tabContent"
             hx-swap="innerHTML"
@@ -76,7 +77,7 @@ ACCESSIBILITY:
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
        aria-controls="tabContent"
        tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
-       data-tab="{{.Key}}"
+       data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -90,7 +91,7 @@ ACCESSIBILITY:
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             aria-controls="tabContent"
             tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
-            data-tab="{{.Key}}"
+            data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -110,7 +111,7 @@ ACCESSIBILITY:
        class="main-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
-       data-tab="{{.Key}}"
+       data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         <span>{{.Label}}</span>
@@ -121,7 +122,7 @@ ACCESSIBILITY:
             class="main-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
-            data-tab="{{.Key}}"
+            data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         <span>{{.Label}}</span>
@@ -141,7 +142,7 @@ ACCESSIBILITY:
        class="sub-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
-       data-tab="{{.Key}}"
+       data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -152,7 +153,7 @@ ACCESSIBILITY:
             class="sub-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
-            data-tab="{{.Key}}"
+            data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -171,7 +172,7 @@ ACCESSIBILITY:
             class="client-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
-            data-tab="{{.Key}}"
+            data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -190,7 +191,7 @@ ACCESSIBILITY:
        class="help-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
-       data-tab="{{.Key}}"
+       data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -201,7 +202,7 @@ ACCESSIBILITY:
             class="help-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
-            data-tab="{{.Key}}"
+            data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -220,7 +221,7 @@ ACCESSIBILITY:
     <a href="{{.Href}}"
        class="category-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        {{if eq .Key $activeTab}}aria-current="page"{{end}}
-       data-tab="{{.Key}}"
+       data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}
@@ -229,7 +230,7 @@ ACCESSIBILITY:
     {{else}}
     <button type="button"
             class="category-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
-            data-tab="{{.Key}}"
+            data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if eq .Key $activeTab}}aria-pressed="true"{{end}}
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
