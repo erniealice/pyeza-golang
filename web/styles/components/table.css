@@ -239,14 +239,16 @@
 /* Sort Menu */
 .sort-menu {
     padding: 0.5rem;
+    min-width: 20rem;
 }
 
 .sort-option {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
     padding: 0.625rem 0.75rem;
-    border-radius: var(--radius-sm);
+    border-radius: 0.5rem;
     cursor: pointer;
     transition: background var(--transition-fast, 0.2s) ease;
 }
@@ -257,6 +259,7 @@
 
 .sort-option.active {
     background: var(--accent-terracotta-light);
+    border-radius: 0.5rem;
 }
 
 .sort-option-label {
@@ -270,17 +273,19 @@
 }
 
 .sort-dir-btn {
-    width: 1.75rem;
-    height: 1.75rem;
-    display: flex;
+    min-height: 1.75rem;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.25rem;
+    padding: 0 0.5rem;
     background: transparent;
     border: 1px solid transparent;
-    border-radius: var(--radius-sm);
+    border-radius: 0.25rem;
     color: var(--text-muted);
     cursor: pointer;
     transition: all var(--transition-fast, 0.15s) ease;
+    white-space: nowrap;
 }
 
 .sort-dir-btn:hover {
@@ -302,23 +307,25 @@
 
 .sort-dir-label {
     font-size: 0.75rem;
-    margin-left: 0.25rem;
-    color: var(--text-muted);
+    color: inherit;
+    line-height: 1;
 }
 
 /* Columns Menu */
 .columns-menu {
     padding: 0.5rem;
+    min-width: 16rem;
     max-height: 20rem;
     overflow-y: auto;
 }
 
 .column-toggle {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.625rem;
     padding: 0.625rem 0.75rem;
-    border-radius: var(--radius-sm);
+    border-radius: 0.5rem;
     cursor: pointer;
     transition: background var(--transition-fast, 0.2s) ease;
     font-size: var(--text-md);
@@ -346,11 +353,13 @@
 }
 
 .column-toggle-hint {
+    flex-basis: 100%;
     display: block;
     font-size: 0.75rem;
+    line-height: 1.3;
     color: var(--text-muted);
-    margin-top: 0.125rem;
-    padding-left: 1.5rem;
+    margin: 0.125rem 0 0;
+    padding-left: 1.625rem;
 }
 
 /* Export Menu */

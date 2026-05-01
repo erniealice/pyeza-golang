@@ -202,6 +202,13 @@
         const tables = document.querySelectorAll('.data-table[data-default-sort]');
 
         tables.forEach(table => {
+            // Server-paginated tables: server already applied (and rendered) the
+            // authoritative sort. Don't second-guess it on the client — doing so
+            // overrides URL params like ?sort=price by re-applying the page's
+            // DefaultSortColumn ("name") and corrupts the active-state indicators.
+            const card = table.closest('.table-card');
+            if (card && card.dataset.serverPagination === 'true') return;
+
             const column = table.dataset.defaultSort;
             const direction = table.dataset.defaultDirection || 'asc';
 

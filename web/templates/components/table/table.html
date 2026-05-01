@@ -238,7 +238,7 @@ JavaScript:
     </td>
     {{end}}
     {{range .Cells}}
-    <td{{if .Label}} data-label="{{.Label}}"{{end}}{{if .WidthClass}} class="{{.WidthClass}}"{{end}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}};{{end}}vertical-align: {{$rowVAlign}}">
+    <td{{if .Label}} data-label="{{.Label}}"{{end}}{{if .WidthClass}} class="{{.WidthClass}}"{{end}} data-csv="{{csvCell .}}" style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}};{{end}}vertical-align: {{$rowVAlign}}">
         {{if eq .Type "name"}}{{template "table-cell-name" .}}
         {{else if eq .Type "badge"}}{{template "table-cell-badge" .}}
         {{else if eq .Type "link"}}{{template "table-cell-link" .}}

@@ -151,6 +151,87 @@ type TableCell struct {
 	// When empty, the template falls back to a single-line .Value rendering.
 	DateText string // Date portion (e.g., "Jan 02, 2026")
 	TimeText string // Time portion (e.g., "3:04 PM")
+	// TestID is an optional data-testid override for the cell's inner container.
+	// When set, the cell wrapper (e.g., .table-cell-chips div) renders with data-testid="{{.TestID}}".
+	TestID string
+	// CSVValue is an explicit per-cell override for CSV export. When non-empty,
+	// CellCSV returns this verbatim instead of deriving from Type. Use it when
+	// the type-default formatter is wrong for a specific column (e.g., you want
+	// the raw centavo integer instead of the formatted decimal, or an enum's
+	// machine code instead of its localized label).
+	CSVValue string
+}
+
+// CellCSV returns the canonical CSV-export representation of a TableCell.
+// Order of resolution:
+//  1. Explicit override via c.CSVValue.
+//  2. Type-aware default that strips presentational chrome (currency symbols,
+//     icons, multi-line layouts) and joins multi-value fields with "; ".
+//  3. Fallback to c.Value.
+//
+// The goal is to keep export output consistent across every list page so an
+// analyst opening the CSV gets clean numeric/date/text columns, not whatever
+// happened to land in textContent at render time.
+func CellCSV(c TableCell) string {
+	if c.CSVValue != "" {
+		return c.CSVValue
+	}
+	switch c.Type {
+	case "money", "number":
+		// Numeric. Drop currency prefix and number prefix/suffix — those are
+		// presentation. Caller can override via CSVValue if they want raw cents.
+		return c.Value
+	case "datetime":
+		if c.DateText != "" && c.TimeText != "" {
+			return c.DateText + " " + c.TimeText
+		}
+		return c.Value
+	case "chips":
+		out := make([]string, 0, len(c.Chips))
+		for _, ch := range c.Chips {
+			out = append(out, ch.Label)
+		}
+		return joinSemi(out)
+	case "multi-person":
+		out := make([]string, 0, len(c.Persons))
+		for _, p := range c.Persons {
+			out = append(out, p.Name)
+		}
+		return joinSemi(out)
+	case "single-person":
+		if c.Person != nil {
+			return c.Person.Name
+		}
+		return c.Value
+	case "author":
+		// "Name (date)" — the variant carries the date; export both for context.
+		if c.Variant != "" {
+			return c.Value + " (" + c.Variant + ")"
+		}
+		return c.Value
+	case "html":
+		// Raw HTML can't be safely flattened without a parser. Caller should set
+		// CSVValue when this matters; default to Value (often empty for html cells).
+		return c.Value
+	default:
+		// text, name, link, email, phone, badge, select, input, "" — Value is the
+		// human-meaningful payload in every case.
+		return c.Value
+	}
+}
+
+func joinSemi(parts []string) string {
+	switch len(parts) {
+	case 0:
+		return ""
+	case 1:
+		return parts[0]
+	}
+	out := parts[0]
+	for _, p := range parts[1:] {
+		out += "; " + p
+	}
+	return out
 }
 
 // DeriveSortKind returns the SortKind implied by a TableCell.Type.

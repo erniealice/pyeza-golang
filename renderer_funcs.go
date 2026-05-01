@@ -141,6 +141,10 @@ func getDefaultFuncMap() template.FuncMap {
 			}
 			return template.JS(b)
 		},
+		// csvCell returns the canonical CSV-export string for a TableCell, used
+		// by table.html to emit data-csv on each <td>. Keeps client-side export
+		// consistent regardless of how the cell renders visually.
+		"csvCell": types.CellCSV,
 		// filterColumnsJSON serializes filterable columns as a JSON array for use
 		// in inert <script type="application/json"> blocks in table templates.
 		// Only columns with Filterable==true are included.

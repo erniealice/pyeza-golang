@@ -135,14 +135,17 @@
             <div class="toolbar-dropdown-menu sort-menu">
                 {{range .Columns}}
                 {{if not .NoSort}}
-                <div class="sort-option" data-sort="{{.Key}}" data-sort-kind="{{.SortKind}}">
+                {{$isActiveSort := false}}
+                {{$activeDir := ""}}
+                {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActiveSort = true}}{{$activeDir = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
+                <div class="sort-option{{if $isActiveSort}} active{{end}}" data-sort="{{.Key}}" data-sort-kind="{{.SortKind}}">
                     <span class="sort-option-label">{{.Label}}</span>
                     <div class="sort-option-direction">
-                        <button type="button" class="sort-dir-btn" data-direction="asc" aria-label="Sort ascending">
+                        <button type="button" class="sort-dir-btn{{if and $isActiveSort (eq $activeDir "asc")}} active{{end}}" data-direction="asc" aria-label="Sort ascending">
                             {{template "icon-arrow-up" $}}
                             <span class="sort-dir-label">{{if eq .SortKind "number"}}{{$.Labels.SortAscNumber}}{{else if eq .SortKind "date"}}{{$.Labels.SortAscDate}}{{else if eq .SortKind "enum"}}{{$.Labels.SortAscEnum}}{{else}}{{$.Labels.SortAscText}}{{end}}</span>
                         </button>
-                        <button type="button" class="sort-dir-btn" data-direction="desc" aria-label="Sort descending">
+                        <button type="button" class="sort-dir-btn{{if and $isActiveSort (eq $activeDir "desc")}} active{{end}}" data-direction="desc" aria-label="Sort descending">
                             {{template "icon-arrow-down" $}}
                             <span class="sort-dir-label">{{if eq .SortKind "number"}}{{$.Labels.SortDescNumber}}{{else if eq .SortKind "date"}}{{$.Labels.SortDescDate}}{{else if eq .SortKind "enum"}}{{$.Labels.SortDescEnum}}{{else}}{{$.Labels.SortDescText}}{{end}}</span>
                         </button>
