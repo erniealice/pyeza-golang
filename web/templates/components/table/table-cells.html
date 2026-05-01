@@ -66,7 +66,7 @@
 {{$chipCount := len .Chips}}
 {{$maxVisible := 3}}
 {{$hasOverflow := gt $chipCount $maxVisible}}
-<div class="table-cell-chips"{{if $hasOverflow}} data-chip-expandable="true"{{end}}>
+<div class="table-cell-chips"{{if .TestID}} data-testid="{{.TestID}}"{{end}}{{if $hasOverflow}} data-chip-expandable="true"{{end}}>
     {{range $i, $chip := .Chips}}<span class="table-chip{{if ge $i $maxVisible}} chip-hidden{{end}}"{{if $chip.Color}} style="background-color: {{$chip.Color}}; color: #fff; border-color: {{$chip.Color}}"{{end}}>{{$chip.Label}}</span>{{end}}
     {{if $hasOverflow}}
     <button type="button" class="chip-expand-toggle" onclick="this.parentElement.classList.toggle('expanded')" aria-label="Show all {{$chipCount}} items">

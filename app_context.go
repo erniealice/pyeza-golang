@@ -122,8 +122,8 @@ type AppContext struct {
 	// HashPassword hashes a password with bcrypt.
 	HashPassword any
 
-	// GetUserRolesMap returns role badges for all users.
-	GetUserRolesMap any
+	// GetUserWorkspacesMap returns workspace chip data per user (for the user list workspace chip column).
+	GetUserWorkspacesMap any
 
 	// LedgerReportingSvc provides financial reporting queries.
 	LedgerReportingSvc any
