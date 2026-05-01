@@ -95,10 +95,17 @@
 
                     // Determine new direction
                     let direction = 'asc';
-                    if (this.classList.contains('sort-asc')) {
+                    const currentDir = this.dataset.sortDirection ||
+                        (this.classList.contains('sort-asc') ? 'asc' :
+                         this.classList.contains('sort-desc') ? 'desc' : '');
+                    if (currentDir === 'asc') {
                         direction = 'desc';
-                    } else if (this.classList.contains('sort-desc')) {
+                    } else if (currentDir === 'desc') {
                         direction = 'asc';
+                    } else {
+                        // Kind-aware default direction for first click on an unsorted column.
+                        const kind = this.dataset.sortKind || 'text';
+                        direction = (kind === 'number' || kind === 'date') ? 'desc' : 'asc';
                     }
 
                     // Update indicators

@@ -14,8 +14,8 @@ table := types.TableConfig{
     ShowExport:   true,
     ShowEntries:  true,
     Columns: []types.TableColumn{
-        {Key: "name", Label: "Name", Sortable: true, MinWidth: "150px"},
-        {Key: "status", Label: "Status", Sortable: true, MinWidth: "100px"},
+        {Key: "name", Label: "Name", MinWidth: "150px"},
+        {Key: "status", Label: "Status", MinWidth: "100px"},
         {Key: "amount", Label: "Amount", Align: "right", Width: "120px"},
     },
     Rows: []types.TableRow{
@@ -69,10 +69,10 @@ Setting `Minimal: true` hides the toolbar and footer (useful for embedded settin
 
 ```go
 Columns: []types.TableColumn{
-    {Key: "name",   Label: "Name",   Sortable: true,  MinWidth: "150px"},
-    {Key: "email",  Label: "Email",  Sortable: true,  MinWidth: "200px"},
-    {Key: "role",   Label: "Role",   Sortable: false, Width: "120px"},
-    {Key: "amount", Label: "Amount", Sortable: true,  Width: "100px", Align: "right"},
+    {Key: "name",   Label: "Name",   MinWidth: "150px"},
+    {Key: "email",  Label: "Email",  MinWidth: "200px"},
+    {Key: "role",   Label: "Role",   NoSort: true, Width: "120px"},
+    {Key: "amount", Label: "Amount", Width: "100px", Align: "right"},
 }
 ```
 
@@ -80,7 +80,7 @@ Columns: []types.TableColumn{
 |------------|--------|-------------|
 | `Key`      | string | Data attribute key used for sorting and filtering. Must match keys in `DataAttrs`. |
 | `Label`    | string | Column header text. |
-| `Sortable` | bool   | Makes the column header clickable for sorting, and includes it in the sort/filter dropdowns. |
+| `NoSort`   | bool   | Disables sorting for this column. Columns are sortable by default; set `NoSort: true` to opt out. |
 | `Width`    | string | Fixed width (e.g., `"120px"`, `"20%"`). Column cannot grow or shrink. |
 | `MinWidth` | string | Minimum width (e.g., `"150px"`). Column can grow but not shrink below this. |
 | `Align`    | string | Horizontal alignment: `"left"` (default), `"center"`, `"right"`. Applied to header and all cells in the column. |
@@ -94,15 +94,15 @@ ColumnGroups: []types.ColumnGroup{
     {
         Label: "Job Rates",
         Columns: []types.TableColumn{
-            {Key: "jobDefault", Label: "Default", Sortable: true, Align: "right"},
-            {Key: "jobMinimum", Label: "Minimum", Sortable: true, Align: "right"},
+            {Key: "jobDefault", Label: "Default", Align: "right"},
+            {Key: "jobMinimum", Label: "Minimum", Align: "right"},
         },
     },
     {
         Label: "Employee Rates",
         Columns: []types.TableColumn{
-            {Key: "empDefault", Label: "Default", Sortable: true, Align: "right"},
-            {Key: "empMinimum", Label: "Minimum", Sortable: true, Align: "right"},
+            {Key: "empDefault", Label: "Default", Align: "right"},
+            {Key: "empMinimum", Label: "Minimum", Align: "right"},
         },
     },
 }
@@ -818,10 +818,10 @@ table := types.TableConfig{
     DefaultSortColumn:    "name",
     DefaultSortDirection: "asc",
     Columns: []types.TableColumn{
-        {Key: "name",       Label: "Client Name", Sortable: true, MinWidth: "200px"},
-        {Key: "status",     Label: "Status",      Sortable: true, Width: "120px"},
-        {Key: "contact",    Label: "Contact",     Sortable: true, MinWidth: "150px"},
-        {Key: "totalValue", Label: "Total Value",  Sortable: true, Width: "130px", Align: "right"},
+        {Key: "name",       Label: "Client Name", MinWidth: "200px"},
+        {Key: "status",     Label: "Status",      Width: "120px"},
+        {Key: "contact",    Label: "Contact",     MinWidth: "150px"},
+        {Key: "totalValue", Label: "Total Value",  Width: "130px", Align: "right"},
     },
     Rows: buildClientRows(clients), // your row builder function
     Labels: types.TableLabels{

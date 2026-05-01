@@ -300,6 +300,12 @@
     height: 0.875rem;
 }
 
+.sort-dir-label {
+    font-size: 0.75rem;
+    margin-left: 0.25rem;
+    color: var(--text-muted);
+}
+
 /* Columns Menu */
 .columns-menu {
     padding: 0.5rem;
@@ -328,6 +334,23 @@
     height: 1rem;
     accent-color: var(--accent-terracotta);
     cursor: pointer;
+}
+
+.column-toggle-locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.column-toggle-locked input {
+    cursor: not-allowed;
+}
+
+.column-toggle-hint {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.125rem;
+    padding-left: 1.5rem;
 }
 
 /* Export Menu */
@@ -777,13 +800,8 @@ button.sort-btn {
 }
 
 /* Only show the relevant icon when column is actively sorted */
-.data-table th.sort-asc .sort-indicator .sort-asc {
-    display: block;
-}
-
-.data-table th.sort-desc .sort-indicator .sort-desc {
-    display: block;
-}
+.data-table th.sort-asc  .sort-indicator .sort-asc  svg { display: block; }
+.data-table th.sort-desc .sort-indicator .sort-desc svg { display: block; }
 
 /* Legacy sort-icon support */
 .sort-icon {

@@ -7,6 +7,14 @@
 
 {{/* TABLE BULK TOOLBAR - Shown when rows are selected */}}
 {{define "table-bulk-toolbar"}}
+{{/* Bulk-labels JSON payload — consumed by readBulkLabels() in table-selection.js */}}
+<script type="application/json" id="{{.ID}}-bulk-labels">
+{
+  "bulkSelectAllPage": {{quoteJSON .Labels.BulkSelectAllPage}},
+  "bulkSelectAllAcrossPages": {{quoteJSON .Labels.BulkSelectAllAcrossPages}},
+  "bulkClearSelection": {{quoteJSON .Labels.BulkClearSelection}}
+}
+</script>
 <div class="table-bulk-toolbar hidden" data-table="{{.ID}}">
     <div class="bulk-toolbar-left">
         <button type="button" class="bulk-cancel-btn" data-action="cancel-selection" aria-label="{{if .BulkActions.CancelLabel}}{{.BulkActions.CancelLabel}}{{else}}Cancel selection{{end}}">
@@ -16,8 +24,13 @@
             <strong><span class="selected-count">0</span></strong>
             {{if .BulkActions.SelectedLabel}}{{.BulkActions.SelectedLabel}}{{else}}selected{{end}}
         </span>
-        <button type="button" class="bulk-select-all-btn" data-action="select-all">
-            {{if .BulkActions.SelectAllLabel}}{{.BulkActions.SelectAllLabel}}{{else}}Select all{{end}}
+        {{/* Per-table SelectAllLabel override removed — use global TableLabels.BulkSelect* instead */}}
+        <button type="button"
+                class="bulk-select-all-btn"
+                data-action="select-all"
+                data-mode="page"
+                aria-live="polite">
+            {{.Labels.BulkSelectAllPage}}
         </button>
     </div>
     <div class="bulk-toolbar-actions">
@@ -121,15 +134,17 @@
             </button>
             <div class="toolbar-dropdown-menu sort-menu">
                 {{range .Columns}}
-                {{if .Sortable}}
-                <div class="sort-option" data-sort="{{.Key}}">
+                {{if not .NoSort}}
+                <div class="sort-option" data-sort="{{.Key}}" data-sort-kind="{{.SortKind}}">
                     <span class="sort-option-label">{{.Label}}</span>
                     <div class="sort-option-direction">
                         <button type="button" class="sort-dir-btn" data-direction="asc" aria-label="Sort ascending">
                             {{template "icon-arrow-up" $}}
+                            <span class="sort-dir-label">{{if eq .SortKind "number"}}{{$.Labels.SortAscNumber}}{{else if eq .SortKind "date"}}{{$.Labels.SortAscDate}}{{else if eq .SortKind "enum"}}{{$.Labels.SortAscEnum}}{{else}}{{$.Labels.SortAscText}}{{end}}</span>
                         </button>
                         <button type="button" class="sort-dir-btn" data-direction="desc" aria-label="Sort descending">
                             {{template "icon-arrow-down" $}}
+                            <span class="sort-dir-label">{{if eq .SortKind "number"}}{{$.Labels.SortDescNumber}}{{else if eq .SortKind "date"}}{{$.Labels.SortDescDate}}{{else if eq .SortKind "enum"}}{{$.Labels.SortDescEnum}}{{else}}{{$.Labels.SortDescText}}{{end}}</span>
                         </button>
                     </div>
                 </div>
@@ -147,11 +162,19 @@
                 <span>{{.Labels.Columns}}</span>
                 {{template "icon-chevron-down" .}}
             </button>
-            <div class="toolbar-dropdown-menu columns-menu">
+            <div class="toolbar-dropdown-menu columns-menu" data-sort-active-column="{{if .ServerPagination}}{{.ServerPagination.SortColumn}}{{end}}">
                 {{range $index, $col := .Columns}}
-                <label class="column-toggle">
-                    <input type="checkbox" checked data-column="{{$col.Key}}" data-index="{{$index}}">
+                {{$isActiveSort := false}}
+                {{if $.ServerPagination}}{{if and $.ServerPagination.SortColumn (eq $.ServerPagination.SortColumn $col.Key)}}{{$isActiveSort = true}}{{end}}{{end}}
+                <label class="column-toggle{{if $isActiveSort}} column-toggle-locked{{end}}">
+                    <input type="checkbox" checked
+                           data-column="{{$col.Key}}"
+                           data-index="{{$index}}"
+                           {{if $isActiveSort}}disabled aria-disabled="true"{{end}}>
                     <span>{{$col.Label}}</span>
+                    {{if $isActiveSort}}
+                    <small class="column-toggle-hint">{{$.Labels.ColumnSortLockedHint}}</small>
+                    {{end}}
                 </label>
                 {{end}}
             </div>
@@ -233,6 +256,7 @@
         {{if .PrimaryAction.Disabled}}
         <button type="button"
                 class="btn-primary toolbar-primary-action disabled"
+                {{if .PrimaryAction.TestID}}data-testid="{{.PrimaryAction.TestID}}"{{else}}data-testid="{{.ID}}-primary-action"{{end}}
                 disabled
                 title="{{.PrimaryAction.DisabledTooltip}}">
             {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
@@ -241,6 +265,7 @@
         {{else if .PrimaryAction.ActionURL}}
         <button type="button"
                 class="btn-primary toolbar-primary-action"
+                {{if .PrimaryAction.TestID}}data-testid="{{.PrimaryAction.TestID}}"{{else}}data-testid="{{.ID}}-primary-action"{{end}}
                 aria-haspopup="dialog"
                 hx-get="{{.PrimaryAction.ActionURL}}"
                 hx-target="#sheetContent"
@@ -251,7 +276,7 @@
             {{.PrimaryAction.Label}}
         </button>
         {{else}}
-        <a href="{{.PrimaryAction.Href}}" class="btn-primary toolbar-primary-action">
+        <a href="{{.PrimaryAction.Href}}" class="btn-primary toolbar-primary-action"{{if .PrimaryAction.TestID}} data-testid="{{.PrimaryAction.TestID}}"{{else}} data-testid="{{.ID}}-primary-action"{{end}}>
             {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
             {{.PrimaryAction.Label}}
         </a>

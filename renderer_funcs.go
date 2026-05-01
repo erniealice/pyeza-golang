@@ -130,6 +130,17 @@ func getDefaultFuncMap() template.FuncMap {
 			}
 			return FormatDuration(v, unit, labels)
 		},
+		// quoteJSON JSON-encodes a string value and returns it as template.JS so
+		// it can be embedded inside a <script type="application/json"> block without
+		// double-escaping. The result includes the surrounding double-quotes.
+		// Usage: {{quoteJSON .Labels.BulkSelectAllPage}} → "Select All items in this page"
+		"quoteJSON": func(s string) template.JS {
+			b, err := json.Marshal(s)
+			if err != nil {
+				return template.JS(`""`)
+			}
+			return template.JS(b)
+		},
 		// filterColumnsJSON serializes filterable columns as a JSON array for use
 		// in inert <script type="application/json"> blocks in table templates.
 		// Only columns with Filterable==true are included.

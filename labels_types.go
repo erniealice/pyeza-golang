@@ -284,8 +284,20 @@ type CommonTableLabels struct {
 	ExportCsv         string             `json:"exportCsv"`
 	ExportExcel       string             `json:"exportExcel"`
 	Density           TableDensityLabels `json:"density"`
-	SelectAll         string             `json:"selectAll"`
-	SelectRow         string             `json:"selectRow"`
+	SelectAll                string             `json:"selectAll"`
+	BulkSelectAllPage        string             `json:"bulkSelectAllPage"`
+	BulkSelectAllAcrossPages string             `json:"bulkSelectAllAcrossPages"`
+	BulkClearSelection       string             `json:"bulkClearSelection"`
+	ColumnSortLockedHint     string             `json:"columnSortLockedHint"`
+	SortAscText              string             `json:"sortAscText"`
+	SortDescText             string             `json:"sortDescText"`
+	SortAscNumber            string             `json:"sortAscNumber"`
+	SortDescNumber           string             `json:"sortDescNumber"`
+	SortAscDate              string             `json:"sortAscDate"`
+	SortDescDate             string             `json:"sortDescDate"`
+	SortAscEnum              string             `json:"sortAscEnum"`
+	SortDescEnum             string             `json:"sortDescEnum"`
+	SelectRow                string             `json:"selectRow"`
 	Actions           string             `json:"actions"`
 	Show              string             `json:"show"`
 	Entries           string             `json:"entries"`

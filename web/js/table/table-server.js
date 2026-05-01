@@ -282,6 +282,11 @@
                         lf.TableSelection.initBulkSelection();
                     }
 
+                    // Refresh column-selector sort-lock after sort column may have changed
+                    if (lf.TableColumns && lf.TableColumns.refreshColumnSortLock) {
+                        lf.TableColumns.refreshColumnSortLock(tableCard);
+                    }
+
                     console.log('[TableServer] Targeted swap complete for:', baseId);
                 })
                 .catch(function(err) {

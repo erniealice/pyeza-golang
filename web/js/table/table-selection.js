@@ -131,16 +131,34 @@
                 listeners.push({ element: cancelBtn, type: 'click', handler: cancelHandler });
             }
 
-            // Store original "Select all" label for dynamic text updates
-            if (selectAllBtn && !selectAllBtn.dataset.originalLabel) {
-                selectAllBtn.dataset.originalLabel = selectAllBtn.textContent.trim();
-            }
-
-            // Select all button in bulk toolbar
+            // Select all button in bulk toolbar — mode-aware (page → all-pages → clear)
             if (selectAllBtn) {
                 const selectAllBtnHandler = () => {
+                    const mode = selectAllBtn.dataset.mode || 'page';
+
+                    if (mode === 'clear') {
+                        clearAllSelections(table, card, state.selectedIds, selectedCountEl, selectAllCheckbox);
+                        return;
+                    }
+
+                    if (mode === 'all-pages') {
+                        // Enter cross-page select mode
+                        const isServerPaginated = card.dataset.serverPagination === 'true';
+                        const totalRows = parseInt(card.dataset.totalRows) || 0;
+                        if (isServerPaginated && totalRows > state.selectedIds.size) {
+                            state.allResultsSelected = true;
+                            console.log('[TableSelection] Entering allResultsSelected mode, total:', totalRows);
+                            if (selectedCountEl) selectedCountEl.textContent = totalRows;
+                            fetchAllResultIds(card, state).then(function() {
+                                updateBulkSelectionUI(card, state.selectedIds, selectedCountEl, selectAllCheckbox, table);
+                            });
+                        }
+                        updateBulkSelectionUI(card, state.selectedIds, selectedCountEl, selectAllCheckbox, table);
+                        return;
+                    }
+
+                    // mode === 'page' (default): check all visible page rows
                     const checkboxes = table.querySelectorAll('.row-select-checkbox');
-                    // Check all visible rows
                     checkboxes.forEach(cb => {
                         cb.checked = true;
                         const rowId = cb.dataset.rowId;
@@ -148,21 +166,6 @@
                         cb.closest('tr').classList.add('selected');
                     });
                     if (selectAllCheckbox) selectAllCheckbox.checked = true;
-
-                    // In server-pagination mode, fetch ALL result IDs across pages
-                    const isServerPaginated = card.dataset.serverPagination === 'true';
-                    const totalRows = parseInt(card.dataset.totalRows) || 0;
-                    if (isServerPaginated && totalRows > checkboxes.length) {
-                        state.allResultsSelected = true;
-                        console.log('[TableSelection] Entering allResultsSelected mode, total:', totalRows);
-                        // Optimistically show total count while fetching
-                        if (selectedCountEl) selectedCountEl.textContent = totalRows;
-                        // Fetch all IDs from the server
-                        fetchAllResultIds(card, state).then(function() {
-                            updateBulkSelectionUI(card, state.selectedIds, selectedCountEl, selectAllCheckbox, table);
-                        });
-                    }
-
                     updateBulkSelectionUI(card, state.selectedIds, selectedCountEl, selectAllCheckbox, table);
                 };
                 selectAllBtn.addEventListener('click', selectAllBtnHandler);
@@ -281,7 +284,7 @@
             card.setAttribute('data-bulk-mode', 'false');
         }
 
-        // Update select all checkbox state and "Select all" button
+        // Update select all checkbox state and mode-aware "Select all" button
         if (selectAllCheckbox) {
             const allCheckboxes = table.querySelectorAll('.row-select-checkbox');
             const allChecked = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(cb => cb.checked);
@@ -292,29 +295,67 @@
 
             const selectAllBtn = card.querySelector('[data-action="select-all"]');
             if (selectAllBtn) {
-                if (state && state.allResultsSelected) {
-                    // All results selected cross-page — hide button
-                    selectAllBtn.style.display = 'none';
-                } else if (isServerPaginated && allChecked && totalRows > allCheckboxes.length) {
-                    // All page rows checked but more exist — show "Select all {total}"
-                    const label = selectAllBtn.dataset.originalLabel || 'Select all';
-                    selectAllBtn.textContent = label + ' ' + totalRows;
-                    selectAllBtn.style.display = '';
-                } else if (allChecked) {
-                    // Client-side table or total equals page — hide
-                    selectAllBtn.style.display = 'none';
-                } else {
-                    // Partial selection — restore original label
-                    if (selectAllBtn.dataset.originalLabel) {
-                        selectAllBtn.textContent = selectAllBtn.dataset.originalLabel;
-                    }
-                    selectAllBtn.style.display = '';
-                }
+                const labels = readBulkLabels(card);
+                const mode = resolveSelectAllMode({
+                    allChecked,
+                    allResultsSelected: !!(state && state.allResultsSelected),
+                    isServerPaginated,
+                    totalRows,
+                    pageRows: allCheckboxes.length
+                });
+                applySelectAllMode(selectAllBtn, mode, totalRows, labels);
             }
         }
 
         // Update conditional bulk action button visibility
         updateConditionalButtonVisibility(card, table, selectedIds);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Select-all mode machine helpers (Phase 5)
+    // ---------------------------------------------------------------------------
+
+    function resolveSelectAllMode(s) {
+        if (s.allResultsSelected) return 'clear';
+        if (!s.allChecked) return 'page';
+        if (s.isServerPaginated && s.totalRows > s.pageRows) return 'all-pages';
+        return 'hidden';
+    }
+
+    function applySelectAllMode(btn, mode, totalRows, labels) {
+        switch (mode) {
+            case 'hidden':
+                btn.style.display = 'none';
+                btn.dataset.mode = '';
+                return;
+            case 'page':
+                btn.textContent = labels.bulkSelectAllPage;
+                btn.dataset.mode = 'page';
+                btn.style.display = '';
+                return;
+            case 'all-pages':
+                btn.textContent = labels.bulkSelectAllAcrossPages.replace('{N}', totalRows);
+                btn.dataset.mode = 'all-pages';
+                btn.style.display = '';
+                return;
+            case 'clear':
+                btn.textContent = labels.bulkClearSelection;
+                btn.dataset.mode = 'clear';
+                btn.style.display = '';
+                return;
+        }
+    }
+
+    function readBulkLabels(card) {
+        const tableId = card.id.replace('-card', '');
+        const node = document.getElementById(tableId + '-bulk-labels');
+        if (!node) {
+            return { bulkSelectAllPage: 'Select All items in this page',
+                     bulkSelectAllAcrossPages: 'Select all {N} across all pages',
+                     bulkClearSelection: 'Clear selection' };
+        }
+        try { return JSON.parse(node.textContent); }
+        catch (e) { console.warn('[TableSelection] failed to parse bulk labels JSON', e); return {}; }
     }
 
     /**

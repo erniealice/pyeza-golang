@@ -165,11 +165,11 @@ func TestSortableKeys(t *testing.T) {
 	t.Parallel()
 
 	columns := []TableColumn{
-		{Key: "name", Sortable: true},
-		{Key: "email", Sortable: false},
-		{Key: "date_created", Sortable: true},
-		{Key: "status", Sortable: false},
-		{Key: "amount", Sortable: true},
+		{Key: "name"},
+		{Key: "email", NoSort: true},
+		{Key: "date_created"},
+		{Key: "status", NoSort: true},
+		{Key: "amount"},
 	}
 
 	keys := SortableKeys(columns)
@@ -189,8 +189,8 @@ func TestSortableKeys_NoSortable(t *testing.T) {
 	t.Parallel()
 
 	columns := []TableColumn{
-		{Key: "name", Sortable: false},
-		{Key: "email", Sortable: false},
+		{Key: "name", NoSort: true},
+		{Key: "email", NoSort: true},
 	}
 
 	keys := SortableKeys(columns)

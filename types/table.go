@@ -36,7 +36,14 @@ type ActiveFilter struct {
 type TableColumn struct {
 	Key        string // Data attribute key for sorting
 	Label      string // Column header label
-	Sortable   bool   // Whether column is sortable
+	// NoSort, when true, disables sorting on this column. Default false (column is sortable). Use for derived columns where ORDER BY has no meaning, e.g., computed fields without a stable backing column.
+	NoSort bool
+	// SortKind influences the initial sort direction picked when the user first clicks a header,
+	// and the labels rendered in the toolbar Sort dropdown.
+	// Allowed values: "text" (A→Z asc, default), "number" (High→Low desc default),
+	// "date" (Newest→Oldest desc default), "enum" (grouped, asc default).
+	// Empty = auto-derived from the first cell type in the column via DeriveSortKind.
+	SortKind string
 	Width      string // Optional fixed width (e.g., "200px", "20%") — prefer WidthClass
 	WidthClass string // Optional density-responsive width class (e.g., "col-3xl") — preferred over Width
 	MinWidth   string // Optional minimum width (e.g., "100px") - column can grow but not shrink below this
@@ -146,9 +153,38 @@ type TableCell struct {
 	TimeText string // Time portion (e.g., "3:04 PM")
 }
 
+// DeriveSortKind returns the SortKind implied by a TableCell.Type.
+// Used by ApplyColumnStyles to memoize SortKind onto each TableColumn from its first row's cell.
+// Returns "" for unknown cell types (the template treats this as "text" by default).
+func DeriveSortKind(cellType string) string {
+	switch cellType {
+	case "number", "money":
+		return "number"
+	case "datetime", "author":
+		return "date"
+	case "badge", "select":
+		return "enum"
+	case "text", "name", "link", "email", "phone", "html", "chips", "single-person", "multi-person", "input":
+		return "text"
+	default:
+		return ""
+	}
+}
+
 // ApplyColumnStyles copies alignment, width, minWidth, vAlign, and label from columns to cells in all rows.
 // Call this after building rows to ensure cells inherit column styles.
 func ApplyColumnStyles(columns []TableColumn, rows []TableRow) {
+	// Memoize SortKind for each column from the first row's matching cell, unless caller already set it.
+	if len(rows) > 0 {
+		for j := range columns {
+			if columns[j].SortKind != "" {
+				continue
+			}
+			if j < len(rows[0].Cells) {
+				columns[j].SortKind = DeriveSortKind(rows[0].Cells[j].Type)
+			}
+		}
+	}
 	for i := range rows {
 		for j := range rows[i].Cells {
 			if j < len(columns) {
@@ -269,6 +305,21 @@ type TableLabels struct {
 	Actions        string
 	Prev           string
 	Next           string
+	// Bulk select-all mode machine labels (Phase 5)
+	BulkSelectAllPage        string // "Select All items in this page"
+	BulkSelectAllAcrossPages string // "Select all {N} across all pages" — JS does literal .replace('{N}', totalRows)
+	BulkClearSelection       string // "Clear selection"
+	// Column selector sort-lock (Phase 4)
+	ColumnSortLockedHint string // Hint shown below the disabled column-toggle checkbox when the column is the active sort. e.g. "Change the sort column before hiding this one."
+	// Sort dropdown labels per SortKind (Phase 3). Rendered next to each direction button in the toolbar Sort dropdown.
+	SortAscText    string // "A → Z"
+	SortDescText   string // "Z → A"
+	SortAscNumber  string // "Low → High"
+	SortDescNumber string // "High → Low"
+	SortAscDate    string // "Oldest → Newest"
+	SortDescDate   string // "Newest → Oldest"
+	SortAscEnum    string // "Grouped"
+	SortDescEnum   string // "Grouped (reverse)"
 }
 
 // PrimaryAction defines a primary action button for the table toolbar
@@ -279,6 +330,7 @@ type PrimaryAction struct {
 	ActionURL       string // HTMX action URL for form loading
 	Disabled        bool   // If true, render as disabled button (no click, no HTMX)
 	DisabledTooltip string // Tooltip shown when hovering over disabled button
+	TestID          string // Optional custom data-testid attribute for the button
 }
 
 // BulkAction defines an action available when multiple rows are selected
@@ -542,11 +594,13 @@ func itoa(n int) string {
 }
 
 // SortableKeys extracts the keys of all sortable columns.
-// Used by view handlers to build the allowed sort columns list.
+// Used by view handlers to build the allowed sort columns whitelist passed
+// to ParseTableParams. Returns keys for columns where NoSort is false (the
+// default) and Key is non-empty.
 func SortableKeys(cols []TableColumn) []string {
 	var keys []string
 	for _, c := range cols {
-		if c.Sortable {
+		if !c.NoSort && c.Key != "" {
 			keys = append(keys, c.Key)
 		}
 	}

@@ -13,8 +13,8 @@ Required data structure (use shared.TableConfig):
         ID: "myTable",
         CardClass: "my-table-card",
         Columns: []TableColumn{
-            {Key: "name", Label: "Name", Sortable: true, MinWidth: "150px"},
-            {Key: "status", Label: "Status", Sortable: false, MinWidth: "100px"},
+            {Key: "name", Label: "Name", MinWidth: "150px"},
+            {Key: "status", Label: "Status", NoSort: true, MinWidth: "100px"},
             {Key: "amount", Label: "Amount", Align: "right", Width: "120px"},
         },
         Rows: []TableRow{
@@ -150,9 +150,9 @@ JavaScript:
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}{{if .WidthClass}} {{.WidthClass}}{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{else}}{{if .WidthClass}}class="{{.WidthClass}}"{{end}}{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}}{{if or .Width .MinWidth .Align}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}"{{end}}>
-                {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
-                {{if .Sortable}}
+            <th scope="col" {{if not .NoSort}}class="sortable{{if $isActive}} active sort-{{$activeDirection}}{{end}}{{if .WidthClass}} {{.WidthClass}}{{end}}" data-sort="{{.Key}}"{{if .SortKind}} data-sort-kind="{{.SortKind}}"{{end}} aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{else}}{{if .WidthClass}}class="{{.WidthClass}}"{{end}}{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}}{{if or .Width .MinWidth .Align}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}"{{end}}>
+                {{if not .NoSort}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
+                {{if not .NoSort}}
                 <span class="sort-indicator">
                     <span class="sort-asc{{if and $isActive (eq $activeDirection "asc")}} active{{end}}">{{template "icon-arrow-up" $}}</span>
                     <span class="sort-desc{{if and $isActive (eq $activeDirection "desc")}} active{{end}}">{{template "icon-arrow-down" $}}</span>
@@ -181,9 +181,9 @@ JavaScript:
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active{{end}}{{if .WidthClass}} {{.WidthClass}}{{end}}" data-sort="{{.Key}}" aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{else}}{{if .WidthClass}}class="{{.WidthClass}}"{{end}}{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}}{{if or .Width .MinWidth .Align}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}"{{end}}>
-                {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
-                {{if .Sortable}}
+            <th scope="col" {{if not .NoSort}}class="sortable{{if $isActive}} active sort-{{$activeDirection}}{{end}}{{if .WidthClass}} {{.WidthClass}}{{end}}" data-sort="{{.Key}}"{{if .SortKind}} data-sort-kind="{{.SortKind}}"{{end}} aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{else}}{{if .WidthClass}}class="{{.WidthClass}}"{{end}}{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}}{{if or .Width .MinWidth .Align}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}"{{end}}>
+                {{if not .NoSort}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
+                {{if not .NoSort}}
                 <span class="sort-indicator">
                     <span class="sort-asc{{if and $isActive (eq $activeDirection "asc")}} active{{end}}">{{template "icon-arrow-up"}}</span>
                     <span class="sort-desc{{if and $isActive (eq $activeDirection "desc")}} active{{end}}">{{template "icon-arrow-down"}}</span>
