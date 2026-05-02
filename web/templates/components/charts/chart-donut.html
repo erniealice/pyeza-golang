@@ -1,0 +1,14 @@
+{{/*
+================================================================================
+CHART — DONUT
+================================================================================
+Donut variant of chart-pie. Same input contract; CSS adds the center hole and
+gives the disc room for a center stat (caller may layer one via Custom HTML).
+
+USAGE: {{template "chart-donut" .ChartData}}
+================================================================================
+*/}}
+
+{{define "chart-donut"}}
+{{template "chart-pie-base" (dict "Data" . "Donut" true)}}
+{{end}}

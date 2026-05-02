@@ -135,6 +135,7 @@ func (r *HTMLRenderer) Init() error {
 			filepath.Join(tmplRoot, "components", "*.html"),
 			filepath.Join(tmplRoot, "components", "calendar", "*.html"),
 			filepath.Join(tmplRoot, "components", "table", "*.html"),
+			filepath.Join(tmplRoot, "components", "charts", "*.html"),
 			filepath.Join(tmplRoot, "blocks", "*.html"),
 		}
 		patterns = append(patterns, r.templatePatterns...)

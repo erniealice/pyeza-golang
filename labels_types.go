@@ -1,5 +1,7 @@
 package pyeza
 
+import "github.com/erniealice/pyeza-golang/types"
+
 // TabLabels holds shared tab label strings used across all domain packages
 type TabLabels struct {
 	Attachments string `json:"attachments"`
@@ -530,10 +532,18 @@ type DurationUnitLabels struct {
 	YearSelect    string `json:"yearSelect"`
 }
 
-// CurrencyOptionLabels holds the translated display names for each supported
-// currency code. Loaded from translations/en/common/common.json under the
-// "currency" key. Used by centymo.BuildCurrencyOptions via CurrencyLabelsFromCommon.
-type CurrencyOptionLabels struct {
-	PHP string `json:"php"`
-	USD string `json:"usd"`
+// CurrencyLabels is the shape of a translatable currency picker — a
+// placeholder string plus a list of select options. Pyeza owns this shape
+// (same role it plays for every other common-block label type) so any
+// consumer view can declare a field of this type and have lyngua's loader
+// populate it from a JSON bundle. Pyeza never owns the curated list — that
+// lives in the consuming domain (e.g. centymo.DefaultCurrencyOptions).
+//
+// Conventionally loaded from translations/en/common/currency.json by each
+// view that renders a currency picker, mirroring how DurationUnitLabels is
+// loaded from translations/en/common/common.json.
+type CurrencyLabels struct {
+	Placeholder string               `json:"placeholder"`
+	Options     []types.SelectOption `json:"options"`
 }
+

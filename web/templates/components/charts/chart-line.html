@@ -1,0 +1,66 @@
+{{/*
+================================================================================
+CHART — LINE
+================================================================================
+SVG line chart. Multi-series renders as overlay polylines. No JS, server-only.
+
+INPUT (types/dashboard.go ChartData):
+  Labels []string             x-axis category labels (defines N)
+  Series []ChartSeries        each: Name, Values []float64, Color
+  YMax   float64              upper bound; views call AutoScale() before render
+  XAxis  string               optional axis title
+  YAxis  string               optional axis title
+
+VIEWBOX:
+  width  = 400  (units)
+  height = 180  (units)
+  pad-left=32 pad-right=8 pad-top=8 pad-bottom=24
+
+USAGE: {{template "chart-line" .ChartData}}
+================================================================================
+*/}}
+
+{{define "chart-line"}}
+{{$w := 400.0}}{{$h := 180.0}}
+{{$pl := 32.0}}{{$pr := 8.0}}{{$pt := 8.0}}{{$pb := 24.0}}
+{{$cw := subf $w (addf $pl $pr)}}
+{{$ch := subf $h (addf $pt $pb)}}
+{{$ymax := .YMax}}{{if not $ymax}}{{$ymax = 1.0}}{{end}}
+{{$n := len .Labels}}
+{{$step := 0.0}}{{if gt $n 1}}{{$step = div $cw (sub $n 1)}}{{end}}
+{{$baseY := addf $pt $ch}}
+{{$xRight := subf $w $pr}}
+
+<div class="chart chart--line" data-testid="chart-line">
+    <svg viewBox="0 0 {{$w}} {{$h}}" preserveAspectRatio="none" role="img"{{if .YAxis}} aria-label="{{.YAxis}}"{{end}}>
+        {{/* horizontal grid lines (4 divisions) */}}
+        {{range $i := until 5}}
+        {{$gy := addf $pt (mul $ch (div (sub 4 $i) 4))}}
+        <line class="chart-grid" x1="{{$pl}}" y1="{{$gy}}" x2="{{$xRight}}" y2="{{$gy}}" />
+        {{end}}
+
+        {{$plOuter := $pl}}{{$ymaxOuter := $ymax}}{{$stepOuter := $step}}{{$baseYOuter := $baseY}}{{$chOuter := $ch}}
+
+        {{range $si, $s := .Series}}
+        {{$color := $s.Color}}{{if not $color}}{{$color = (index (list "terracotta" "sage" "navy" "amber" "plum" "teal") $si)}}{{end}}
+        <polyline class="chart-line chart-line--{{$color}}" fill="none" points="{{range $i, $v := $s.Values}}{{if $i}} {{end}}{{$x := addf $plOuter (mul $i $stepOuter)}}{{$y := subf $baseYOuter (mul (div $v $ymaxOuter) $chOuter)}}{{$x}},{{$y}}{{end}}" />
+
+        {{range $i, $v := $s.Values}}
+        {{$x := addf $plOuter (mul $i $stepOuter)}}
+        {{$y := subf $baseYOuter (mul (div $v $ymaxOuter) $chOuter)}}
+        <circle class="chart-line-dot chart-line-dot--{{$color}}" cx="{{$x}}" cy="{{$y}}" r="2.5" />
+        {{end}}
+        {{end}}
+    </svg>
+
+    {{if .Labels}}
+    <div class="chart-x-labels">
+        {{range .Labels}}<span class="chart-x-label">{{.}}</span>{{end}}
+    </div>
+    {{end}}
+
+    {{if gt (len .Series) 1}}
+    {{template "chart-legend" .}}
+    {{end}}
+</div>
+{{end}}

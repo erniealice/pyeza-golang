@@ -1,0 +1,64 @@
+{{/*
+================================================================================
+DASHBOARD COMPONENT BLOCK
+================================================================================
+Reusable dashboard layout: optional header, quick-actions row, stats row,
+and a flexible widgets grid.
+
+INPUT CONTRACT (types/dashboard.go DashboardData):
+  Title?        string                 Optional internal heading (most callers
+                                       leave empty — app-shell header carries it)
+  Subtitle?     string
+  Icon?         string
+
+  QuickActions? []QuickAction          Action row above stats
+  Stats?        []StatCardData         4–6 KPI tiles
+  Widgets?      []DashboardWidget      Cards in the responsive grid
+
+  Class?        string                 Extra class on the .dashboard-block
+  RefreshURL?   string                 HTMX hook (data-refresh-url attribute)
+
+USAGE:
+  {{template "dashboard" .Dashboard}}
+
+The block does NOT call app-shell — the page-content partial owns that.
+================================================================================
+*/}}
+
+{{define "dashboard"}}
+<div class="dashboard-block{{if .Class}} {{.Class}}{{end}}"{{if .RefreshURL}} data-refresh-url="{{.RefreshURL}}"{{end}}>
+
+    {{if .Title}}
+    <div class="dashboard-header">
+        <div class="dashboard-header-title">
+            {{if .Icon}}<div class="dashboard-header-icon" data-icon="{{.Icon}}"></div>{{end}}
+            <div class="dashboard-header-text">
+                <h1 class="dashboard-title">{{.Title}}</h1>
+                {{if .Subtitle}}<p class="dashboard-subtitle">{{.Subtitle}}</p>{{end}}
+            </div>
+        </div>
+    </div>
+    {{end}}
+
+    {{if .QuickActions}}
+    {{template "quick-actions" (dict "Actions" .QuickActions)}}
+    {{end}}
+
+    {{if .Stats}}
+    <div class="dashboard-stats-row" data-testid="dashboard-stats-row">
+        {{range .Stats}}
+        {{template "stat-card" .}}
+        {{end}}
+    </div>
+    {{end}}
+
+    {{if .Widgets}}
+    <div class="dashboard-widgets-grid" data-testid="dashboard-widgets-grid">
+        {{range .Widgets}}
+        {{template "dashboard-widget" .}}
+        {{end}}
+    </div>
+    {{end}}
+
+</div>
+{{end}}

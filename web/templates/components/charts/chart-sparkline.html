@@ -1,0 +1,25 @@
+{{/*
+================================================================================
+CHART — SPARKLINE
+================================================================================
+Tiny inline trend line — no axes, no labels, no legend. Used inside
+stat-cards or table cells.
+
+USAGE: {{template "chart-sparkline" .ChartData}}
+================================================================================
+*/}}
+
+{{define "chart-sparkline"}}
+{{$w := 120.0}}{{$h := 32.0}}
+{{$ymax := .YMax}}{{if not $ymax}}{{$ymax = 1.0}}{{end}}
+{{$series0 := index .Series 0}}
+{{$values := $series0.Values}}
+{{$color := $series0.Color}}{{if not $color}}{{$color = "terracotta"}}{{end}}
+{{$n := len $values}}
+{{$step := 0.0}}{{if gt $n 1}}{{$step = div $w (sub $n 1)}}{{end}}
+
+<svg class="chart chart--sparkline chart--sparkline-{{$color}}" viewBox="0 0 {{$w}} {{$h}}" preserveAspectRatio="none" data-testid="chart-sparkline" role="img">
+    <polyline class="chart-sparkline-line chart-sparkline-line--{{$color}}" fill="none"
+              points="{{range $i, $v := $values}}{{if $i}} {{end}}{{$x := mul $i $step}}{{$y := subf $h (mul (div $v $ymax) $h)}}{{$x}},{{$y}}{{end}}" />
+</svg>
+{{end}}

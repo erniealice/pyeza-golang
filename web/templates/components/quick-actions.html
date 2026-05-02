@@ -1,0 +1,33 @@
+{{/*
+================================================================================
+QUICK ACTIONS ROW
+================================================================================
+A horizontal pill row of icon+label action buttons, typically rendered above
+the stats row on a dashboard. Permission-aware: when an action carries a
+.Permission, the surrounding view is responsible for filtering it out before
+passing the slice (this template does not do permission lookup itself —
+keeping pyeza dependency-free).
+
+INPUT:
+  Actions: []QuickAction
+    Icon, Label, Href, Variant ("primary"|"secondary"|"ghost"), TestID
+
+USAGE:
+  {{template "quick-actions" (dict "Actions" .QuickActions)}}
+================================================================================
+*/}}
+
+{{define "quick-actions"}}
+{{if .Actions}}
+<nav class="dashboard-quick-actions" aria-label="Quick actions" data-testid="dashboard-quick-actions">
+    {{range .Actions}}
+    {{$variant := .Variant}}
+    {{if not $variant}}{{$variant = "secondary"}}{{end}}
+    <a href="{{.Href}}" class="quick-action quick-action--{{$variant}}"{{if .TestID}} data-testid="{{.TestID}}"{{end}}>
+        {{if .Icon}}<span class="quick-action-icon" data-icon="{{.Icon}}"></span>{{end}}
+        <span class="quick-action-label">{{.Label}}</span>
+    </a>
+    {{end}}
+</nav>
+{{end}}
+{{end}}

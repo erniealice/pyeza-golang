@@ -36,6 +36,15 @@ func getDefaultFuncMap() template.FuncMap {
 			}
 			return af / bf
 		},
+		// addf/subf are float-typed counterparts to add/sub. Used for SVG
+		// coordinate math in chart templates where mul/div already returns
+		// float64 and chained add/sub would otherwise need int args.
+		"addf": func(a, b any) float64 {
+			return toFloat64(a) + toFloat64(b)
+		},
+		"subf": func(a, b any) float64 {
+			return toFloat64(a) - toFloat64(b)
+		},
 		"until": func(count int) []int {
 			// Sprig-compatible until function: generates [0, 1, ..., count-1]
 			result := make([]int, count)

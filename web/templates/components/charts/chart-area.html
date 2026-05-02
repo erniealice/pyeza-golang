@@ -1,0 +1,55 @@
+{{/*
+================================================================================
+CHART — AREA
+================================================================================
+Filled-area variant of chart-line. Same input contract; renders a shaded area
+under the polyline.
+
+USAGE: {{template "chart-area" .ChartData}}
+================================================================================
+*/}}
+
+{{define "chart-area"}}
+{{$w := 400.0}}{{$h := 180.0}}
+{{$pl := 32.0}}{{$pr := 8.0}}{{$pt := 8.0}}{{$pb := 24.0}}
+{{$cw := subf $w (addf $pl $pr)}}
+{{$ch := subf $h (addf $pt $pb)}}
+{{$ymax := .YMax}}{{if not $ymax}}{{$ymax = 1.0}}{{end}}
+{{$n := len .Labels}}
+{{$step := 0.0}}{{if gt $n 1}}{{$step = div $cw (sub $n 1)}}{{end}}
+{{$baseY := addf $pt $ch}}
+{{$xRight := subf $w $pr}}
+
+<div class="chart chart--area" data-testid="chart-area">
+    <svg viewBox="0 0 {{$w}} {{$h}}" preserveAspectRatio="none" role="img"{{if .YAxis}} aria-label="{{.YAxis}}"{{end}}>
+        {{range $i := until 5}}
+        {{$gy := addf $pt (mul $ch (div (sub 4 $i) 4))}}
+        <line class="chart-grid" x1="{{$pl}}" y1="{{$gy}}" x2="{{$xRight}}" y2="{{$gy}}" />
+        {{end}}
+
+        {{$plOuter := $pl}}{{$chOuter := $ch}}{{$ymaxOuter := $ymax}}{{$stepOuter := $step}}{{$baseYOuter := $baseY}}
+
+        {{range $si, $s := .Series}}
+        {{$color := $s.Color}}{{if not $color}}{{$color = (index (list "terracotta" "sage" "navy" "amber" "plum" "teal") $si)}}{{end}}
+        {{$last := sub (len $s.Values) 1}}
+        {{$xFirst := $plOuter}}
+        {{$xLast := addf $plOuter (mul $stepOuter $last)}}
+
+        <path class="chart-area-fill chart-area-fill--{{$color}}"
+              d="M {{$xFirst}},{{$baseYOuter}} {{range $i, $v := $s.Values}}{{$x := addf $plOuter (mul $i $stepOuter)}}{{$y := subf $baseYOuter (mul (div $v $ymaxOuter) $chOuter)}}L {{$x}},{{$y}} {{end}}L {{$xLast}},{{$baseYOuter}} Z" />
+        <polyline class="chart-area-line chart-area-line--{{$color}}" fill="none"
+              points="{{range $i, $v := $s.Values}}{{if $i}} {{end}}{{$x := addf $plOuter (mul $i $stepOuter)}}{{$y := subf $baseYOuter (mul (div $v $ymaxOuter) $chOuter)}}{{$x}},{{$y}}{{end}}" />
+        {{end}}
+    </svg>
+
+    {{if .Labels}}
+    <div class="chart-x-labels">
+        {{range .Labels}}<span class="chart-x-label">{{.}}</span>{{end}}
+    </div>
+    {{end}}
+
+    {{if gt (len .Series) 1}}
+    {{template "chart-legend" .}}
+    {{end}}
+</div>
+{{end}}

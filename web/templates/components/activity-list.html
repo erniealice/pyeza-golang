@@ -1,0 +1,43 @@
+{{/*
+================================================================================
+ACTIVITY LIST
+================================================================================
+Recent-activity feed for dashboard list-type widgets. Each row has an icon
+chip, a title, a description, and a relative-time string. An optional Href
+turns the row into a link.
+
+INPUT:
+  Items: []ActivityItem
+    IconName, IconVariant, Title, Description, Time, Href, TestID
+
+USAGE:
+  {{template "activity-list" (dict "Items" .Items)}}
+================================================================================
+*/}}
+
+{{define "activity-list"}}
+{{if .Items}}
+<ul class="activity-list" data-testid="activity-list">
+    {{range $i, $it := .Items}}
+    {{$testID := $it.TestID}}
+    {{if not $testID}}{{$testID = printf "activity-item-%d" (add $i 1)}}{{end}}
+    <li class="activity-item" data-testid="{{$testID}}">
+        <div class="activity-icon{{if $it.IconVariant}} activity-icon--{{$it.IconVariant}}{{end}}">
+            {{if $it.IconName}}<span data-icon="{{$it.IconName}}"></span>{{end}}
+        </div>
+        <div class="activity-content">
+            {{if $it.Href}}
+            <a href="{{$it.Href}}" class="activity-title">{{$it.Title}}</a>
+            {{else}}
+            <div class="activity-title">{{$it.Title}}</div>
+            {{end}}
+            {{if $it.Description}}<div class="activity-desc">{{$it.Description}}</div>{{end}}
+        </div>
+        {{if $it.Time}}<span class="activity-time">{{$it.Time}}</span>{{end}}
+    </li>
+    {{end}}
+</ul>
+{{else}}
+{{template "empty-state" (dict "Title" "No recent activity" "Class" "empty-state--widget")}}
+{{end}}
+{{end}}

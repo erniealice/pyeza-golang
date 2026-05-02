@@ -1,0 +1,265 @@
+/*
+ * ==========================================================================
+ * DASHBOARD BLOCK
+ * ==========================================================================
+ * Layout for the pyeza "dashboard" component block. Composed of an optional
+ * header, an optional quick-actions row, a stats row, and a widgets grid.
+ *
+ * The block does NOT carry visual chrome of its own — pyeza tokens drive
+ * spacing, color, and typography. Per-app dashboards add layout overrides
+ * via their own `{pkg}-{module}-dashboard.css` files (loaded via
+ * data-page-css on .page-content).
+ * ==========================================================================
+ */
+
+.dashboard-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xl);
+    padding: var(--spacing-xl) var(--spacing-2xl);
+}
+
+/* ========================================
+   HEADER (optional — most callers leave this out and let app-shell render the title)
+   ======================================== */
+
+.dashboard-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+}
+
+.dashboard-header-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.dashboard-header-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dashboard-header-icon svg {
+    width: 1.375rem;
+    height: 1.375rem;
+}
+
+.dashboard-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.dashboard-subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0;
+}
+
+/* ========================================
+   STATS ROW
+   ======================================== */
+
+.dashboard-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--spacing-lg);
+}
+
+/* ========================================
+   QUICK ACTIONS ROW
+   ======================================== */
+
+.dashboard-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.quick-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    border: var(--border-width) solid var(--border);
+    transition: background var(--duration-base), border-color var(--duration-base), transform var(--duration-base);
+    white-space: nowrap;
+}
+
+.quick-action--primary {
+    background: var(--accent-terracotta);
+    color: var(--bg-card);
+    border-color: var(--accent-terracotta);
+}
+
+.quick-action--primary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.quick-action--secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+.quick-action--secondary:hover {
+    background: var(--bg-subtle);
+    border-color: var(--accent-terracotta);
+    color: var(--accent-terracotta);
+}
+
+.quick-action--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: transparent;
+}
+
+.quick-action--ghost:hover {
+    background: var(--bg-subtle);
+    color: var(--text-primary);
+}
+
+.quick-action-icon {
+    width: 1rem;
+    height: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-action-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.quick-action-label {
+    line-height: 1;
+}
+
+/* ========================================
+   ACTIVITY LIST
+   ======================================== */
+
+.activity-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: 0.75rem var(--spacing-md);
+    border-bottom: var(--border-width) solid var(--border-light);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-icon svg {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+.activity-icon--client {
+    background: var(--accent-terracotta-light);
+    color: var(--accent-terracotta);
+}
+
+.activity-icon--quote {
+    background: var(--accent-sage-light);
+    color: var(--accent-sage);
+}
+
+.activity-icon--award {
+    background: var(--accent-amber-light);
+    color: var(--accent-amber);
+}
+
+.activity-icon--integration {
+    background: var(--accent-navy-light);
+    color: var(--accent-navy);
+}
+
+.activity-content {
+    min-width: 0;
+}
+
+.activity-title {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+a.activity-title:hover {
+    color: var(--accent-terracotta);
+}
+
+.activity-desc {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    margin-top: 0.125rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.activity-time {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .dashboard-block {
+        padding: var(--spacing-md);
+        gap: var(--spacing-lg);
+    }
+
+    .dashboard-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

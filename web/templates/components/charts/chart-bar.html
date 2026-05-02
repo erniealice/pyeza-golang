@@ -1,0 +1,70 @@
+{{/*
+================================================================================
+CHART — BAR
+================================================================================
+Vertical bar chart. Multi-series renders side-by-side groups (or stacked when
+.Stacked = true).
+
+USAGE: {{template "chart-bar" .ChartData}}
+================================================================================
+*/}}
+
+{{define "chart-bar"}}
+{{$w := 400.0}}{{$h := 180.0}}
+{{$pl := 32.0}}{{$pr := 8.0}}{{$pt := 8.0}}{{$pb := 24.0}}
+{{$cw := subf $w (addf $pl $pr)}}
+{{$ch := subf $h (addf $pt $pb)}}
+{{$ymax := .YMax}}{{if not $ymax}}{{$ymax = 1.0}}{{end}}
+{{$n := len .Labels}}
+{{$ns := len .Series}}{{if not $ns}}{{$ns = 1}}{{end}}
+{{$slot := 0.0}}{{if gt $n 0}}{{$slot = div $cw $n}}{{end}}
+{{$pad := mul $slot 0.18}}
+{{$bw := 0.0}}
+{{if .Stacked}}{{$bw = subf $slot (mul $pad 2.0)}}{{else}}{{$bw = div (subf $slot (mul $pad 2.0)) $ns}}{{end}}
+{{$baseY := addf $pt $ch}}
+{{$xRight := subf $w $pr}}
+
+<div class="chart chart--bar" data-testid="chart-bar">
+    <svg viewBox="0 0 {{$w}} {{$h}}" preserveAspectRatio="none" role="img"{{if .YAxis}} aria-label="{{.YAxis}}"{{end}}>
+        {{range $i := until 5}}
+        {{$gy := addf $pt (mul $ch (div (sub 4 $i) 4))}}
+        <line class="chart-grid" x1="{{$pl}}" y1="{{$gy}}" x2="{{$xRight}}" y2="{{$gy}}" />
+        {{end}}
+
+        {{$ymaxOuter := $ymax}}{{$plOuter := $pl}}{{$ptOuter := $pt}}{{$chOuter := $ch}}{{$slotOuter := $slot}}{{$padOuter := $pad}}{{$bwOuter := $bw}}{{$baseYOuter := $baseY}}{{$stacked := .Stacked}}
+
+        {{range $i, $label := .Labels}}
+        {{$x0 := addf $plOuter (addf $padOuter (mul $slotOuter $i))}}
+        {{if $stacked}}
+        {{$cy := $baseYOuter}}
+        {{range $si, $s := $.Series}}
+        {{$v := index $s.Values $i}}
+        {{$bh := mul (div $v $ymaxOuter) $chOuter}}
+        {{$cy = subf $cy $bh}}
+        {{$color := $s.Color}}{{if not $color}}{{$color = (index (list "terracotta" "sage" "navy" "amber" "plum" "teal") $si)}}{{end}}
+        <rect class="chart-bar chart-bar--{{$color}}" x="{{$x0}}" y="{{$cy}}" width="{{$bwOuter}}" height="{{$bh}}" />
+        {{end}}
+        {{else}}
+        {{range $si, $s := $.Series}}
+        {{$v := index $s.Values $i}}
+        {{$bh := mul (div $v $ymaxOuter) $chOuter}}
+        {{$x := addf $x0 (mul $bwOuter $si)}}
+        {{$y := subf $baseYOuter $bh}}
+        {{$color := $s.Color}}{{if not $color}}{{$color = (index (list "terracotta" "sage" "navy" "amber" "plum" "teal") $si)}}{{end}}
+        <rect class="chart-bar chart-bar--{{$color}}" x="{{$x}}" y="{{$y}}" width="{{$bwOuter}}" height="{{$bh}}" />
+        {{end}}
+        {{end}}
+        {{end}}
+    </svg>
+
+    {{if .Labels}}
+    <div class="chart-x-labels chart-x-labels--bar">
+        {{range .Labels}}<span class="chart-x-label">{{.}}</span>{{end}}
+    </div>
+    {{end}}
+
+    {{if gt (len .Series) 1}}
+    {{template "chart-legend" .}}
+    {{end}}
+</div>
+{{end}}

@@ -1,0 +1,23 @@
+{{/*
+================================================================================
+CHART LEGEND
+================================================================================
+Shared legend rendered under multi-series charts. Iterates .Series, paints a
+swatch + name. Each chart-{kind} that wants a legend just calls this.
+
+USAGE: {{template "chart-legend" .}} (where . is a ChartData)
+================================================================================
+*/}}
+
+{{define "chart-legend"}}
+<ul class="chart-legend">
+    {{$colors := list "terracotta" "sage" "navy" "amber" "plum" "teal"}}
+    {{range $si, $s := .Series}}
+    {{$color := $s.Color}}{{if not $color}}{{$color = index $colors $si}}{{end}}
+    <li class="chart-legend-item">
+        <span class="chart-legend-swatch chart-legend-swatch--{{$color}}"></span>
+        <span class="chart-legend-name">{{$s.Name}}</span>
+    </li>
+    {{end}}
+</ul>
+{{end}}

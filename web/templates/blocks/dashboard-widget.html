@@ -1,0 +1,91 @@
+{{/*
+================================================================================
+DASHBOARD WIDGET COMPONENT
+================================================================================
+A single card-shaped slot inside the dashboard widgets grid.
+Dispatches to the right body sub-template based on .Type.
+
+TYPES:
+  "chart"       — renders chart-{ChartKind} with .ChartData
+  "table"       — renders table-card with .Table
+  "list"        — renders activity-list with .ListItems
+  "stat-group"  — tiled stat-card cluster from .StatGroup
+  "custom"      — renders raw .Custom (template.HTML)
+
+INPUT (types/dashboard.go DashboardWidget):
+  ID, Title, Subtitle, Type, ChartKind, ChartData, Table, ListItems,
+  StatGroup, Custom, HeaderActions, Footer, Span, EmptyState, TestID
+
+USAGE: not called directly; iterated by the dashboard block.
+================================================================================
+*/}}
+
+{{define "dashboard-widget"}}
+{{$testID := .TestID}}
+{{if not $testID}}{{$testID = printf "widget-%s" .ID}}{{end}}
+{{$span := .Span}}
+{{if not $span}}{{$span = 1}}{{end}}
+<section class="dashboard-widget dashboard-widget--span-{{$span}}" id="widget-{{.ID}}" data-testid="{{$testID}}">
+
+    {{if or .Title .HeaderActions}}
+    <header class="dashboard-widget-header">
+        <div class="dashboard-widget-header-text">
+            {{if .Title}}<h2 class="dashboard-widget-title">{{.Title}}</h2>{{end}}
+            {{if .Subtitle}}<p class="dashboard-widget-subtitle">{{.Subtitle}}</p>{{end}}
+        </div>
+        {{if .HeaderActions}}
+        <div class="dashboard-widget-header-actions">
+            {{range .HeaderActions}}
+            <a href="{{.Href}}" class="dashboard-widget-action{{if eq .Variant "primary"}} dashboard-widget-action--primary{{end}}"{{if .TestID}} data-testid="{{.TestID}}"{{end}}>
+                {{.Label}}
+            </a>
+            {{end}}
+        </div>
+        {{end}}
+    </header>
+    {{end}}
+
+    <div class="dashboard-widget-body">
+        {{if eq .Type "chart"}}
+            {{if and .ChartData .ChartData.Series}}
+                {{if eq .ChartKind "line"}}{{template "chart-line" .ChartData}}
+                {{else if eq .ChartKind "bar"}}{{template "chart-bar" .ChartData}}
+                {{else if eq .ChartKind "pie"}}{{template "chart-pie" .ChartData}}
+                {{else if eq .ChartKind "donut"}}{{template "chart-donut" .ChartData}}
+                {{else if eq .ChartKind "area"}}{{template "chart-area" .ChartData}}
+                {{else if eq .ChartKind "sparkline"}}{{template "chart-sparkline" .ChartData}}
+                {{end}}
+            {{else}}
+                {{template "dashboard-widget-empty" .EmptyState}}
+            {{end}}
+        {{else if eq .Type "table"}}
+            {{if .Table}}{{template "table-card" .Table}}
+            {{else}}{{template "dashboard-widget-empty" .EmptyState}}{{end}}
+        {{else if eq .Type "list"}}
+            {{if .ListItems}}{{template "activity-list" (dict "Items" .ListItems)}}
+            {{else}}{{template "dashboard-widget-empty" .EmptyState}}{{end}}
+        {{else if eq .Type "stat-group"}}
+            {{if .StatGroup}}
+            <div class="dashboard-widget-stat-group">
+                {{range .StatGroup}}{{template "stat-mini" .}}{{end}}
+            </div>
+            {{else}}{{template "dashboard-widget-empty" .EmptyState}}{{end}}
+        {{else if eq .Type "custom"}}
+            {{.Custom}}
+        {{end}}
+    </div>
+
+    {{if .Footer}}
+    <footer class="dashboard-widget-footer">{{.Footer}}</footer>
+    {{end}}
+
+</section>
+{{end}}
+
+{{define "dashboard-widget-empty"}}
+{{if .}}
+{{template "empty-state" (dict "Icon" .Icon "Title" .Title "Desc" .Desc "Class" "empty-state--widget")}}
+{{else}}
+{{template "empty-state" (dict "Title" "No data" "Class" "empty-state--widget")}}
+{{end}}
+{{end}}

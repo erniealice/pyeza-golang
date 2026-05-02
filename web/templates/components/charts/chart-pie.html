@@ -1,0 +1,54 @@
+{{/*
+================================================================================
+CHART — PIE
+================================================================================
+Pie chart implemented as CSS conic-gradient. Plots .Series[0].Values, labelled
+by .Labels.
+
+USAGE: {{template "chart-pie" .ChartData}}
+================================================================================
+*/}}
+
+{{define "chart-pie"}}
+{{template "chart-pie-base" (dict "Data" . "Donut" false)}}
+{{end}}
+
+{{define "chart-pie-base"}}
+{{$d := .Data}}
+{{$series0 := index $d.Series 0}}
+{{$values := $series0.Values}}
+
+{{$total := 0.0}}
+{{range $values}}{{$total = addf $total .}}{{end}}
+{{if eq $total 0.0}}{{$total = 1.0}}{{end}}
+
+{{$colors := list "terracotta" "sage" "navy" "amber" "plum" "teal"}}
+
+<div class="chart chart--pie{{if .Donut}} chart--donut{{end}}" data-testid="chart-{{if .Donut}}donut{{else}}pie{{end}}">
+    {{$totalOuter := $total}}{{$cum := 0.0}}
+    {{$stops := ""}}
+    {{range $i, $v := $values}}
+    {{$pct := mul (div $v $totalOuter) 100.0}}
+    {{$start := $cum}}
+    {{$cum = addf $cum $pct}}
+    {{$color := index $colors $i}}
+    {{$stops = printf "%svar(--accent-%s) %v%% %v%%, " $stops $color $start $cum}}
+    {{end}}
+
+    <div class="chart-pie-disc" style="background: conic-gradient({{$stops}}var(--accent-terracotta) 100%);" role="img"></div>
+
+    <ul class="chart-pie-legend">
+        {{$totalLegend := $totalOuter}}
+        {{range $i, $label := $d.Labels}}
+        {{$v := index $values $i}}
+        {{$pct := mul (div $v $totalLegend) 100.0}}
+        {{$color := index $colors $i}}
+        <li class="chart-pie-legend-item">
+            <span class="chart-pie-swatch chart-pie-swatch--{{$color}}"></span>
+            <span class="chart-pie-legend-label">{{$label}}</span>
+            <span class="chart-pie-legend-pct">{{printf "%.0f" $pct}}%</span>
+        </li>
+        {{end}}
+    </ul>
+</div>
+{{end}}
