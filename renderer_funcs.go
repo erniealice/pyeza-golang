@@ -195,8 +195,8 @@ func getDefaultFuncMap() template.FuncMap {
 		//
 		// Phase 8b: default-on — emit every column with a non-empty Key unless NoFilter is set.
 		// The 8b sweep removed all consumer Filterable: true lines and pre-set NoFilter: true
-		// on derived/joined/Phase-7.4-risky columns. The legacy `Filterable bool` field is
-		// scheduled for deletion in Phase 9.
+		// on derived/joined/Phase-7.4-risky columns. Phase 9 deleted the legacy `Filterable bool`
+		// field from TableColumn and added view-layer filter validation via FilterableKeys.
 		//
 		// Each entry: key, label, type (legacy alias), filterType (Phase 8 widget kind),
 		// defaultOperator, and optionally options (for list/status filters).

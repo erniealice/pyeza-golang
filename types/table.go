@@ -64,15 +64,9 @@ type TableColumn struct {
 	// NoFilter, when true, disables filtering on this column. Default false (column is filterable).
 	// Use for derived columns the SQL/use-case layer can't filter (computed fields, joined columns
 	// without a stable backing column, etc.). Mirrors NoSort.
-	NoFilter bool
-	// Filter panel configuration
-	//
-	// Filterable is deprecated — kept readable through the Phase 8b consumer sweep so legacy
-	// `Filterable: true` lines compile until the sweep removes them. New code should leave it
-	// unset and rely on default-on filtering with NoFilter as the opt-out.
-	Filterable    bool             // Deprecated: use !NoFilter. Removed after Phase 8b sweep.
+	NoFilter      bool
 	FilterType    FilterColumnType // Input type rendered in filter panel; empty = auto-derived from cell type via DeriveFilterType
-	FilterOptions []FilterOption   // For FilterTypeStatus / list filters: checkbox options
+	FilterOptions []FilterOption   // For list filters: checkbox options
 }
 
 // ColumnGroup defines a group of columns with a shared parent header.
