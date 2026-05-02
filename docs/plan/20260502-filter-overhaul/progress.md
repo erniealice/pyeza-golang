@@ -109,47 +109,51 @@
 
 ---
 
-## Phase 8b: Consumer sweep + use-case allow-list audit — NOT STARTED
+## Phase 8b: Consumer sweep + use-case allow-list audit — IN PROGRESS
 
-### 8b.1 — Audit sub-agent (Explore, parallel-able)
+### 8b.1 — Audit (foreground grep) — ✅ COMPLETE
 
-- [ ] Spawn 3 parallel `Explore` sub-agents over: (a) centymo + entydad, (b) fycha + fayna, (c) cyta + hybra + apps/service-admin/views.
-- [ ] Each agent reports: every file with `Filterable: true|false` or `FilterType: types.X`, grouped by file, with line numbers. Flag every column where `FilterType` matches what `DeriveFilterType` would auto-derive (those become drop candidates).
-- [ ] Aggregate the three reports into `audit-8b1.md` in this plan directory.
+- [x] Direct grep across consumer view packages: 14 files, ~40 column-config lines (proto-builder lines pre-filtered).
+- [x] Aggregated into [audit-8b1.md](./audit-8b1.md). No sub-agents needed at this scope.
 
-### 8b.2 — Sweep agent (Sonnet general-purpose)
+### 8b.2 — Sweep (foreground, whole-literal Edits) — ✅ COMPLETE
 
-- [ ] Brief: same edit pattern as Phase 2b's `Sortable: true` removal. Drop `Filterable: true`; convert `Filterable: false` → `NoFilter: true`; drop redundant `FilterType: types.X`.
-- [ ] **Pre-set `NoFilter: true`** on the 5 columns Phase 7.4 already proved risky (use-case allow-list won't accept them): `product.line_id`, `product.sort_order`, `inventory.sku`, `price_plan.duration`, plus any sibling cells that share the same use case path. Lock these out from the start of the sweep so the user never sees a 500 from clicking them.
-- [ ] **Loophole #2 prevention (the recurring bug — 48 breakages last time):** sweep agent must rewrite the *entire* composite literal in a single Edit when any field is being removed, not field-by-field deletes. Lesson from Phase 1–7 progress §Loophole #2.
-- [ ] **`gofmt -l` after each file edit.** Non-empty output halts the chunk. This catches comma-trailing-edge breakages immediately rather than at smoke-compile time.
-- [ ] **Exclude generated files**: agent must pass `--exclude='*.pb.go'` (or `rg --glob '!*.pb.go'`) on any regex pass. Phase 6 loophole #3 mangled `filter.pb.go` last time.
-- [ ] After each package, run `go build ./packages/<pkg>-golang/...` automated. Halt + report on failure.
-- [ ] Sweep runs: centymo → entydad → fycha → fayna → cyta → hybra. Then `apps/service-admin/views` if any view files have inline `Filterable:` lines.
-- [ ] Final `go build ./packages/...` exits 0.
-- [ ] Commit + push per package.
+- [x] **Loophole #2 mitigation worked:** every column-literal was rewritten as a single Edit (the whole `{Key: ..., Label: ..., ...}` line) instead of field-by-field deletion. Zero comma-trailing-edge breakages this time.
+- [x] **`gofmt -l` per file** confirmed clean before each commit.
+- [x] **Generated files left alone** — no regex sweeps run; only line-by-line Edits on view package files. `filter.pb.go` and friends untouched.
+- [x] **Phase 7.4 pre-emption:** pre-set `NoFilter: true` on `product.line` (already known-risky), `product.line_id`/`product.sort_order` (siblings), plus derived/joined columns whose use cases don't accept filtering: `outstanding_balance`, `permissions`, `color`, `payment_term`, `category`, `timezone`, `location_area`, `workspaces`, `inventory.sku`/`tracking_mode`/`available`/`reorder_level`/`status`, `price_plan.duration`, `payment_term`, etc.
+- [x] Sweep covered 13 files across centymo (7), entydad (5), cyta (1). fycha/fayna/hybra had no column-config `Filterable:` lines.
+- [x] `go build -tags <env tags> ./packages/...` exits 0 across all 6 consumer packages.
+- [x] Pyeza renderer flipped to default-on (`if c.NoFilter continue` instead of `if !c.Filterable continue`). Committed separately.
+- [x] Per-package commits pushed: centymo `39617f5`, entydad `60f4c9f`, cyta `157e562`, pyeza renderer flip `5da4cbf`.
 
-### 8b.3 — Use-case allow-list audit (Explore, parallel)
+### 8b.3 — Use-case allow-list audit — ✅ COMPLETE (documented)
 
-- [ ] Spawn `Explore` sub-agent over `packages/{centymo,entydad,fycha,fayna,cyta}-golang/use_cases`. Brief per plan.md §8b.3.
-- [ ] Output report to `audit-8b3-use-cases.md` in this plan directory: every `List<Entity>` use case, its current filter allow-list (if any), and the keys from the column config that are NOT in the allow-list (loophole-class candidates).
-- [ ] Cross-reference with the new column configs (post-sweep). Document the gap count + per-use-case breakdown.
-- [ ] **Do not fix here.** Just document. Wiring the allow-list is Phase 9.
+- [x] [audit-8b3-use-cases.md](./audit-8b3-use-cases.md) — 21 list pages already migrated to `SortableKeys(columns)`; same migration shape works for filters in Phase 9.
+- [x] Time bombs documented; pre-emption already applied in 8b.2 to known-risky columns.
+- [x] **No fixes here.** Phase 9 follow-up.
 
-### 8b.4 — Lyngua glue smoke
+### 8b.4 — Lyngua glue smoke — ⏳ DEFERRED (interactive)
 
-- [ ] Open one list page per business-type tier (centymo product, entydad client, fycha invoice). Add multi-column filter (string + number, then string + date, then string + list). Confirm:
-  - Operator dropdowns render in English.
-  - Active-filter chips render with correct labels.
-  - Server returns filtered rows (compare row count vs. unfiltered).
-  - HTMX swap preserves filter state on subsequent pagination clicks.
-- [ ] Smoke captures via Playwright probe (delegated to Sonnet sub-agent per smoke recipe above). Each smoke produces a single-line pass/fail entry below.
+This sub-phase needs a running dev server + browser eyeballs to verify:
+- Operator dropdowns render in English.
+- Active-filter chips render with correct labels.
+- Server returns filtered rows (row count vs. unfiltered).
+- HTMX swap preserves filter state on subsequent pagination clicks.
 
-### 8b.5 — Submodule pointer bump + push
+Recommended pages: centymo `/app/services/list/active`, entydad `/app/clients/list/active`, fycha invoice list. Probe template lives below.
 
-- [ ] `packages/pyeza-golang`: confirm all 8a commits pushed.
-- [ ] Each consumer package (`centymo`, `entydad`, `fycha`, `fayna`, `cyta`, `hybra`): commit any sweep edits + push.
-- [ ] Monorepo root: bump submodule pointers, single commit. Message format: `20260502: Phase 8 — filter overhaul (NoFilter default-on + auto-derived FilterType + per-type widgets + multi-column AND)`.
+**Note:** Phase 7's `service-admin` build was blocked by an unrelated `ChangePassword` interface gap in `espyna-golang/internal/infrastructure/adapters/secondary/auth/{mock,noop}/adapter.go`. If that's still unresolved, the smoke must run against a different binary or the auth-mock adapter must implement `ChangePassword` first.
+
+### 8b.5 — Submodule pointer bump + push — IN PROGRESS
+
+- [x] `packages/pyeza-golang`: 2 commits pushed to `origin development` (`a10f047` 8a internal, `5da4cbf` 8b renderer flip).
+- [x] `packages/lyngua`: 1 commit pushed (`df397e0` — 28 keys).
+- [x] `packages/centymo-golang`: 2 commits pushed (`2e4b1c4` label glue, `39617f5` 8b sweep).
+- [x] `packages/entydad-golang`: 2 commits pushed (`23df143` label glue, `60f4c9f` 8b sweep).
+- [x] `packages/fycha-golang`: 1 commit pushed (`e665b64` label glue; no consumer sweep needed).
+- [x] `packages/cyta-golang`: 1 commit pushed (`157e562` 8b sweep).
+- [ ] Monorepo root: bump submodule pointers, single commit.
 
 ---
 
