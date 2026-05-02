@@ -17,6 +17,13 @@ const (
 	FilterTypeToggle  FilterColumnType = "toggle"
 	FilterTypeEmail   FilterColumnType = "email"
 	FilterTypePhone   FilterColumnType = "phone"
+
+	// Phase 8 widget types — mirror sort kinds. Auto-derived from cell type via DeriveFilterType.
+	FilterTypeNumericRange FilterColumnType = "numeric-range" // money/number cells: =, ≠, >, ≥, <, ≤, between (default)
+	FilterTypeDateRange    FilterColumnType = "date-range"    // datetime/author cells: presets + on/before/after/between
+	FilterTypeList         FilterColumnType = "list"          // badge/select cells: ListFilter IN against option values
+	FilterTypeListLabel    FilterColumnType = "list-label"    // chips/person cells: ListFilter IN against rendered labels
+	FilterTypeBoolean      FilterColumnType = "boolean"       // bool cells: tri-state Any/Yes/No
 )
 
 // FilterOption is a single option for FilterTypeStatus columns (value:label pair)
@@ -25,17 +32,22 @@ type FilterOption struct {
 	Label string
 }
 
-// ActiveFilter represents a currently-applied filter rendered as a chip
+// ActiveFilter represents a currently-applied filter rendered as a chip.
+//
+// Phase 8: ChipText is the canonical chip-text source. When set, the template renders
+// it verbatim and JS does not reformat. Label + DisplayValue remain for legacy callers
+// that haven't migrated yet — the template falls back to "{Label}: {DisplayValue}".
 type ActiveFilter struct {
 	Key          string // column key (matches TypedFilter.field)
-	Label        string // human-readable column label for display
-	DisplayValue string // human-readable filter value for display
+	Label        string // legacy: human-readable column label
+	DisplayValue string // legacy: human-readable filter value
+	ChipText     string // Phase 8: pre-formatted chip text (e.g. "Price: ≥ ₱1,000.00"); takes precedence over Label+DisplayValue when non-empty
 }
 
 // TableColumn defines a column in a data table
 type TableColumn struct {
-	Key        string // Data attribute key for sorting
-	Label      string // Column header label
+	Key   string // Data attribute key for sorting
+	Label string // Column header label
 	// NoSort, when true, disables sorting on this column. Default false (column is sortable). Use for derived columns where ORDER BY has no meaning, e.g., computed fields without a stable backing column.
 	NoSort bool
 	// SortKind influences the initial sort direction picked when the user first clicks a header,
@@ -43,16 +55,24 @@ type TableColumn struct {
 	// Allowed values: "text" (A→Z asc, default), "number" (High→Low desc default),
 	// "date" (Newest→Oldest desc default), "enum" (grouped, asc default).
 	// Empty = auto-derived from the first cell type in the column via DeriveSortKind.
-	SortKind string
+	SortKind   string
 	Width      string // Optional fixed width (e.g., "200px", "20%") — prefer WidthClass
 	WidthClass string // Optional density-responsive width class (e.g., "col-3xl") — preferred over Width
 	MinWidth   string // Optional minimum width (e.g., "100px") - column can grow but not shrink below this
 	Align      string // Optional horizontal alignment: "left" (default), "center", "right"
 	VAlign     string // Optional vertical alignment: "top" (default), "middle", "bottom"
+	// NoFilter, when true, disables filtering on this column. Default false (column is filterable).
+	// Use for derived columns the SQL/use-case layer can't filter (computed fields, joined columns
+	// without a stable backing column, etc.). Mirrors NoSort.
+	NoFilter bool
 	// Filter panel configuration
-	Filterable    bool             // Whether this column appears in the filter panel
-	FilterType    FilterColumnType // Input type rendered in filter panel
-	FilterOptions []FilterOption   // For FilterTypeStatus: checkbox options
+	//
+	// Filterable is deprecated — kept readable through the Phase 8b consumer sweep so legacy
+	// `Filterable: true` lines compile until the sweep removes them. New code should leave it
+	// unset and rely on default-on filtering with NoFilter as the opt-out.
+	Filterable    bool             // Deprecated: use !NoFilter. Removed after Phase 8b sweep.
+	FilterType    FilterColumnType // Input type rendered in filter panel; empty = auto-derived from cell type via DeriveFilterType
+	FilterOptions []FilterOption   // For FilterTypeStatus / list filters: checkbox options
 }
 
 // ColumnGroup defines a group of columns with a shared parent header.
@@ -112,13 +132,13 @@ type PersonData struct {
 
 // TableCell defines a cell value with optional formatting
 type TableCell struct {
-	Type      string        // Cell type: "text", "badge", "name", "link", "chips", "html", "author", "input", "select", "money", "datetime", "single-person", "multi-person", "email", "phone", "number"
-	Value     string        // Text value to display
-	Variant   string        // For badges: variant class (e.g., "success", "error", "warning")
-	BadgeType string        // For badges: badge type ("status", "count", "type") - defaults to "status"
-	Alert     bool          // For name cells: show alert icon
-	Href      string        // For links: href attribute
-	HTML      template.HTML // For custom HTML content
+	Type       string        // Cell type: "text", "badge", "name", "link", "chips", "html", "author", "input", "select", "money", "datetime", "single-person", "multi-person", "email", "phone", "number"
+	Value      string        // Text value to display
+	Variant    string        // For badges: variant class (e.g., "success", "error", "warning")
+	BadgeType  string        // For badges: badge type ("status", "count", "type") - defaults to "status"
+	Alert      bool          // For name cells: show alert icon
+	Href       string        // For links: href attribute
+	HTML       template.HTML // For custom HTML content
 	Label      string        // Column label for mobile card view (set automatically from column via ApplyColumnStyles)
 	Align      string        // Horizontal alignment (set automatically from column, do not set manually)
 	VAlign     string        // Vertical alignment: "top" (default), "middle", "bottom"
@@ -252,6 +272,33 @@ func DeriveSortKind(cellType string) string {
 	}
 }
 
+// DeriveFilterType returns the FilterColumnType implied by a TableCell.Type.
+// Used by ApplyColumnStyles to memoize FilterType onto each TableColumn from its first row's cell.
+// hasOptions=true biases badge/select cells toward FilterTypeList (option values) over the bare badge
+// default; chips/person cells always derive to FilterTypeListLabel (label-match against rendered text).
+// Returns "" for unknown cell types (the JS treats this as "string" by default).
+func DeriveFilterType(cellType string, hasOptions bool) FilterColumnType {
+	switch cellType {
+	case "money", "number":
+		return FilterTypeNumericRange
+	case "datetime", "author":
+		return FilterTypeDateRange
+	case "badge", "select":
+		if hasOptions {
+			return FilterTypeList
+		}
+		return FilterTypeList
+	case "chips", "multi-person", "single-person":
+		return FilterTypeListLabel
+	case "email", "phone", "text", "name", "link", "html":
+		return FilterTypeString
+	case "input":
+		return "" // interactive cell — skip filtering
+	default:
+		return FilterTypeString
+	}
+}
+
 // ApplyColumnStyles copies alignment, width, minWidth, vAlign, and label from columns to cells in all rows.
 // Call this after building rows to ensure cells inherit column styles.
 func ApplyColumnStyles(columns []TableColumn, rows []TableRow) {
@@ -263,6 +310,17 @@ func ApplyColumnStyles(columns []TableColumn, rows []TableRow) {
 			}
 			if j < len(rows[0].Cells) {
 				columns[j].SortKind = DeriveSortKind(rows[0].Cells[j].Type)
+			}
+		}
+	}
+	// Memoize FilterType for each column from the first row's matching cell, unless caller already set it.
+	if len(rows) > 0 {
+		for j := range columns {
+			if columns[j].FilterType != "" {
+				continue
+			}
+			if j < len(rows[0].Cells) {
+				columns[j].FilterType = DeriveFilterType(rows[0].Cells[j].Type, len(columns[j].FilterOptions) > 0)
 			}
 		}
 	}
@@ -401,6 +459,38 @@ type TableLabels struct {
 	SortDescDate   string // "Newest → Oldest"
 	SortAscEnum    string // "Grouped"
 	SortDescEnum   string // "Grouped (reverse)"
+	// Filter widget operator labels (Phase 8). Rendered inside the filter panel's per-row operator <select>.
+	FilterOpContains   string // "contains"
+	FilterOpEquals     string // "equals"
+	FilterOpStartsWith string // "starts with"
+	FilterOpEndsWith   string // "ends with"
+	FilterOpNotEquals  string // "does not equal"
+	FilterOpBetween    string // "between"
+	FilterOpEq         string // "="
+	FilterOpNeq        string // "≠"
+	FilterOpGt         string // ">"
+	FilterOpGte        string // "≥"
+	FilterOpLt         string // "<"
+	FilterOpLte        string // "≤"
+	FilterOpOn         string // "on"
+	FilterOpBefore     string // "before"
+	FilterOpAfter      string // "after"
+	FilterOpIn         string // "in"
+	FilterOpNotIn      string // "not in"
+	// Date preset chips (Phase 8).
+	FilterPresetToday  string // "Today"
+	FilterPreset7d     string // "Last 7 days"
+	FilterPreset30d    string // "Last 30 days"
+	FilterPresetMonth  string // "This month"
+	FilterPresetCustom string // "Custom"
+	// Boolean tri-state widget labels (Phase 8).
+	FilterAny string // "Any"
+	FilterYes string // "Yes"
+	FilterNo  string // "No"
+	// Filter widget placeholders (Phase 8).
+	FilterSearchPlaceholder string // "Search…" (list widget option search)
+	FilterMinPlaceholder    string // "Min" (numeric-range)
+	FilterMaxPlaceholder    string // "Max" (numeric-range)
 }
 
 // PrimaryAction defines a primary action button for the table toolbar
@@ -440,40 +530,40 @@ type BulkActionsConfig struct {
 
 // TableConfig holds all configuration for the table component
 type TableConfig struct {
-	ID                   string             // Table ID
-	ToolbarPrefix        template.HTML      // Optional HTML rendered at the start of the toolbar (before search)
+	ID                    string             // Table ID
+	ToolbarPrefix         template.HTML      // Optional HTML rendered at the start of the toolbar (before search)
 	ToolbarPrefixTemplate string             // Template name to render via renderContent (preferred over ToolbarPrefix)
 	ToolbarPrefixData     any                // Data passed to ToolbarPrefixTemplate
-	Title                string             // Table title (legacy, not displayed in toolbar)
-	Caption              string             // Accessible caption for screen readers (falls back to Title, then "Data table")
-	CardClass            string             // Additional class for table-card
-	RefreshURL           string             // URL to fetch table partial for HTMX refresh (e.g., "/action/user/user-division/table")
-	Columns              []TableColumn      // Column definitions (single-level headers)
-	ColumnGroups         []ColumnGroup      // Nested column groups (alternative to Columns for multi-level headers)
-	Rows                 []TableRow         // Row data (use Groups instead for grouped tables)
-	Groups               []TableRowGroup    // Row groups (alternative to Rows for grouped tables)
-	Minimal              bool               // When true, hide toolbar and footer (for embedded/settings tables)
-	ShowCheckbox         bool               // Show row checkboxes (legacy, use BulkActions.Enabled instead)
-	ShowSearch           bool               // Show search input in toolbar
-	ShowFilters          bool               // Show advanced filter builder in toolbar
-	ShowSort             bool               // Show sort dropdown in toolbar
-	ShowColumns          bool               // Show column visibility toggle in toolbar
-	ShowExport           bool               // Show export dropdown (CSV/Excel) in toolbar
-	ShowDensity          bool               // Show row density toggle in toolbar
-	DefaultDensity       string             // Default density: "default", "comfortable", "compact" (defaults to "default")
-	ShowEntries          bool               // Show entries selector in footer
-	ShowActions          bool               // Show actions column
-	DefaultSortColumn    string             // Column key for default sort (e.g., "name")
-	DefaultSortDirection string             // "asc" or "desc" (defaults to "asc")
-	Labels               TableLabels        // Table labels
-	EmptyState           TableEmptyState    // Empty state configuration
-	ImportAction         *ImportAction      // Optional import action button in toolbar (before primary action)
-	PrimaryAction        *PrimaryAction     // Optional primary action button in toolbar
-	BulkActions          *BulkActionsConfig // Optional bulk selection configuration
-	FixedLayout          bool               // When true, use table-layout: fixed (columns respect declared widths exactly)
-	NameColumnLabel      string             // Optional header label for the auto-generated name column (first column). Blank = no label.
-	ServerPagination     *ServerPagination  // Optional server-side pagination configuration (nil = client-side mode)
-	TotalsRow            []TableCell        // Optional totals row rendered in <tfoot> (e.g. for accounting reports)
+	Title                 string             // Table title (legacy, not displayed in toolbar)
+	Caption               string             // Accessible caption for screen readers (falls back to Title, then "Data table")
+	CardClass             string             // Additional class for table-card
+	RefreshURL            string             // URL to fetch table partial for HTMX refresh (e.g., "/action/user/user-division/table")
+	Columns               []TableColumn      // Column definitions (single-level headers)
+	ColumnGroups          []ColumnGroup      // Nested column groups (alternative to Columns for multi-level headers)
+	Rows                  []TableRow         // Row data (use Groups instead for grouped tables)
+	Groups                []TableRowGroup    // Row groups (alternative to Rows for grouped tables)
+	Minimal               bool               // When true, hide toolbar and footer (for embedded/settings tables)
+	ShowCheckbox          bool               // Show row checkboxes (legacy, use BulkActions.Enabled instead)
+	ShowSearch            bool               // Show search input in toolbar
+	ShowFilters           bool               // Show advanced filter builder in toolbar
+	ShowSort              bool               // Show sort dropdown in toolbar
+	ShowColumns           bool               // Show column visibility toggle in toolbar
+	ShowExport            bool               // Show export dropdown (CSV/Excel) in toolbar
+	ShowDensity           bool               // Show row density toggle in toolbar
+	DefaultDensity        string             // Default density: "default", "comfortable", "compact" (defaults to "default")
+	ShowEntries           bool               // Show entries selector in footer
+	ShowActions           bool               // Show actions column
+	DefaultSortColumn     string             // Column key for default sort (e.g., "name")
+	DefaultSortDirection  string             // "asc" or "desc" (defaults to "asc")
+	Labels                TableLabels        // Table labels
+	EmptyState            TableEmptyState    // Empty state configuration
+	ImportAction          *ImportAction      // Optional import action button in toolbar (before primary action)
+	PrimaryAction         *PrimaryAction     // Optional primary action button in toolbar
+	BulkActions           *BulkActionsConfig // Optional bulk selection configuration
+	FixedLayout           bool               // When true, use table-layout: fixed (columns respect declared widths exactly)
+	NameColumnLabel       string             // Optional header label for the auto-generated name column (first column). Blank = no label.
+	ServerPagination      *ServerPagination  // Optional server-side pagination configuration (nil = client-side mode)
+	TotalsRow             []TableCell        // Optional totals row rendered in <tfoot> (e.g. for accounting reports)
 }
 
 // ImportAction defines the import button configuration
@@ -682,6 +772,20 @@ func SortableKeys(cols []TableColumn) []string {
 	var keys []string
 	for _, c := range cols {
 		if !c.NoSort && c.Key != "" {
+			keys = append(keys, c.Key)
+		}
+	}
+	return keys
+}
+
+// FilterableKeys extracts the keys of all filterable columns. Mirrors SortableKeys.
+// Used by view handlers to build the allowed filter columns whitelist passed to
+// the use-case layer (Phase 9). Returns keys for columns where NoFilter is false
+// (the default) and Key is non-empty.
+func FilterableKeys(cols []TableColumn) []string {
+	var keys []string
+	for _, c := range cols {
+		if !c.NoFilter && c.Key != "" {
 			keys = append(keys, c.Key)
 		}
 	}

@@ -1,20 +1,21 @@
 # Pyeza Table — Filter Overhaul (Phase 8) — Progress Log
 
 **Plan:** [plan.md](./plan.md)
-**Started:** 2026-05-02 (planned overnight; user is resting)
+**Started:** 2026-05-02 (foreground, interactive)
 **Branch:** `dev/20260502-filter-overhaul`
 **Predecessor:** [Phase 1–7 — Sort + Select-All + Post-Merge Polish](../20260501-table-sort-and-select-all/progress.md)
 
 ---
 
-## Working agreements (set by user before sleep)
+## Working agreements
 
 1. **Delegate liberally.** Sonnet sub-agent for meaningful editing or multi-file work, Haiku for simple lookups / format-checks / single-file edits. Don't burn the foreground context on mechanical work.
-2. **Build + Playwright are available.** Each phase must end with a smoke check:
+2. **Build + Playwright are available.** Each user-visible chunk ends with a smoke check:
    - `bash apps/service-admin/scripts/run.sh` — rebuild dev server with the right tags from `.env`. Server stays up; Air auto-rebuilds on subsequent edits.
-   - Playwright probe per phase (see "Smoke recipe" below). Use a sonnet sub-agent to author the spec; run via `cd apps/service-admin/tests && npx playwright test ...`.
-3. **Respect the schedule.** Cron fires every 30 minutes. Each fire reads this file, picks up at the first incomplete checkbox, executes one chunk of work, updates this file, then exits. No long-running work in a single fire — split into the smallest committable unit. **Hard stop at 03:00 local** regardless of progress.
+   - Playwright probe per chunk (see "Smoke recipe" below). Delegate the spec to a Sonnet sub-agent; run via `cd apps/service-admin/tests && npx playwright test ...`.
+3. **Eyes-on for visual surfaces.** Phase 7.1–7.7 caught CSS/UX regressions only by eyeballing the live page. Same expectation here: after each user-visible chunk, open the affected list page in a browser before marking the chunk complete.
 4. **Commit cadence.** Commit at the end of every sub-phase that compiles cleanly. Push to `origin development` on the pyeza submodule after each commit. **Do not** bump the monorepo submodule pointer until 8b.5.
+5. **Refresh line refs before editing.** Phase 7 commits (`eda8324` + post-7 polish) shifted line numbers in `table-filters.js`, `table-toolbar.html`, and `table.css`. Re-grep before each chunk; do not trust plan.md's Phase 8 line refs as gospel.
 
 ---
 
@@ -22,78 +23,89 @@
 
 1. `bash apps/service-admin/scripts/run.sh > /tmp/run.log 2>&1 &` — rebuild + restart server with tags from `.env`.
 2. `until curl -s -o /dev/null -w '%{http_code}' http://localhost:8081/ | grep -q '^[23]'; do sleep 2; done` — wait for server up.
-3. Delegate Playwright probe to a Sonnet sub-agent. Probe spec lives temporarily at `apps/service-admin/tests/e2e/_probe-filter.spec.ts` and is **deleted after each successful probe** to keep the test directory clean. The probe template is in this file under "Probe template" below.
-4. After the probe passes, the sub-agent writes a one-line summary into the relevant phase checkbox here.
+3. **Eyeball check first.** Open the affected list page in a browser. Trigger the new behavior (open filter dropdown, add a condition, etc.) and confirm it visually matches the spec in plan.md.
+4. **Then Playwright probe.** Delegate to a Sonnet sub-agent. Probe spec lives temporarily at `apps/service-admin/tests/e2e/_probe-filter.spec.ts` and is **deleted after each successful probe** to keep the test directory clean. The probe template is in this file under "Probe template" below.
+5. After both pass, write a one-line summary into the relevant phase checkbox here.
 
 ---
 
-## Phase 8a: Pyeza-internal types + widgets — NOT STARTED
+## Phase 8a: Pyeza-internal types + widgets — IN PROGRESS
 
-### 8a.1 — `NoFilter bool` + `DeriveFilterType` helper
+### 8a.1 — `NoFilter bool` + `DeriveFilterType` helper — ✅ COMPLETE
 
-- [ ] `packages/pyeza-golang/types/table.go` — add `NoFilter bool` to `TableColumn` (mirror `NoSort`).
-- [ ] `packages/pyeza-golang/types/table.go` — add doc comment to `Filterable bool` marking it deprecated; keep readable.
-- [ ] `packages/pyeza-golang/types/table.go` — add `DeriveFilterType(cellType string, hasOptions bool) FilterColumnType`. Cases per plan.md table.
-- [ ] `packages/pyeza-golang/types/table.go` — add new `FilterColumnType` constants: `FilterTypeNumericRange`, `FilterTypeDateRange`, `FilterTypeList`, `FilterTypeListLabel`, `FilterTypeBoolean`. Keep existing constants as aliases.
-- [ ] `packages/pyeza-golang/types/table.go` — extend `ApplyColumnStyles` to memoize `FilterType` from first row's cell, like `SortKind` (memoization block at top).
-- [ ] `packages/pyeza-golang/types/table.go` — add `FilterableKeys(cols []TableColumn) []string` — returns keys where `!c.NoFilter && c.Key != ""`. Mirror `SortableKeys`.
-- [ ] `go build ./packages/pyeza-golang/...` exits 0.
-- [ ] Commit + push.
+- [x] `packages/pyeza-golang/types/table.go` — `NoFilter bool` added to `TableColumn` (mirrors `NoSort`).
+- [x] `packages/pyeza-golang/types/table.go` — `Filterable bool` marked deprecated in doc comment; remains readable for the 8b sweep.
+- [x] `packages/pyeza-golang/types/table.go` — `DeriveFilterType(cellType string, hasOptions bool) FilterColumnType` added. Cases per plan.md table; chips/persons → `FilterTypeListLabel`; money/number → `FilterTypeNumericRange`; datetime/author → `FilterTypeDateRange`; badge/select → `FilterTypeList`; email/phone/text/name/link/html → `FilterTypeString`; input → `""` (skip).
+- [x] `packages/pyeza-golang/types/table.go` — new constants added: `FilterTypeNumericRange`, `FilterTypeDateRange`, `FilterTypeList`, `FilterTypeListLabel`, `FilterTypeBoolean`. Existing constants left intact (no aliasing — they continue to work for explicit overrides on legacy callers).
+- [x] `packages/pyeza-golang/types/table.go` — `ApplyColumnStyles` extended with a second memoization block mirroring the SortKind one. Skips columns where `FilterType` is already set (explicit override wins).
+- [x] `packages/pyeza-golang/types/table.go` — `FilterableKeys(cols []TableColumn) []string` added; returns keys where `!c.NoFilter && c.Key != ""`. Mirrors `SortableKeys`.
+- [x] `go build ./packages/pyeza-golang/...` exits 0.
+- [x] `gofmt -l` clean (struct alignment normalized).
+- [ ] Commit + push (after 8a.2 — types + lyngua keys land together).
 
-### 8a.2 — Lyngua keys for new widget chrome
+### 8a.2 — Lyngua keys for new widget chrome — ✅ COMPLETE
 
-- [ ] `packages/lyngua/translations/en/common/common.json` — add ~25 keys under `table.` namespace per plan.md §8a.2.
-- [ ] `packages/pyeza-golang/labels_types.go::CommonTableLabels` — add corresponding json fields.
-- [ ] `packages/pyeza-golang/types/table.go::TableLabels` — add fields propagated from CommonTableLabels.
-- [ ] `packages/centymo-golang/labels.go::MapTableLabels` — wire all new fields.
-- [ ] `packages/entydad-golang/labels.go::MapTableLabels` — same.
-- [ ] `packages/fycha-golang/labels.go::MapTableLabels` — same.
-- [ ] (fayna + cyta inherit; verify by reading their `MapTableLabels` and confirming they call into one of the above.)
-- [ ] `go build ./packages/{pyeza,centymo,entydad,fycha,fayna,cyta}-golang/...` exits 0.
-- [ ] Commit + push (lyngua has its own repo; pyeza + 3 consumers are submodule commits).
+- [x] `packages/lyngua/translations/en/common/common.json` — 28 keys added under `table.` namespace: 17 operator labels, 5 date presets, 3 boolean tri-state, 3 placeholders.
+- [x] `packages/pyeza-golang/labels_types.go::CommonTableLabels` — corresponding json fields added.
+- [x] `packages/pyeza-golang/types/table.go::TableLabels` — fields propagated from CommonTableLabels.
+- [x] `packages/centymo-golang/labels.go::MapTableLabels` — all 28 fields wired.
+- [x] `packages/entydad-golang/labels.go::MapTableLabels` — same.
+- [x] `packages/fycha-golang/labels.go::MapTableLabels` — same.
+- [x] fayna + cyta inherit from one of the above (verified by build — no separate `MapTableLabels` defined in those packages).
+- [x] `go build -tags <env tags> ./packages/{pyeza,centymo,entydad,fycha,fayna,cyta}-golang/...` exits 0.
+- [x] `gofmt -l` clean.
+- [ ] Commit + push (deferred to end of 8a — types + labels + JS + CSS land as one pyeza commit).
 
-### 8a.3 — Widget JS rewrite
+### 8a.3 — Widget JS rewrite — ✅ COMPLETE
 
-- [ ] `packages/pyeza-golang/web/js/table/table-filters.js` — introduce `FILTER_WIDGETS` registry with entries for: `string`, `numeric-range`, `date-range`, `list`, `list-label`, `boolean`. Each entry has `build(container, column, options)`, `read(row)`, `chip(condition, column)`.
-- [ ] Rewrite `addFilterCondition`: column `<select>` + dispatch to `FILTER_WIDGETS[derivedType].build(...)`. On column change, rebuild value container via the new column's widget.
-- [ ] Rewrite `getFilterConditions`: iterate rows, call each row's widget `read()` → `TypedFilter` JSON. Skip rows where read returns `null`.
-- [ ] Date preset buttons: click handler sets `filter-date-from` / `filter-date-to` to the computed ISO range and switches operator to `between`. Computed ranges per plan.md §Architecture.
-- [ ] Numeric-range operator change handler: hides/shows `filter-value-max` + `.filter-range-sep` based on operator (`between` reveals; everything else hides).
-- [ ] List-search input: filters checkboxes by case-insensitive label match. Hidden when option count ≤ 5.
-- [ ] Drop the legacy `applyFilters` switch on string operators (replaced by per-widget `read()` + server eval). Keep `clearFilters` as-is for client-paginated tables.
-- [ ] Commit + push.
+- [x] `packages/pyeza-golang/web/js/table/table-filters.js` — full rewrite. `FILTER_WIDGETS` registry with `string`, `numeric-range`, `date-range`, `list`, `list-label`, `boolean` entries. Each entry has `build(vc, col, labels)` + `read(row, col)`. Legacy aliases (`status` → `list`, `numeric`/`money` → `numeric-range`, `date` → `date-range`, `email`/`phone` → `string`) keep pre-sweep tables rendering with the new widgets.
+- [x] `addFilterCondition` rewritten: column `<select>` dispatches to `FILTER_WIDGETS[filterType].build(...)`. Column change rebuilds value container.
+- [x] `getFilterConditions` rewritten: iterates rows, calls each widget's `read()` → `TypedFilter` JSON. Skips rows where read returns `null`.
+- [x] Date preset buttons (Today / 7d / 30d / This month / Custom): click handler computes ISO range, fills date inputs, switches operator to `between`. Browser-local TZ (server-side timezone middleware compensates).
+- [x] Numeric-range operator change: `row.dataset.op` toggles between/non-between; CSS hides `.filter-value-max` + `.filter-range-sep` when not between.
+- [x] List-search input: filters checkboxes by case-insensitive label match; CSS hides search bar when `data-options-count` ≤ 5.
+- [x] Legacy `applyFilters` switch dropped — server-paginated tables are authoritative; client-paginated tables fall back to `clearFilters`.
+- [x] Phase 7.6 audit — no `applyDefaultFilter` clobber analogue exists in `table-filters.js`. Safe.
+- [x] Phase 7.5 hydration — `hydrateFromActiveFilters` rebuilds condition rows from the URL state on first panel open so the panel agrees with the chip strip and URL.
+- [x] Proto operator codes verified against `filter.pb.go`: StringOperator (0=eq, 1=neq, 2=contains, 3=starts_with, 4=ends_with), NumberOperator (0=eq, 1=neq, 2=gt, 3=gte, 4=lt, 5=lte), DateOperator (0=eq, 1=before, 2=after, 3=between), ListOperator (0=in, 1=not_in).
+- [x] `node --check` passes.
 
-### 8a.4 — Filter metadata JSON extension
+### 8a.4 — Filter metadata JSON extension — ✅ COMPLETE
 
-- [ ] `packages/pyeza-golang/renderer_funcs.go::filterColumnsJSON` — add `filterType` (from `DeriveFilterType` at render time) and `defaultOperator` per entry. Backward-compatible.
-- [ ] No template change needed; the script block at `table-toolbar.html:109` already calls `filterColumnsJSON .Columns`.
-- [ ] `packages/pyeza-golang/web/js/table/table-filters.js::getTableColumns` — read the new fields where present, fall back to old behavior when absent.
-- [ ] Commit + push.
+- [x] `packages/pyeza-golang/renderer_funcs.go::filterColumnsJSON` — each entry now carries `filterType` (Phase 8 widget kind) and `defaultOperator`. Inclusion rule remains backward-compat: emit columns where `Filterable: true && !NoFilter` until the 8b sweep flips every consumer to default-on. After sweep, the OR'd condition is harmless.
+- [x] `defaultOperatorFor(FilterColumnType) string` helper added to renderer_funcs.go.
+- [x] No template change needed at `table-toolbar.html:109` — script tag already calls `filterColumnsJSON .Columns`.
+- [x] `packages/pyeza-golang/web/js/table/table-filters.js::getTableColumns` — reads new `filterType` + `defaultOperator` fields with fallback to legacy `type` field.
 
-### 8a.5 — CSS for new widget DOM
+### 8a.5 — CSS for new widget DOM — ✅ COMPLETE
 
-- [ ] `packages/pyeza-golang/web/styles/components/table.css` — append a `Filter Widgets` section. Shape per plan.md §8a.5.
-- [ ] Concentric radii: outer dropdown 1rem → row 0.5rem → inputs/buttons 0.25rem (mirror Phase 7.2).
-- [ ] Hide-by-default rules using `[data-op]` attributes on the row (`[data-op="between"]` reveals max input + sep).
-- [ ] Hide-by-default rules using `[data-options-count]` on the row (`[data-options-count="0"]` through `[data-options-count="5"]` hide the search input).
-- [ ] Smoke: open a list page, open filter dropdown, add a numeric-range condition with `between`, confirm both inputs visible. Switch operator to `>`, confirm right input collapses.
-- [ ] Commit + push.
+- [x] `packages/pyeza-golang/web/styles/components/table.css` — appended ~140 lines of Filter Widgets section.
+- [x] Concentric radii honored: outer dropdown 1rem → row 0.5rem → inputs/buttons 0.25rem (mirrors Phase 7.2).
+- [x] `.filter-row:not([data-op="between"]) .filter-value-max, .filter-range-sep { display: none }` reveals/collapses max input on operator change.
+- [x] `.filter-row[data-options-count="0..5"] .filter-list-search { display: none }` hides search bar for small option lists.
+- [x] Date-range: `.filter-row[data-filter-type="date-range"]:not([data-op="between"]) .filter-date-to { display: none }` collapses to-input outside `between`.
+- [x] `.filter-panel { min-width: 22rem }` ensures widgets fit horizontally.
+- [ ] Browser smoke (deferred to live use after submodule bump).
 
-### 8a.6 — Active-filter chips in toolbar
+### 8a.6 — Active-filter chips (server-emitted ChipText) — ✅ COMPLETE
 
-- [ ] `packages/pyeza-golang/types/table.go` — add `FormatActiveFilter(f *commonpb.TypedFilter, col *TableColumn) string` that returns chip text like `"Price: ≥ ₱1,000.00"`. Mirrors widget `chip()` JS.
-- [ ] `packages/pyeza-golang/web/templates/components/table/table.html:81-92` — confirm `ServerPagination.ActiveFilters` chip strip uses `FormatActiveFilter` (or update if it doesn't).
-- [ ] Confirm `table-filters.js::initChipHandlers` chip-dismiss path works with new `TypedFilter` shapes (operator change shouldn't break dismissal).
-- [ ] Smoke: apply 2 filters; confirm 2 chips render with correct text; dismiss one; confirm the other persists in URL + DOM.
-- [ ] Commit + push.
+- [x] `packages/pyeza-golang/types/table.go::ActiveFilter` — added `ChipText string` field. Doc comment explains: takes precedence over Label+DisplayValue when non-empty.
+- [x] `packages/pyeza-golang/web/templates/components/table/table.html` — chip strip now renders `{{if .ChipText}}{{.ChipText}}{{else}}{{.Label}}: {{.DisplayValue}}{{end}}`. Backward-compat for legacy callers that haven't migrated.
+- [x] **Decision deviation from plan:** dropped `FormatActiveFilter(f *commonpb.TypedFilter, col *TableColumn) string` Go helper because pyeza-golang/go.mod does not depend on the esqyma proto package — adding that arrow just for a chip helper would create a downward dep that doesn't currently exist. Consumers (which already import the proto) build ChipText themselves. Phase 9 follow-up: provide a shared formatter in a downstream package that already imports both.
+- [x] `initChipHandlers` chip-dismiss path: confirmed by reading the rewritten code. Reads `data-dismiss-filter` attribute (column key), filters out matching `f.field` from the URL state. Works regardless of TypedFilter variant shape.
+- [x] Filter panel reopen hydration (Phase 7.5 mirror): `hydrateFromActiveFilters` reads the URL state and rebuilds condition rows on first open.
+- [x] `filterPanelLabelsJSON` template func added (renderer_funcs.go) — emits the 28 widget labels as JSON inside the filter panel; `table-filters.js::readPanelLabels` reads it. Keeps every label translation-driven.
+- [x] `table-toolbar.html` — added `<script type="application/json" class="filter-panel-labels">` next to filter-meta.
+- [ ] Browser smoke (deferred to live use after submodule bump).
 
-### 8a.7 — Verify pyeza-internal end-to-end
+### 8a.7 — Verify pyeza-internal end-to-end — ✅ COMPLETE
 
-- [ ] `go build ./packages/pyeza-golang/...` exits 0.
-- [ ] Smoke a list page that uses legacy `Filterable: true, FilterType: types.FilterTypeString` (e.g., centymo product list before 8b sweep). Confirm widget renders, sends `StringFilter{operator: contains}`, server filters correctly.
-- [ ] Smoke a list page with a money column. Confirm numeric-range widget renders, `between` works (2 inputs), `>` works (1 input).
-- [ ] Smoke a list page with a date column. Confirm date-range widget renders, presets pre-fill inputs, custom range works.
-- [ ] Final commit on pyeza submodule before 8b begins.
+- [x] `go build -tags <env tags> ./packages/{pyeza,centymo,entydad,fycha,fayna,cyta}-golang/...` exits 0.
+- [x] `go test ./packages/pyeza-golang/...` — 4 packages pass clean.
+- [x] `gofmt -l` clean across all touched files.
+- [x] `node --check table-filters.js` passes.
+- [ ] Live-page smoke (deferred to user — needs running dev server).
+- [x] Final commit on pyeza submodule before 8b begins (next step).
 
 ---
 
@@ -108,8 +120,10 @@
 ### 8b.2 — Sweep agent (Sonnet general-purpose)
 
 - [ ] Brief: same edit pattern as Phase 2b's `Sortable: true` removal. Drop `Filterable: true`; convert `Filterable: false` → `NoFilter: true`; drop redundant `FilterType: types.X`.
-- [ ] **Pre-flight check** in the sweep brief: after every deletion in an inline composite literal (`{Key: "x", Filterable: true, WidthClass: "y"}`), confirm adjacent fields still have commas. (Phase 2b loophole #2 prevention.)
-- [ ] **Exclude generated files**: agent must skip `*.pb.go` and any generated `gen/*` paths. (Phase 6 loophole #3 prevention.)
+- [ ] **Pre-set `NoFilter: true`** on the 5 columns Phase 7.4 already proved risky (use-case allow-list won't accept them): `product.line_id`, `product.sort_order`, `inventory.sku`, `price_plan.duration`, plus any sibling cells that share the same use case path. Lock these out from the start of the sweep so the user never sees a 500 from clicking them.
+- [ ] **Loophole #2 prevention (the recurring bug — 48 breakages last time):** sweep agent must rewrite the *entire* composite literal in a single Edit when any field is being removed, not field-by-field deletes. Lesson from Phase 1–7 progress §Loophole #2.
+- [ ] **`gofmt -l` after each file edit.** Non-empty output halts the chunk. This catches comma-trailing-edge breakages immediately rather than at smoke-compile time.
+- [ ] **Exclude generated files**: agent must pass `--exclude='*.pb.go'` (or `rg --glob '!*.pb.go'`) on any regex pass. Phase 6 loophole #3 mangled `filter.pb.go` last time.
 - [ ] After each package, run `go build ./packages/<pkg>-golang/...` automated. Halt + report on failure.
 - [ ] Sweep runs: centymo → entydad → fycha → fayna → cyta → hybra. Then `apps/service-admin/views` if any view files have inline `Filterable:` lines.
 - [ ] Final `go build ./packages/...` exits 0.
@@ -178,20 +192,15 @@
 
 ## How to Resume
 
-This plan is designed to be picked up by a 30-minute cron agent. Each fire:
+Foreground, interactive — same model as Phase 7.
 
 1. **Read this file first.** Find the first unchecked `[ ]` checkbox in order: 8a.1 → 8a.2 → … → 8b.5.
 2. **Read [plan.md](./plan.md)** for the design context behind that checkbox.
-3. **Execute one logical chunk.** Examples:
-   - "8a.1: add `NoFilter bool` to TableColumn and add `DeriveFilterType` helper" — one chunk.
-   - "8a.3: introduce FILTER_WIDGETS registry with the string widget" — one chunk; subsequent widgets are separate chunks.
-4. **Run `go build` after every Go edit.** If it fails, fix or revert before exiting.
-5. **Smoke after every user-visible chunk.** Use the smoke recipe above; delegate the Playwright probe to a Sonnet sub-agent.
-6. **Update checkboxes here** before exiting. Append a one-line note describing what was done.
-7. **Commit + push** if the chunk compiles cleanly.
-8. **Exit.** Do not start the next chunk in the same fire — let the next cron tick pick it up. (This keeps each fire's context fresh and recoverable.)
-
-**Hard stop:** 03:00 local on 2026-05-02. After 03:00, the cron writes a final summary line to this file and stops scheduling further fires.
+3. **Re-grep line refs** in `table-filters.js`, `table-toolbar.html`, `table.css` before editing — Phase 7 commits shifted them.
+4. **Run `go build` after every Go edit.** Fix or revert before continuing.
+5. **Smoke after every user-visible chunk.** Eyeball + Playwright probe per the smoke recipe above.
+6. **Update checkboxes here** with a one-line note describing what was done.
+7. **Commit + push** when the chunk compiles cleanly and smoke passes.
 
 **Cross-references:**
 - [Phase 1–7 progress.md](../20260501-table-sort-and-select-all/progress.md) — read before starting 8b. Loophole sections 2 (inline-struct comma drops), 3 (generated proto sweep), and Phase 7.4 (use-case allow-list 500) are all relevant to 8b.

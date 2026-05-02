@@ -89,7 +89,7 @@ type SidebarRegulationsLabels struct {
 	PayItems         string `json:"payItems"`
 	PayItemsMapping  string `json:"payItemsMapping"`
 	AwardMultipliers string `json:"awardMultipliers"`
-	AdditionalItems string `json:"additionalItems"`
+	AdditionalItems  string `json:"additionalItems"`
 }
 
 type SidebarMarketplaceLabels struct {
@@ -268,22 +268,22 @@ type HelpPaneLabels struct {
 }
 
 type CommonTableLabels struct {
-	Search            string             `json:"search"`
-	SearchPlaceholder string             `json:"searchPlaceholder"`
-	Filters           string             `json:"filters"`
-	FilterConditions  string             `json:"filterConditions"`
-	ClearAll          string             `json:"clearAll"`
-	AddCondition      string             `json:"addCondition"`
-	Clear             string             `json:"clear"`
-	ApplyFilters      string             `json:"applyFilters"`
-	Sort              string             `json:"sort"`
-	Ascending         string             `json:"ascending"`
-	Descending        string             `json:"descending"`
-	Columns           string             `json:"columns"`
-	Export            string             `json:"export"`
-	ExportCsv         string             `json:"exportCsv"`
-	ExportExcel       string             `json:"exportExcel"`
-	Density           TableDensityLabels `json:"density"`
+	Search                   string             `json:"search"`
+	SearchPlaceholder        string             `json:"searchPlaceholder"`
+	Filters                  string             `json:"filters"`
+	FilterConditions         string             `json:"filterConditions"`
+	ClearAll                 string             `json:"clearAll"`
+	AddCondition             string             `json:"addCondition"`
+	Clear                    string             `json:"clear"`
+	ApplyFilters             string             `json:"applyFilters"`
+	Sort                     string             `json:"sort"`
+	Ascending                string             `json:"ascending"`
+	Descending               string             `json:"descending"`
+	Columns                  string             `json:"columns"`
+	Export                   string             `json:"export"`
+	ExportCsv                string             `json:"exportCsv"`
+	ExportExcel              string             `json:"exportExcel"`
+	Density                  TableDensityLabels `json:"density"`
 	SelectAll                string             `json:"selectAll"`
 	BulkSelectAllPage        string             `json:"bulkSelectAllPage"`
 	BulkSelectAllAcrossPages string             `json:"bulkSelectAllAcrossPages"`
@@ -297,15 +297,47 @@ type CommonTableLabels struct {
 	SortDescDate             string             `json:"sortDescDate"`
 	SortAscEnum              string             `json:"sortAscEnum"`
 	SortDescEnum             string             `json:"sortDescEnum"`
-	SelectRow                string             `json:"selectRow"`
-	Actions           string             `json:"actions"`
-	Show              string             `json:"show"`
-	Entries           string             `json:"entries"`
-	Showing           string             `json:"showing"`
-	To                string             `json:"to"`
-	Of                string             `json:"of"`
-	EntriesLabel      string             `json:"entriesLabel"`
-	ColumnsLabel      TableColumnLabels  `json:"columnsLabel"`
+	// Phase 8 — filter widget operator labels
+	FilterOpContains   string `json:"filterOpContains"`
+	FilterOpEquals     string `json:"filterOpEquals"`
+	FilterOpStartsWith string `json:"filterOpStartsWith"`
+	FilterOpEndsWith   string `json:"filterOpEndsWith"`
+	FilterOpNotEquals  string `json:"filterOpNotEquals"`
+	FilterOpBetween    string `json:"filterOpBetween"`
+	FilterOpEq         string `json:"filterOpEq"`
+	FilterOpNeq        string `json:"filterOpNeq"`
+	FilterOpGt         string `json:"filterOpGt"`
+	FilterOpGte        string `json:"filterOpGte"`
+	FilterOpLt         string `json:"filterOpLt"`
+	FilterOpLte        string `json:"filterOpLte"`
+	FilterOpOn         string `json:"filterOpOn"`
+	FilterOpBefore     string `json:"filterOpBefore"`
+	FilterOpAfter      string `json:"filterOpAfter"`
+	FilterOpIn         string `json:"filterOpIn"`
+	FilterOpNotIn      string `json:"filterOpNotIn"`
+	// Phase 8 — date preset chips
+	FilterPresetToday  string `json:"filterPresetToday"`
+	FilterPreset7d     string `json:"filterPreset7d"`
+	FilterPreset30d    string `json:"filterPreset30d"`
+	FilterPresetMonth  string `json:"filterPresetMonth"`
+	FilterPresetCustom string `json:"filterPresetCustom"`
+	// Phase 8 — boolean tri-state labels
+	FilterAny string `json:"filterAny"`
+	FilterYes string `json:"filterYes"`
+	FilterNo  string `json:"filterNo"`
+	// Phase 8 — placeholders
+	FilterSearchPlaceholder string            `json:"filterSearchPlaceholder"`
+	FilterMinPlaceholder    string            `json:"filterMinPlaceholder"`
+	FilterMaxPlaceholder    string            `json:"filterMaxPlaceholder"`
+	SelectRow               string            `json:"selectRow"`
+	Actions                 string            `json:"actions"`
+	Show                    string            `json:"show"`
+	Entries                 string            `json:"entries"`
+	Showing                 string            `json:"showing"`
+	To                      string            `json:"to"`
+	Of                      string            `json:"of"`
+	EntriesLabel            string            `json:"entriesLabel"`
+	ColumnsLabel            TableColumnLabels `json:"columnsLabel"`
 }
 
 type TableColumnLabels struct {

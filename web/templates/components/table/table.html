@@ -82,7 +82,7 @@ JavaScript:
     <div class="chip-group" role="list">
       {{range .ServerPagination.ActiveFilters}}
       <span class="chip sm" data-filter-key="{{.Key}}" role="listitem">
-        <span class="chip-label">{{.Label}}: {{.DisplayValue}}</span>
+        <span class="chip-label">{{if .ChipText}}{{.ChipText}}{{else}}{{.Label}}: {{.DisplayValue}}{{end}}</span>
         <button type="button" class="chip-dismiss" data-dismiss-filter="{{.Key}}" aria-label="{{$.Labels.Clear}} {{.Label}}">
           {{template "icon-x" $}}
         </button>

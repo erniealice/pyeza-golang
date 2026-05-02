@@ -252,7 +252,10 @@ Two-phase split (8a / 8b) so the pyeza-internal change can be reviewed in isolat
 - Hide `.filter-list-search` when option count ≤ 5 (set via `data-options-count` attribute on the row).
 
 **8a.6 — Active-filter chips in toolbar**
-- `packages/pyeza-golang/web/templates/components/table/table.html` — already renders `ServerPagination.ActiveFilters` chip strip (table.html:81-92). Confirm chip dismiss handler in `table-filters.js::initChipHandlers` works with the new TypedFilter shapes. Each active filter chip should show `column • operator • value` (e.g., "Price: ≥ ₱1,000.00 ✕"). Chip text formatting → server-side via a `formatActiveFilter` template func that mirrors widget `chip()` JS.
+- **Single source of truth for chip text: server.** `ServerPagination.ActiveFilter` gets a `ChipText string` field populated server-side from a new `FormatActiveFilter(f *commonpb.TypedFilter, col *TableColumn) string` helper. The chip strip in `table.html:81-92` renders `{{.ChipText}}` verbatim. JS does not reformat. (Eliminates the Go ↔ widget `chip()` JS duplication that would otherwise drift.)
+- Each chip shows `column • operator • value` (e.g., `"Price: ≥ ₱1,000.00 ✕"`).
+- Confirm chip dismiss handler in `table-filters.js::initChipHandlers` works with the new TypedFilter shapes (the dismiss path reads the filter's index/key from the chip's data attribute, not the chip text — should be unaffected).
+- Filter panel reopen: when the panel opens with active filters, hydrate condition rows from `ServerPagination.ActiveFilters` so the user sees what's currently applied (mirrors Phase 7.5 — sort-dropdown active state must agree with the URL).
 
 **8a.7 — Verify pyeza-internal**
 - `go build ./packages/pyeza-golang/...` exits 0.
@@ -268,7 +271,11 @@ Two-phase split (8a / 8b) so the pyeza-internal change can be reviewed in isolat
   - Drop `Filterable: true` lines (default-on after the sweep).
   - Convert `Filterable: false` → `NoFilter: true`.
   - Drop `FilterType: types.FilterTypeXxx` only when it matches `DeriveFilterType(cellType)`. Keep when it's an override.
-- **Lesson from Phase 2b loophole #2:** if the `Filterable: true` was inline (`{Key: "x", Filterable: true, WidthClass: "y"}`), the comma-trailing-edge breaks the same way. Pre-flight the agent with: "after every deletion, regex-check that adjacent fields still have commas." Run `go build` after every package as an automated comma sanity check.
+- **Pre-set `NoFilter: true` on the 5 known-risky columns** (Phase 7.4 burned on `product.line`; the 5 siblings have the same use-case allow-list gap): `product.line_id`, `product.sort_order`, `inventory.sku`, `price_plan.duration`, plus filter analogues on the same use cases. Lock these out before the sweep ships so the user never hits a 500.
+- **Loophole #2 prevention (the recurring bug):** sweep agent rewrites the *entire* composite literal as one Edit when removing fields, never field-by-field. Last sweep produced 48 comma-trailing-edge breakages doing it field-by-field; that approach is banned here.
+- **`gofmt -l` after each file edit.** Non-empty output halts the chunk. Catches comma drops at edit time, not smoke-compile time.
+- **Generated-file exclusion:** sweep agent passes `--exclude='*.pb.go'` (or `rg --glob '!*.pb.go'`) on any regex pass. Phase 6 loophole #3 mangled `filter.pb.go` last time.
+- Run `go build ./packages/<pkg>-golang/...` after each package as a final sanity check.
 
 **8b.3 — Use-case allow-list audit** (separate agent, parallel)
 - Brief: for every `List<Entity>` use case in `packages/centymo-golang/use_cases`, `packages/entydad-golang/use_cases`, `packages/fycha-golang/use_cases`, `packages/fayna-golang/use_cases`, `packages/cyta-golang/use_cases`, identify the filter allow-list (the equivalent of sort's `allowedSortColumns`). Report:
@@ -304,7 +311,7 @@ Two-phase split (8a / 8b) so the pyeza-internal change can be reviewed in isolat
 | `packages/pyeza-golang/web/styles/components/table.css` | Append Filter Widgets section (~80-120 lines) | 8a.5 |
 | `packages/pyeza-golang/web/templates/components/table/table-toolbar.html` | (No change — `filterColumnsJSON` carries the metadata; new widgets are JS-driven.) | 8a.4 |
 | `packages/pyeza-golang/web/templates/components/table/table.html` | (Minor) confirm `ServerPagination.ActiveFilters` chip strip works with new TypedFilter shapes; no structural change | 8a.6 |
-| `packages/pyeza-golang/types/table.go::FormatActiveFilter` | New helper to render chip text server-side; mirrors widget `chip()` JS | 8a.6 |
+| `packages/pyeza-golang/types/table.go::FormatActiveFilter` | New helper that returns chip text. Server is the single source of truth — exposed to template as `{{.ChipText}}` on each `ActiveFilter`. JS reads verbatim, does not reformat. | 8a.6 |
 | Sweep: ~50–80 consumer files | Drop `Filterable: true`; flip `Filterable: false`→`NoFilter: true`; drop redundant `FilterType` | 8b.2 |
 | `progress.md` (this plan) | Document use-case allow-list gaps as a Loophole Log entry | 8b.3 |
 
@@ -331,8 +338,8 @@ Two-phase split (8a / 8b) so the pyeza-internal change can be reviewed in isolat
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Sweep agent drops trailing commas inside inline struct literals (Phase 2b loophole #2) | Compile failure in 20+ files | Pre-flight regex check after each deletion; `go build` per package as automated sanity check; perl two-pass fixer template ready (see Phase 6 progress.md) |
-| Use-case allow-list missing a newly-exposed filter column (Phase 7.4 loophole) | 500 on first user click | 8b.3 audit *documents* every gap; if smoke surfaces a 500, set `NoFilter: true` on that column until the use case allow-list is extended |
+| Sweep agent drops trailing commas inside inline struct literals (Phase 2b loophole #2 — 48 breakages last time) | Compile failure in 20+ files | Sweep rewrites entire composite literals in one Edit (never field-by-field); `gofmt -l` halts on each file; `go build` per package as final check |
+| Use-case allow-list missing a newly-exposed filter column (Phase 7.4 loophole) | 500 on first user click | Pre-set `NoFilter: true` on the 5 columns Phase 7.4 already proved risky (`product.line_id`, `product.sort_order`, `inventory.sku`, `price_plan.duration`, plus filter analogues). 8b.3 audit documents the rest; Phase 9 wires the allow-list properly |
 | Generated proto file caught by sweep regex (Phase 6 loophole #3) | Broken `.pb.go` reverted by `git checkout` | Sweep agent must `--exclude="*.pb.go"` from any regex pass |
 | Existing `Filterable: true` callers break if I remove the field too eagerly | Compile failure across all consumer pages | Keep `Filterable bool` deprecated-but-readable for one wave (8a). Sweep deletes it (8b). Then a follow-up plan removes the field after the wave is committed. |
 | `DeriveFilterType` returns wrong default for an edge case (e.g. a money cell that should actually be a list filter on currency code) | User sees the wrong widget on one page | Auto-derivation is overrideable via explicit `FilterType: types.FilterTypeXxx`. The sweep keeps explicit overrides intact; only redundant overrides are dropped. |
@@ -391,8 +398,9 @@ To continue this work in a fresh session:
 1. Read [plan.md](./plan.md) (this file) and [progress.md](./progress.md).
 2. Check `git status` in monorepo root and `cd packages/pyeza-golang && git status` for uncommitted work.
 3. Resume from the first phase that's not COMPLETE in progress.md.
-4. **Hard rule:** sub-phases within 8a must run sequentially (8a.1 → 8a.2 → … → 8a.7). Sub-phases within 8b: 8b.1 (audit) before 8b.2 (sweep); 8b.3 (use-case audit) is parallel-able.
-5. Always run `go build ./packages/pyeza-golang/...` after each 8a sub-phase. Always run `go build ./packages/<pkg>/...` after each consumer-package edit in 8b.
+4. **Refresh line refs.** Phase 7 commits (`eda8324` + post-7 polish) shifted line numbers in `table-filters.js`, `table-toolbar.html`, `table.css`. Re-grep for the anchor strings before editing — the line numbers cited in this plan are approximate.
+5. **Hard rule:** sub-phases within 8a must run sequentially (8a.1 → 8a.2 → … → 8a.7). Sub-phases within 8b: 8b.1 (audit) before 8b.2 (sweep); 8b.3 (use-case audit) is parallel-able.
+6. Always run `go build ./packages/pyeza-golang/...` after each 8a sub-phase. Always run `go build ./packages/<pkg>/...` after each consumer-package edit in 8b.
 
 **Cross-references for context:**
 - [Phase 1–7 progress.md](../20260501-table-sort-and-select-all/progress.md) — read the "Loophole Log" sections (especially loophole #2 inline-struct comma drops, loophole #3 generated proto sweep collision, and Phase 7.4 use-case allow-list 500). The same risks apply here.

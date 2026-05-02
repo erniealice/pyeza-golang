@@ -109,6 +109,10 @@
                 <script type="application/json" id="{{.ID}}-filter-meta">
                 {{filterColumnsJSON .Columns}}
                 </script>
+                {{/* Filter widget labels — read by table-filters.js readPanelLabels() */}}
+                <script type="application/json" class="filter-panel-labels">
+                {{filterPanelLabelsJSON .Labels}}
+                </script>
                 <div class="filter-conditions" id="{{.ID}}-filter-conditions">
                     {{/* Filter rows will be added dynamically by JS */}}
                 </div>

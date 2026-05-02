@@ -145,10 +145,66 @@ func getDefaultFuncMap() template.FuncMap {
 		// by table.html to emit data-csv on each <td>. Keeps client-side export
 		// consistent regardless of how the cell renders visually.
 		"csvCell": types.CellCSV,
+		// filterPanelLabelsJSON serializes the subset of TableLabels needed by
+		// the filter widget JS into an inert JSON block. Read by table-filters.js
+		// via readPanelLabels() — keeps every label (operator names, date presets,
+		// tri-state, placeholders) translation-driven instead of hardcoded.
+		"filterPanelLabelsJSON": func(labels any) template.JS {
+			tl, ok := labels.(types.TableLabels)
+			if !ok {
+				return template.JS("{}")
+			}
+			m := map[string]string{
+				"filterOpContains":        tl.FilterOpContains,
+				"filterOpEquals":          tl.FilterOpEquals,
+				"filterOpStartsWith":      tl.FilterOpStartsWith,
+				"filterOpEndsWith":        tl.FilterOpEndsWith,
+				"filterOpNotEquals":       tl.FilterOpNotEquals,
+				"filterOpBetween":         tl.FilterOpBetween,
+				"filterOpEq":              tl.FilterOpEq,
+				"filterOpNeq":             tl.FilterOpNeq,
+				"filterOpGt":              tl.FilterOpGt,
+				"filterOpGte":             tl.FilterOpGte,
+				"filterOpLt":              tl.FilterOpLt,
+				"filterOpLte":             tl.FilterOpLte,
+				"filterOpOn":              tl.FilterOpOn,
+				"filterOpBefore":          tl.FilterOpBefore,
+				"filterOpAfter":           tl.FilterOpAfter,
+				"filterOpIn":              tl.FilterOpIn,
+				"filterOpNotIn":           tl.FilterOpNotIn,
+				"filterPresetToday":       tl.FilterPresetToday,
+				"filterPreset7d":          tl.FilterPreset7d,
+				"filterPreset30d":         tl.FilterPreset30d,
+				"filterPresetMonth":       tl.FilterPresetMonth,
+				"filterPresetCustom":      tl.FilterPresetCustom,
+				"filterAny":               tl.FilterAny,
+				"filterYes":               tl.FilterYes,
+				"filterNo":                tl.FilterNo,
+				"filterSearchPlaceholder": tl.FilterSearchPlaceholder,
+				"filterMinPlaceholder":    tl.FilterMinPlaceholder,
+				"filterMaxPlaceholder":    tl.FilterMaxPlaceholder,
+			}
+			b, _ := json.Marshal(m)
+			if b == nil {
+				return template.JS("{}")
+			}
+			return template.JS(b)
+		},
 		// filterColumnsJSON serializes filterable columns as a JSON array for use
 		// in inert <script type="application/json"> blocks in table templates.
-		// Only columns with Filterable==true are included.
-		// Each entry has: key, label, type, and optionally options (for FilterTypeStatus).
+		//
+		// Inclusion rule (Phase 8 transition window):
+		//   - Legacy: emit if Filterable == true. Used by every list page until the 8b sweep.
+		//   - Post-sweep (8b): emit if !NoFilter && Key != "". Default-on for every column.
+		//
+		// During the transition, BOTH paths are accepted: a column emits if Filterable is true
+		// OR if it has been explicitly migrated (NoFilter is the only opt-out). The 8b sweep
+		// removes the Filterable: true lines AND the redundant FilterType lines, leaving the
+		// default-on path active everywhere. After the sweep, the OR'd condition is harmless —
+		// no columns rely on Filterable=true anymore. Phase 9 deletes the field.
+		//
+		// Each entry: key, label, type (legacy alias), filterType (Phase 8 widget kind),
+		// defaultOperator, and optionally options (for list/status filters).
 		// Returns template.JS to prevent double-escaping.
 		// Usage: {{filterColumnsJSON .Columns}}
 		"filterColumnsJSON": func(columns any) template.JS {
@@ -158,13 +214,28 @@ func getDefaultFuncMap() template.FuncMap {
 			}
 			filterable := make([]map[string]any, 0)
 			for _, c := range cols {
-				if !c.Filterable {
+				if c.Key == "" {
 					continue
 				}
+				if !c.Filterable {
+					// Legacy opt-in path: until the 8b sweep flips every consumer to
+					// default-on, we keep emitting only columns that explicitly opted in.
+					continue
+				}
+				if c.NoFilter {
+					// Phase 8 opt-out wins even if a stale Filterable: true is still set.
+					continue
+				}
+				ft := c.FilterType
+				if ft == "" {
+					ft = types.FilterTypeString
+				}
 				entry := map[string]any{
-					"key":   c.Key,
-					"label": c.Label,
-					"type":  string(c.FilterType),
+					"key":             c.Key,
+					"label":           c.Label,
+					"type":            string(ft),
+					"filterType":      string(ft),
+					"defaultOperator": defaultOperatorFor(ft),
 				}
 				if len(c.FilterOptions) > 0 {
 					opts := make([]map[string]string, len(c.FilterOptions))
@@ -250,6 +321,23 @@ func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 	}
 
 	return base
+}
+
+// defaultOperatorFor returns the JS operator string used when the filter widget renders.
+// Mirrors the default-operator decisions in plan §Locked decisions row 2.
+func defaultOperatorFor(ft types.FilterColumnType) string {
+	switch ft {
+	case types.FilterTypeNumericRange, types.FilterTypeNumeric, types.FilterTypeMoney:
+		return "between"
+	case types.FilterTypeDateRange, types.FilterTypeDate:
+		return "between"
+	case types.FilterTypeList, types.FilterTypeListLabel, types.FilterTypeStatus:
+		return "in"
+	case types.FilterTypeBoolean, types.FilterTypeToggle:
+		return "" // boolean has no operator concept (value is the assertion)
+	default:
+		return "contains"
+	}
 }
 
 // toFloat64 converts various numeric types to float64
