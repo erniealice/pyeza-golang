@@ -193,15 +193,10 @@ func getDefaultFuncMap() template.FuncMap {
 		// filterColumnsJSON serializes filterable columns as a JSON array for use
 		// in inert <script type="application/json"> blocks in table templates.
 		//
-		// Inclusion rule (Phase 8 transition window):
-		//   - Legacy: emit if Filterable == true. Used by every list page until the 8b sweep.
-		//   - Post-sweep (8b): emit if !NoFilter && Key != "". Default-on for every column.
-		//
-		// During the transition, BOTH paths are accepted: a column emits if Filterable is true
-		// OR if it has been explicitly migrated (NoFilter is the only opt-out). The 8b sweep
-		// removes the Filterable: true lines AND the redundant FilterType lines, leaving the
-		// default-on path active everywhere. After the sweep, the OR'd condition is harmless —
-		// no columns rely on Filterable=true anymore. Phase 9 deletes the field.
+		// Phase 8b: default-on — emit every column with a non-empty Key unless NoFilter is set.
+		// The 8b sweep removed all consumer Filterable: true lines and pre-set NoFilter: true
+		// on derived/joined/Phase-7.4-risky columns. The legacy `Filterable bool` field is
+		// scheduled for deletion in Phase 9.
 		//
 		// Each entry: key, label, type (legacy alias), filterType (Phase 8 widget kind),
 		// defaultOperator, and optionally options (for list/status filters).
@@ -217,13 +212,7 @@ func getDefaultFuncMap() template.FuncMap {
 				if c.Key == "" {
 					continue
 				}
-				if !c.Filterable {
-					// Legacy opt-in path: until the 8b sweep flips every consumer to
-					// default-on, we keep emitting only columns that explicitly opted in.
-					continue
-				}
 				if c.NoFilter {
-					// Phase 8 opt-out wins even if a stale Filterable: true is still set.
 					continue
 				}
 				ft := c.FilterType
