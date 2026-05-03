@@ -221,6 +221,31 @@ JS API:
 
         panel.setAttribute('data-position', this.position);
 
+        // Constrain width to available horizontal viewport space.
+        // After placing the panel, measure how much room exists between its
+        // left edge and the right viewport edge (or right edge and left edge
+        // for right-anchored placements).  Clamp max-width so the panel never
+        // overflows, but keep a 180 px minimum for readable text.  If even
+        // 180 px doesn't fit on the preferred side, flip the horizontal anchor
+        // to use the opposite side instead.
+        var wMargin = 12; // px gap between panel edge and viewport edge
+        var minPanelW = 180;
+        var maxPanelW = 320;
+        panel.style.maxWidth = ''; // clear any previous inline value first
+        var pRect = panel.getBoundingClientRect();
+        var availRight = window.innerWidth - pRect.left - wMargin;
+        var availLeft  = pRect.right - wMargin;
+        if (availRight < minPanelW && availLeft >= minPanelW) {
+            // Not enough room on the right — flip so the panel grows leftward.
+            // Re-anchor: clear left, pin right to (viewport width - trigger left).
+            panel.style.left  = '';
+            panel.style.right = (window.innerWidth - rect.left) + 'px';
+            pRect = panel.getBoundingClientRect();
+            availRight = window.innerWidth - pRect.left - wMargin;
+        }
+        var clampedW = Math.max(minPanelW, Math.min(maxPanelW, availRight));
+        panel.style.maxWidth = clampedW + 'px';
+
         // Constrain height to available viewport space (10px margin)
         var margin = 10;
         var panelRect = panel.getBoundingClientRect();

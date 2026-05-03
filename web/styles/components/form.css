@@ -92,7 +92,8 @@
     box-shadow: 0 0 0 0.125rem var(--accent-primary-light); /* 2px */
 }
 .form-label-info-panel {
-    max-width: 17.5rem; /* 280px */
+    max-width: 20rem; /* 320px — JS _reposition will clamp down when needed */
+    min-width: 11.25rem; /* 180px — prevents one-word-per-line wrapping */
     font-size: var(--text-sm);
     line-height: 1.45;
     color: var(--text-primary);
@@ -325,6 +326,15 @@
 
 .form-row:last-child {
     margin-bottom: 0;
+}
+
+/* 2026-05-03 — Inline hint variant. Pulls the row tighter to the field
+ * row above it so a follow-up note (e.g., an alert-info banner explaining
+ * the field's downstream effect) reads as part of the same group rather
+ * than as an unrelated section. */
+.form-row.form-row-hint {
+    margin-top: -0.625rem; /* 10px pull-up from the previous row's 20px gap */
+    margin-bottom: 0.875rem; /* 14px below — tighter than default 20px */
 }
 
 /* Single column */
