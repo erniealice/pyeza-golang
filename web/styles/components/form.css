@@ -203,6 +203,15 @@
     color: var(--text-muted);
 }
 
+/* When the disabled placeholder option is the currently-checked one, render
+   the trigger text muted so the empty-state matches <input> placeholder
+   semantics. Without this rule the trigger inherits .form-select's
+   --text-primary even though the active option is the placeholder.
+   :has() is supported in Chromium 105+, Safari 15.4+, Firefox 121+. */
+.form-select:has(option[disabled]:checked) {
+    color: var(--text-muted);
+}
+
 /* Compact variant */
 .form-select-compact {
     padding: 0.625rem 0.75rem; /* 10px 12px */
@@ -384,6 +393,59 @@
     margin-bottom: 1rem; /* 16px */
     padding-bottom: 0.5rem; /* 8px */
     border-bottom: var(--border-width) solid var(--border-light);
+}
+
+/* ==========================================================================
+   FORM SUMMARY (read-only key/value list)
+   ==========================================================================
+   Shared <dl> styling for read-only context blocks rendered inside drawer
+   forms — e.g. the subscription drawer's "Plan Details" section that displays
+   the selected price plan's billing kind, amount, cycle, and term as derived
+   facts the operator cannot edit. Pair with .form-section + .form-section-title
+   for the wrapper; see drawer-form-template-anatomy.md § Read-only Summary.
+   ========================================================================== */
+
+.form-summary {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, max-content) 1fr;
+    column-gap: 1rem; /* 16px */
+    row-gap: 0.5rem; /* 8px */
+    margin: 0 0 1.25rem 0; /* 20px bottom — separates the box from the next form-section */
+    padding: 0.75rem 1rem; /* 12px 16px */
+    background: var(--bg-subtle, #F5F5F7);
+    /* Fixed rem values — read-only summary intentionally opts out of
+       theme-driven border + radius so the box reads as a stable, non-input
+       surface across all themes (including pill-radius themes that would
+       otherwise warp it into an oval). */
+    border: 1px solid #E5E5EA;
+    border-radius: 0.5rem; /* 8px */
+    font-size: var(--text-md); /* 14px */
+}
+
+.form-summary > dt {
+    color: var(--text-muted);
+    font-weight: var(--font-weight-medium);
+    margin: 0;
+}
+
+.form-summary > dd {
+    color: var(--text-primary);
+    margin: 0;
+    word-break: break-word;
+}
+
+/* Compact one-line variant when many short fields would otherwise stack;
+   intended for narrow drawers — switches to a single column on small viewports. */
+@media (max-width: 30rem) {
+    .form-summary {
+        grid-template-columns: 1fr;
+        row-gap: 0.25rem; /* 4px */
+    }
+    .form-summary > dt {
+        font-size: var(--text-2xs);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-normal);
+    }
 }
 
 /* ==========================================================================

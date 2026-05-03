@@ -221,7 +221,7 @@ func getDefaultFuncMap() template.FuncMap {
 				if c.Key == "" {
 					continue
 				}
-				if c.NoFilter {
+				if !c.IsFilterable() {
 					continue
 				}
 				ft := c.FilterType

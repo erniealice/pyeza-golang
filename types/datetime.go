@@ -10,7 +10,26 @@ const (
 	TimeOnly     = "3:04 PM"              // Time only
 	DateShort    = "01/02/2006"           // Short numeric
 	DateTimeISO  = "2006-01-02 15:04"     // ISO datetime without seconds
+
+	// NameTimestampLayout is the wall-clock portion of an auto-derived entity
+	// name suffix. The IANA zone name is appended separately by AppendTimestamp
+	// — Go's Format has no IANA-name verb, and "MST" gives ambiguous abbreviations.
+	NameTimestampLayout = "2006-01-02 15:04:05"
+
+	// NameSeparator sits between the base name and the timestamp suffix.
+	NameSeparator = " - "
 )
+
+// AppendTimestamp returns "{base} - 2026-05-03 14:30:00 Asia/Manila" — base name,
+// separator, wall-clock in tz, and the tz's IANA name (or "UTC" / fixed offset
+// when the location wasn't loaded by name). Nil tz falls back to UTC so callers
+// without a request-scoped zone still get an unambiguous suffix.
+func AppendTimestamp(base string, now time.Time, tz *time.Location) string {
+	if tz == nil {
+		tz = time.UTC
+	}
+	return base + NameSeparator + now.In(tz).Format(NameTimestampLayout) + " " + tz.String()
+}
 
 // FormatDateTime converts a date string from one format to another.
 // `to` is the desired output format (Go reference time layout).

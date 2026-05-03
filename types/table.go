@@ -46,9 +46,25 @@ type ActiveFilter struct {
 
 // TableColumn defines a column in a data table
 type TableColumn struct {
-	Key   string // Data attribute key for sorting
+	Key   string // View-facing column key (data attribute, label lookup, filter binding)
 	Label string // Column header label
-	// NoSort, when true, disables sorting on this column. Default false (column is sortable). Use for derived columns where ORDER BY has no meaning, e.g., computed fields without a stable backing column.
+	// SortKey is the wire/SQL key sent to the server when this column header is
+	// clicked. Empty = use Key. Set this when the on-screen value is computed from
+	// a joined or derived field whose Key isn't a real SQL column (e.g. a person
+	// cell whose name comes from a joined user row → Key:"representative",
+	// SortKey:"rep_name"; the adapter then maps "rep_name" to its SQL expression
+	// via SortSpec.ColMap).
+	SortKey string
+	// Sortable controls whether the header is clickable / appears in the Sort
+	// dropdown. Positive form, but kept opt-in/opt-out compatible with the legacy
+	// NoSort flag via ApplyTableSettings, which sets Sortable = !NoSort during
+	// the migration shim. Read .Sortable from templates and helpers; ignore
+	// NoSort except in the shim itself.
+	Sortable bool
+	// NoSort is the legacy negative form. Still honored during the migration
+	// shim — set to true to disable sorting. Prefer leaving unset and using the
+	// positive Sortable field on new code. Will be removed after the call-site
+	// sweep flips every column to opt-in Sortable.
 	NoSort bool
 	// SortKind influences the initial sort direction picked when the user first clicks a header,
 	// and the labels rendered in the toolbar Sort dropdown.
@@ -61,12 +77,36 @@ type TableColumn struct {
 	MinWidth   string // Optional minimum width (e.g., "100px") - column can grow but not shrink below this
 	Align      string // Optional horizontal alignment: "left" (default), "center", "right"
 	VAlign     string // Optional vertical alignment: "top" (default), "middle", "bottom"
-	// NoFilter, when true, disables filtering on this column. Default false (column is filterable).
-	// Use for derived columns the SQL/use-case layer can't filter (computed fields, joined columns
-	// without a stable backing column, etc.). Mirrors NoSort.
+	// Filterable mirrors Sortable: positive form, set by ApplyTableSettings from
+	// !NoFilter during the shim. Read .Filterable from templates and helpers.
+	Filterable bool
+	// NoFilter is the legacy negative form. See NoSort for migration notes.
 	NoFilter      bool
 	FilterType    FilterColumnType // Input type rendered in filter panel; empty = auto-derived from cell type via DeriveFilterType
 	FilterOptions []FilterOption   // For list filters: checkbox options
+}
+
+// EffectiveSortKey returns the wire/SQL key the browser should send for this
+// column. Prefers SortKey when set, falling back to Key. Used by both the
+// template (data-sort=) and the view-layer SortableKeys helper so they stay in
+// agreement.
+func (c TableColumn) EffectiveSortKey() string {
+	if c.SortKey != "" {
+		return c.SortKey
+	}
+	return c.Key
+}
+
+// IsSortable returns the effective sortable state, bridging the legacy NoSort
+// negative form to the positive Sortable field. Once the call-site sweep
+// removes NoSort this collapses to `return c.Sortable`.
+func (c TableColumn) IsSortable() bool {
+	return c.Sortable || !c.NoSort
+}
+
+// IsFilterable mirrors IsSortable for the filter axis.
+func (c TableColumn) IsFilterable() bool {
+	return c.Filterable || !c.NoFilter
 }
 
 // ColumnGroup defines a group of columns with a shared parent header.
@@ -357,6 +397,25 @@ func ApplyTableSettings(config *TableConfig) {
 	}
 	for i := range config.Rows {
 		config.Rows[i].ShowCheckbox = config.ShowCheckbox
+	}
+
+	// Migration shim: normalize Sortable/Filterable from legacy NoSort/NoFilter
+	// so templates can read the positive fields without each call site needing
+	// to know about both. Existing code that only sets NoSort:true continues to
+	// work — Sortable derives from !NoSort. The eventual sweep flips every
+	// column to declare Sortable explicitly and removes NoSort, at which point
+	// this loop collapses to a no-op (or vanishes with NoSort itself).
+	for i := range config.Columns {
+		c := &config.Columns[i]
+		c.Sortable = c.Sortable || !c.NoSort
+		c.Filterable = c.Filterable || !c.NoFilter
+	}
+	for gi := range config.ColumnGroups {
+		for i := range config.ColumnGroups[gi].Columns {
+			c := &config.ColumnGroups[gi].Columns[i]
+			c.Sortable = c.Sortable || !c.NoSort
+			c.Filterable = c.Filterable || !c.NoFilter
+		}
 	}
 }
 
@@ -758,30 +817,31 @@ func itoa(n int) string {
 	return strconv.Itoa(n)
 }
 
-// SortableKeys extracts the keys of all sortable columns.
-// Used by view handlers to build the allowed sort columns whitelist passed
-// to ParseTableParams. Returns keys for columns where NoSort is false (the
-// default) and Key is non-empty.
+// SortableKeys extracts the wire/SQL sort keys of all sortable columns. Used by
+// view handlers to build the allowed-sort whitelist passed to ParseTableParams.
+// For each sortable column with non-empty Key, prefers SortKey when set; falls
+// back to Key. The shim's IsSortable bridges legacy NoSort and the new
+// Sortable field so callers don't need to know which the column declares.
 func SortableKeys(cols []TableColumn) []string {
 	var keys []string
 	for _, c := range cols {
-		if !c.NoSort && c.Key != "" {
-			keys = append(keys, c.Key)
+		if c.Key == "" || !c.IsSortable() {
+			continue
 		}
+		keys = append(keys, c.EffectiveSortKey())
 	}
 	return keys
 }
 
 // FilterableKeys extracts the keys of all filterable columns. Mirrors SortableKeys.
-// Used by view handlers to build the allowed filter columns whitelist passed to
-// the use-case layer (Phase 9). Returns keys for columns where NoFilter is false
-// (the default) and Key is non-empty.
+// Filtering still uses Key (not SortKey) because the filter UI binds by view-key.
 func FilterableKeys(cols []TableColumn) []string {
 	var keys []string
 	for _, c := range cols {
-		if !c.NoFilter && c.Key != "" {
-			keys = append(keys, c.Key)
+		if c.Key == "" || !c.IsFilterable() {
+			continue
 		}
+		keys = append(keys, c.Key)
 	}
 	return keys
 }

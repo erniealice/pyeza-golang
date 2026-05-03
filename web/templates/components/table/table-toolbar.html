@@ -138,11 +138,12 @@
             </button>
             <div class="toolbar-dropdown-menu sort-menu">
                 {{range .Columns}}
-                {{if not .NoSort}}
+                {{if .Sortable}}
                 {{$isActiveSort := false}}
                 {{$activeDir := ""}}
-                {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn .Key}}{{$isActiveSort = true}}{{$activeDir = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-                <div class="sort-option{{if $isActiveSort}} active{{end}}" data-sort="{{.Key}}" data-sort-kind="{{.SortKind}}">
+                {{$wireKey := .Key}}{{if .SortKey}}{{$wireKey = .SortKey}}{{end}}
+                {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn $wireKey}}{{$isActiveSort = true}}{{$activeDir = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
+                <div class="sort-option{{if $isActiveSort}} active{{end}}" data-sort="{{$wireKey}}" data-sort-kind="{{.SortKind}}">
                     <span class="sort-option-label">{{.Label}}</span>
                     <div class="sort-option-direction">
                         <button type="button" class="sort-dir-btn{{if and $isActiveSort (eq $activeDir "asc")}} active{{end}}" data-direction="asc" aria-label="Sort ascending">

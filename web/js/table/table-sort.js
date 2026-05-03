@@ -143,6 +143,10 @@
             th.classList.remove('sort-asc', 'sort-desc');
             // P1: reset aria-sort to "none" on all non-active sortable headers
             th.setAttribute('aria-sort', 'none');
+            // Clear stale data-sort-direction so click toggle reads the new active
+            // header, not whatever the server rendered as initially active. In
+            // server mode the thead is not re-rendered after targeted swaps.
+            th.removeAttribute('data-sort-direction');
         });
 
         // Add sort class and aria-sort to active column
@@ -151,6 +155,7 @@
             activeHeader.classList.add(`sort-${direction}`);
             // P1: aria-sort uses "ascending" / "descending" per ARIA spec
             activeHeader.setAttribute('aria-sort', direction === 'asc' ? 'ascending' : 'descending');
+            activeHeader.setAttribute('data-sort-direction', direction);
         }
     }
 
