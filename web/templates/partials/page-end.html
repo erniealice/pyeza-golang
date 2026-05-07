@@ -36,9 +36,11 @@
          The script is small and safe to load on every page. */}}
     <script src="/assets/js/pyeza/help-pane.js?v={{.CacheVersion}}"></script>
 
-    {{/* Toast Container + auto-dismiss script */}}
+    {{/* Toast Container + centralized lf.Toast module.
+         toast.js owns auto-dismiss, OOB-swap pickup, and HX-Trigger
+         listeners (showToast, pyeza:toast). */}}
     {{template "toast-container" .}}
-    {{template "toast-init"}}
+    <script src="/assets/js/pyeza/toast.js?v={{.CacheVersion}}"></script>
 
     {{/* Tab Active State - toggles active class on HTMX tab clicks + arrow-key navigation */}}
     <script>

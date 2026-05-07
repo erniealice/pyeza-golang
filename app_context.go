@@ -77,11 +77,17 @@ type AppContext struct {
 	// UploadFile uploads a file to object storage (for attachments).
 	UploadFile any // func(ctx context.Context, bucket, key string, content []byte, contentType string) error
 
+	// DownloadFile fetches a file's bytes from object storage (for preview/download).
+	DownloadFile any // func(ctx context.Context, bucket, key string) ([]byte, error)
+
 	// ListAttachments lists attachments for an entity.
 	ListAttachments any // typed by consumer — domain blocks type-assert
 
 	// CreateAttachment creates an attachment record.
 	CreateAttachment any
+
+	// ReadAttachment reads a single attachment record by ID.
+	ReadAttachment any
 
 	// DeleteAttachment deletes an attachment record.
 	DeleteAttachment any

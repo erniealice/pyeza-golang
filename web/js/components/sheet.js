@@ -177,8 +177,9 @@
                 }
             }));
 
-            // Show success toast
-            showToast('Changes saved successfully.', 'success');
+            // Show success toast — text comes from CommonLabels.Toast.Saved
+            // via <body data-lf-toast-saved>. Toast module handles render.
+            showToast(savedToastMessage(), 'success');
 
             // Extract the target table ID from the HX-Trigger response header.
             // HTMXSuccess sends: {"formSuccess":true,"refreshTable":"clients-table"}
@@ -218,11 +219,11 @@
             }
 
             // Default error path
-            const errorMessage = xhr.getResponseHeader('HX-Error-Message') || 'An error occurred. Please try again.';
+            const errorMessage = xhr.getResponseHeader('HX-Error-Message') || errorFallbackMessage();
             document.dispatchEvent(new CustomEvent('formError', {
                 detail: { xhr: xhr, message: errorMessage }
             }));
-            showError(errorMessage);
+            if (errorMessage) showError(errorMessage);
         }
     }
 
@@ -258,7 +259,7 @@
             '<div class="alert-body">',
             '  <div class="alert-message"></div>',
             '</div>',
-            '<button type="button" class="alert-dismiss" aria-label="Dismiss alert">',
+            '<button type="button" class="alert-dismiss" aria-label="' + dismissAlertAriaLabel() + '">',
             '  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',
             '    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
             '  </svg>',
@@ -284,44 +285,47 @@
     }
 
     /**
-     * Show a toast notification.
-     * Requires #toast-container in the DOM (from toast-container template).
-     * The toast-init MutationObserver auto-handles dismiss timers.
-     * @param {string} message - Text to display
+     * Resolve the lyngua-translated "saved" toast message from <body data-lf-toast-saved>.
+     * Returns empty string if not set — callers should suppress the toast in that case.
+     */
+    function savedToastMessage() {
+        return (document.body && document.body.dataset && document.body.dataset.lfToastSaved) || '';
+    }
+
+    /**
+     * Resolve the lyngua-translated error fallback message from
+     * <body data-lf-sheet-error-fallback>. Returns empty string if not set —
+     * callers should suppress the inline alert in that case.
+     */
+    function errorFallbackMessage() {
+        return (document.body && document.body.dataset && document.body.dataset.lfSheetErrorFallback) || '';
+    }
+
+    /**
+     * Resolve the lyngua-translated aria-label for the inline error alert's
+     * dismiss button from <body data-lf-sheet-dismiss-alert>.
+     * Returns empty string if not set.
+     */
+    function dismissAlertAriaLabel() {
+        return (document.body && document.body.dataset && document.body.dataset.lfSheetDismissAlert) || '';
+    }
+
+    /**
+     * Show a toast notification — thin shim that delegates to the centralized
+     * lf.Toast.show API. Kept on Sheet for backwards-compatibility with
+     * pre-existing call sites that used lf.Sheet.showToast.
+     *
+     * @param {string} message
      * @param {string} [state] - success | error | warning | info (default: success)
      */
     function showToast(message, state) {
-        state = state || 'success';
-        var container = document.getElementById('toast-container');
-        if (!container) return;
-
-        var toast = document.createElement('div');
-        toast.className = 'toast toast-' + state;
-
-        // P2: success/info use polite; error/warning stay assertive
-        var isUrgent = (state === 'error' || state === 'warning');
-        toast.setAttribute('role', isUrgent ? 'alert' : 'status');
-        toast.setAttribute('aria-live', isUrgent ? 'assertive' : 'polite');
-        toast.setAttribute('data-duration', '3000');
-        toast.setAttribute('data-delay', '0');
-
-        // Icon SVGs — lightweight inline versions matching pyeza icon templates
-        var icons = {
-            success: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-            error: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-            warning: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-            info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
-        };
-
-        toast.innerHTML =
-            '<div class="toast-icon">' + (icons[state] || icons.info) + '</div>' +
-            '<div class="toast-body"><div class="toast-message">' + message + '</div></div>' +
-            '<button class="toast-close" aria-label="Dismiss notification" onclick="this.closest(\'.toast\').classList.add(\'toast-exit\')">' +
-                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-            '</button>' +
-            '<div class="toast-progress" style="animation-duration: 3000ms; animation-delay: 0ms;"></div>';
-
-        container.appendChild(toast);
+        if (!message) return;
+        if (!window.lf || !window.lf.Toast || typeof window.lf.Toast.show !== 'function') {
+            // Defensive: if toast.js failed to load, fall back to console.
+            console.warn('lf.Toast not loaded; toast suppressed:', message);
+            return;
+        }
+        window.lf.Toast.show(message, state || 'success');
     }
 
     /**

@@ -194,6 +194,25 @@
                     throw new Error(text || 'Action failed');
                 });
             }
+            // Dispatch HX-Trigger body events so server-driven toasts/refreshes fire.
+            // Mirrors what HTMX does for regular hx-post requests: each key in the
+            // JSON object is dispatched as a CustomEvent on document.body with the
+            // value as event.detail.
+            const triggerHeader = response.headers.get('HX-Trigger');
+            if (triggerHeader) {
+                try {
+                    const triggers = JSON.parse(triggerHeader);
+                    Object.entries(triggers).forEach(([eventName, detail]) => {
+                        document.body.dispatchEvent(new CustomEvent(eventName, {
+                            detail: detail,
+                            bubbles: true,
+                        }));
+                    });
+                } catch (e) {
+                    // Ignore parse errors — plain-string HX-Trigger values are
+                    // not structured events; skip silently.
+                }
+            }
             return response.text();
         })
         .then(html => {

@@ -11,11 +11,13 @@ Data: .FormAction, .Labels, .CommonLabels
         <!-- Description (optional) -->
         <div class="form-row single">
             {{template "form-group" (dict
-                "Type" "text"
+                "Type" "textarea"
                 "Name" "description"
                 "Label" .Labels.Description
                 "Required" false
                 "Placeholder" .Labels.Description
+                "Rows" 3
+                "MaxLength" 500
             )}}
         </div>
 

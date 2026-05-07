@@ -93,7 +93,7 @@
         <div class="toast-message">{{.Message}}</div>
     </div>
     {{- if $dismissible }}
-    <button class="toast-close" aria-label="{{if .DismissLabel}}{{.DismissLabel}}{{else}}Dismiss notification{{end}}" onclick="this.closest('.toast').classList.add('toast-exit')">
+    <button class="toast-close" aria-label="{{.DismissLabel}}" onclick="this.closest('.toast').classList.add('toast-exit')">
         {{template "icon-x"}}
     </button>
     {{- end }}
@@ -104,59 +104,13 @@
 {{end}}
 
 {{/* ============================================================
-    Toast Init Script
+    Toast Init — DEPRECATED stub.
     ============================================================
-    Include once in your base layout after toast-container.
-    Handles auto-dismiss timers, exit animations, and cleanup.
+    Auto-dismiss + MutationObserver wiring now lives in
+    /assets/js/pyeza/toast.js (loaded once by page-end.html).
+    This template is retained as a no-op so existing layouts that still
+    invoke {{template "toast-init"}} keep working without re-wiring.
+    Remove the template invocation when you next touch your layout.
     ============================================================ */}}
 
-{{define "toast-init"}}
-<script>
-(function() {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-
-    function initToast(toast) {
-        const duration = parseInt(toast.dataset.duration || '4000', 10);
-        const delay = parseInt(toast.dataset.delay || '0', 10);
-
-        // Delay before showing
-        if (delay > 0) {
-            toast.classList.add('toast--delayed');
-            setTimeout(function() {
-                toast.classList.remove('toast--delayed');
-            }, delay);
-        }
-
-        // Auto-dismiss
-        if (duration > 0) {
-            setTimeout(function() {
-                toast.classList.add('toast-exit');
-            }, duration + delay);
-        }
-
-        // Remove from DOM after exit animation
-        toast.addEventListener('animationend', function(e) {
-            if (e.animationName === 'toastSlideOut') {
-                toast.remove();
-            }
-        });
-    }
-
-    // Init existing toasts
-    container.querySelectorAll('.toast').forEach(initToast);
-
-    // Watch for new toasts (HTMX OOB swaps)
-    var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(m) {
-            m.addedNodes.forEach(function(node) {
-                if (node.nodeType === 1 && node.classList.contains('toast')) {
-                    initToast(node);
-                }
-            });
-        });
-    });
-    observer.observe(container, { childList: true });
-})();
-</script>
-{{end}}
+{{define "toast-init"}}{{end}}

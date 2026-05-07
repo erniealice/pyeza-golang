@@ -547,3 +547,27 @@ type CurrencyLabels struct {
 	Options     []types.SelectOption `json:"options"`
 }
 
+// ToastLabels holds translatable strings for the centralized toast component.
+// Surfaced to JS via <body data-lf-toast-*> attributes set by the app shell;
+// the lf.Toast module reads them at runtime so no English text is hardcoded
+// on the JS side. Loaded from common/common.json#toast.
+type ToastLabels struct {
+	// Saved is the message used by Sheet.handleResponse when a generic form
+	// submit succeeds. Empty value suppresses the toast (no English fallback).
+	Saved string `json:"saved"`
+	// Dismiss is the aria-label applied to a toast's close button.
+	Dismiss string `json:"dismiss"`
+}
+
+// SheetLabels holds translatable strings for the form-drawer (sheet)
+// component. Surfaced to JS via <body data-lf-sheet-*> attrs. Loaded from
+// common/common.json#sheet.
+type SheetLabels struct {
+	// ErrorFallback is the message shown when a sheet-form submit returns
+	// a non-2xx response without HX-Error-Message. Empty value suppresses.
+	ErrorFallback string `json:"errorFallback"`
+	// DismissAlert is the aria-label for the close button on the inline
+	// error alert that appears inside the drawer body on submit failure.
+	DismissAlert string `json:"dismissAlert"`
+}
+

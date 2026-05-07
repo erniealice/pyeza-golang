@@ -39,6 +39,18 @@ func getDefaultFuncMap() template.FuncMap {
 		// addf/subf are float-typed counterparts to add/sub. Used for SVG
 		// coordinate math in chart templates where mul/div already returns
 		// float64 and chained add/sub would otherwise need int args.
+		"min": func(a, b int) int {
+			if a < b {
+				return a
+			}
+			return b
+		},
+		"max": func(a, b int) int {
+			if a > b {
+				return a
+			}
+			return b
+		},
 		"addf": func(a, b any) float64 {
 			return toFloat64(a) + toFloat64(b)
 		},

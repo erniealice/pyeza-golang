@@ -264,7 +264,45 @@ JavaScript:
     <td class="actions-cell" style="vertical-align: {{$rowVAlign}}">
         <div class="action-buttons">
             {{range .Actions}}
-            {{if and .Href (not .Disabled)}}
+            {{if and .HxGet (not .Disabled)}}
+            {{/* HTMX drawer-open action: no href (avoids hx-boost navigation),
+                 carries hx-get/hx-target/hx-swap to load content into the sheet
+                 portal without changing the browser URL. */}}
+            <a class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}}{{if .OnClick}} onclick="{{.OnClick}}"{{end}}>
+                {{if eq .Type "run"}}{{template "icon-zap" $}}{{end}}
+                {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
+                {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
+                {{if eq .Type "manage"}}{{template "icon-shield" $}}{{end}}
+                {{if eq .Type "clone"}}{{template "icon-copy" $}}{{end}}
+                {{if eq .Type "delete"}}{{template "icon-trash" $}}{{end}}
+                {{if eq .Type "download"}}{{template "icon-download" $}}{{end}}
+                {{if eq .Type "archive"}}{{template "icon-archive" $}}{{end}}
+                {{if eq .Type "block"}}{{template "icon-x-circle" $}}{{end}}
+                {{if eq .Type "hold"}}{{template "icon-pause-circle" $}}{{end}}
+                {{if eq .Type "prospect"}}{{template "icon-user-plus" $}}{{end}}
+                {{if eq .Type "mail"}}{{template "icon-mail" $}}{{end}}
+                {{if eq .Type "check"}}{{template "icon-check" $}}{{end}}
+                {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
+            </a>
+            {{else if and .HxGet .Disabled}}
+            {{/* Disabled HTMX drawer-open action: render as span, no interaction. */}}
+            <span class="action-btn {{.Type}} disabled" aria-disabled="true" aria-label="{{if .DisabledTooltip}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" title="{{if .DisabledTooltip}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}}>
+                {{if eq .Type "run"}}{{template "icon-zap" $}}{{end}}
+                {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
+                {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
+                {{if eq .Type "manage"}}{{template "icon-shield" $}}{{end}}
+                {{if eq .Type "clone"}}{{template "icon-copy" $}}{{end}}
+                {{if eq .Type "delete"}}{{template "icon-trash" $}}{{end}}
+                {{if eq .Type "download"}}{{template "icon-download" $}}{{end}}
+                {{if eq .Type "archive"}}{{template "icon-archive" $}}{{end}}
+                {{if eq .Type "block"}}{{template "icon-x-circle" $}}{{end}}
+                {{if eq .Type "hold"}}{{template "icon-pause-circle" $}}{{end}}
+                {{if eq .Type "prospect"}}{{template "icon-user-plus" $}}{{end}}
+                {{if eq .Type "mail"}}{{template "icon-mail" $}}{{end}}
+                {{if eq .Type "check"}}{{template "icon-check" $}}{{end}}
+                {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
+            </span>
+            {{else if and .Href (not .Disabled)}}
             <a href="{{.Href}}" class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-push-url="true">
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
