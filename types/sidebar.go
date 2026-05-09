@@ -240,6 +240,8 @@ type SidebarLabels struct {
 	LapsingScheduleIcon       string `json:"lapsing_schedule_icon"`
 	DepreciationPoliciesLabel string `json:"depreciation_policies_label"`
 	DepreciationPoliciesIcon  string `json:"depreciation_policies_icon"`
+	DepreciationRunsLabel     string `json:"depreciation_runs_label"`
+	DepreciationRunsIcon      string `json:"depreciation_runs_icon"`
 
 	// Invoice templates
 	InvoiceTemplatesLabel string `json:"invoice_templates_label"`
@@ -431,6 +433,8 @@ func DefaultSidebarLabels() SidebarLabels {
 		LapsingScheduleIcon:       "icon-calendar",
 		DepreciationPoliciesLabel: "Depreciation Policies",
 		DepreciationPoliciesIcon:  "icon-settings",
+		DepreciationRunsLabel:     "Depreciation Runs",
+		DepreciationRunsIcon:      "icon-trending-down",
 
 		InvoiceTemplatesLabel: "Invoice Templates",
 		InvoiceTemplatesIcon:  "icon-file-text",
