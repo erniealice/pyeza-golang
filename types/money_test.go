@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestFormatMoney(t *testing.T) {
+func Test_formatMoney(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -171,7 +171,7 @@ func TestParseMoneyAmount(t *testing.T) {
 	}
 }
 
-func TestFormatMoney_BoundaryValues(t *testing.T) {
+func Test_formatMoney_BoundaryValues(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -325,6 +325,129 @@ func TestParseMoneyAmount_NaNInf(t *testing.T) {
 		if !tc.positive && got >= 0 {
 			t.Errorf("ParseMoneyAmount(%q) = %v, expected -Inf", tc.input, got)
 		}
+	}
+}
+
+func TestParseCentavos(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		input   string
+		want    int64
+		wantErr bool
+	}{
+		{name: "two decimal places", input: "1234.56", want: 123456},
+		{name: "integer only", input: "1234", want: 123400},
+		{name: "one decimal place", input: "1234.5", want: 123450},
+		{name: "negative two decimals", input: "-12.34", want: -1234},
+		{name: "negative integer", input: "-12", want: -1200},
+		{name: "whitespace trimmed", input: " 100 ", want: 10000},
+		{name: "zero", input: "0", want: 0},
+		{name: "zero point ninety-nine", input: "0.99", want: 99},
+		{name: "three decimals errors", input: "1234.567", wantErr: true},
+		{name: "empty string errors", input: "", wantErr: true},
+		{name: "whitespace only errors", input: "   ", wantErr: true},
+		{name: "non-numeric errors", input: "abc", wantErr: true},
+		{name: "multiple dots errors", input: "1.2.3", wantErr: true},
+		{name: "comma-formatted errors", input: "1,234.56", wantErr: true},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := ParseCentavos(tc.input)
+			if tc.wantErr {
+				if err == nil {
+					t.Errorf("ParseCentavos(%q) expected error, got %d", tc.input, got)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("ParseCentavos(%q) unexpected error: %v", tc.input, err)
+			}
+			if got != tc.want {
+				t.Errorf("ParseCentavos(%q) = %d, want %d", tc.input, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestFormatMoney(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		centavos int64
+		currency string
+		want     string
+	}{
+		{name: "PHP fifty thousand", centavos: 5_000_000, currency: "PHP", want: "PHP 50,000.00"},
+		{name: "USD one hundred", centavos: 10_000, currency: "USD", want: "USD 100.00"},
+		{name: "JPY one billion", centavos: 100_000_000_000, currency: "JPY", want: "JPY 1,000,000,000.00"},
+		{name: "zero PHP", centavos: 0, currency: "PHP", want: "PHP 0.00"},
+		{name: "one centavo", centavos: 1, currency: "PHP", want: "PHP 0.01"},
+		{name: "negative PHP", centavos: -123_456, currency: "PHP", want: "PHP -1,234.56"},
+		{name: "empty currency", centavos: 5_000_000, currency: "", want: "50,000.00"},
+		{name: "empty currency negative", centavos: -5_000_000, currency: "", want: "-50,000.00"},
+		{name: "EUR with decimals", centavos: 99, currency: "EUR", want: "EUR 0.99"},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got := FormatMoney(tc.centavos, tc.currency)
+			if got != tc.want {
+				t.Errorf("FormatMoney(%d, %q) = %q, want %q", tc.centavos, tc.currency, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestFormatMoneyCompact(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		centavos int64
+		currency string
+		want     string
+	}{
+		// Mid-range thresholds (centavos = pesos * 100).
+		{name: "PHP exactly 1M pesos", centavos: 100_000_000, currency: "PHP", want: "PHP 1.0M"},
+		{name: "PHP 1.2M pesos", centavos: 120_000_000, currency: "PHP", want: "PHP 1.2M"},
+		{name: "PHP 4.86M pesos rounds up", centavos: 486_000_000, currency: "PHP", want: "PHP 4.9M"},
+		{name: "PHP exactly 100k pesos", centavos: 10_000_000, currency: "PHP", want: "PHP 100K"},
+		{name: "PHP 750k pesos", centavos: 75_000_000, currency: "PHP", want: "PHP 750K"},
+		{name: "PHP just under 100k pesos", centavos: 9_999_999, currency: "PHP", want: "PHP 100.0K"},
+		{name: "PHP exactly 1k pesos", centavos: 100_000, currency: "PHP", want: "PHP 1.0K"},
+		{name: "PHP 1.5k pesos", centavos: 150_000, currency: "PHP", want: "PHP 1.5K"},
+		{name: "PHP 999 pesos no separator", centavos: 99_900, currency: "PHP", want: "PHP 999"},
+		{name: "PHP 1 peso", centavos: 100, currency: "PHP", want: "PHP 1"},
+		{name: "PHP zero", centavos: 0, currency: "PHP", want: "PHP 0"},
+		// Negatives keep their sign before the number.
+		{name: "PHP negative 1.2M pesos", centavos: -120_000_000, currency: "PHP", want: "PHP -1.2M"},
+		{name: "PHP negative 750k pesos", centavos: -75_000_000, currency: "PHP", want: "PHP -750K"},
+		{name: "PHP negative 1.5k pesos", centavos: -150_000, currency: "PHP", want: "PHP -1.5K"},
+		{name: "PHP negative 500 pesos", centavos: -50_000, currency: "PHP", want: "PHP -500"},
+		// Empty currency drops the prefix.
+		{name: "empty currency 1.2M", centavos: 120_000_000, currency: "", want: "1.2M"},
+		{name: "empty currency 999", centavos: 99_900, currency: "", want: "999"},
+		// Multi-currency.
+		{name: "USD 1.2M", centavos: 120_000_000, currency: "USD", want: "USD 1.2M"},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got := FormatMoneyCompact(tc.centavos, tc.currency)
+			if got != tc.want {
+				t.Errorf("FormatMoneyCompact(%d, %q) = %q, want %q", tc.centavos, tc.currency, got, tc.want)
+			}
+		})
 	}
 }
 
