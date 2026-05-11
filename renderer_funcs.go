@@ -316,15 +316,23 @@ func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 	// arbitrary templates or trigger server errors.
 	base["renderContent"] = func(name string, data any) template.HTML {
 		if name == "" {
+			// Diagnostic: empty name should never happen for content partials.
+			log.Printf("renderContent: empty template name; data type=%T", data)
 			return template.HTML("")
 		}
 		t := r.templates.Lookup(name)
 		if t == nil {
+			// Diagnostic: print which template was missing and the data type, so the
+			// next request immediately reveals the cause of the "Page content not
+			// available" fallback.
+			log.Printf("renderContent: template %q NOT REGISTERED (data type=%T)", name, data)
 			return template.HTML(`<div class="page-content"><p>Page content not available</p></div>`)
 		}
 		var buf bytes.Buffer
 		if err := t.Execute(&buf, data); err != nil {
-			log.Printf("renderContent error for %s: %v", name, err)
+			// Diagnostic: full error chain + data type so the failing template /
+			// field surfaces in the server log without needing a stack walk.
+			log.Printf("renderContent: Execute(%q) FAILED: %v (data type=%T)", name, err, data)
 			return template.HTML(`<div class="page-content"><p>Page content not available</p></div>`)
 		}
 		return template.HTML(buf.String())

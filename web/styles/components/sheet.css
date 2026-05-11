@@ -90,16 +90,37 @@
 .sheet-panel-sm {
     width: 23.75rem;
     max-width: 100vw;
+    --sheet-panel-w: 23.75rem;
 }
 
 .sheet-panel-md {
     width: 28.125rem;
     max-width: 100vw;
+    --sheet-panel-w: 28.125rem;
 }
 
 .sheet-panel-lg {
     width: 37.5rem;
     max-width: 100vw;
+    --sheet-panel-w: 37.5rem;
+}
+
+.sheet-panel-xl {
+    width: 48rem;
+    max-width: 100vw;
+    --sheet-panel-w: 48rem;
+}
+
+.sheet-panel-2xl {
+    width: 64rem;
+    max-width: 100vw;
+    --sheet-panel-w: 64rem;
+}
+
+.sheet-panel-3xl {
+    width: 80rem;
+    max-width: 100vw;
+    --sheet-panel-w: 80rem;
 }
 
 /* Panel shadow */
@@ -250,7 +271,7 @@
     position: fixed;
     bottom: 0;
     right: 0;
-    width: 28.125rem;
+    width: var(--sheet-panel-w, 28.125rem);  /* fallback to md */
     margin: 0;
     padding: 1.25rem 1.5rem;
     background: var(--bg-base);
@@ -743,7 +764,10 @@
     /* Full width on mobile */
     .sheet-panel-sm,
     .sheet-panel-md,
-    .sheet-panel-lg {
+    .sheet-panel-lg,
+    .sheet-panel-xl,
+    .sheet-panel-2xl,
+    .sheet-panel-3xl {
         width: 100vw;
     }
 

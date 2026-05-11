@@ -570,4 +570,3 @@ type SheetLabels struct {
 	// error alert that appears inside the drawer body on submit failure.
 	DismissAlert string `json:"dismissAlert"`
 }
-

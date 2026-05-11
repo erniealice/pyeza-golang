@@ -9,29 +9,29 @@ type PageData struct {
 	// ContentTemplate is the name of the content template to render inside app-shell.
 	// SECURITY: Must always be a compile-time constant set in Go view code.
 	// NEVER derive from user input (URL params, headers, form values, cookies).
-	ContentTemplate   string
-	CurrentPath       string
-	ActiveNav         string
-	ActiveSubNav      string // Active sub-navigation item (for sidebar sub-menus)
-	Sidebar           SidebarConfig
+	ContentTemplate     string
+	CurrentPath         string
+	ActiveNav           string
+	ActiveSubNav        string // Active sub-navigation item (for sidebar sub-menus)
+	Sidebar             SidebarConfig
 	HeaderIcon          string
 	HeaderTitle         string
 	HeaderSubtitle      string
 	HeaderBreadcrumb    string // optional text shown above the title (e.g., "← Rate Card XYZ")
 	HeaderBreadcrumbURL string // optional href; when set, the breadcrumb renders as a link
-	SearchPlaceholder string
-	HasNotifications  bool
-	HelpContent       template.HTML     // Server-rendered markdown content for help pane
-	HasHelp           bool              // Whether this page has help content
-	HeaderIconHTML    template.HTML     // Pre-rendered icon HTML for header
-	CommonLabels      any               // i18n labels (avoids circular import)
-	Messages          map[string]string // flat i18n messages (dot-notation keys)
-	UserPermissions   *UserPermissions  // permission codes for current user (for UI adaptation)
-	BottomNavTabs     []BottomNavTab    // mobile bottom navigation tabs
-	AllApps           []AppGridItem     // all apps for mobile app grid overlay
-	AppGroups         []AppGridGroup    // grouped apps for mobile bottom sheet
-	DefaultTheme      string            // server-configured default theme (for <html> data-theme)
-	DefaultFont       string            // server-configured default font (for <html> data-font)
+	SearchPlaceholder   string
+	HasNotifications    bool
+	HelpContent         template.HTML     // Server-rendered markdown content for help pane
+	HasHelp             bool              // Whether this page has help content
+	HeaderIconHTML      template.HTML     // Pre-rendered icon HTML for header
+	CommonLabels        any               // i18n labels (avoids circular import)
+	Messages            map[string]string // flat i18n messages (dot-notation keys)
+	UserPermissions     *UserPermissions  // permission codes for current user (for UI adaptation)
+	BottomNavTabs       []BottomNavTab    // mobile bottom navigation tabs
+	AllApps             []AppGridItem     // all apps for mobile app grid overlay
+	AppGroups           []AppGridGroup    // grouped apps for mobile bottom sheet
+	DefaultTheme        string            // server-configured default theme (for <html> data-theme)
+	DefaultFont         string            // server-configured default font (for <html> data-font)
 	// Session user fields — populated from auth context by the ViewAdapter.
 	// Used by settings-modal.html to display the authenticated user's name/email.
 	// These use the "Session" prefix to avoid collision with domain-specific UserEmail

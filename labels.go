@@ -23,10 +23,10 @@ type CommonLabels struct {
 	Card          CardLabels         `json:"card"`
 	Tabs          TabLabels          `json:"tabs"`
 	Audit         AuditLabels        `json:"audit"`
-	DurationUnit  DurationUnitLabels  `json:"durationUnit"`
-	Currency      CurrencyLabels      `json:"currency"`
-	Toast         ToastLabels         `json:"toast"`
-	Sheet         SheetLabels         `json:"sheet"`
+	DurationUnit  DurationUnitLabels `json:"durationUnit"`
+	Currency      CurrencyLabels     `json:"currency"`
+	Toast         ToastLabels        `json:"toast"`
+	Sheet         SheetLabels        `json:"sheet"`
 }
 
 // TabItem represents a single tab in a tab component

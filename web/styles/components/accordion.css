@@ -130,6 +130,16 @@
 }
 
 /* ========================================
+   MODIFIER — chevron-right
+   Move the chevron to the right edge of the header (e.g. drawer accordions).
+   ======================================== */
+
+.pyeza-accordion--chevron-right .pyeza-accordion__chevron {
+    order: 99;
+    margin-left: var(--spacing-md);
+}
+
+/* ========================================
    ACCESSIBILITY — Reduced Motion
    ======================================== */
 
