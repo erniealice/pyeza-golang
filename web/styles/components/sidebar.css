@@ -616,6 +616,10 @@
     background: linear-gradient(135deg, var(--app-color-ledger) 0%, var(--app-color-ledger-dark) 100%);
 }
 
+.app-icon--home {
+    background: linear-gradient(135deg, var(--app-color-home) 0%, var(--app-color-home-dark) 100%);
+}
+
 .app-switcher-info {
     flex: 1;
     display: flex;
