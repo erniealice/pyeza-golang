@@ -118,6 +118,9 @@
     --app-color-ledger: #166534;
     --app-color-ledger-dark: #14532D;
     --app-color-ledger-light: #F0FDF4;
+    --app-color-home: #4F46E5;
+    --app-color-home-dark: #4338CA;
+    --app-color-home-light: #EEF2FF;
 
     /* Theme Meta */
     --theme-name: "Ichizen Default";

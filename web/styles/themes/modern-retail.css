@@ -117,6 +117,9 @@
     --app-color-ledger: #16A34A;
     --app-color-ledger-dark: #15803D;
     --app-color-ledger-light: #F0FDF4;
+    --app-color-home: #4318D9;
+    --app-color-home-dark: #3712B5;
+    --app-color-home-light: #EDE9FC;
 
     /* Theme Meta */
     --theme-name: "Modern Retail";

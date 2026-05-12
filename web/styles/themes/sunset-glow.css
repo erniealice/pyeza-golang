@@ -116,6 +116,9 @@
     --app-color-ledger: #4ADE80;
     --app-color-ledger-dark: #22C55E;
     --app-color-ledger-light: rgba(74, 222, 128, 0.15);
+    --app-color-home: #6B8EE0;
+    --app-color-home-dark: #5578C8;
+    --app-color-home-light: rgba(107, 142, 224, 0.15);
 
     /* Theme Meta */
     --theme-name: "Sunset Glow";

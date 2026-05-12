@@ -119,6 +119,9 @@
     --app-color-ledger: #527060;
     --app-color-ledger-dark: #3E5848;
     --app-color-ledger-light: #EFF4F1;
+    --app-color-home: #5A5898;
+    --app-color-home-dark: #464278;
+    --app-color-home-light: #F0EFF7;
 
     /* Theme Meta */
     --theme-name: "Warm Cream";

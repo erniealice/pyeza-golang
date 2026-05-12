@@ -116,6 +116,9 @@
     --app-color-ledger: #4ADE80;
     --app-color-ledger-dark: #22C55E;
     --app-color-ledger-light: rgba(74, 222, 128, 0.15);
+    --app-color-home: #7856FF;
+    --app-color-home-dark: #6340E0;
+    --app-color-home-light: rgba(120, 86, 255, 0.15);
 
     /* Theme Meta */
     --theme-name: "Ocean Deep";

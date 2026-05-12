@@ -117,6 +117,9 @@
     --app-color-ledger: #3A6848;
     --app-color-ledger-dark: #2C5238;
     --app-color-ledger-light: #EAF1ED;
+    --app-color-home: #4E5580;
+    --app-color-home-dark: #3A4068;
+    --app-color-home-light: #EEEDF5;
 
     /* Theme Meta */
     --theme-name: "Paper & Ink";

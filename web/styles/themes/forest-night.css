@@ -116,6 +116,9 @@
     --app-color-ledger: #4ADE80;
     --app-color-ledger-dark: #22C55E;
     --app-color-ledger-light: rgba(74, 222, 128, 0.15);
+    --app-color-home: #818CF8;
+    --app-color-home-dark: #6366F1;
+    --app-color-home-light: rgba(129, 140, 248, 0.15);
 
     /* Theme Meta */
     --theme-name: "Forest Night";

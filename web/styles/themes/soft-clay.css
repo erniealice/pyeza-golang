@@ -117,6 +117,9 @@
     --app-color-ledger: #4A7858;
     --app-color-ledger-dark: #386044;
     --app-color-ledger-light: #EDF2EE;
+    --app-color-home: #5A6080;
+    --app-color-home-dark: #444A68;
+    --app-color-home-light: #EEEEF4;
 
     /* Theme Meta */
     --theme-name: "Soft Clay";

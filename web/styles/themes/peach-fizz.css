@@ -117,6 +117,9 @@
     --app-color-ledger: #509868;
     --app-color-ledger-dark: #3E8050;
     --app-color-ledger-light: #EBF5EF;
+    --app-color-home: #6268A8;
+    --app-color-home-dark: #4E5390;
+    --app-color-home-light: #F0EFF7;
 
     /* Theme Meta */
     --theme-name: "Peach Fizz";

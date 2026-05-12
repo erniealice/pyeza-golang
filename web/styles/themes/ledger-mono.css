@@ -117,6 +117,9 @@
     --app-color-ledger: #2E6040;
     --app-color-ledger-dark: #1E4C30;
     --app-color-ledger-light: #E8F2EC;
+    --app-color-home: #4A5080;
+    --app-color-home-dark: #363C68;
+    --app-color-home-light: #ECEEF5;
 
     /* Theme Meta */
     --theme-name: "Ledger Mono";
