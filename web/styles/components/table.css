@@ -1119,6 +1119,145 @@ button.sort-btn {
     color: var(--accent-terracotta);
 }
 
+/* ========================================
+   ACTION OVERFLOW (⋮ MENU — desktop row-level)
+   Mirrors .action-dropdown but stays visible on desktop and
+   lives inline inside .action-buttons. Used for actions marked
+   Overflow:true on TableAction (typically status transitions).
+   ======================================== */
+
+.action-overflow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.action-overflow-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all var(--transition-fast, 0.2s) ease;
+}
+
+.action-overflow-btn:hover,
+.action-overflow.open .action-overflow-btn {
+    background: var(--bg-base);
+    color: var(--text-primary);
+}
+
+.action-overflow-btn svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.action-overflow-menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    min-width: 12rem;
+    padding: var(--spacing-2xs) 0;
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: var(--z-popover, 1000);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.25rem);
+    transition: opacity var(--transition-fast, 0.2s) ease,
+                transform var(--transition-fast, 0.2s) ease,
+                visibility 0s linear var(--transition-fast, 0.2s);
+}
+
+.action-overflow.open .action-overflow-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity var(--transition-fast, 0.2s) ease,
+                transform var(--transition-fast, 0.2s) ease,
+                visibility 0s linear 0s;
+}
+
+.action-overflow-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    text-align: left;
+    transition: background var(--transition-fast, 0.2s) ease;
+}
+
+.action-overflow-item:hover {
+    background: var(--bg-base);
+}
+
+.action-overflow-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.action-overflow-item-icon svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.action-overflow-item-label {
+    flex: 1;
+    min-width: 0;
+}
+
+.action-overflow-item.delete,
+.action-overflow-item.delete .action-overflow-item-icon {
+    color: var(--accent-terracotta);
+}
+
+.action-overflow-item.block,
+.action-overflow-item.block .action-overflow-item-icon {
+    color: var(--accent-terracotta);
+}
+
+.action-overflow-item.hold .action-overflow-item-icon {
+    color: var(--status-warning);
+}
+
+.action-overflow-item.prospect .action-overflow-item-icon {
+    color: var(--accent-navy);
+}
+
+.action-overflow-item.activate .action-overflow-item-icon {
+    color: var(--status-success);
+}
+
+.action-overflow-item:disabled,
+.action-overflow-item.disabled,
+.action-overflow-item[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.action-overflow-item:disabled:hover,
+.action-overflow-item.disabled:hover,
+.action-overflow-item[aria-disabled="true"]:hover {
+    background: transparent;
+}
+
 /* ═══════════════════════════════════════════════════════
    COLUMN WIDTH SCALE (density-responsive)
    ═══════════════════════════════════════════════════════

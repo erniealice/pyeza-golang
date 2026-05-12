@@ -433,6 +433,7 @@ type TableAction struct {
 	ConfirmMessage  string // Custom message for confirmation dialog
 	Disabled        bool   // If true, action is disabled (grayed out, not clickable)
 	DisabledTooltip string // Tooltip shown when hovering over disabled action
+	Overflow        bool   // If true, action collapses into the row's ⋮ overflow menu instead of rendering as an inline icon button
 	// HTMX drawer-open fields — additive; existing Href callers are unaffected.
 	// When HxGet is set the action renders as an <a> with hx-get/hx-target/hx-swap
 	// instead of (or in addition to) a plain href. Leave Href empty to avoid the

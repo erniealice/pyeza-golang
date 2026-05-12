@@ -16,6 +16,7 @@
         initRowActions();
         initRowNavigation();
         initMobileActionDropdowns();
+        initActionOverflows();
     }
 
     function initRowActions() {
@@ -25,7 +26,7 @@
 
         document.addEventListener('click', function(e) {
             // Handle Edit button
-            const editBtn = e.target.closest('.action-btn[data-action="edit"]');
+            const editBtn = e.target.closest('.action-btn[data-action="edit"], .action-overflow-item[data-action="edit"]');
             if (editBtn) {
                 if (isDisabled(editBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
@@ -63,7 +64,7 @@
             // Reuses the Edit URL but appends ?clone=1 so the server returns a
             // drawer form pre-populated from the source record, with FormAction
             // pointing at AddURL and the name field suffixed " (Copy)".
-            const cloneBtn = e.target.closest('.action-btn[data-action="clone"], .action-dropdown-item[data-action="clone"]');
+            const cloneBtn = e.target.closest('.action-btn[data-action="clone"], .action-dropdown-item[data-action="clone"], .action-overflow-item[data-action="clone"]');
             if (cloneBtn) {
                 if (isDisabled(cloneBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
@@ -98,7 +99,7 @@
             }
 
             // Handle Delete button
-            const deleteBtn = e.target.closest('.action-btn[data-action="delete"]');
+            const deleteBtn = e.target.closest('.action-btn[data-action="delete"], .action-overflow-item[data-action="delete"]');
             if (deleteBtn) {
                 if (isDisabled(deleteBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
@@ -120,7 +121,7 @@
             }
 
             // Handle Deactivate button
-            const deactivateBtn = e.target.closest('.action-btn[data-action="deactivate"]');
+            const deactivateBtn = e.target.closest('.action-btn[data-action="deactivate"], .action-overflow-item[data-action="deactivate"]');
             if (deactivateBtn) {
                 if (isDisabled(deactivateBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
@@ -142,7 +143,7 @@
             }
 
             // Handle Activate button
-            const activateBtn = e.target.closest('.action-btn[data-action="activate"]');
+            const activateBtn = e.target.closest('.action-btn[data-action="activate"], .action-overflow-item[data-action="activate"]');
             if (activateBtn) {
                 if (isDisabled(activateBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
@@ -164,7 +165,7 @@
             }
 
             // Handle Undo button
-            const undoBtn = e.target.closest('.action-btn[data-action="undo"]');
+            const undoBtn = e.target.closest('.action-btn[data-action="undo"], .action-overflow-item[data-action="undo"]');
             if (undoBtn) {
                 if (isDisabled(undoBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
@@ -244,7 +245,7 @@
             }
 
             // Handle Download button (direct GET — opens in new tab or triggers download)
-            const downloadBtn = e.target.closest('.action-btn[data-action="download"]');
+            const downloadBtn = e.target.closest('.action-btn[data-action="download"], .action-overflow-item[data-action="download"]');
             if (downloadBtn) {
                 if (isDisabled(downloadBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
@@ -272,7 +273,7 @@
             }
 
             // Handle Send Email button (POST with dialog confirmation)
-            const sendEmailBtn = e.target.closest('.action-btn[data-action="send-email"]');
+            const sendEmailBtn = e.target.closest('.action-btn[data-action="send-email"], .action-overflow-item[data-action="send-email"]');
             if (sendEmailBtn) {
                 if (isDisabled(sendEmailBtn)) { e.preventDefault(); return; }
                 e.preventDefault();
@@ -512,13 +513,110 @@
         });
     }
 
+    /**
+     * Action Overflow (⋮) — desktop row-level "more" menu.
+     * Targets .action-overflow-btn triggers and their sibling .action-overflow-menu.
+     * Same open/close/escape/arrow-key pattern as the mobile .action-dropdown but
+     * stays visible on desktop and lives inline inside .action-buttons.
+     * Uses event delegation so it survives HTMX swaps.
+     */
+    let overflowMenusInitialized = false;
+
+    function initActionOverflows() {
+        if (overflowMenusInitialized) return;
+        overflowMenusInitialized = true;
+
+        // Toggle on trigger click
+        document.addEventListener('click', function(e) {
+            var trigger = e.target.closest('.action-overflow-btn');
+            if (!trigger) return;
+
+            e.stopPropagation();
+            e.preventDefault();
+            var wrapper = trigger.closest('.action-overflow');
+            if (!wrapper) return;
+            var menu = wrapper.querySelector('.action-overflow-menu, [role="menu"]');
+
+            var isOpen = wrapper.classList.contains('open');
+
+            // Close any other open overflow menus first
+            document.querySelectorAll('.action-overflow.open').forEach(function(el) {
+                if (el === wrapper) return;
+                el.classList.remove('open');
+                var t = el.querySelector('.action-overflow-btn');
+                if (t) t.setAttribute('aria-expanded', 'false');
+            });
+
+            if (!isOpen) {
+                wrapper.classList.add('open');
+                trigger.setAttribute('aria-expanded', 'true');
+                if (menu) {
+                    var firstItem = menu.querySelector('button:not([disabled]):not([aria-disabled="true"]), a');
+                    if (firstItem) firstItem.focus();
+                }
+            } else {
+                wrapper.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.action-overflow')) {
+                document.querySelectorAll('.action-overflow.open').forEach(function(el) {
+                    el.classList.remove('open');
+                    var t = el.querySelector('.action-overflow-btn');
+                    if (t) t.setAttribute('aria-expanded', 'false');
+                });
+            }
+        });
+
+        // Keyboard: Escape closes; ArrowDown/ArrowUp navigates items
+        document.addEventListener('keydown', function(e) {
+            var activeWrapper = document.querySelector('.action-overflow.open');
+            if (!activeWrapper) return;
+
+            var trigger = activeWrapper.querySelector('.action-overflow-btn');
+            var menu = activeWrapper.querySelector('.action-overflow-menu, [role="menu"]');
+            var items = menu
+                ? Array.from(menu.querySelectorAll('button:not([disabled]):not([aria-disabled="true"]), a'))
+                : [];
+
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                activeWrapper.classList.remove('open');
+                if (trigger) {
+                    trigger.setAttribute('aria-expanded', 'false');
+                    trigger.focus();
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                var idx = items.indexOf(document.activeElement);
+                var next = idx < items.length - 1 ? items[idx + 1] : items[0];
+                if (next) next.focus();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                var idx2 = items.indexOf(document.activeElement);
+                var prev = idx2 > 0 ? items[idx2 - 1] : items[items.length - 1];
+                if (prev) prev.focus();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                if (items[0]) items[0].focus();
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                if (items.length) items[items.length - 1].focus();
+            }
+        });
+    }
+
     // Expose module
     window.lf = window.lf || {};
     window.lf.TableActions = {
         init,
         initRowActions,
         initRowNavigation,
-        initMobileActionDropdowns
+        initMobileActionDropdowns,
+        initActionOverflows
     };
 
 })();

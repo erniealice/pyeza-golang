@@ -263,12 +263,14 @@ JavaScript:
     {{if .Actions}}
     <td class="actions-cell" style="vertical-align: {{$rowVAlign}}">
         <div class="action-buttons">
+            {{/* Inline primary actions — anything with Overflow:false renders as an icon button in the row. */}}
             {{range .Actions}}
+            {{if .Overflow}}{{/* skip — rendered below in the ⋮ menu */}}{{else}}
             {{if and .HxGet (not .Disabled)}}
             {{/* HTMX drawer-open action: no href (avoids hx-boost navigation),
                  carries hx-get/hx-target/hx-swap to load content into the sheet
                  portal without changing the browser URL. */}}
-            <a class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}}{{if .OnClick}} onclick="{{.OnClick}}"{{end}}>
+            <a class="action-btn {{.Type}}" aria-label="{{.Label}}" title="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}}{{if .OnClick}} onclick="{{.OnClick}}"{{end}}>
                 {{if eq .Type "run"}}{{template "icon-zap" $}}{{end}}
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
@@ -303,7 +305,7 @@ JavaScript:
                 {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
             </span>
             {{else if and .Href (not .Disabled)}}
-            <a href="{{.Href}}" class="action-btn {{.Type}}" aria-label="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-push-url="true">
+            <a href="{{.Href}}" class="action-btn {{.Type}}" aria-label="{{.Label}}" title="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-push-url="true">
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
                 {{if eq .Type "manage"}}{{template "icon-shield" $}}{{end}}
@@ -357,7 +359,58 @@ JavaScript:
                 {{if eq .Type "undo"}}{{template "icon-undo" $}}{{end}}
                 {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
             </button>
-            {{end}}
+            {{end}}{{/* close branch */}}
+            {{end}}{{/* close `{{if .Overflow}}skip{{else}}…` */}}
+            {{end}}{{/* close `{{range .Actions}}` */}}
+
+            {{/* Overflow ⋮ menu — collects every Action with Overflow:true. Hidden when there are none. */}}
+            {{$hasOverflow := false}}
+            {{range .Actions}}{{if .Overflow}}{{$hasOverflow = true}}{{end}}{{end}}
+            {{if $hasOverflow}}
+            <div class="action-overflow">
+                <button type="button" class="action-overflow-btn"
+                        aria-haspopup="menu" aria-expanded="false"
+                        aria-controls="action-overflow-menu-{{.ID}}"
+                        aria-label="More actions" title="More actions"
+                        data-testid="actions-more-{{.ID}}">
+                    {{template "icon-more-vertical" $}}
+                </button>
+                <div class="action-overflow-menu" id="action-overflow-menu-{{.ID}}" role="menu">
+                    {{range .Actions}}{{if .Overflow}}
+                    <button type="button" class="action-overflow-item {{.Type}}{{if .Disabled}} disabled{{end}}"
+                            role="menuitem"
+                            data-action="{{.Action}}"
+                            {{if .TestID}}data-testid="{{.TestID}}"{{else}}data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}}
+                            {{if .Disabled}}aria-disabled="true" aria-label="{{.DisabledTooltip}}"{{end}}
+                            {{if $.ID}}data-id="{{$.ID}}"{{end}}
+                            {{if .URL}}{{if eq .Action "edit"}}data-edit-url="{{.URL}}"{{else if eq .Action "clone"}}data-clone-url="{{.URL}}"{{else if eq .Action "delete"}}data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}}data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}}data-activate-url="{{.URL}}"{{else if eq .Action "undo"}}data-activate-url="{{.URL}}"{{else if eq .Action "download"}}data-download-url="{{.URL}}"{{else if eq .Action "send-email"}}data-send-email-url="{{.URL}}"{{end}}{{end}}
+                            {{if .DrawerTitle}}data-drawer-title="{{.DrawerTitle}}"{{end}}
+                            {{if .ItemName}}data-item-name="{{.ItemName}}"{{end}}
+                            {{if .ConfirmTitle}}data-confirm-title="{{.ConfirmTitle}}"{{end}}
+                            {{if .ConfirmMessage}}data-confirm-message="{{.ConfirmMessage}}"{{end}}>
+                        <span class="action-overflow-item-icon" aria-hidden="true">
+                            {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
+                            {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
+                            {{if eq .Type "clone"}}{{template "icon-copy" $}}{{end}}
+                            {{if eq .Type "deactivate"}}{{template "icon-pause" $}}{{end}}
+                            {{if eq .Type "activate"}}{{template "icon-play" $}}{{end}}
+                            {{if eq .Type "block"}}{{template "icon-x-circle" $}}{{end}}
+                            {{if eq .Type "hold"}}{{template "icon-pause-circle" $}}{{end}}
+                            {{if eq .Type "prospect"}}{{template "icon-user-plus" $}}{{end}}
+                            {{if eq .Type "delete"}}{{template "icon-trash" $}}{{end}}
+                            {{if eq .Type "download"}}{{template "icon-download" $}}{{end}}
+                            {{if eq .Type "archive"}}{{template "icon-archive" $}}{{end}}
+                            {{if eq .Type "mail"}}{{template "icon-mail" $}}{{end}}
+                            {{if eq .Type "check"}}{{template "icon-check" $}}{{end}}
+                            {{if eq .Type "undo"}}{{template "icon-undo" $}}{{end}}
+                            {{if eq .Type "manage"}}{{template "icon-shield" $}}{{end}}
+                            {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
+                        </span>
+                        <span class="action-overflow-item-label">{{.Label}}</span>
+                    </button>
+                    {{end}}{{end}}
+                </div>
+            </div>
             {{end}}
         </div>
     </td>
