@@ -1371,3 +1371,310 @@
     white-space: nowrap;
 }
 
+/* ==========================================================================
+   SIDEBAR PROFILE — bottom-of-sidebar wide button + upward popover menu
+   ==========================================================================
+   Sourced from SidebarConfig.CurrentUser (populated per-request by the app's
+   UserLoader). Renders only when a user is authenticated (UserID non-empty).
+   ========================================================================== */
+
+.sidebar-profile {
+    /* Push to the bottom of the .sidebar flex column regardless of nav length. */
+    margin-top: auto;
+    position: relative;
+    padding: 0.5rem 0.625rem 0.75rem;
+    border-top: var(--border-width) solid var(--border-subtle, var(--border));
+}
+
+.sidebar-profile-trigger {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-md, 0.5rem);
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast, 120ms ease),
+        box-shadow var(--transition-fast, 120ms ease);
+    font: inherit;
+}
+
+.sidebar-profile-trigger:hover {
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.sidebar-profile-trigger:focus-visible {
+    outline: none;
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+    box-shadow: 0 0 0 2px var(--accent-primary-light, rgba(46, 92, 138, 0.18));
+}
+
+.sidebar-profile.is-open .sidebar-profile-trigger {
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.sidebar-profile-avatar {
+    grid-column: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg,
+        var(--accent-primary, #2E5C8A) 0%,
+        var(--accent-primary-dark, #1F4068) 100%);
+    color: var(--text-inverse, #FFFFFF);
+    font-size: var(--text-sm, 0.8125rem);
+    font-weight: var(--font-weight-semibold, 600);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    /* A whisper of brand presence — visible but not loud. */
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-profile-name {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    min-width: 0;
+}
+
+.sidebar-profile-name-first,
+.sidebar-profile-name-last {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-profile-name-first {
+    font-size: var(--text-md, 0.875rem);
+    font-weight: var(--font-weight-medium, 500);
+    color: var(--text-primary);
+}
+
+.sidebar-profile-name-last {
+    font-size: var(--text-sm, 0.8125rem);
+    color: var(--text-secondary);
+}
+
+.sidebar-profile-chevron {
+    grid-column: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--text-muted, var(--text-secondary));
+    transition: transform var(--transition-fast, 120ms ease);
+}
+
+.sidebar-profile-chevron svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sidebar-profile.is-open .sidebar-profile-chevron {
+    /* Chevron-up rotates to point down — signals "menu is open, click to close". */
+    transform: rotate(180deg);
+    color: var(--text-primary);
+}
+
+/* ----- Upward popover menu ----- */
+
+.sidebar-profile-menu {
+    position: absolute;
+    /* Anchor above the trigger, mirror the trigger's horizontal padding. */
+    left: 0.625rem;
+    right: 0.625rem;
+    bottom: calc(100% - 0.25rem);
+    z-index: 60;
+
+    display: flex;
+    flex-direction: column;
+    padding: 0.375rem;
+    background: var(--bg-card, var(--bg-base, #FFFFFF));
+    /* Fixed border + radius — opt out of the theme radius / border axes.
+       A floating popover must keep its geometry stable: data-radius="full"
+       turns var(--radius-md) into a stadium pill (warps the box into an
+       oval), and data-border="none" zeroes var(--border-width) (erases
+       the edge entirely). Match the same opt-out used by .form-summary
+       in form.css per drawer-form-template-anatomy.md guidance. */
+    border: 1px solid var(--border, #E5E5EA);
+    border-radius: 0.5rem;
+    box-shadow:
+        0 12px 32px -8px rgba(0, 0, 0, 0.18),
+        0 4px 12px -2px rgba(0, 0, 0, 0.08);
+
+    /* Animation origin = bottom (popover rises from the trigger). */
+    transform-origin: bottom center;
+    opacity: 0;
+    transform: translateY(0.375rem) scale(0.98);
+    transition:
+        opacity var(--transition-fast, 120ms ease),
+        transform var(--transition-fast, 120ms ease);
+    pointer-events: none;
+}
+
+.sidebar-profile-menu[hidden] {
+    /* Override the HTML hidden attribute so our transition is visible — we
+       manage actual visibility via .is-open on the parent. The hidden attr
+       on initial markup ensures non-JS users don't see a flash. */
+    display: flex;
+}
+
+.sidebar-profile.is-open .sidebar-profile-menu {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.sidebar-profile:not(.is-open) .sidebar-profile-menu {
+    /* Keep tab order out of a hidden menu. */
+    visibility: hidden;
+}
+
+.sidebar-profile.is-open .sidebar-profile-menu {
+    visibility: visible;
+}
+
+.sidebar-profile-menu-form {
+    margin: 0;
+}
+
+.sidebar-profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-sm, 0.375rem);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: var(--text-md, 0.875rem);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast, 120ms ease),
+        color var(--transition-fast, 120ms ease);
+}
+
+.sidebar-profile-menu-item:hover,
+.sidebar-profile-menu-item:focus-visible {
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+    outline: none;
+}
+
+.sidebar-profile-menu-item:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent-primary-light, rgba(46, 92, 138, 0.18));
+}
+
+.sidebar-profile-menu-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--text-muted, var(--text-secondary));
+    flex-shrink: 0;
+}
+
+.sidebar-profile-menu-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sidebar-profile-menu-item:hover .sidebar-profile-menu-icon,
+.sidebar-profile-menu-item:focus-visible .sidebar-profile-menu-icon {
+    color: var(--text-primary);
+}
+
+.sidebar-profile-menu-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-profile-menu-divider {
+    height: 1px;
+    margin: 0.25rem 0.375rem;
+    background: var(--border-subtle, var(--border));
+}
+
+/* Danger variant for the logout item — visually distinct but not alarming
+   until interaction. Resting state is muted red; hover deepens to full
+   accent on a tinted background. */
+.sidebar-profile-menu-item--danger {
+    color: var(--status-error, #C0392B);
+}
+
+.sidebar-profile-menu-item--danger .sidebar-profile-menu-icon {
+    color: var(--status-error, #C0392B);
+}
+
+.sidebar-profile-menu-item--danger:hover,
+.sidebar-profile-menu-item--danger:focus-visible {
+    background-color: var(--status-error-light, rgba(192, 57, 43, 0.08));
+    color: var(--status-error, #C0392B);
+}
+
+.sidebar-profile-menu-item--danger:hover .sidebar-profile-menu-icon,
+.sidebar-profile-menu-item--danger:focus-visible .sidebar-profile-menu-icon {
+    color: var(--status-error, #C0392B);
+}
+
+/* ----- Collapsed sidebar — icon-only ----- */
+
+.sidebar.collapsed .sidebar-profile {
+    padding: 0.5rem 0.5rem 0.75rem;
+}
+
+.sidebar.collapsed .sidebar-profile-trigger {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 0.375rem;
+}
+
+.sidebar.collapsed .sidebar-profile-name,
+.sidebar.collapsed .sidebar-profile-chevron {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-profile-menu {
+    /* When collapsed, the menu floats out to the right of the icon. */
+    left: calc(100% + 0.5rem);
+    right: auto;
+    bottom: 0;
+    min-width: 12rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar-profile-trigger,
+    .sidebar-profile-chevron,
+    .sidebar-profile-menu,
+    .sidebar-profile-menu-item {
+        transition: none;
+    }
+}
+
+

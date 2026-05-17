@@ -15,19 +15,34 @@ func NewUserPermissions(codes []string) *UserPermissions {
 	return &UserPermissions{codes: m}
 }
 
+// NewEmptyUserPermissions returns a UserPermissions instance with no permission codes.
+//
+// Use this for legitimate "explicitly empty" cases:
+//   - tests that want to verify deny-by-default behavior
+//   - pre-login pages (login form, principal chooser) where no permissions apply
+//   - the request context middleware (P4) when no permissions chain resolved
+//
+// IMPORTANT: After Phase P3, nil UserPermissions will return false for every check.
+// Code paths that legitimately need "explicit zero" should use this factory instead
+// of leaving the field nil.
+func NewEmptyUserPermissions() *UserPermissions {
+	return &UserPermissions{codes: map[string]bool{}}
+}
+
 // Can checks if the user has a permission for the given entity and action.
 // Usage in templates: {{if .UserPermissions.Can "client" "create"}}
+//
+// Fail-closed: nil receiver returns false. Use NewEmptyUserPermissions() when
+// you need an explicit "deny everything" value.
 func (p *UserPermissions) Can(entity, action string) bool {
-	if p == nil {
-		return true // nil = no restrictions (dev mode / not wired)
-	}
-	return p.codes[entity+":"+action]
+	return p != nil && p.codes[entity+":"+action]
 }
 
 // CanAny checks if the user has any of the given entity:action permissions.
+// Fail-closed: nil receiver returns false.
 func (p *UserPermissions) CanAny(perms ...string) bool {
 	if p == nil {
-		return true
+		return false
 	}
 	for _, perm := range perms {
 		if p.codes[perm] {
@@ -38,9 +53,7 @@ func (p *UserPermissions) CanAny(perms ...string) bool {
 }
 
 // HasCode checks if the user has a specific permission code (e.g. "reports:view").
+// Fail-closed: nil receiver returns false.
 func (p *UserPermissions) HasCode(code string) bool {
-	if p == nil {
-		return true
-	}
-	return p.codes[code]
+	return p != nil && p.codes[code]
 }

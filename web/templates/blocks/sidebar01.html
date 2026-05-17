@@ -14,7 +14,7 @@
 
     {{if gt (len .Sidebar.AvailableWorkspaces) 1}}
     <div class="workspace-switcher">
-        <button type="button" class="workspace-switcher-btn" onclick="this.nextElementSibling.classList.toggle('hidden')" aria-haspopup="listbox">
+        <button type="button" class="workspace-switcher-btn" onclick="this.nextElementSibling.classList.toggle('hidden');this.setAttribute('aria-expanded',this.nextElementSibling.classList.contains('hidden')?'false':'true')" aria-haspopup="listbox" aria-expanded="false" aria-label="Switch workspace" data-testid="workspace-switcher-btn">
             <span class="workspace-icon">{{template "icon-briefcase" .}}</span>
             <span class="workspace-name">{{.Sidebar.CurrentWorkspace.Name}}</span>
             <span class="workspace-chevron">{{template "icon-chevron-down" .}}</span>
@@ -84,7 +84,7 @@
                     </button>
                     <div class="app-switcher-group-items">
                         {{range .Apps}}
-                        <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem">
+                        <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem"{{if eq .Key $.Sidebar.ActiveApp}} aria-current="page"{{end}}>
                             <div class="app-option-icon app-icon--{{.Key}}">
                                 {{renderContent .Icon $}}
                             </div>
@@ -119,7 +119,7 @@
             <div class="app-switcher-header">Switch App</div>
             <div class="app-switcher-grid{{if eq .Sidebar.AppGridColumns 1}} app-switcher-grid--cols-1{{end}}">
                 {{range .Sidebar.Apps}}
-                <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem">
+                <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem"{{if eq .Key $.Sidebar.ActiveApp}} aria-current="page"{{end}}>
                     <div class="app-option-icon app-icon--{{.Key}}">
                         {{renderContent .Icon $}}
                     </div>
@@ -160,5 +160,58 @@
         </div>
         {{end}}
     </nav>
+
+    {{if .Sidebar.CurrentUser.UserID}}
+    {{/* Bottom-of-sidebar profile button + upward popover menu.
+         Data sourced per-request by UserLoader (apps/service-admin/internal/
+         infrastructure/input/http/user_loader.go) → SidebarConfig.CurrentUser.
+         Labels via lyngua keys under "sidebarProfile.*" in
+         packages/lyngua/translations/en/general/sidebar.json. */}}
+    <div class="sidebar-profile" id="sidebarProfile" data-sidebar-profile>
+        <div class="sidebar-profile-menu" id="sidebarProfileMenu" role="menu" aria-label="{{.T "sidebarProfile.menuAriaLabel"}}" hidden>
+            <a href="{{.Sidebar.CurrentUser.ProfileURL}}" class="sidebar-profile-menu-item" role="menuitem" data-testid="sidebar-profile-menu-profile">
+                <span class="sidebar-profile-menu-icon">{{template "icon-user"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.profile"}}</span>
+            </a>
+            <a href="{{.Sidebar.CurrentUser.AccountURL}}" class="sidebar-profile-menu-item" role="menuitem" data-testid="sidebar-profile-menu-account">
+                <span class="sidebar-profile-menu-icon">{{template "icon-shield"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.account"}}</span>
+            </a>
+            <a href="{{.Sidebar.CurrentUser.BillingURL}}" class="sidebar-profile-menu-item" role="menuitem" data-testid="sidebar-profile-menu-billing">
+                <span class="sidebar-profile-menu-icon">{{template "icon-credit-card"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.billing"}}</span>
+            </a>
+            <a href="{{.Sidebar.CurrentUser.PreferencesURL}}" class="sidebar-profile-menu-item" role="menuitem" data-testid="sidebar-profile-menu-preferences">
+                <span class="sidebar-profile-menu-icon">{{template "icon-sliders-horizontal"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.preferences"}}</span>
+            </a>
+            <div class="sidebar-profile-menu-divider" role="separator"></div>
+            <form method="POST" action="{{.Sidebar.CurrentUser.LogoutActionURL}}" class="sidebar-profile-menu-form" role="none">
+                <button type="submit" class="sidebar-profile-menu-item sidebar-profile-menu-item--danger" role="menuitem" data-testid="sidebar-profile-menu-logout">
+                    <span class="sidebar-profile-menu-icon">{{template "icon-log-out"}}</span>
+                    <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.signOut"}}</span>
+                </button>
+            </form>
+        </div>
+
+        <button type="button"
+                class="sidebar-profile-trigger"
+                id="sidebarProfileTrigger"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-label="{{.T "sidebarProfile.triggerAriaLabel"}}"
+                aria-controls="sidebarProfileMenu"
+                data-sidebar-profile-trigger
+                data-testid="sidebar-profile-trigger"
+                data-tooltip="{{.Sidebar.CurrentUser.FirstName}} {{.Sidebar.CurrentUser.LastName}}">
+            <span class="sidebar-profile-avatar" aria-hidden="true">{{slice .Sidebar.CurrentUser.FirstName 0 1}}{{slice .Sidebar.CurrentUser.LastName 0 1}}</span>
+            <span class="sidebar-profile-name">
+                <span class="sidebar-profile-name-first">{{.Sidebar.CurrentUser.FirstName}}</span>
+                <span class="sidebar-profile-name-last">{{.Sidebar.CurrentUser.LastName}}</span>
+            </span>
+            <span class="sidebar-profile-chevron" aria-hidden="true">{{template "icon-chevron-up"}}</span>
+        </button>
+    </div>
+    {{end}}
 </aside>
 {{end}}

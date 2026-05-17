@@ -50,6 +50,16 @@
             return;
         }
 
+        // Permission gate (UI reflection): if the view layer rendered this
+        // button disabled (pyeza BulkAction.Disabled), abort. table-selection
+        // already short-circuits the click, but this is defence-in-depth in
+        // case the custom bulkAction event is dispatched from elsewhere.
+        if (actionBtn.disabled || actionBtn.getAttribute('aria-disabled') === 'true') {
+            console.log('[BulkAction] Action button disabled, ignoring');
+            e.stopImmediatePropagation();
+            return;
+        }
+
         // Check if unified config exists (data-endpoint)
         const endpoint = actionBtn.dataset.endpoint;
         if (!endpoint) {

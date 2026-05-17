@@ -174,7 +174,20 @@
 
             // Handle bulk action buttons
             bulkActionBtns.forEach(btn => {
-                const bulkActionHandler = () => {
+                const bulkActionHandler = (ev) => {
+                    // Permission gate (UI reflection): if the button is rendered
+                    // disabled by the view layer (pyeza BulkAction.Disabled),
+                    // short-circuit before dispatching any event. The hover
+                    // `title` carries the missing-permission tooltip.
+                    if (btn.disabled || btn.getAttribute('aria-disabled') === 'true') {
+                        if (ev) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                        }
+                        console.log('[TableSelection] Bulk action button disabled, ignoring click');
+                        return;
+                    }
+
                     const action = btn.dataset.bulkAction;
                     const selectedArray = Array.from(state.selectedIds);
 

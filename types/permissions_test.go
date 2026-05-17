@@ -61,9 +61,9 @@ func TestUserPermissions_Can_NilPermissions(t *testing.T) {
 	t.Parallel()
 
 	var perms *UserPermissions
-	// nil permissions = no restrictions (dev mode)
-	if !perms.Can("anything", "goes") {
-		t.Error("nil UserPermissions.Can should return true (no restrictions)")
+	// Fail-closed: nil permissions = deny everything.
+	if perms.Can("anything", "goes") {
+		t.Error("nil UserPermissions.Can should return false (fail-closed)")
 	}
 }
 
@@ -84,8 +84,9 @@ func TestUserPermissions_CanAny_NilPermissions(t *testing.T) {
 	t.Parallel()
 
 	var perms *UserPermissions
-	if !perms.CanAny("anything") {
-		t.Error("nil UserPermissions.CanAny should return true")
+	// Fail-closed: nil permissions = deny everything.
+	if perms.CanAny("anything") {
+		t.Error("nil UserPermissions.CanAny should return false (fail-closed)")
 	}
 }
 
@@ -115,8 +116,9 @@ func TestUserPermissions_HasCode_NilPermissions(t *testing.T) {
 	t.Parallel()
 
 	var perms *UserPermissions
-	if !perms.HasCode("anything") {
-		t.Error("nil UserPermissions.HasCode should return true")
+	// Fail-closed: nil permissions = deny everything.
+	if perms.HasCode("anything") {
+		t.Error("nil UserPermissions.HasCode should return false (fail-closed)")
 	}
 }
 
@@ -285,5 +287,58 @@ func TestNewUserPermissions_NilSlice(t *testing.T) {
 	}
 	if perms.Can("client", "read") {
 		t.Error("Can should return false with nil input codes")
+	}
+}
+
+// TestNewEmptyUserPermissions_Can verifies that an explicitly empty UserPermissions
+// returns false for Can. The factory always returns false on missing codes because
+// the internal map is empty, not nil.
+func TestNewEmptyUserPermissions_Can(t *testing.T) {
+	t.Parallel()
+
+	p := NewEmptyUserPermissions()
+	if p == nil {
+		t.Fatal("NewEmptyUserPermissions returned nil")
+	}
+	if p.Can("anything", "anything") {
+		t.Error("expected Can to return false on empty UserPermissions")
+	}
+}
+
+// TestNewEmptyUserPermissions_CanAny verifies that CanAny returns false on an
+// explicitly empty UserPermissions.
+func TestNewEmptyUserPermissions_CanAny(t *testing.T) {
+	t.Parallel()
+
+	p := NewEmptyUserPermissions()
+	if p.CanAny("x", "y") {
+		t.Error("expected CanAny to return false on empty UserPermissions")
+	}
+}
+
+// TestNewEmptyUserPermissions_HasCode verifies that HasCode returns false on an
+// explicitly empty UserPermissions.
+func TestNewEmptyUserPermissions_HasCode(t *testing.T) {
+	t.Parallel()
+
+	p := NewEmptyUserPermissions()
+	if p.HasCode("x") {
+		t.Error("expected HasCode to return false on empty UserPermissions")
+	}
+}
+
+// TestNilUserPermissions_FailClosed asserts that a nil *UserPermissions returns
+// false for Can (fail-closed semantics, post-P3).
+//
+// History: this test was originally named TestNilUserPermissions_FailOpen and
+// asserted the pre-P3 fail-open behavior. P3 flipped Can/CanAny/HasCode defaults
+// from "nil = allow" to "nil = deny"; the test was renamed and the assertion
+// inverted in lockstep with the type change.
+func TestNilUserPermissions_FailClosed(t *testing.T) {
+	t.Parallel()
+
+	var p *UserPermissions
+	if p.Can("x", "y") {
+		t.Error("expected nil UserPermissions.Can to return false (fail-closed, post-P3 behavior)")
 	}
 }

@@ -1,0 +1,50 @@
+{{/*
+================================================================================
+FORBIDDEN PAGE BLOCK
+================================================================================
+Shared 403 page rendered by view.Forbidden(perm string) when a page-level
+permission gate rejects the request. AWS-style messaging: the missing
+permission code (e.g. "plan:create") is surfaced so users know what to
+request from their workspace admin.
+
+INPUT CONTRACT (view.ForbiddenPageData):
+  Perm           string  Missing entity:action code, e.g. "plan:create"
+  CommonLabels   any     Injected by ViewAdapter; provides Errors.MissingPermission
+                         template string ("Missing permission: %s") for body copy
+
+The block defines both "forbidden" (full page via app-shell) and
+"forbidden-content" (HTMX swap target).
+================================================================================
+*/}}
+
+{{/* Full page — for direct access / non-HTMX */}}
+{{define "forbidden"}}
+{{template "app-shell" .}}
+{{end}}
+
+{{/* Content-only partial — for HTMX navigation */}}
+{{define "forbidden-content"}}
+<div class="page-content page-content--forbidden">
+    <div class="forbidden-card" role="alert" aria-live="polite">
+        <div class="forbidden-icon" aria-hidden="true">
+            {{template "icon-lock" .}}
+        </div>
+        <h1 class="forbidden-title">
+            {{with .CommonLabels}}{{with .Errors}}{{if .Forbidden}}{{.Forbidden}}{{else}}Forbidden{{end}}{{else}}Forbidden{{end}}{{else}}Forbidden{{end}}
+        </h1>
+        <p class="forbidden-message">
+            {{/* AWS-style: surface the missing permission code so users know
+                 exactly what to request. The CommonLabels.Errors.MissingPermission
+                 template carries "Missing permission: %s" (interpolated below
+                 via printf). Falls back to a hard-coded English message if
+                 labels are unavailable. */}}
+            {{$msg := "Missing permission: %s"}}
+            {{with .CommonLabels}}{{with .Errors}}{{if .MissingPermission}}{{$msg = .MissingPermission}}{{end}}{{end}}{{end}}
+            <code class="forbidden-perm">{{printf $msg .Perm}}</code>
+        </p>
+        <p class="forbidden-hint">
+            Contact your workspace administrator to request access.
+        </p>
+    </div>
+</div>
+{{end}}

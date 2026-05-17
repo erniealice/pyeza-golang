@@ -86,6 +86,49 @@ func Error(err error) ViewResult {
 	}
 }
 
+// ForbiddenPageData is the template data shape for the shared "forbidden"
+// page. Carries the missing permission code so the AWS-style tooltip pattern
+// ("Missing permission: plan:create") can render. CommonLabels is populated
+// by the ViewAdapter via reflection on render — views just call
+// view.Forbidden(perm); they do not construct this struct directly.
+type ForbiddenPageData struct {
+	CacheVersion    string
+	Title           string
+	ContentTemplate string
+	CurrentPath     string
+	HeaderIcon      string
+	HeaderTitle     string
+	HeaderSubtitle  string
+	CommonLabels    any
+	Messages        map[string]string
+	// Perm carries the entity:action code that was missing, e.g., "plan:create".
+	// Rendered inside the "Missing permission: %s" tooltip / page body.
+	Perm string
+}
+
+// Forbidden creates a 403 ViewResult that renders the shared "forbidden"
+// template (see packages/pyeza-golang/web/templates/blocks/forbidden.html).
+// `perm` is the entity:action code that the user is missing, e.g.,
+// "plan:create" — it is interpolated into the page body so users know what
+// to request from their workspace admin (AWS-style messaging).
+//
+// Pyeza stays dumb: the helper does not import any business-logic packages
+// or label types. Callers (view-layer page controllers) hand in only a
+// string; the renderer injects CommonLabels via reflection.
+func Forbidden(perm string) ViewResult {
+	return ViewResult{
+		Template: "forbidden",
+		Data: &ForbiddenPageData{
+			Title:           "Forbidden",
+			ContentTemplate: "forbidden-content",
+			HeaderIcon:      "icon-lock",
+			HeaderTitle:     "Forbidden",
+			Perm:            perm,
+		},
+		StatusCode: http.StatusForbidden,
+	}
+}
+
 // RouteRegistrar is the interface consumer apps must satisfy
 // to register view routes.
 type RouteRegistrar interface {

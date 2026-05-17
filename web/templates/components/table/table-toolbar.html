@@ -35,7 +35,7 @@
     </div>
     <div class="bulk-toolbar-actions">
         {{range .BulkActions.Actions}}
-        <button type="button" class="bulk-action-btn{{if eq .Variant "danger"}} bulk-action-danger{{else if eq .Variant "primary"}} bulk-action-primary{{else if eq .Variant "warning"}} bulk-action-warning{{end}}" data-bulk-action="{{.Key}}"{{if .Endpoint}} data-endpoint="{{.Endpoint}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}{{if .ExtraParamsJSON}} data-extra-params="{{.ExtraParamsJSON}}"{{end}}{{if .RequiresDataAttr}} data-requires-attr="{{.RequiresDataAttr}}"{{end}}>
+        <button type="button" class="bulk-action-btn{{if eq .Variant "danger"}} bulk-action-danger{{else if eq .Variant "primary"}} bulk-action-primary{{else if eq .Variant "warning"}} bulk-action-warning{{end}}" data-bulk-action="{{.Key}}"{{if .Endpoint}} data-endpoint="{{.Endpoint}}"{{end}}{{if .ConfirmTitle}} data-confirm-title="{{.ConfirmTitle}}"{{end}}{{if .ConfirmMessage}} data-confirm-message="{{.ConfirmMessage}}"{{end}}{{if .ExtraParamsJSON}} data-extra-params="{{.ExtraParamsJSON}}"{{end}}{{if .RequiresDataAttr}} data-requires-attr="{{.RequiresDataAttr}}"{{end}}{{if .Disabled}} disabled aria-disabled="true"{{if .DisabledTooltip}} title="{{.DisabledTooltip}}"{{end}}{{end}}>
             {{if eq .Icon "icon-trash"}}{{template "icon-trash" $}}{{end}}
             {{if eq .Icon "icon-archive"}}{{template "icon-archive" $}}{{end}}
             {{if eq .Icon "icon-download"}}{{template "icon-download" $}}{{end}}

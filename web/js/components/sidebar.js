@@ -396,4 +396,86 @@
 
     document.addEventListener('htmx:pushedIntoHistory', updateActiveNav);
     window.addEventListener('popstate', updateActiveNav);
+
+    // ========================================
+    // Sidebar Profile — bottom button + upward popover menu
+    // ========================================
+    //
+    // Behavior:
+    //   - Click trigger → toggles `.is-open` on .sidebar-profile and
+    //     `aria-expanded` + `hidden` on the menu.
+    //   - Click outside the .sidebar-profile region → closes.
+    //   - Esc key while open → closes and refocuses the trigger.
+    //   - First menu item receives focus on open.
+    //   - Idempotent: re-running on the same root is a no-op (data-profile-wired).
+    //
+    // The form-submit logout button works without JS — submitting the form
+    // POSTs to /action/auth/logout regardless of menu state.
+
+    var profileRoot = document.getElementById('sidebarProfile');
+    if (profileRoot && profileRoot.dataset.profileWired !== 'true') {
+        var profileTrigger = profileRoot.querySelector('[data-sidebar-profile-trigger]');
+        var profileMenu = profileRoot.querySelector('.sidebar-profile-menu');
+
+        if (profileTrigger && profileMenu) {
+            var openProfileMenu = function () {
+                profileRoot.classList.add('is-open');
+                profileTrigger.setAttribute('aria-expanded', 'true');
+                profileMenu.removeAttribute('hidden');
+                var firstItem = profileMenu.querySelector('.sidebar-profile-menu-item');
+                if (firstItem) {
+                    // Defer focus by one tick so the transition can start cleanly.
+                    setTimeout(function () { firstItem.focus(); }, 0);
+                }
+            };
+
+            var closeProfileMenu = function (returnFocus) {
+                if (!profileRoot.classList.contains('is-open')) return;
+                profileRoot.classList.remove('is-open');
+                profileTrigger.setAttribute('aria-expanded', 'false');
+                profileMenu.setAttribute('hidden', '');
+                if (returnFocus) profileTrigger.focus();
+            };
+
+            profileTrigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (profileRoot.classList.contains('is-open')) {
+                    closeProfileMenu(false);
+                } else {
+                    openProfileMenu();
+                }
+            });
+
+            // Click outside → close.
+            document.addEventListener('click', function (e) {
+                if (!profileRoot.classList.contains('is-open')) return;
+                if (profileRoot.contains(e.target)) return;
+                closeProfileMenu(false);
+            });
+
+            // Esc → close and return focus.
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape') return;
+                if (!profileRoot.classList.contains('is-open')) return;
+                closeProfileMenu(true);
+            });
+
+            // Keyboard nav inside the menu — Down/Up move between items.
+            profileMenu.addEventListener('keydown', function (e) {
+                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+                e.preventDefault();
+                var items = Array.prototype.slice.call(
+                    profileMenu.querySelectorAll('.sidebar-profile-menu-item')
+                );
+                if (items.length === 0) return;
+                var idx = items.indexOf(document.activeElement);
+                if (idx === -1) idx = 0;
+                else if (e.key === 'ArrowDown') idx = (idx + 1) % items.length;
+                else idx = (idx - 1 + items.length) % items.length;
+                items[idx].focus();
+            });
+
+            profileRoot.dataset.profileWired = 'true';
+        }
+    }
 })();

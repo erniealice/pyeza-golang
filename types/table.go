@@ -579,6 +579,13 @@ type BulkAction struct {
 	ExtraParamsJSON string // Pre-rendered JSON for extra form params (e.g., '{"bulk_action":"set-admin-manager"}')
 	// Dynamic visibility based on selected rows:
 	RequiresDataAttr string // Data attribute name that must be "true" on ALL selected rows (e.g., "deletable")
+	// Permission gating (UI-layer reflection of espyna authcheck — see plan
+	// docs/plan/20260514-permission-gates/plan.md). When Disabled is true the
+	// button renders inert (disabled attribute, no HTMX dispatch) and surfaces
+	// DisabledTooltip via title="…". The view layer decides Disabled; pyeza is
+	// the dumb component.
+	Disabled        bool   // If true, render as disabled button (no click, no HTMX)
+	DisabledTooltip string // Tooltip shown when hovering over disabled button
 }
 
 // BulkActionsConfig holds configuration for bulk selection mode

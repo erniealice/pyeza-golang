@@ -485,11 +485,19 @@ type LoadingLabels struct {
 }
 
 type ErrorLabels struct {
-	General             string `json:"general"`
-	NotFound            string `json:"notFound"`
-	Unauthorized        string `json:"unauthorized"`
-	Forbidden           string `json:"forbidden"`
-	NoPermission        string `json:"noPermission"`
+	General      string `json:"general"`
+	NotFound     string `json:"notFound"`
+	Unauthorized string `json:"unauthorized"`
+	Forbidden    string `json:"forbidden"`
+	// NoPermission is the legacy static tooltip ("No permission") still used
+	// for status-gated (non-permission) Disabled tooltips, e.g. "Paid invoice
+	// cannot be edited" surfaces are NOT permission errors.
+	NoPermission string `json:"noPermission"`
+	// MissingPermission is a printf template ("Missing permission: %s") used
+	// by permission-gated widgets to surface the specific entity:action code
+	// the user is missing. AWS-style — actionable. See plan
+	// docs/plan/20260514-permission-gates/plan.md §"Pyeza primitive contract".
+	MissingPermission   string `json:"missingPermission"`
 	PermissionDenied    string `json:"permissionDenied"`
 	InvalidFormData     string `json:"invalidFormData"`
 	InvalidStatus       string `json:"invalidStatus"`

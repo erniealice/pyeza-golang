@@ -18,6 +18,33 @@ type SidebarConfig struct {
 	CurrentWorkspace    SidebarWorkspace
 	AvailableWorkspaces []SidebarWorkspace
 	SwitchWorkspaceURL  string
+
+	// Current user — populated per-request from UserLoader. Drives the
+	// bottom-of-sidebar profile button + upward popover menu.
+	CurrentUser SidebarCurrentUser
+}
+
+// SidebarCurrentUser is the authenticated user data displayed at the bottom
+// of the sidebar in the profile button + popover menu.
+//
+// All URL fields are populated by the app composition layer so the template
+// stays route-convention-agnostic.
+type SidebarCurrentUser struct {
+	UserID    string
+	FirstName string
+	LastName  string
+	Email     string
+
+	// Menu item URLs (each routes to its own page).
+	ProfileURL     string // e.g. /app/profile
+	AccountURL     string // e.g. /app/account
+	BillingURL     string // e.g. /app/billing
+	PreferencesURL string // e.g. /app/preferences
+
+	// Logout URL — the GET endpoint that renders a "signing out…" loading
+	// page and POSTs to LogoutActionURL on load.
+	LogoutURL       string // GET /auth/logout
+	LogoutActionURL string // POST /action/auth/logout
 }
 
 // SidebarWorkspace is a workspace entry for the sidebar workspace switcher.
