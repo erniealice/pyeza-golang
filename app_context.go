@@ -131,6 +131,10 @@ type AppContext struct {
 	// GetUserWorkspacesMap returns workspace chip data per user (for the user list workspace chip column).
 	GetUserWorkspacesMap any
 
-	// LedgerReportingSvc provides financial reporting queries.
-	LedgerReportingSvc any
+	// LedgerReportingSvc was retired 2026-05-21 (Wave B P1.E.1-P1.E.5 final
+	// cleanup). Reporting is now consumed by downstream blocks
+	// (fycha/centymo/entydad) via typed closures threaded through their
+	// block UseCases structs from
+	// `useCases.Service.Reporting.<Group>.<UseCase>.Execute`. No app
+	// populates this field anymore.
 }

@@ -1,6 +1,13 @@
 {{define "scripts"}}
 <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-<script src="/assets/js/pyeza/sidebar.js"></script>
+{{/*
+  sidebar.js was previously loaded here, but it runs `lf.on(...)` which is
+  defined in lf-on.js. lf-on.js is loaded later in app-shell.html (after this
+  partial), so the early load threw "lf.on is not a function" and aborted the
+  sidebar IIFE before its document-delegated handlers attached. The shell
+  template re-loads sidebar.js AFTER lf-on.js, so the early load here was a
+  pure source of the runtime error. Removed 2026-05-19.
+*/}}
 <script>
 (function() {
     // Keyboard shortcut for search (Ctrl+K)
