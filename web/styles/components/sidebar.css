@@ -1393,14 +1393,21 @@
     gap: 0.625rem;
     width: 100%;
     padding: 0.5rem 0.625rem;
-    background: transparent;
-    border: 0;
-    border-radius: var(--radius-md, 0.5rem);
+    /* Match the popover surface so the open state reads as one continuous
+       shape (trigger = bottom half, popover = top half).
+       Radius is FIXED (not var(--radius-md)) — themes with data-radius="full"
+       resolve --radius-md to ~9999px, which warps a floating popover into a
+       stadium-arch when joined to the trigger. See the matching opt-out on
+       .sidebar-profile-menu below. */
+    background: var(--bg-card, var(--bg-base, #FFFFFF));
+    border: 1px solid var(--border, #E5E5EA);
+    border-radius: 0.5rem;
     color: var(--text-primary);
     text-align: left;
     cursor: pointer;
     transition:
         background-color var(--transition-fast, 120ms ease),
+        border-radius var(--transition-fast, 120ms ease),
         box-shadow var(--transition-fast, 120ms ease);
     font: inherit;
 }
@@ -1416,7 +1423,12 @@
 }
 
 .sidebar-profile.is-open .sidebar-profile-trigger {
-    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+    background-color: var(--bg-card, var(--bg-base, #FFFFFF));
+    /* Flatten the edge that meets the popover above; keep the bottom
+       corners round so the trigger + popover form one rounded shape. */
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top-color: transparent;
 }
 
 .sidebar-profile-avatar {
@@ -1497,24 +1509,28 @@
 
 .sidebar-profile-menu {
     position: absolute;
-    /* Anchor above the trigger, mirror the trigger's horizontal padding. */
+    /* Anchor flush against the trigger's top edge so the two surfaces meet
+       seamlessly (trigger top corners flatten on open — see above).
+       Horizontal alignment mirrors the trigger. The 0.5rem offset
+       accounts for .sidebar-profile's padding-top so the popover's
+       bottom edge lands exactly on the trigger's top edge. */
     left: 0.625rem;
     right: 0.625rem;
-    bottom: calc(100% - 0.25rem);
+    bottom: calc(100% - 0.5rem);
     z-index: 60;
 
     display: flex;
     flex-direction: column;
     padding: 0.375rem;
     background: var(--bg-card, var(--bg-base, #FFFFFF));
-    /* Fixed border + radius — opt out of the theme radius / border axes.
-       A floating popover must keep its geometry stable: data-radius="full"
-       turns var(--radius-md) into a stadium pill (warps the box into an
-       oval), and data-border="none" zeroes var(--border-width) (erases
-       the edge entirely). Match the same opt-out used by .form-summary
-       in form.css per drawer-form-template-anatomy.md guidance. */
+    /* Fixed radius — opt out of the theme radius axis. data-radius="full"
+       resolves var(--radius-md) to ~9999px which clamps to half the
+       popover's height and warps it into a giant stadium-arch. Keep this
+       in sync with .sidebar-profile-trigger's radius above. Bottom corners
+       are zeroed so the popover meets the trigger as a single rounded
+       shape (the trigger keeps its bottom corners round). */
     border: 1px solid var(--border, #E5E5EA);
-    border-radius: 0.5rem;
+    border-radius: 0.5rem 0.5rem 0 0;
     box-shadow:
         0 12px 32px -8px rgba(0, 0, 0, 0.18),
         0 4px 12px -2px rgba(0, 0, 0, 0.08);
@@ -1540,6 +1556,10 @@
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
+    /* Hide the bottom edge that meets the trigger — the trigger keeps its
+       border-top transparent (above) so the seam becomes invisible and the
+       two surfaces read as one continuous rounded shape. */
+    border-bottom-color: transparent;
 }
 
 .sidebar-profile:not(.is-open) .sidebar-profile-menu {
