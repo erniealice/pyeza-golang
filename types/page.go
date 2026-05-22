@@ -2,6 +2,30 @@ package types
 
 import "html/template"
 
+// PostRotationBannerData holds the data for the post-rotation visible
+// interstitial banner (red-team A-2 / C-2 mitigation in
+// docs/plan/20260521-workspace-keyed-routing). Rendered by app-shell.html
+// on the first page render after a URL-driven workspace switch.
+type PostRotationBannerData struct {
+	// Active is true when the banner should be rendered. The view adapter
+	// sets this from the workspace_path middleware's CtxKeyPostRotationBanner
+	// context flag.
+	Active bool
+	// TargetSlug is the slug of the workspace just switched INTO.
+	TargetSlug string
+	// PreviousSlug is the slug of the workspace just switched FROM.
+	// Empty when the previous workspace_id is not in the slug cache
+	// (first request after server restart); in that case the "Switch back"
+	// link is omitted in the template.
+	PreviousSlug string
+	// PreviousURL is the reconstructed /w/{prev-slug}/ URL for the
+	// "Switch back" link. Empty when PreviousSlug is empty.
+	PreviousURL string
+	// RecentActivityURL is the link for "View recent activity" — always
+	// /me/recent-activity.
+	RecentActivityURL string
+}
+
 // PageData holds base data passed to all page templates
 type PageData struct {
 	CacheVersion string
@@ -39,6 +63,10 @@ type PageData struct {
 	SessionUserName     string // authenticated user's display name (e.g. "John Doe")
 	SessionUserEmail    string // authenticated user's email address
 	SessionUserInitials string // two-letter initials derived from the display name (e.g. "JD")
+	// PostRotationBanner is populated by the view adapter when the workspace_path
+	// middleware sets CtxKeyPostRotationBanner on the first page render after a
+	// URL-driven workspace switch (red-team A-2 / C-2 mitigation).
+	PostRotationBanner PostRotationBannerData
 }
 
 // BottomNavTab represents a single tab in the mobile bottom navigation bar.
