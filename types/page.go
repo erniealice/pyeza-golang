@@ -67,6 +67,14 @@ type PageData struct {
 	// middleware sets CtxKeyPostRotationBanner on the first page render after a
 	// URL-driven workspace switch (red-team A-2 / C-2 mitigation).
 	PostRotationBanner PostRotationBannerData
+	// WorkspaceID is the session's current workspace_id, populated by the
+	// ViewAdapter from consumer.GetWorkspaceIDFromContext on every render.
+	// Templates pass this to {{actionForm "/action/..." .WorkspaceID}} so the
+	// action_workspace_guard middleware (P10c) can verify form/session
+	// cross-binding. Empty for pre-workspace pages (login, signup, principal
+	// switch); the helper renders nothing in that case and the guard exempts
+	// those paths.
+	WorkspaceID string
 }
 
 // BottomNavTab represents a single tab in the mobile bottom navigation bar.

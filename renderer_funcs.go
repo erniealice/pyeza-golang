@@ -304,6 +304,50 @@ func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 		return route.ResolveURL(pattern, strPairs...)
 	}
 
+	// actionForm renders the signed hidden-input pair that the
+	// action_workspace_guard middleware requires on every unsafe (POST/PUT/
+	// PATCH/DELETE) /action/* request. Usage in templates:
+	//
+	//	<form hx-post="{{.FormAction}}" ...>
+	//	    {{actionForm .FormAction .WorkspaceID}}
+	//	    ...
+	//	</form>
+	//
+	// The first arg is the same URL the form posts to (it is bound into the
+	// HMAC so a signature for /action/clients/delete cannot be lifted into
+	// /action/clients/add). The second arg is the current session's
+	// workspace_id, populated on every render by the ViewAdapter into
+	// PageData.WorkspaceID.
+	//
+	// Safe-mode returns (empty HTML) when:
+	//   - no signer is wired (dev boots without WORKSPACE_FORM_HMAC_KEY) — the
+	//     guard is also disabled in that case so the missing fields don't
+	//     break anything.
+	//   - workspaceID is empty (e.g. pre-workspace auth pages) — the guard
+	//     exempts /action/auth/* and pre-binding requests, so an empty render
+	//     is also correct here.
+	//   - signing errors (extremely rare; rand source failure) — empty render
+	//     plus an error log; the form will then fail closed at the guard
+	//     with the standard "please reload" 409.
+	base["actionForm"] = func(actionPath, workspaceID string) template.HTML {
+		if r.wsFormSigner == nil || workspaceID == "" || actionPath == "" {
+			return template.HTML("")
+		}
+		sig, err := r.wsFormSigner.SignFields(workspaceID, actionPath)
+		if err != nil {
+			log.Printf("actionForm: SignFields failed (path=%q): %v", actionPath, err)
+			return template.HTML("")
+		}
+		// Use template.HTMLEscapeString on values: workspaceID is a UUID and
+		// sig is base64url, but defensive escaping protects against future
+		// shape changes (e.g. if workspaceID ever held arbitrary input).
+		return template.HTML(fmt.Sprintf(
+			`<input type="hidden" name="_workspace_id" value="%s"><input type="hidden" name="_workspace_id_sig" value="%s">`,
+			template.HTMLEscapeString(workspaceID),
+			template.HTMLEscapeString(sig),
+		))
+	}
+
 	// renderContent dynamically executes a named template and returns the result
 	// as template.HTML. This is safe because the sub-template output is already
 	// auto-escaped by html/template — the template.HTML wrapper prevents

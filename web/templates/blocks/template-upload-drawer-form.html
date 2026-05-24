@@ -4,6 +4,7 @@ Data: .FormAction, .Labels, .CommonLabels, .AcceptTypes
 */}}
 {{define "template-upload-drawer-form"}}
 <form hx-post="{{.FormAction}}" hx-swap="none" hx-encoding="multipart/form-data" hx-on::after-request="lf.Sheet.handleResponse(event)">
+    {{actionForm .FormAction .WorkspaceID}}
 
     <div class="sheet-body">
         {{template "form-section" (dict "Title" .Labels.UploadTemplate)}}

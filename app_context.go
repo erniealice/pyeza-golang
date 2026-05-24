@@ -137,4 +137,29 @@ type AppContext struct {
 	// block UseCases structs from
 	// `useCases.Service.Reporting.<Group>.<UseCase>.Execute`. No app
 	// populates this field anymore.
+
+	// SecureWorkspaceSwitch is the optional host-provided override for
+	// /action/admin/switch-workspace. When non-nil, the entydad workspace
+	// block routes the sidebar workspace-switcher through this closure
+	// instead of the legacy in-place SwitchWorkspace use case. The
+	// service-admin host wires this to its executePrincipalSwitch primitive
+	// so the switch rotates the session token, locks the target binding
+	// inside tx, and writes an audit row — matching the workspace-boundary
+	// rotation invariant (Q-WS-13) and the audit-on-every-switch invariant
+	// (red-team A-4 / X-2). A1 fix WKR-P0-1 (2026-05-22).
+	//
+	// Type-assert to workspaceaction.SecureSwitchFn inside the entydad
+	// block. Kept as `any` here to avoid pulling entydad as a pyeza
+	// dependency.
+	SecureWorkspaceSwitch any
+
+	// SecureWorkspaceSwitchResolveUserID extracts the authenticated user_id
+	// from the request. Required when SecureWorkspaceSwitch is set.
+	// Type-assert to func(r *http.Request) string.
+	SecureWorkspaceSwitchResolveUserID any
+
+	// SecureWorkspaceSwitchSetSessionCookie writes the post-rotation
+	// session cookie. Required when SecureWorkspaceSwitch is set.
+	// Type-assert to func(w http.ResponseWriter, token string).
+	SecureWorkspaceSwitchSetSessionCookie any
 }

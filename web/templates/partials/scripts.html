@@ -18,6 +18,21 @@
             if (searchInput) searchInput.focus();
         }
     });
+
+    // CSRF: mirror ws_csrf cookie into X-Ws-Csrf-Token header for every
+    // non-GET HTMX request. The server's WorkspaceCSRFMiddleware (scoped
+    // to /action/*) requires cookie + header to match. Pre-action GETs
+    // already received the cookie via Set-Cookie; this hook keeps the
+    // header in sync without per-form annotation. /auth/* and other
+    // non-/action/* paths are exempt server-side; this hook runs for them
+    // too but the middleware skips validation.
+    document.addEventListener('htmx:configRequest', function(evt) {
+        if (!evt.detail.verb || evt.detail.verb.toUpperCase() === 'GET') return;
+        var m = document.cookie.match(/(?:^|;\s*)ws_csrf=([^;]+)/);
+        if (m) {
+            evt.detail.headers['X-Ws-Csrf-Token'] = m[1];
+        }
+    });
 })();
 </script>
 {{end}}

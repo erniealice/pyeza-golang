@@ -14,6 +14,22 @@ import (
 	"sync"
 )
 
+// WorkspaceFormSigner is the minimal contract pyeza needs in order to render
+// the signed (_workspace_id, _workspace_id_sig) hidden-input pair for any
+// /action/* form. The concrete implementation lives in service-admin's
+// middleware package (middleware.WorkspaceFormSigner); pyeza only sees this
+// interface so the renderer stays free of monorepo dependencies.
+//
+// SignFields takes the current session workspace_id and the action path the
+// form posts to (e.g. "/action/client/edit/abc-123"), and returns the value
+// to place in the _workspace_id_sig hidden input. Returns ("", err) only on
+// a misconfiguration (empty workspaceID) or a rand-source failure — callers
+// should treat the error as "render nothing" so the action_workspace_guard
+// middleware rejects the submission with 409 + HX-Refresh.
+type WorkspaceFormSigner interface {
+	SignFields(workspaceID, actionPath string) (sigValue string, err error)
+}
+
 // HTMLRenderer handles HTML template rendering with shared components
 type HTMLRenderer struct {
 	templates        *template.Template
@@ -22,7 +38,8 @@ type HTMLRenderer struct {
 	templateFS       []fs.FS
 	parseOnce        sync.Once
 	parseErr         error
-	routeMap         map[string]string // route key → URL pattern (populated before first render)
+	routeMap         map[string]string   // route key → URL pattern (populated before first render)
+	wsFormSigner     WorkspaceFormSigner // signs (_workspace_id, _workspace_id_sig) for action forms
 }
 
 // NewHTMLRenderer creates a new HTMLRenderer.
@@ -55,6 +72,15 @@ func (r *HTMLRenderer) WithFuncs(funcs template.FuncMap) *HTMLRenderer {
 // and values are URL patterns with chi-style {param} placeholders.
 func (r *HTMLRenderer) SetRouteMap(m map[string]string) {
 	r.routeMap = m
+}
+
+// SetWorkspaceFormSigner installs the signer used by the {{actionForm}}
+// template helper. Must be called before the first template render when the
+// app wires the action_workspace_guard middleware. When nil (e.g. dev boots
+// without HMAC env), the helper renders nothing — the guard is then also
+// disabled, so the missing hidden inputs are not a problem.
+func (r *HTMLRenderer) SetWorkspaceFormSigner(s WorkspaceFormSigner) {
+	r.wsFormSigner = s
 }
 
 // getSharedComponentsDir returns the path to the shared pyeza package directory

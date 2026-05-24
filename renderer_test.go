@@ -3,6 +3,7 @@ package pyeza
 import (
 	"fmt"
 	"html/template"
+	"strings"
 	"testing"
 )
 
@@ -439,6 +440,102 @@ func TestGetDefaultFuncMap_Mul_EdgeCases(t *testing.T) {
 				t.Errorf("mul(%v, %v) = %v, want %v", tt.a, tt.b, got, tt.want)
 			}
 		})
+	}
+}
+
+// stubWorkspaceFormSigner is a deterministic test double for WorkspaceFormSigner.
+// SignFields returns "sig-for-{workspaceID}-on-{actionPath}" so tests can assert
+// the exact wiring without re-implementing HMAC.
+type stubWorkspaceFormSigner struct {
+	err error
+}
+
+func (s *stubWorkspaceFormSigner) SignFields(workspaceID, actionPath string) (string, error) {
+	if s.err != nil {
+		return "", s.err
+	}
+	return fmt.Sprintf("sig-for-%s-on-%s", workspaceID, actionPath), nil
+}
+
+func TestActionForm_RendersBothHiddenFields(t *testing.T) {
+	r := NewHTMLRenderer(nil)
+	r.SetWorkspaceFormSigner(&stubWorkspaceFormSigner{})
+
+	tmpl := template.Must(template.New("t").Funcs(r.templateFuncs).Parse(
+		`<form>{{actionForm "/action/client/edit/abc-123" "ws-uuid-42"}}</form>`,
+	))
+
+	var buf strings.Builder
+	if err := tmpl.Execute(&buf, nil); err != nil {
+		t.Fatalf("template execute failed: %v", err)
+	}
+	out := buf.String()
+
+	if !strings.Contains(out, `name="_workspace_id"`) {
+		t.Errorf("actionForm output missing _workspace_id field; got %q", out)
+	}
+	if !strings.Contains(out, `name="_workspace_id_sig"`) {
+		t.Errorf("actionForm output missing _workspace_id_sig field; got %q", out)
+	}
+	if !strings.Contains(out, `value="ws-uuid-42"`) {
+		t.Errorf("actionForm output missing workspaceID value; got %q", out)
+	}
+	if !strings.Contains(out, `value="sig-for-ws-uuid-42-on-/action/client/edit/abc-123"`) {
+		t.Errorf("actionForm output missing signature value derived from action path + workspaceID; got %q", out)
+	}
+	if !strings.Contains(out, `type="hidden"`) {
+		t.Errorf("actionForm output missing hidden input type; got %q", out)
+	}
+}
+
+func TestActionForm_EmptyWhenSignerNil(t *testing.T) {
+	r := NewHTMLRenderer(nil)
+	// Note: SetWorkspaceFormSigner NOT called — simulates dev boot without HMAC env.
+
+	tmpl := template.Must(template.New("t").Funcs(r.templateFuncs).Parse(
+		`<form>{{actionForm "/action/client/edit/abc" "ws-1"}}</form>`,
+	))
+
+	var buf strings.Builder
+	if err := tmpl.Execute(&buf, nil); err != nil {
+		t.Fatalf("template execute failed: %v", err)
+	}
+	if got := buf.String(); got != `<form></form>` {
+		t.Errorf("actionForm should render empty when signer is nil; got %q", got)
+	}
+}
+
+func TestActionForm_EmptyWhenWorkspaceIDEmpty(t *testing.T) {
+	r := NewHTMLRenderer(nil)
+	r.SetWorkspaceFormSigner(&stubWorkspaceFormSigner{})
+
+	tmpl := template.Must(template.New("t").Funcs(r.templateFuncs).Parse(
+		`<form>{{actionForm "/action/foo" ""}}</form>`,
+	))
+
+	var buf strings.Builder
+	if err := tmpl.Execute(&buf, nil); err != nil {
+		t.Fatalf("template execute failed: %v", err)
+	}
+	if got := buf.String(); got != `<form></form>` {
+		t.Errorf("actionForm should render empty when workspaceID is empty; got %q", got)
+	}
+}
+
+func TestActionForm_EmptyOnSignError(t *testing.T) {
+	r := NewHTMLRenderer(nil)
+	r.SetWorkspaceFormSigner(&stubWorkspaceFormSigner{err: fmt.Errorf("rand source dead")})
+
+	tmpl := template.Must(template.New("t").Funcs(r.templateFuncs).Parse(
+		`<form>{{actionForm "/action/foo" "ws-1"}}</form>`,
+	))
+
+	var buf strings.Builder
+	if err := tmpl.Execute(&buf, nil); err != nil {
+		t.Fatalf("template execute failed: %v", err)
+	}
+	if got := buf.String(); got != `<form></form>` {
+		t.Errorf("actionForm should render empty on signer error; got %q", got)
 	}
 }
 
