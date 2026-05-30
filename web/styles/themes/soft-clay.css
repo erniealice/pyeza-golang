@@ -54,6 +54,10 @@
     --border-light: #EDE6DE;
     --border-focus: var(--accent-primary);
     --border-default: #E4DACF;
+    --border-subtle: #EDE6DE;
+    --bg-muted: #EDE6DE;
+    --bg-subtle: #F3EDE7;
+    --text-subtle: #9A8C80;
     --shadow-sm: 0 1px 3px rgba(58, 42, 30, 0.03);
     --shadow-md: 0 4px 12px rgba(58, 42, 30, 0.05);
     --shadow-lg: 0 8px 24px rgba(58, 42, 30, 0.07);
