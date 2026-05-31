@@ -1,0 +1,11 @@
+# pnpm-workspace.yaml — scope pnpm to THIS package only (the @leapfor/ui SDK).
+# pyeza is a standalone git submodule; this file keeps `pnpm install` from
+# walking up into the monorepo and treating sibling packages as workspace
+# members. Mirrors the esqyma Node-in-a-Go-package precedent.
+packages:
+  - "."
+
+# esbuild ships a prebuilt platform binary via a postinstall script; allow it
+# so a fresh `pnpm install` produces a working bundler binary in CI.
+onlyBuiltDependencies:
+  - esbuild

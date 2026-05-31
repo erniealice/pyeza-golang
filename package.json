@@ -1,0 +1,38 @@
+{
+  "name": "@leapfor/ui",
+  "version": "1.0.0",
+  "description": "Leapfor (lf) design-system primitives — the pyeza window.lf.ui.* surface, dual-built ESM + UMD for external consumers. The running service-admin app does NOT consume these artifacts; it loads the per-file IIFE scripts verbatim-copied by pyeza.CopyStaticAssets.",
+  "type": "module",
+  "main": "dist/lf.umd.cjs",
+  "module": "dist/lf.esm.js",
+  "types": "dist/lf.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/lf.d.ts",
+      "import": "./dist/lf.esm.js",
+      "require": "./dist/lf.umd.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "web/js"
+  ],
+  "sideEffects": [
+    "./src/bootstrap.js",
+    "./web/js/**/*.js"
+  ],
+  "private": true,
+  "scripts": {
+    "build:sdk": "node build/sdk.mjs",
+    "build:bundle": "node build/bundle.mjs",
+    "build": "pnpm build:bundle && pnpm build:sdk",
+    "check:js": "node build/check.mjs",
+    "version:check": "node build/version-check.mjs",
+    "lint:namespace": "bash scripts/lint-lf-namespace.sh",
+    "test": "node --test 'test/**/*.test.mjs'",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0"
+  }
+}
