@@ -130,7 +130,9 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TableColumns = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableColumns = {
         init,
         initColumnVisibility,
         toggleColumn,

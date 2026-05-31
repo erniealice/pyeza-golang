@@ -7,7 +7,9 @@
 
     // Shared pagination state for all tables
     window.lf = window.lf || {};
-    window.lf.TableState = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableState = {
         pagination: {}
     };
 
@@ -58,7 +60,9 @@
     }
 
     // Expose utilities
-    window.lf.TableCore = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableCore = {
         debounce,
         closeAllDropdowns,
         updateTableInfo

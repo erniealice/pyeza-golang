@@ -82,7 +82,9 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TableDialog = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableDialog = {
         showConfirmDialog
     };
 

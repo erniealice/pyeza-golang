@@ -313,7 +313,8 @@
 
         // Expose functions globally under lf namespace
         window.lf = window.lf || {};
-        window.lf.Dialog = { open: openDialog, close: closeDialog };
+        window.lf.ui = window.lf.ui || {};
+        window.lf.ui.Dialog = { open: openDialog, close: closeDialog };
     }
 
     // Initialize on DOM ready

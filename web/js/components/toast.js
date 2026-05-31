@@ -345,7 +345,8 @@
     // ========================================
 
     window.lf = window.lf || {};
-    window.lf.Toast = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.Toast = {
         show: show,
         dismiss: dismiss,
         dismissAll: dismissAll,

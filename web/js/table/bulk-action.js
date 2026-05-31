@@ -255,7 +255,9 @@
 
     // Expose module for debugging
     window.lf = window.lf || {};
-    window.lf.BulkAction = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.BulkAction = {
         handleBulkAction,
         executeBulkAction,
         refreshTable

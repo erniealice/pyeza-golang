@@ -361,7 +361,8 @@
 
     // Expose API for external use
     window.lf = window.lf || {};
-    window.lf.NotificationDrawer = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.NotificationDrawer = {
         open: openDrawer,
         close: closeDrawer,
         toggle: toggleDrawer,

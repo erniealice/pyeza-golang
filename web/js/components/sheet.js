@@ -586,7 +586,8 @@
     // ========================================
 
     window.lf = window.lf || {};
-    window.lf.Sheet = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.Sheet = {
         open: open,
         close: close,
         handleResponse: handleResponse,

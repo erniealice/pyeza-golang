@@ -118,7 +118,9 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TableExport = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableExport = {
         init,
         initExport,
         exportToCSV,

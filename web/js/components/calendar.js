@@ -237,7 +237,8 @@
     // ========================================
 
     window.lf = window.lf || {};
-    window.lf.Calendar = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.Calendar = {
         init:              init,
         updateCurrentTime: updateCurrentTime,
         setView:           setView
@@ -326,8 +327,11 @@
         return pad2(h) + ':' + pad2(mm);
     }
 
-    window.lf.calendar = window.lf.calendar || {};
-    window.lf.calendar.suggestStartTime = suggestStartTime;
+    // suggestStartTime folds onto lf.ui.Calendar (namespaceMap:
+    // lf.calendar.suggestStartTime -> lf.ui.Calendar.suggestStartTime).
+    // The legacy lf.calendar alias is installed in 00-lf-namespace.js and
+    // resolves to lf.ui.Calendar, so lf.calendar.suggestStartTime still works.
+    window.lf.ui.Calendar.suggestStartTime = suggestStartTime;
 
     // Auto-init on DOMContentLoaded
     if (document.readyState === 'loading') {

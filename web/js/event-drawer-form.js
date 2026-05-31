@@ -10,7 +10,7 @@
        end-date to equal start-date.
 
    Exposed:
-     window.lf.eventDrawerForm.bind(formEl)
+     window.lf.ui.eventDrawerForm.bind(formEl)
 
    Auto-init: the drawer template renders an inline init script that calls
    bind(form) after every HTMX swap.
@@ -121,7 +121,8 @@
         void startRow; void endRow;
     }
 
-    window.lf.eventDrawerForm = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.eventDrawerForm = {
         bind: bind,
         snapToHalfHour: snapToHalfHour,
         addMinutes: addMinutes,

@@ -388,7 +388,9 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TableServer = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableServer = {
         buildServerPaginationURL,
         isServerPagination,
         getPaginationMode,

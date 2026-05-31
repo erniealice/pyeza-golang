@@ -611,7 +611,9 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TableActions = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableActions = {
         init,
         initRowActions,
         initRowNavigation,

@@ -566,7 +566,9 @@
     }
 
     window.lf = window.lf || {};
-    window.lf.TableFilters = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableFilters = {
         init: init,
         initFilters: initFilters,
         initChipHandlers: initChipHandlers,

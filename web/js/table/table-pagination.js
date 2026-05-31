@@ -500,7 +500,9 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TablePagination = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TablePagination = {
         init,
         initPagination,
         initServerPagination,

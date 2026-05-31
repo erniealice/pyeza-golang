@@ -94,7 +94,9 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TableDensity = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableDensity = {
         init,
         initDensity,
         getCurrentDensity,

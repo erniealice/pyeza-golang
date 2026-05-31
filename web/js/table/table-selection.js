@@ -452,7 +452,9 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TableSelection = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableSelection = {
         init,
         initBulkSelection,
         updateBulkSelectionUI,
@@ -476,7 +478,8 @@
     };
 
     // Expose cleanup function globally for debugging
-    window.lf.__tableSelectionCleanupAll = function() {
+    window.lf._internal = window.lf._internal || {};
+    window.lf._internal.tableSelectionCleanupAll = function() {
         console.log('[TableSelection] Cleaning up ALL table states');
         tableState.forEach((state, tableId) => {
             cleanupTable(tableId);

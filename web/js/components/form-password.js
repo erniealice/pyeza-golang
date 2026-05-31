@@ -73,6 +73,7 @@
     // Expose for tests / programmatic re-wiring.
     if (typeof window !== 'undefined') {
         window.lf = window.lf || {};
-        window.lf.FormPassword = { wire: wire, wireAll: wireAll };
+        window.lf.ui = window.lf.ui || {};
+        window.lf.ui.FormPassword = { wire: wire, wireAll: wireAll };
     }
 }());

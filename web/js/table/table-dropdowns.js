@@ -90,6 +90,8 @@
 
     // Expose module
     window.lf = window.lf || {};
-    window.lf.TableDropdowns = { init };
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableDropdowns = { init };
 
 })();

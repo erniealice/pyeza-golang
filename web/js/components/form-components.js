@@ -12,8 +12,9 @@
  */
 
 window.lf = window.lf || {};
+window.lf.ui = window.lf.ui || {};
 
-window.lf.FormComponents = (function () {
+window.lf.ui.FormComponents = (function () {
     'use strict';
 
     // -------------------------------------------------------------------------

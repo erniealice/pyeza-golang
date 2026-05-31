@@ -125,7 +125,9 @@
 
     // Expose public API via lf.TableToolbar for backwards compatibility
     window.lf = window.lf || {};
-    window.lf.TableToolbar = {
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.table = window.lf.ui.table || {};
+    window.lf.ui.table.TableToolbar = {
         // Core utilities
         closeAllDropdowns: function() {
             if (lf.TableCore) return lf.TableCore.closeAllDropdowns();

@@ -67,5 +67,6 @@
     }
 
     window.lf = window.lf || {};
-    window.lf.FocusTrap = { trapFocus: trapFocus, releaseFocus: releaseFocus };
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.FocusTrap = { trapFocus: trapFocus, releaseFocus: releaseFocus };
 })();
