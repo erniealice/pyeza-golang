@@ -399,6 +399,21 @@
             }
         });
 
+        // CSP-prep (Plan-6): delegated close for form Cancel/close buttons that
+        // previously carried inline `onclick="lf.ui.Sheet.close()"`. Inline
+        // event-handler attributes cannot be nonced/hashed and block an
+        // enforcing `script-src 'self'`, so footer cancel buttons now declare a
+        // `data-sheet-close` (or `data-sheet-cancel`) hook instead. Document
+        // delegation matches even freshly HTMX-swapped drawer content. Behavior
+        // is identical to calling close() directly. `data-sheet-close` may carry
+        // a component-id value (sheet.html) — it is ignored here; the global
+        // drawer close() is the only close path the app uses.
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('[data-sheet-close], [data-sheet-cancel]')) {
+                close();
+            }
+        });
+
         // Escape key to close
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && isOpen) {

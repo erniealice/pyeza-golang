@@ -16,6 +16,44 @@
     // Track the last trigger that opened a dropdown (for focus restore on Escape)
     let lastOpenTrigger = null;
 
+    // CSP-prep (Plan-6): mobile toolbar actions-sheet toggle/backdrop.
+    // These controls previously carried inline
+    // `onclick="this.closest('.table-toolbar').classList.toggle('actions-open')"`
+    // (toggle) and `.remove('actions-open')` (backdrop), plus a paired
+    // `onkeydown` on the backdrop. Inline event-handler attributes cannot be
+    // nonced/hashed and block an enforcing `script-src 'self'`, so the markup
+    // now uses `data-toolbar-toggle` / `data-toolbar-backdrop` hooks. Document
+    // delegation reproduces the exact prior behavior (toggle vs. remove on the
+    // closest `.table-toolbar`) and survives HTMX swaps without re-binding.
+    const toolbarToggleHandler = function(e) {
+        const toggle = e.target.closest('[data-toolbar-toggle]');
+        if (toggle) {
+            const toolbar = toggle.closest('.table-toolbar');
+            if (toolbar) {
+                toolbar.classList.toggle('actions-open');
+            }
+            return;
+        }
+        const backdrop = e.target.closest('[data-toolbar-backdrop]');
+        if (backdrop) {
+            const toolbar = backdrop.closest('.table-toolbar');
+            if (toolbar) {
+                toolbar.classList.remove('actions-open');
+            }
+        }
+    };
+
+    const toolbarBackdropKeyHandler = function(e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const backdrop = e.target.closest('[data-toolbar-backdrop]');
+        if (!backdrop) return;
+        e.preventDefault();
+        const toolbar = backdrop.closest('.table-toolbar');
+        if (toolbar) {
+            toolbar.classList.remove('actions-open');
+        }
+    };
+
     // Define handlers outside init so references are stable
     const clickOutsideHandler = function(e) {
         if (!e.target.closest('.toolbar-dropdown')) {
@@ -84,6 +122,9 @@
         if (!documentListenersInitialized) {
             document.addEventListener('click', clickOutsideHandler);
             document.addEventListener('keydown', escapeKeyHandler);
+            // CSP-prep delegated toolbar mobile-actions toggle/backdrop.
+            document.addEventListener('click', toolbarToggleHandler);
+            document.addEventListener('keydown', toolbarBackdropKeyHandler);
             documentListenersInitialized = true;
         }
     }

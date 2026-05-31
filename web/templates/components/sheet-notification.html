@@ -101,6 +101,33 @@ HTMX Events:
     let notifications = [];
     let currentFilter = 'all';
 
+    // --- XSS hardening (mirrors toast.js isSafeToastURL / escapeHTML) ---------
+    // renderNotifications() builds card HTML from /api/notifications JSON. The
+    // backend handler is a stub today, but these guards keep the sink safe even
+    // before it ships: scheme-guard actionUrl (reject javascript:/data:/vbscript:)
+    // and HTML-escape every interpolated string value.
+    function isSafeURL(url) {
+        if (typeof url !== 'string' || url.length === 0) return false;
+        // Allow relative URLs (start with "/", "?", or "#").
+        if (/^[\/?#]/.test(url)) return true;
+        // Allow only http(s) absolute URLs.
+        return /^https?:\/\//i.test(url);
+    }
+
+    function safeURL(url) {
+        return isSafeURL(url) ? url : '#';
+    }
+
+    function escapeHTML(s) {
+        if (s == null) return '';
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     function getFilterButtons() {
         const sheet = getSheet();
         return sheet ? Array.from(sheet.querySelectorAll('.sheet-tab')) : [];
@@ -207,14 +234,14 @@ HTMX Events:
         } else {
             if (emptyEl) emptyEl.style.display = 'none';
             itemsEl.innerHTML = visibleNotifications.map(n => `
-                <a href="${n.actionUrl || '#'}" class="sheet-card${n.read ? '' : ' unread'}">
-                    <div class="sheet-card-icon ${n.type || 'info'}">
+                <a href="${escapeHTML(safeURL(n.actionUrl))}" class="sheet-card${n.read ? '' : ' unread'}">
+                    <div class="sheet-card-icon ${escapeHTML(n.type || 'info')}">
                         {{template "icon-bell"}}
                     </div>
                     <div class="sheet-card-content">
-                        <h4 class="sheet-card-title">${n.title || ''}</h4>
-                        <p class="sheet-card-message">${n.message || ''}</p>
-                        <span class="sheet-card-time">${formatTime(n.timestamp)}</span>
+                        <h4 class="sheet-card-title">${escapeHTML(n.title || '')}</h4>
+                        <p class="sheet-card-message">${escapeHTML(n.message || '')}</p>
+                        <span class="sheet-card-time">${escapeHTML(formatTime(n.timestamp))}</span>
                     </div>
                 </a>
             `).join('');
