@@ -164,7 +164,7 @@ JavaScript:
             {{end}}
         </tr>
     </thead>
-    <script>setTimeout(function(){var r=document.querySelector('.column-group-header');if(!r)return;var h=r.offsetHeight-1;if(h>0){document.querySelectorAll('.column-sub-header th').forEach(function(el){el.style.top=h+'px'})}},50);</script>
+    <script nonce="{{.Nonce}}">setTimeout(function(){var r=document.querySelector('.column-group-header');if(!r)return;var h=r.offsetHeight-1;if(h>0){document.querySelectorAll('.column-sub-header th').forEach(function(el){el.style.top=h+'px'})}},50);</script>
     {{else}}
     {{/* Standard single-level headers */}}
     <thead>
@@ -270,7 +270,7 @@ JavaScript:
             {{/* HTMX drawer-open action: no href (avoids hx-boost navigation),
                  carries hx-get/hx-target/hx-swap to load content into the sheet
                  portal without changing the browser URL. */}}
-            <a class="action-btn {{.Type}}" aria-label="{{.Label}}" title="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}}{{if .OnClick}} onclick="{{.OnClick}}"{{end}}>
+            <a class="action-btn {{.Type}}" aria-label="{{.Label}}" title="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}}{{if .OnClick}} data-lf-onclick="{{.OnClick}}"{{end}}>
                 {{if eq .Type "run"}}{{template "icon-zap" $}}{{end}}
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}

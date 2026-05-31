@@ -633,6 +633,10 @@ type TableConfig struct {
 	NameColumnLabel       string             // Optional header label for the auto-generated name column (first column). Blank = no label.
 	ServerPagination      *ServerPagination  // Optional server-side pagination configuration (nil = client-side mode)
 	TotalsRow             []TableCell        // Optional totals row rendered in <tfoot> (e.g. for accounting reports)
+	// Nonce is the per-request CSP nonce, populated by the ViewAdapter via
+	// reflection (same mechanism as PageData.Nonce). Templates use it as
+	// nonce="{{.Nonce}}" on inline <script> tags inside the table component.
+	Nonce                 string
 }
 
 // ImportAction defines the import button configuration

@@ -8,7 +8,7 @@
   template re-loads sidebar.js AFTER lf-on.js, so the early load here was a
   pure source of the runtime error. Removed 2026-05-19.
 */}}
-<script>
+<script nonce="{{.Nonce}}">
 (function() {
     // Keyboard shortcut for search (Ctrl+K)
     document.addEventListener('keydown', function(e) {

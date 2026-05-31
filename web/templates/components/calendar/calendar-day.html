@@ -152,8 +152,7 @@ CalendarDayEvent:
                             href="{{$dayNewEventURL}}&at={{$label0}}"
                             hx-get="{{$dayNewEventURL}}&at={{$label0}}"
                             hx-target="#sheetContent"
-                            hx-swap="innerHTML"
-                            onclick="if(window.lf&&window.lf.Sheet){window.lf.Sheet.open();}">
+                            hx-swap="innerHTML">
                             {{template "icon-plus" .}}
                             <span>New event at {{$label0}}</span>
                         </a>
@@ -163,8 +162,7 @@ CalendarDayEvent:
                             href="{{$dayNewEventURL}}&at={{$label30}}"
                             hx-get="{{$dayNewEventURL}}&at={{$label30}}"
                             hx-target="#sheetContent"
-                            hx-swap="innerHTML"
-                            onclick="if(window.lf&&window.lf.Sheet){window.lf.Sheet.open();}">
+                            hx-swap="innerHTML">
                             {{template "icon-plus" .}}
                             <span>New event at {{$label30}}</span>
                         </a>

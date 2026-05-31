@@ -23,7 +23,9 @@ Usage:
     Buttons should use:
         hx-target="#sheetContent"
         hx-swap="innerHTML"
-        onclick="lf.Sheet.open('Title')"
+        data-lf-action="sheet-open" data-lf-sheet-title="Title"
+    (The delegated handler in web/js/components/component-actions.js opens the
+     sheet; CSP-safe — no inline onclick.)
 
 ================================================================================
 */}}

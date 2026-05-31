@@ -98,7 +98,7 @@ Labels are resolved from CommonLabels.Buttons (Save, Cancel, Update).
 {{define "sheet-form-footer"}}
 <div class="sheet-footer">
     {{if .ShowCancel}}
-    <button type="button" class="btn btn-secondary" onclick="lf.Sheet.close()">{{if .CancelLabel}}{{.CancelLabel}}{{else}}{{.CommonLabels.Buttons.Cancel}}{{end}}</button>
+    <button type="button" class="btn btn-secondary" data-lf-action="sheet-close">{{if .CancelLabel}}{{.CancelLabel}}{{else}}{{.CommonLabels.Buttons.Cancel}}{{end}}</button>
     {{end}}
     <button type="submit" class="btn btn-primary">
         {{if .SubmitLabel}}{{.SubmitLabel}}{{else if .IsEdit}}{{.CommonLabels.Buttons.Update}}{{else}}{{.CommonLabels.Buttons.Save}}{{end}}
@@ -118,14 +118,14 @@ Variants for convenience:
 
 {{define "sheet-form-footer-cancel-save"}}
 <div class="sheet-footer">
-    <button type="button" class="btn btn-secondary" onclick="lf.Sheet.close()">{{.CommonLabels.Buttons.Cancel}}</button>
+    <button type="button" class="btn btn-secondary" data-lf-action="sheet-close">{{.CommonLabels.Buttons.Cancel}}</button>
     <button type="submit" class="btn btn-primary">{{.CommonLabels.Buttons.Save}}</button>
 </div>
 {{end}}
 
 {{define "sheet-form-footer-cancel-update"}}
 <div class="sheet-footer">
-    <button type="button" class="btn btn-secondary" onclick="lf.Sheet.close()">{{.CommonLabels.Buttons.Cancel}}</button>
+    <button type="button" class="btn btn-secondary" data-lf-action="sheet-close">{{.CommonLabels.Buttons.Cancel}}</button>
     <button type="submit" class="btn btn-primary">{{.CommonLabels.Buttons.Update}}</button>
 </div>
 {{end}}

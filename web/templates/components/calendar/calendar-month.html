@@ -150,8 +150,7 @@ CalendarEvent:
                     href="{{.NewEventURL}}"
                     hx-get="{{.NewEventURL}}"
                     hx-target="#sheetContent"
-                    hx-swap="innerHTML"
-                    onclick="if(window.lf&&window.lf.Sheet){window.lf.Sheet.open();}">
+                    hx-swap="innerHTML">
                     {{template "icon-plus" .}}
                     <span>New event{{if .SuggestedTime}} at {{.SuggestedTime}}{{end}}</span>
                 </a>

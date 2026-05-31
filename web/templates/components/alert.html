@@ -60,7 +60,7 @@
         <div class="alert-message">{{.Message}}</div>
     </div>
     {{- if $dismissible }}
-    <button class="alert-dismiss" aria-label="{{if .DismissLabel}}{{.DismissLabel}}{{else}}Dismiss alert{{end}}" onclick="this.closest('.alert').remove()">
+    <button class="alert-dismiss" aria-label="{{if .DismissLabel}}{{.DismissLabel}}{{else}}Dismiss alert{{end}}">
         {{template "icon-x"}}
     </button>
     {{- end }}

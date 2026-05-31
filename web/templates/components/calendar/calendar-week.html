@@ -181,8 +181,7 @@ CalendarWeekEvent:
                             href="{{$colDay.NewEventURL}}&at={{$label0}}"
                             hx-get="{{$colDay.NewEventURL}}&at={{$label0}}"
                             hx-target="#sheetContent"
-                            hx-swap="innerHTML"
-                            onclick="if(window.lf&&window.lf.Sheet){window.lf.Sheet.open();}">
+                            hx-swap="innerHTML">
                             {{template "icon-plus" .}}
                             <span>New event at {{$label0}}</span>
                         </a>
@@ -192,8 +191,7 @@ CalendarWeekEvent:
                             href="{{$colDay.NewEventURL}}&at={{$label30}}"
                             hx-get="{{$colDay.NewEventURL}}&at={{$label30}}"
                             hx-target="#sheetContent"
-                            hx-swap="innerHTML"
-                            onclick="if(window.lf&&window.lf.Sheet){window.lf.Sheet.open();}">
+                            hx-swap="innerHTML">
                             {{template "icon-plus" .}}
                             <span>New event at {{$label30}}</span>
                         </a>

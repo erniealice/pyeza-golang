@@ -2,7 +2,7 @@
 <!-- Mobile sidebar overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <aside class="sidebar" id="sidebar">
-    <script>if(localStorage.getItem('lf-sidebar-collapsed')==='true')document.getElementById('sidebar').classList.add('collapsed');</script>
+    <script nonce="{{.Nonce}}">if(localStorage.getItem('lf-sidebar-collapsed')==='true')document.getElementById('sidebar').classList.add('collapsed');</script>
     <div class="sidebar-header">
         <a href="{{.Sidebar.LogoURL}}" class="logo">
             <span class="logo-text">{{.Sidebar.LogoText}}</span>
@@ -14,7 +14,7 @@
 
     {{if gt (len .Sidebar.AvailableWorkspaces) 1}}
     <div class="workspace-switcher">
-        <button type="button" class="workspace-switcher-btn" onclick="this.nextElementSibling.classList.toggle('hidden');this.setAttribute('aria-expanded',this.nextElementSibling.classList.contains('hidden')?'false':'true')" aria-haspopup="listbox" aria-expanded="false" aria-label="Switch workspace" data-testid="workspace-switcher-btn">
+        <button type="button" class="workspace-switcher-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Switch workspace" data-testid="workspace-switcher-btn">
             <span class="workspace-icon">{{template "icon-briefcase" .}}</span>
             <span class="workspace-name">{{.Sidebar.CurrentWorkspace.Name}}</span>
             <span class="workspace-chevron">{{template "icon-chevron-down" .}}</span>

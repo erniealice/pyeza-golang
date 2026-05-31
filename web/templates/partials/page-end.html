@@ -24,7 +24,7 @@
     {{template "settings-modal" .}}
 
     {{/* Popover Component - auto-inits all [data-popover] elements (incl. header theme switcher) */}}
-    {{template "popover-init"}}
+    {{template "popover-init" .}}
 
     {{/* Theme Switcher Script */}}
     <script src="/assets/js/theme-switcher.js?v={{.CacheVersion}}"></script>
@@ -43,7 +43,7 @@
     <script src="/assets/js/pyeza/toast.js?v={{.CacheVersion}}"></script>
 
     {{/* Tab Active State - toggles active class on HTMX tab clicks + arrow-key navigation */}}
-    <script>
+    <script nonce="{{.Nonce}}">
     document.addEventListener('click', function(e) {
         var tab = e.target.closest('[role="tab"]');
         if (!tab) return;

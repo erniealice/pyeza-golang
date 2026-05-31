@@ -8,7 +8,7 @@
 {{/* TABLE BULK TOOLBAR - Shown when rows are selected */}}
 {{define "table-bulk-toolbar"}}
 {{/* Bulk-labels JSON payload — consumed by readBulkLabels() in table-selection.js */}}
-<script type="application/json" id="{{.ID}}-bulk-labels">
+<script type="application/json" id="{{.ID}}-bulk-labels" nonce="{{.Nonce}}">
 {
   "bulkSelectAllPage": {{quoteJSON .Labels.BulkSelectAllPage}},
   "bulkSelectAllAcrossPages": {{quoteJSON .Labels.BulkSelectAllAcrossPages}},
@@ -83,12 +83,12 @@
     {{end}}
 
     {{/* Mobile Options Toggle (visible only on mobile) */}}
-    <button type="button" class="toolbar-mobile-toggle" onclick="this.closest('.table-toolbar').classList.toggle('actions-open')" aria-label="More options" data-testid="{{.ID}}-toolbar-toggle">
+    <button type="button" class="toolbar-mobile-toggle" aria-label="More options" data-testid="{{.ID}}-toolbar-toggle">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
     </button>
 
     {{/* Mobile Backdrop (closes actions sheet) */}}
-    <div class="toolbar-mobile-backdrop" role="button" tabindex="0" aria-label="Close menu" data-testid="{{.ID}}-toolbar-backdrop" onclick="this.closest('.table-toolbar').classList.remove('actions-open')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.closest('.table-toolbar').classList.remove('actions-open')}"></div>
+    <div class="toolbar-mobile-backdrop" role="button" tabindex="0" aria-label="Close menu" data-testid="{{.ID}}-toolbar-backdrop"></div>
 
     {{/* Toolbar Actions */}}
     <div class="toolbar-actions">
@@ -106,11 +106,11 @@
                     <button type="button" class="filter-clear-all">{{.Labels.ClearAll}}</button>
                 </div>
                 {{/* Filter column metadata — read by table-filters.js to build typed conditions */}}
-                <script type="application/json" id="{{.ID}}-filter-meta">
+                <script type="application/json" id="{{.ID}}-filter-meta" nonce="{{.Nonce}}">
                 {{filterColumnsJSON .Columns}}
                 </script>
                 {{/* Filter widget labels — read by table-filters.js readPanelLabels() */}}
-                <script type="application/json" class="filter-panel-labels">
+                <script type="application/json" class="filter-panel-labels" nonce="{{.Nonce}}">
                 {{filterPanelLabelsJSON .Labels}}
                 </script>
                 <div class="filter-conditions" id="{{.ID}}-filter-conditions">
@@ -247,7 +247,7 @@
                 hx-target="#sheetContent"
                 hx-swap="innerHTML"
                 hx-push-url="false"
-                onclick="lf.Sheet.open('{{.ImportAction.Label}}')">
+                data-lf-action="sheet-open" data-lf-sheet-title="{{.ImportAction.Label}}">
             {{if eq .ImportAction.Icon "icon-upload"}}{{template "icon-upload" .}}{{end}}
             {{.ImportAction.Label}}
         </button>
@@ -279,7 +279,7 @@
                 hx-target="#sheetContent"
                 hx-swap="innerHTML"
                 hx-push-url="false"
-                onclick="lf.Sheet.open('{{.PrimaryAction.Label}}')">
+                data-lf-action="sheet-open" data-lf-sheet-title="{{.PrimaryAction.Label}}">
             {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
             {{.PrimaryAction.Label}}
         </button>

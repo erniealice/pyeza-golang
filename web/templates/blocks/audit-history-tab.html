@@ -46,7 +46,6 @@ Data: .AuditEntries, .AuditHasNext, .AuditNextCursor, .AuditHistoryURL, .CommonL
                             data-audit-details-target="{{$detailID}}"
                             aria-controls="{{$detailID}}"
                             aria-expanded="false"
-                            onclick="lf.toggleAuditDetails(this)"
                             type="button">
                         {{$labels.Details}}
                     </button>
@@ -100,7 +99,7 @@ Data: .AuditEntries, .AuditHasNext, .AuditNextCursor, .AuditHistoryURL, .CommonL
     </div>
     {{end}}
 </div>
-<script>
+<script nonce="{{.Nonce}}">
 window.lf = window.lf || {};
 window.lf.toggleAuditDetails = window.lf.toggleAuditDetails || function(button) {
     if (!button) {
