@@ -75,6 +75,14 @@ type PageData struct {
 	// switch); the helper renders nothing in that case and the guard exempts
 	// those paths.
 	WorkspaceID string
+	// Nonce is the per-request CSP nonce minted by the SecurityHeaders
+	// middleware (apps/service-admin .../middleware/security_headers.go) and
+	// read back via middleware.Nonce(ctx). The ViewAdapter populates it in
+	// injectPageData. Consumed by inline <script nonce="{{.Nonce}}"> blocks in a
+	// LATER wave (CSP stage 2); no stage-1 template emits nonce= yet, so this
+	// field is inert today and CSP stays report-only. Empty when the request
+	// skipped SecurityHeaders (e.g. unit tests).
+	Nonce string
 }
 
 // BottomNavTab represents a single tab in the mobile bottom navigation bar.
