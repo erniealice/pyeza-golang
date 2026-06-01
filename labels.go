@@ -9,6 +9,7 @@ type CommonLabels struct {
 	Theme         ThemeLabels        `json:"theme"`
 	HelpPane      HelpPaneLabels     `json:"helpPane"`
 	Table         CommonTableLabels  `json:"table"`
+	Columns       CommonColumnLabels `json:"columns"`
 	Pagination    PaginationLabels   `json:"pagination"`
 	Buttons       ButtonLabels       `json:"buttons"`
 	Actions       ActionLabels       `json:"actions"`

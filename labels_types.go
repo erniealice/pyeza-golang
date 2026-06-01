@@ -269,6 +269,21 @@ type HelpPaneLabels struct {
 	Close string `json:"close"`
 }
 
+// CommonColumnLabels holds genuinely-shared table column-header names reused
+// across many domain list/report views (Code, Name, Amount, Status, Date,
+// etc.). Domain-specific column names stay in their own domain label structs.
+type CommonColumnLabels struct {
+	Code        string `json:"code"`
+	Name        string `json:"name"`
+	Amount      string `json:"amount"`
+	Status      string `json:"status"`
+	Date        string `json:"date"`
+	Description string `json:"description"`
+	Reference   string `json:"reference"`
+	Type        string `json:"type"`
+	Total       string `json:"total"`
+}
+
 type CommonTableLabels struct {
 	Search                   string             `json:"search"`
 	SearchPlaceholder        string             `json:"searchPlaceholder"`
