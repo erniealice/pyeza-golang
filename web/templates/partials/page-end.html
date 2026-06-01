@@ -143,6 +143,15 @@
             }
         }
     });
+    // 2.3a: also clear aria-busy when a #sheetContent request FINISHES without a swap
+    // (drawer forms post with hx-swap="none", so htmx:afterSwap never fires for them).
+    document.addEventListener('htmx:afterRequest', function(e) {
+        var el = e.target;
+        if (el.id === 'sheetContent' || (el.closest && el.closest('#sheetContent'))) {
+            var sc = document.getElementById('sheetContent');
+            if (sc) { sc.setAttribute('aria-busy', 'false'); }
+        }
+    });
 
     // 2.4: toggle role=switch Space/Enter activation
     document.addEventListener('keydown', function(e) {
@@ -163,6 +172,18 @@
                 else { sw.classList.remove('active'); }
             }
         }
+    });
+
+    // 2.4: keep role=switch aria-checked + .active in sync for POINTER/touch toggles too —
+    // the native <label for> path flips the checkbox without updating the switch's ARIA state.
+    document.addEventListener('change', function(e) {
+        var cb = e.target;
+        if (!cb || cb.type !== 'checkbox' || !cb.classList || !cb.classList.contains('toggle-checkbox')) return;
+        var label = cb.id ? document.querySelector('label[for="' + cb.id + '"]') : (cb.closest && cb.closest('label'));
+        var sw = label ? label.querySelector('[role="switch"]') : null;
+        if (!sw) return;
+        sw.setAttribute('aria-checked', cb.checked ? 'true' : 'false');
+        if (cb.checked) { sw.classList.add('active'); } else { sw.classList.remove('active'); }
     });
     </script>
 

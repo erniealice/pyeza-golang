@@ -10,6 +10,8 @@ USAGE:
     "Name" "toggleName"     // Field name for form submission
     "ID" "toggleId"         // Optional: element ID (defaults to Name)
     "Label" "Toggle Label"  // Optional: label text
+    "LabelledBy" "ext-id"   // Optional: id of an EXTERNAL label element — names the focusable switch when there is no .Label
+    "AriaLabel" "Active"    // Optional: literal accessible name for the switch (fallback when neither .Label nor .LabelledBy is set)
     "LabelPosition" "left"  // Optional: left (default) or right
     "Checked" false         // Optional: initial state
     "Disabled" false        // Optional: disable toggle
@@ -65,7 +67,7 @@ ACCESSIBILITY:
             class="toggle-switch{{if .Checked}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="switch"
             aria-checked="{{if .Checked}}true{{else}}false{{end}}"
-            {{if .Label}}aria-labelledby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-label"{{end}}
+            {{if .LabelledBy}}aria-labelledby="{{.LabelledBy}}"{{else if .Label}}aria-labelledby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-label"{{else if .AriaLabel}}aria-label="{{.AriaLabel}}"{{end}}
             {{if .Disabled}}aria-disabled="true"{{end}}
             tabindex="{{if .Disabled}}-1{{else}}0{{end}}"
         >
