@@ -27,6 +27,7 @@ type CommonLabels struct {
 	Currency      CurrencyLabels     `json:"currency"`
 	Toast         ToastLabels        `json:"toast"`
 	Sheet         SheetLabels        `json:"sheet"`
+	A11y          A11yLabels         `json:"a11y"`
 }
 
 // TabItem represents a single tab in a tab component

@@ -578,3 +578,18 @@ type SheetLabels struct {
 	// error alert that appears inside the drawer body on submit failure.
 	DismissAlert string `json:"dismissAlert"`
 }
+
+// A11yLabels holds tier-invariant accessibility strings shared across every
+// page and component — skip-links, icon-only control labels, etc. These are
+// assistive-technology affordances, not business copy, so they live in the
+// common tier (general.json) and are NOT tier-overridden. Loaded from
+// common/common.json#a11y into CommonLabels.A11y.
+type A11yLabels struct {
+	// SkipToContent is the visually-hidden "skip to main content" link text
+	// rendered at the top of every shell so keyboard users can bypass the
+	// sidebar/header. Read by app-shell / portal-shell.
+	SkipToContent string `json:"skipToContent"`
+	// MoreInfo is the aria-label on the icon-only (i) popover trigger beside
+	// a form label. Read by the form-group component when an Info param is set.
+	MoreInfo string `json:"moreInfo"`
+}

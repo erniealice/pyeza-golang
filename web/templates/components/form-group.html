@@ -16,6 +16,7 @@ USAGE:
     "Value" ""              // Optional: current value
     "Hint" ""               // Optional: help text below input
     "Info" ""               // Optional: popover text surfaced via info button beside label
+    "InfoLabel" ""          // Optional: aria-label for the info button (pass .CommonLabels.A11y.MoreInfo; falls back to "More info")
     "Required" false        // Optional: mark as required
     "Disabled" false        // Optional: disable input
     "Readonly" false        // Optional: readonly input
@@ -55,7 +56,7 @@ Wrap form-groups in div.form-row for multi-column layouts:
         {{.Label}}{{if .Required}} <span class="form-required" aria-hidden="true">*</span>{{end}}
         {{if .Info}}
         <span class="form-label-info" data-popover data-popover-trigger="hover click" data-popover-position="top">
-            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" aria-describedby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-info" tabindex="0">
+            <button type="button" class="popover-trigger form-label-info-btn" aria-label="{{if .InfoLabel}}{{.InfoLabel}}{{else}}More info{{end}}" aria-describedby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-info" tabindex="0">
                 {{template "icon-info"}}
             </button>
             <div class="popover-panel form-label-info-panel" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-info" role="tooltip">
