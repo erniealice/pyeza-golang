@@ -393,6 +393,51 @@
 }
 
 /* ========================================
+   LINK BUTTON
+   ========================================
+   Note on BEM asymmetry: button variants use single-dash (.btn-link, .btn-ghost,
+   .btn-primary) while badge variants use double-dash (.badge--default, .badge--success).
+   This is intentional — the button family follows a flat-modifier convention; badges
+   follow strict BEM. Do not "fix" the asymmetry without a full audit of both families.
+   ======================================== */
+
+.btn-link,
+.btn.btn-link {
+    background: transparent;
+    color: var(--accent-primary);
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    font-weight: var(--font-weight-medium);
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline;
+    white-space: normal;
+}
+
+.btn-link:hover,
+.btn.btn-link:hover {
+    color: var(--accent-primary-dark);
+    text-decoration: none;
+}
+
+.btn-link:focus-visible,
+.btn.btn-link:focus-visible {
+    outline: var(--border-width-focus) solid var(--accent-primary);
+    outline-offset: var(--border-width-focus);
+    border-radius: var(--radius-sm);
+}
+
+.btn-link:disabled,
+.btn.btn-link:disabled,
+.btn-link[aria-disabled="true"],
+.btn.btn-link[aria-disabled="true"] {
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: not-allowed;
+}
+
+/* ========================================
    GHOST BUTTON
    ======================================== */
 

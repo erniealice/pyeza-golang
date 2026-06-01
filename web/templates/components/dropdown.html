@@ -105,7 +105,8 @@ Dropdown menu for contextual actions.
         <div class="action-dropdown-item{{if .Danger}} danger{{end}}"
              data-action="{{.Action}}"
              role="menuitem"
-             tabindex="0">
+             tabindex="0"
+             data-testid="dropdown-item-{{.Action}}">
             {{if eq .Icon "eye"}}
             {{template "icon-eye"}}
             {{else if eq .Icon "edit"}}
@@ -154,7 +155,8 @@ A minimal dropdown triggered by an icon button, ideal for table row actions.
         <div class="icon-dropdown-item{{if .Danger}} danger{{end}}"
              data-action="{{.Action}}"
              role="menuitem"
-             tabindex="0">
+             tabindex="0"
+             data-testid="dropdown-item-{{.Action}}">
             {{.Label}}
         </div>
         {{end}}

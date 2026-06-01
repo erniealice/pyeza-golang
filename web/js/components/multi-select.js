@@ -41,6 +41,9 @@ window.lf.ui.MultiSelect = (function () {
         const moreSelectedTemplate = container.dataset.moreTemplate || '+{count} more';
         const placeholder = container.dataset.placeholder || '';
 
+        // Roving highlight index for keyboard navigation (-1 = nothing focused).
+        let focusedIndex = -1;
+
         // Initialize selected values from pre-selected chips
         const selected = new Map();
         container.querySelectorAll('.multi-select-chip').forEach(chip => {
@@ -82,9 +85,11 @@ window.lf.ui.MultiSelect = (function () {
                 }
             }
 
-            // Update option visual states
+            // Update option visual + ARIA states
             allOptions.forEach(opt => {
-                opt.classList.toggle('selected', selected.has(opt.dataset.value));
+                const on = selected.has(opt.dataset.value);
+                opt.classList.toggle('selected', on);
+                opt.setAttribute('aria-selected', on ? 'true' : 'false');
             });
 
             // Update hidden input with comma-separated values
@@ -118,11 +123,76 @@ window.lf.ui.MultiSelect = (function () {
             if (emptyState) {
                 emptyState.classList.toggle('visible', visibleCount === 0);
             }
+
+            // The visible set changed — reset the roving highlight so
+            // aria-activedescendant never points at a now-hidden option.
+            focusedIndex = -1;
+            allOptions.forEach(opt => opt.classList.remove('focused'));
+            setActiveDescendant('');
+        }
+
+        // --- Keyboard navigation: roving highlight + aria-activedescendant ---
+        // aria-activedescendant lives on whichever element owns DOM focus while
+        // the listbox is open: the search input when present, else the trigger
+        // (role="combobox"). The trigger mirrors it either way so AT tracking
+        // the combobox still sees the active option.
+        function setActiveDescendant(id) {
+            const owner = searchInput || trigger;
+            if (id) {
+                owner.setAttribute('aria-activedescendant', id);
+                trigger.setAttribute('aria-activedescendant', id);
+            } else {
+                if (searchInput) searchInput.removeAttribute('aria-activedescendant');
+                trigger.removeAttribute('aria-activedescendant');
+            }
+        }
+
+        function visibleOptions() {
+            return allOptions.filter(opt => !opt.classList.contains('hidden'));
+        }
+
+        function ensureOptionId(opt, i) {
+            if (!opt.id) opt.id = container.id + '-option-nav-' + i;
+            return opt.id;
+        }
+
+        function updateFocus(options) {
+            let activeId = '';
+            allOptions.forEach(opt => opt.classList.remove('focused'));
+            options.forEach((opt, i) => {
+                if (i === focusedIndex) {
+                    opt.classList.add('focused');
+                    activeId = ensureOptionId(opt, i);
+                    opt.scrollIntoView({ block: 'nearest' });
+                }
+            });
+            setActiveDescendant(activeId);
+        }
+
+        function moveFocus(delta) {
+            const options = visibleOptions();
+            if (options.length === 0) return;
+            if (focusedIndex < 0) {
+                focusedIndex = delta > 0 ? 0 : options.length - 1;
+            } else {
+                focusedIndex = Math.min(Math.max(focusedIndex + delta, 0), options.length - 1);
+            }
+            updateFocus(options);
+        }
+
+        function selectFocused() {
+            const options = visibleOptions();
+            if (focusedIndex >= 0 && focusedIndex < options.length) {
+                const opt = options[focusedIndex];
+                toggleOption(opt.dataset.value, opt.dataset.label);
+            }
         }
 
         function openDropdown() {
             container.classList.add('open');
             trigger.setAttribute('aria-expanded', 'true');
+            focusedIndex = -1;
+            setActiveDescendant('');
             if (searchInput) {
                 searchInput.value = '';
                 filterOptions('');
@@ -134,6 +204,9 @@ window.lf.ui.MultiSelect = (function () {
         function closeDropdown() {
             container.classList.remove('open');
             trigger.setAttribute('aria-expanded', 'false');
+            focusedIndex = -1;
+            setActiveDescendant('');
+            allOptions.forEach(opt => opt.classList.remove('focused'));
             updateDisplay(); // Re-render to show collapsed state with overflow
         }
 
@@ -184,22 +257,51 @@ window.lf.ui.MultiSelect = (function () {
                 e.stopPropagation();
             });
 
+            // Arrow keys move the highlight; Enter/Space toggle the highlighted
+            // option (without closing — multi-select keeps the list open so the
+            // user can pick several); Escape closes and returns focus to trigger.
             searchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (!container.classList.contains('open')) openDropdown();
+                    moveFocus(1);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (!container.classList.contains('open')) openDropdown();
+                    moveFocus(-1);
+                } else if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    // Only intercept Space when an option is highlighted; otherwise
+                    // let it type into the search field.
+                    if (e.key === 'Enter' || focusedIndex >= 0) {
+                        e.preventDefault();
+                        selectFocused();
+                    }
+                } else if (e.key === 'Escape') {
                     closeDropdown();
                     trigger.focus();
                 }
             });
         }
 
-        // Keyboard navigation
+        // Keyboard navigation on the trigger (no search input focused yet, or
+        // search input absent). Enter/Space open/toggle; arrows open + move.
         trigger.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (e.key === 'ArrowDown') {
                 e.preventDefault();
-                if (container.classList.contains('open')) {
-                    closeDropdown();
-                } else {
+                if (!container.classList.contains('open')) openDropdown();
+                moveFocus(1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (!container.classList.contains('open')) openDropdown();
+                moveFocus(-1);
+            } else if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                if (!container.classList.contains('open')) {
                     openDropdown();
+                } else if (focusedIndex >= 0) {
+                    selectFocused();
+                } else {
+                    closeDropdown();
                 }
             } else if (e.key === 'Escape') {
                 closeDropdown();

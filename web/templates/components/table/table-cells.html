@@ -103,7 +103,7 @@
 
 {{/* MONEY CELL */}}
 {{define "table-cell-money"}}
-<span class="money-cell">
+<span class="money-cell" data-raw-value="{{.Value}}">
     {{if .Currency}}<span class="money-currency">{{.Currency}}</span>{{end}}
     <span class="money-amount">{{.Value}}</span>
 </span>
@@ -115,15 +115,16 @@
     time smaller and muted below — mirrors the person-name/person-email pattern).
     Falls back to a single-line span when only .Value is set, preserving
     backwards compatibility with date-only callers (DateTimeCell + DateReadable).
+    data-raw-value carries the machine-readable date for test selectors / i18n probes.
 */}}
 {{define "table-cell-datetime"}}
 {{- if and .DateText .TimeText -}}
-<div class="cell-datetime">
+<time class="cell-datetime" datetime="{{.DateText}}" data-raw-value="{{.DateText}}">
     <span class="cell-datetime__date">{{.DateText}}</span>
     <span class="cell-datetime__time">{{.TimeText}}</span>
-</div>
+</time>
 {{- else -}}
-<span class="datetime-cell">{{.Value}}</span>
+<time class="datetime-cell" datetime="{{.Value}}" data-raw-value="{{.Value}}">{{.Value}}</time>
 {{- end -}}
 {{end}}
 
@@ -164,7 +165,7 @@
 {{/* EMAIL CELL */}}
 {{define "table-cell-email"}}
 <a href="mailto:{{.Value}}" class="email-cell">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cell-icon"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cell-icon" aria-hidden="true" focusable="false"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
     <span>{{.Value}}</span>
 </a>
 {{end}}
@@ -172,7 +173,7 @@
 {{/* PHONE CELL */}}
 {{define "table-cell-phone"}}
 <a href="tel:{{.Value}}" class="phone-cell">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cell-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cell-icon" aria-hidden="true" focusable="false"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
     <span>{{.Value}}</span>
 </a>
 {{end}}

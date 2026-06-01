@@ -58,13 +58,14 @@ ACCESSIBILITY:
         {{if or .ID .Name}}for="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}
     >
         {{if and .Label (ne .LabelPosition "right")}}
-        <span class="toggle-label">{{.Label}}</span>
+        <span class="toggle-label" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-label">{{.Label}}</span>
         {{end}}
 
         <span
             class="toggle-switch{{if .Checked}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="switch"
             aria-checked="{{if .Checked}}true{{else}}false{{end}}"
+            {{if .Label}}aria-labelledby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-label"{{end}}
             {{if .Disabled}}aria-disabled="true"{{end}}
             tabindex="{{if .Disabled}}-1{{else}}0{{end}}"
         >
@@ -72,7 +73,7 @@ ACCESSIBILITY:
         </span>
 
         {{if and .Label (eq .LabelPosition "right")}}
-        <span class="toggle-label">{{.Label}}</span>
+        <span class="toggle-label" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-label">{{.Label}}</span>
         {{end}}
     </label>
 </div>
@@ -99,7 +100,7 @@ USAGE:
 {{define "toggle-item"}}
 <div class="toggle-item{{if .Disabled}} disabled{{end}}">
     <div class="toggle-item-content">
-        <span class="toggle-label">{{.Label}}</span>
+        <span class="toggle-label" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-label">{{.Label}}</span>
         {{if .Description}}
         <span class="toggle-description">{{.Description}}</span>
         {{end}}
@@ -123,6 +124,7 @@ USAGE:
             class="toggle-switch{{if .Checked}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="switch"
             aria-checked="{{if .Checked}}true{{else}}false{{end}}"
+            aria-labelledby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-label"
             {{if .Disabled}}aria-disabled="true"{{end}}
             tabindex="{{if .Disabled}}-1{{else}}0{{end}}"
         >

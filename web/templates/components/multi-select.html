@@ -49,14 +49,14 @@
             <input type="text" class="multi-select-search" aria-label="Search {{if .Label}}{{.Label}}{{end}}" placeholder="{{.SearchPlaceholder}}" autocomplete="off">
         </div>
         <div class="multi-select-options">
-            {{range .Options}}
-            <div class="multi-select-option{{if .Selected}} selected{{end}}" data-value="{{.Value}}" data-label="{{.Label}}" role="option">
+            {{range $oi, $opt := .Options}}
+            <div class="multi-select-option{{if $opt.Selected}} selected{{end}}" id="{{$.ID}}-option-{{$oi}}" data-value="{{$opt.Value}}" data-label="{{$opt.Label}}" role="option" aria-selected="{{if $opt.Selected}}true{{else}}false{{end}}">
                 <span class="multi-select-checkbox">
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" focusable="false">
                         <path d="M2 5L4 7L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </span>
-                <span class="multi-select-option-label">{{.Label}}</span>
+                <span class="multi-select-option-label">{{$opt.Label}}</span>
             </div>
             {{end}}
         </div>

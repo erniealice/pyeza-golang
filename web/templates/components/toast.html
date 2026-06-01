@@ -93,7 +93,7 @@
         <div class="toast-message">{{.Message}}</div>
     </div>
     {{- if $dismissible }}
-    <button class="toast-close" aria-label="{{.DismissLabel}}">
+    <button class="toast-close" aria-label="{{if .DismissLabel}}{{.DismissLabel}}{{else}}Dismiss notification{{end}}">
         {{template "icon-x"}}
     </button>
     {{- end }}

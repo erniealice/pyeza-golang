@@ -199,7 +199,7 @@ JavaScript:
         </tr>
     </thead>
     {{end}}
-    <tbody id="{{.ID}}-body">
+    <tbody id="{{.ID}}-body" aria-busy="false">
         {{if .Groups}}
             {{range .Groups}}
             {{template "table-row-group" .}}
@@ -236,7 +236,7 @@ JavaScript:
         <input type="checkbox"
                class="row-select-checkbox"
                data-row-id="{{.ID}}"
-               aria-label="Select row">
+               aria-label="Select row {{.ID}}">
     </td>
     {{end}}
     {{range .Cells}}
@@ -472,7 +472,7 @@ JavaScript:
         <input type="checkbox"
                class="row-select-checkbox"
                data-row-id="{{.ID}}"
-               aria-label="Select row">
+               aria-label="Select row {{.ID}}">
     </td>
     {{end}}
     {{range .Cells}}

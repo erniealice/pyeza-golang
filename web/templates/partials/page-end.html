@@ -57,6 +57,12 @@
         tab.classList.add('active');
         tab.setAttribute('aria-selected', 'true');
         tab.setAttribute('tabindex', '0');
+        // 2.1: update tabpanel aria-labelledby when active tab changes
+        var tabId = tab.id;
+        if (tabId) {
+            var panel = document.getElementById('tabContent');
+            if (panel) { panel.setAttribute('aria-labelledby', tabId); }
+        }
     });
 
     // P1: Left/Right/Home/End arrow-key navigation within a tablist
@@ -97,6 +103,65 @@
             next.focus();
             // Fire click so HTMX loads the tab panel
             next.click();
+        }
+    });
+
+    // 2.3a: aria-busy on tbody + sheetContent during HTMX requests
+    document.addEventListener('htmx:beforeRequest', function(e) {
+        var el = e.target;
+        // Table tbody
+        var card = el.closest('[data-refresh-url]');
+        if (card) {
+            var tbody = card.querySelector('tbody[id]');
+            if (tbody) { tbody.setAttribute('aria-busy', 'true'); }
+        }
+        // Sheet content
+        if (el.id === 'sheetContent' || el.closest('#sheetContent')) {
+            var sc = document.getElementById('sheetContent');
+            if (sc) { sc.setAttribute('aria-busy', 'true'); }
+        }
+    });
+    document.addEventListener('htmx:afterSwap', function(e) {
+        var el = e.target;
+        // Reset aria-busy on swapped tbodies
+        if (el.tagName === 'TBODY' || (el.id && el.id.indexOf('-body') !== -1)) {
+            el.setAttribute('aria-busy', 'false');
+        } else {
+            var tbody = el.querySelector('tbody[id]');
+            if (tbody) { tbody.setAttribute('aria-busy', 'false'); }
+        }
+        // Reset aria-busy on sheet content
+        if (el.id === 'sheetContent') {
+            el.setAttribute('aria-busy', 'false');
+        }
+        // 2.1: ensure tabpanel retains aria-labelledby after HTMX swap
+        var panel = document.getElementById('tabContent');
+        if (panel && !panel.getAttribute('aria-labelledby')) {
+            var activeTab = document.querySelector('[role="tab"][aria-selected="true"]');
+            if (activeTab && activeTab.id) {
+                panel.setAttribute('aria-labelledby', activeTab.id);
+            }
+        }
+    });
+
+    // 2.4: toggle role=switch Space/Enter activation
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== ' ' && e.key !== 'Enter') return;
+        var sw = e.target.closest('[role="switch"]');
+        if (!sw) return;
+        e.preventDefault();
+        // Find associated checkbox via the wrapping label
+        var label = sw.closest('label');
+        if (label) {
+            var forId = label.getAttribute('for');
+            var checkbox = forId ? document.getElementById(forId) : label.querySelector('input[type="checkbox"]');
+            if (checkbox && !checkbox.disabled) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                sw.setAttribute('aria-checked', checkbox.checked ? 'true' : 'false');
+                if (checkbox.checked) { sw.classList.add('active'); }
+                else { sw.classList.remove('active'); }
+            }
         }
     });
     </script>

@@ -84,7 +84,7 @@
                     </button>
                     <div class="app-switcher-group-items">
                         {{range .Apps}}
-                        <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem"{{if eq .Key $.Sidebar.ActiveApp}} aria-current="page"{{end}}>
+                        <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem"{{if eq .Key $.Sidebar.ActiveApp}} aria-current="page"{{end}} data-testid="app-switch-{{.Key}}" data-variant="desktop">
                             <div class="app-option-icon app-icon--{{.Key}}">
                                 {{renderContent .Icon $}}
                             </div>
@@ -119,7 +119,7 @@
             <div class="app-switcher-header">Switch App</div>
             <div class="app-switcher-grid{{if eq .Sidebar.AppGridColumns 1}} app-switcher-grid--cols-1{{end}}">
                 {{range .Sidebar.Apps}}
-                <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem"{{if eq .Key $.Sidebar.ActiveApp}} aria-current="page"{{end}}>
+                <button class="app-option{{if eq .Key $.Sidebar.ActiveApp}} active{{end}}" data-app="{{.Key}}" data-href="{{.URL}}" role="menuitem"{{if eq .Key $.Sidebar.ActiveApp}} aria-current="page"{{end}} data-testid="app-switch-{{.Key}}" data-variant="desktop">
                     <div class="app-option-icon app-icon--{{.Key}}">
                         {{renderContent .Icon $}}
                     </div>
@@ -140,7 +140,9 @@
                class="nav-item{{if eq .Key $.Sidebar.ActiveSubNav}} active{{end}}"
                {{if eq .Key $.Sidebar.ActiveSubNav}}aria-current="page"{{end}}
                aria-label="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}"
-               data-tooltip="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}">
+               data-tooltip="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}"
+               data-testid="nav-{{.Key}}"
+               data-variant="desktop">
                 <span class="nav-icon">{{renderContent .Icon $}}</span>
                 <span class="nav-text">{{.Label}}</span>
             </a>
@@ -150,7 +152,9 @@
                class="nav-item nav-item--child{{if eq .Key $.Sidebar.ActiveSubNav}} active{{end}}"
                {{if eq .Key $.Sidebar.ActiveSubNav}}aria-current="page"{{end}}
                aria-label="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}"
-               data-tooltip="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}">
+               data-tooltip="{{if .Tooltip}}{{.Tooltip}}{{else}}{{.Label}}{{end}}"
+               data-testid="nav-{{.Key}}"
+               data-variant="desktop">
                 <span class="nav-icon">{{renderContent .Icon $}}</span>
                 <span class="nav-text">{{.Label}}</span>
             </a>

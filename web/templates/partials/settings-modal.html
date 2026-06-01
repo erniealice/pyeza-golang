@@ -23,11 +23,11 @@
         <nav class="settings-modal-nav" aria-label="Settings sections">
             <div class="settings-nav-section">
                 <div class="settings-nav-section-title">{{.CommonLabels.Settings.Account.Title}}</div>
-                <button class="settings-nav-item active" data-section="profile">
+                <button class="settings-nav-item active" data-section="profile" data-testid="settings-nav-profile">
                     <span class="settings-nav-icon">{{template "icon-user" .}}</span>
                     <span class="settings-nav-text">{{.CommonLabels.Settings.Account.Profile}}</span>
                 </button>
-                <button class="settings-nav-item" data-section="security">
+                <button class="settings-nav-item" data-section="security" data-testid="settings-nav-security">
                     <span class="settings-nav-icon">{{template "icon-shield" .}}</span>
                     <span class="settings-nav-text">{{.CommonLabels.Settings.Account.Security}}</span>
                 </button>
@@ -35,7 +35,7 @@
 
             <div class="settings-nav-section">
                 <div class="settings-nav-section-title">{{.CommonLabels.Settings.Billing.Title}}</div>
-                <button class="settings-nav-item" data-section="billing">
+                <button class="settings-nav-item" data-section="billing" data-testid="settings-nav-billing">
                     <span class="settings-nav-icon">{{template "icon-credit-card" .}}</span>
                     <span class="settings-nav-text">{{.CommonLabels.Settings.Billing.Billing}}</span>
                 </button>

@@ -101,6 +101,7 @@ type BottomNavTab struct {
 // AppGridItem represents a single app in the mobile app grid overlay.
 // Used by the "mobile-app-grid" template component.
 type AppGridItem struct {
+	Key        string // canonical app key (e.g., "clients") — used for data-testid
 	Label      string // display text
 	Icon       string // icon template name (e.g., "icon-users")
 	Href       string // link URL

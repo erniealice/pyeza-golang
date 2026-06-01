@@ -28,6 +28,7 @@ USAGE:
     "Pattern" ""            // Optional: validation pattern
     "Autocomplete" ""       // Optional: autocomplete attribute
     "Class" ""              // Optional: additional CSS classes
+    "TestId" ""             // Optional: data-testid on the .form-group wrapper
 )}}
 
 SELECT OPTIONS FORMAT:
@@ -48,16 +49,16 @@ Wrap form-groups in div.form-row for multi-column layouts:
 */}}
 
 {{define "form-group"}}
-<div class="form-group{{if .Error}} has-error{{end}}{{if .Class}} {{.Class}}{{end}}">
+<div class="form-group{{if .Error}} has-error{{end}}{{if .Class}} {{.Class}}{{end}}"{{if .TestId}} data-testid="{{.TestId}}"{{end}}>
     {{if .Label}}
     <label class="form-label" {{if or .ID .Name}}for="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}"{{end}}>
         {{.Label}}{{if .Required}} <span class="form-required" aria-hidden="true">*</span>{{end}}
         {{if .Info}}
         <span class="form-label-info" data-popover data-popover-trigger="hover click" data-popover-position="top">
-            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" tabindex="0">
+            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" aria-describedby="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-info" tabindex="0">
                 {{template "icon-info"}}
             </button>
-            <div class="popover-panel form-label-info-panel" role="tooltip">
+            <div class="popover-panel form-label-info-panel" id="{{if .ID}}{{.ID}}{{else}}{{.Name}}{{end}}-info" role="tooltip">
                 <div class="popover-arrow"></div>
                 {{.Info}}
             </div>

@@ -85,10 +85,13 @@ window.lf.ui.AutoComplete = (function () {
                 : '<span class="auto-complete-placeholder">' + escapeHTML(placeholder) + '</span>';
             clearBtn.style.display = value ? '' : 'none';
 
-            // Update selected class on options (for filter mode, keeps visual state consistent)
+            // Update selected class + aria-selected on options (for filter
+            // mode, keeps visual + ARIA state consistent)
             if (!isActionMode) {
                 allOptions.forEach(function(opt) {
-                    opt.classList.toggle('selected', opt.dataset.value === value);
+                    var on = opt.dataset.value === value;
+                    opt.classList.toggle('selected', on);
+                    opt.setAttribute('aria-selected', on ? 'true' : 'false');
                 });
             }
 
@@ -135,6 +138,7 @@ window.lf.ui.AutoComplete = (function () {
             trigger.setAttribute('aria-expanded', 'true');
             searchInput.value = '';
             focusedIndex = -1;
+            setActiveDescendant('');
             emptyState.classList.remove('visible');
             loadingState.classList.remove('visible');
 
@@ -167,6 +171,7 @@ window.lf.ui.AutoComplete = (function () {
             container.classList.remove('open');
             trigger.setAttribute('aria-expanded', 'false');
             focusedIndex = -1;
+            setActiveDescendant('');
         }
 
         // --- Action mode: server-side search ---
@@ -196,6 +201,7 @@ window.lf.ui.AutoComplete = (function () {
                 .then(function(data) {
                     loadingState.classList.remove('visible');
                     focusedIndex = -1;
+                    setActiveDescendant('');
 
                     if (!data || data.length === 0) {
                         emptyState.classList.add('visible');
@@ -216,12 +222,15 @@ window.lf.ui.AutoComplete = (function () {
                             var opts = grp.options || [];
                             for (var j = 0; j < opts.length; j++) {
                                 var opt = opts[j];
-                                var selG = opt.value === hiddenInput.value ? ' selected' : '';
+                                var isSelG = opt.value === hiddenInput.value;
+                                var selG = isSelG ? ' selected' : '';
                                 html += '<div class="auto-complete-option' + selG + '" '
+                                    + 'id="' + container.id + '-option-' + g + '-' + j + '" '
                                     + 'data-value="' + escapeHTML(opt.value) + '" '
                                     + 'data-label="' + escapeHTML(opt.label) + '" '
                                     + 'data-group="' + escapeHTML(groupLabel) + '" '
-                                    + 'role="option">'
+                                    + 'role="option" '
+                                    + 'aria-selected="' + (isSelG ? 'true' : 'false') + '">'
                                     + escapeHTML(opt.label)
                                     + '</div>';
                             }
@@ -230,11 +239,14 @@ window.lf.ui.AutoComplete = (function () {
                     } else {
                         for (var i = 0; i < data.length; i++) {
                             var item = data[i];
-                            var sel = item.value === hiddenInput.value ? ' selected' : '';
+                            var isSel = item.value === hiddenInput.value;
+                            var sel = isSel ? ' selected' : '';
                             html += '<div class="auto-complete-option' + sel + '" '
+                                + 'id="' + container.id + '-option-' + i + '" '
                                 + 'data-value="' + escapeHTML(item.value) + '" '
                                 + 'data-label="' + escapeHTML(item.label) + '" '
-                                + 'role="option">'
+                                + 'role="option" '
+                                + 'aria-selected="' + (isSel ? 'true' : 'false') + '">'
                                 + escapeHTML(item.label)
                                 + '</div>';
                         }
@@ -273,6 +285,7 @@ window.lf.ui.AutoComplete = (function () {
             updateGroupVisibility();
             emptyState.classList.toggle('visible', visibleCount === 0);
             focusedIndex = -1;
+            setActiveDescendant('');
         }
 
         // --- Shared: search input handler ---
@@ -326,11 +339,40 @@ window.lf.ui.AutoComplete = (function () {
             }
         });
 
+        function ensureOptionId(opt, i) {
+            // Dynamically-rendered options always get an id from doSearch, and
+            // server-rendered ones from the template; this is a belt-and-braces
+            // fallback so aria-activedescendant can always point somewhere real.
+            if (!opt.id) opt.id = container.id + '-option-nav-' + i;
+            return opt.id;
+        }
+
+        // aria-activedescendant lives on the element that owns keyboard focus
+        // while the listbox is open. Focus moves into .auto-complete-search on
+        // open, so the search input is the active-descendant container; the
+        // trigger (role="combobox") mirrors it so AT that tracks the combobox
+        // still gets the active option.
+        function setActiveDescendant(id) {
+            if (id) {
+                searchInput.setAttribute('aria-activedescendant', id);
+                trigger.setAttribute('aria-activedescendant', id);
+            } else {
+                searchInput.removeAttribute('aria-activedescendant');
+                trigger.removeAttribute('aria-activedescendant');
+            }
+        }
+
         function updateFocus(options) {
+            var activeId = '';
             options.forEach(function(o, i) {
-                o.classList.toggle('focused', i === focusedIndex);
-                if (i === focusedIndex) o.scrollIntoView({ block: 'nearest' });
+                var on = i === focusedIndex;
+                o.classList.toggle('focused', on);
+                if (on) {
+                    activeId = ensureOptionId(o, i);
+                    o.scrollIntoView({ block: 'nearest' });
+                }
             });
+            setActiveDescendant(activeId);
         }
 
         // --- Shared: trigger interactions ---

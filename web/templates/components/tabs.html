@@ -55,6 +55,7 @@ ACCESSIBILITY:
             class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
             id="tab-{{.Key}}"
+            data-testid="tab-{{.Key}}"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             aria-controls="tabContent"
             tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
@@ -74,6 +75,7 @@ ACCESSIBILITY:
        class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"
        id="tab-{{.Key}}"
+       data-testid="tab-{{.Key}}"
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
        aria-controls="tabContent"
        tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
@@ -88,6 +90,7 @@ ACCESSIBILITY:
             class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
             id="tab-{{.Key}}"
+            data-testid="tab-{{.Key}}"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             aria-controls="tabContent"
             tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
@@ -110,6 +113,8 @@ ACCESSIBILITY:
     <a href="{{.Href}}"
        class="main-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"
+       id="tab-{{.Key}}"
+       data-testid="tab-{{.Key}}"
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
@@ -121,6 +126,8 @@ ACCESSIBILITY:
     <button type="button"
             class="main-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
+            id="tab-{{.Key}}"
+            data-testid="tab-{{.Key}}"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
@@ -141,6 +148,8 @@ ACCESSIBILITY:
     <a href="{{.Href}}"
        class="sub-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"
+       id="tab-{{.Key}}"
+       data-testid="tab-{{.Key}}"
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
@@ -152,6 +161,8 @@ ACCESSIBILITY:
     <button type="button"
             class="sub-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
+            id="tab-{{.Key}}"
+            data-testid="tab-{{.Key}}"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
@@ -171,6 +182,8 @@ ACCESSIBILITY:
     <button type="button"
             class="client-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
+            id="tab-{{.Key}}"
+            data-testid="tab-{{.Key}}"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
@@ -190,6 +203,8 @@ ACCESSIBILITY:
     <a href="{{.Href}}"
        class="help-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
        role="tab"
+       id="tab-{{.Key}}"
+       data-testid="tab-{{.Key}}"
        aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
@@ -201,6 +216,8 @@ ACCESSIBILITY:
     <button type="button"
             class="help-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
             role="tab"
+            id="tab-{{.Key}}"
+            data-testid="tab-{{.Key}}"
             aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
             data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
@@ -220,6 +237,8 @@ ACCESSIBILITY:
     {{if .Href}}
     <a href="{{.Href}}"
        class="category-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+       id="tab-{{.Key}}"
+       data-testid="tab-{{.Key}}"
        {{if eq .Key $activeTab}}aria-current="page"{{end}}
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
@@ -230,6 +249,8 @@ ACCESSIBILITY:
     {{else}}
     <button type="button"
             class="category-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
+            id="tab-{{.Key}}"
+            data-testid="tab-{{.Key}}"
             data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
             {{if eq .Key $activeTab}}aria-pressed="true"{{end}}
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>

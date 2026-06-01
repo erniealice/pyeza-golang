@@ -35,7 +35,7 @@ JavaScript:
         <div class="mobile-app-sheet-group-title">{{.Title}}</div>
         <div class="mobile-app-sheet-items">
             {{range .Items}}
-            <a href="{{.Href}}" class="mobile-app-sheet-item">
+            <a href="{{.Href}}" class="mobile-app-sheet-item"{{if .Key}} data-testid="app-switch-{{.Key}}" data-variant="mobile"{{end}}>
                 <span class="mobile-app-sheet-item-icon">{{renderContent .Icon $}}</span>
                 <span class="mobile-app-sheet-item-label">{{.Label}}</span>
             </a>
@@ -49,7 +49,7 @@ JavaScript:
         <div class="mobile-app-sheet-group-title">All Apps</div>
         <div class="mobile-app-sheet-items">
             {{range .AllApps}}
-            <a href="{{.Href}}" class="mobile-app-sheet-item">
+            <a href="{{.Href}}" class="mobile-app-sheet-item"{{if .Key}} data-testid="app-switch-{{.Key}}" data-variant="mobile"{{end}}>
                 <span class="mobile-app-sheet-item-icon">{{renderContent .Icon $}}</span>
                 <span class="mobile-app-sheet-item-label">{{.Label}}</span>
             </a>

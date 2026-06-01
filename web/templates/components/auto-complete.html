@@ -61,10 +61,10 @@
         {{.Label}}{{if .Required}} <span class="form-required" aria-hidden="true">*</span>{{end}}
         {{if .Info}}
         <span class="form-label-info" data-popover data-popover-trigger="hover click" data-popover-position="top">
-            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" tabindex="0">
+            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" aria-describedby="{{.ID}}-info" tabindex="0">
                 {{template "icon-info"}}
             </button>
-            <div class="popover-panel form-label-info-panel" role="tooltip">
+            <div class="popover-panel form-label-info-panel" id="{{.ID}}-info" role="tooltip">
                 <div class="popover-arrow"></div>
                 {{.Info}}
             </div>
@@ -105,23 +105,25 @@
             </div>
             <div class="auto-complete-results">
                 {{if .OptionGroups}}
-                {{range .OptionGroups}}
-                {{$groupLabel := .GroupLabel}}
+                {{range $gi, $group := .OptionGroups}}
+                {{$groupLabel := $group.GroupLabel}}
                 <div class="auto-complete-group" data-group-label="{{$groupLabel}}">
                     <div class="auto-complete-group-header" role="presentation">{{$groupLabel}}</div>
-                    {{range .Options}}
-                    <div class="auto-complete-option{{if .Selected}} selected{{end}}{{if .Disabled}} disabled{{end}}"
-                         data-value="{{.Value}}" data-label="{{.Label}}" data-description="{{.Description}}" data-group="{{$groupLabel}}" role="option"{{if .Disabled}} aria-disabled="true"{{end}}>
-                        {{.Label}}
+                    {{range $oi, $opt := $group.Options}}
+                    <div class="auto-complete-option{{if $opt.Selected}} selected{{end}}{{if $opt.Disabled}} disabled{{end}}"
+                         id="{{$.ID}}-option-{{$gi}}-{{$oi}}"
+                         data-value="{{$opt.Value}}" data-label="{{$opt.Label}}" data-description="{{$opt.Description}}" data-group="{{$groupLabel}}" role="option" aria-selected="{{if $opt.Selected}}true{{else}}false{{end}}"{{if $opt.Disabled}} aria-disabled="true"{{end}}>
+                        {{$opt.Label}}
                     </div>
                     {{end}}
                 </div>
                 {{end}}
                 {{else if .Options}}
-                {{range .Options}}
-                <div class="auto-complete-option{{if .Selected}} selected{{end}}{{if .Disabled}} disabled{{end}}"
-                     data-value="{{.Value}}" data-label="{{.Label}}" data-description="{{.Description}}" role="option"{{if .Disabled}} aria-disabled="true"{{end}}>
-                    {{.Label}}
+                {{range $oi, $opt := .Options}}
+                <div class="auto-complete-option{{if $opt.Selected}} selected{{end}}{{if $opt.Disabled}} disabled{{end}}"
+                     id="{{$.ID}}-option-{{$oi}}"
+                     data-value="{{$opt.Value}}" data-label="{{$opt.Label}}" data-description="{{$opt.Description}}" role="option" aria-selected="{{if $opt.Selected}}true{{else}}false{{end}}"{{if $opt.Disabled}} aria-disabled="true"{{end}}>
+                    {{$opt.Label}}
                 </div>
                 {{end}}
                 {{end}}

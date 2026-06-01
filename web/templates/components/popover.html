@@ -87,6 +87,24 @@ JS API:
                 e.stopPropagation();
                 self.toggle();
             });
+
+            // Keyboard activation for non-native-button triggers. A real
+            // <button> already synthesises a click on Enter/Space, so binding
+            // keydown there would double-toggle. But role="button" <div>s (the
+            // form-label info button is a <button>, while calendar cells use a
+            // tabindex="0" / role="button" <div>) get no synthetic click — so
+            // Enter/Space would never open the panel without this. Mirrors the
+            // keyboard semantics auto-complete/multi-select use for their
+            // role="combobox" triggers.
+            if (this.trigger.tagName !== 'BUTTON') {
+                this.trigger.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.toggle();
+                    }
+                });
+            }
         }
 
         if (this.triggerModes.indexOf('hover') !== -1) {

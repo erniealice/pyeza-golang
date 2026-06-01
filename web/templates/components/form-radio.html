@@ -82,10 +82,10 @@ ACCESSIBILITY:
         {{.Label}}
         {{if .Info}}
         <span class="form-label-info" data-popover data-popover-trigger="hover click" data-popover-position="top">
-            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" tabindex="0">
+            <button type="button" class="popover-trigger form-label-info-btn" aria-label="More info" aria-describedby="{{.Name}}-info" tabindex="0">
                 {{template "icon-info"}}
             </button>
-            <div class="popover-panel form-label-info-panel" role="tooltip">
+            <div class="popover-panel form-label-info-panel" id="{{.Name}}-info" role="tooltip">
                 <div class="popover-arrow"></div>
                 {{.Info}}
             </div>

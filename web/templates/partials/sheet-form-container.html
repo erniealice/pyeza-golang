@@ -33,7 +33,7 @@ Usage:
 {{define "sheet-form-container"}}
 <div id="sheet" class="sheet sheet-form">
     <div id="sheetOverlay" class="sheet-overlay"></div>
-    <div class="sheet-panel sheet-panel-md" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-panel sheet-panel-md" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-label="Dialog">
         <div class="sheet-header">
             <h2 id="sheetTitle" class="sheet-title"></h2>
             <div class="sheet-header-actions">
@@ -43,7 +43,7 @@ Usage:
             </div>
         </div>
 
-        <div id="sheetContent" class="sheet-content">
+        <div id="sheetContent" class="sheet-content" aria-busy="false">
             <!-- Form content will be loaded here by HTMX -->
         </div>
     </div>

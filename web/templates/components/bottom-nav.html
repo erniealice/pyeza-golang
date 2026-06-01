@@ -29,16 +29,16 @@ ACCESSIBILITY:
     {{range .BottomNavTabs}}
     {{if .IsFAB}}
     {{if .Href}}
-    <a href="{{.Href}}" class="bottom-nav-fab" aria-label="{{.Label}}">
+    <a href="{{.Href}}" class="bottom-nav-fab" aria-label="{{.Label}}"{{if .Key}} data-testid="nav-{{.Key}}" data-variant="mobile"{{end}}>
         <span class="bottom-nav-tab-icon">{{if .FABIcon}}{{renderContent .FABIcon $}}{{else}}{{renderContent .Icon $}}{{end}}</span>
     </a>
     {{else}}
-    <button type="button" class="bottom-nav-fab" data-action-url="{{.DataURL}}" aria-label="{{.Label}}">
+    <button type="button" class="bottom-nav-fab" data-action-url="{{.DataURL}}" aria-label="{{.Label}}"{{if .Key}} data-testid="nav-{{.Key}}" data-variant="mobile"{{end}}>
         <span class="bottom-nav-tab-icon">{{if .FABIcon}}{{renderContent .FABIcon $}}{{else}}{{renderContent .Icon $}}{{end}}</span>
     </button>
     {{end}}
     {{else}}
-    <a href="{{.Href}}" class="bottom-nav-tab{{if .Active}} active{{end}}" aria-label="{{.Label}}">
+    <a href="{{.Href}}" class="bottom-nav-tab{{if .Active}} active{{end}}" aria-label="{{.Label}}"{{if .Key}} data-testid="nav-{{.Key}}" data-variant="mobile"{{end}}>
         <span class="bottom-nav-tab-icon">{{renderContent .Icon $}}</span>
         <span class="bottom-nav-tab-label">{{.Label}}</span>
         {{if .Badge}}<span class="bottom-nav-badge">{{.Badge}}</span>{{end}}
