@@ -131,6 +131,79 @@ func generateMainCSS(webStylesDir, appCssDir, theme, font string) error {
 	return nil
 }
 
+// CopyFonts copies the self-hosted web fonts to the target directory.
+// It auto-discovers the pyeza package location using runtime.Caller, mirroring
+// CopyStaticAssets / CopyStylesWithTheme. Works both in monorepo and as external package.
+//
+// The targetDir should be the app's top-level assets directory (e.g. "assets").
+//   - woff2 binaries (web/assets/fonts/*.woff2) are copied to assets/fonts/
+//   - the @font-face stylesheet (web/assets/css/fonts.css) is copied to assets/css/fonts.css
+//
+// This pairs with web/templates/partials/fonts.html, which loads /assets/css/fonts.css,
+// whose @font-face rules reference /assets/fonts/<f>.woff2 — both served by the static
+// file handler. Fonts are self-hosted (Plan-8 W4 / Q-CSP-1): no Google CDN is contacted.
+func CopyFonts(targetDir string) error {
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		return fmt.Errorf("could not determine source file location")
+	}
+
+	webAssetsDir := filepath.Join(filepath.Dir(filename), "web", "assets")
+
+	// woff2 binaries -> assets/fonts/
+	fontsTargetDir := filepath.Join(targetDir, "fonts")
+	copied, err := copyDirFonts(filepath.Join(webAssetsDir, "fonts"), fontsTargetDir)
+	if err != nil {
+		return fmt.Errorf("failed to copy fonts: %w", err)
+	}
+	if copied == 0 {
+		return fmt.Errorf("no fonts were copied")
+	}
+
+	// fonts.css -> assets/css/fonts.css (served at /assets/css/fonts.css)
+	cssTargetDir := filepath.Join(targetDir, "css")
+	if err := os.MkdirAll(cssTargetDir, 0755); err != nil {
+		return fmt.Errorf("failed to create css target directory: %w", err)
+	}
+	if err := copyFileAsset(
+		filepath.Join(webAssetsDir, "css", "fonts.css"),
+		filepath.Join(cssTargetDir, "fonts.css"),
+	); err != nil {
+		return fmt.Errorf("failed to copy fonts.css: %w", err)
+	}
+
+	log.Printf("Copied %d fonts to: %s (+ fonts.css to %s)", copied, fontsTargetDir, cssTargetDir)
+	return nil
+}
+
+// copyDirFonts copies all .woff2 files from source directory to destination directory.
+func copyDirFonts(srcDir, dstDir string) (int, error) {
+	if err := os.MkdirAll(dstDir, 0755); err != nil {
+		return 0, fmt.Errorf("failed to create target directory: %w", err)
+	}
+
+	files, err := filepath.Glob(filepath.Join(srcDir, "*.woff2"))
+	if err != nil {
+		return 0, fmt.Errorf("failed to list source files: %w", err)
+	}
+
+	if len(files) == 0 {
+		return 0, nil
+	}
+
+	var copied int
+	for _, srcFile := range files {
+		baseName := filepath.Base(srcFile)
+		dstFile := filepath.Join(dstDir, baseName)
+		if err := copyFileAsset(srcFile, dstFile); err != nil {
+			return copied, err
+		}
+		copied++
+	}
+
+	return copied, nil
+}
+
 // copyDirStyles copies all .css files from source directory to destination directory.
 // Infrastructure files (_variables.css, index.css) are excluded as build-time imports only.
 func copyDirStyles(srcDir, dstDir string) (int, error) {
