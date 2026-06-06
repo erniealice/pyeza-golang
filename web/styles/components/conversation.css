@@ -1,0 +1,226 @@
+/*
+ * ==========================================================================
+ * CONVERSATION (secure messaging) COMPONENT STYLES
+ * ==========================================================================
+ * Individual-component VISUALS for the messaging surface (.msg-* classes):
+ * thread rows, message bubbles, composer, unread dot, empty state.
+ *
+ * CSS-provenance split (OWNER DIRECTIVE #4): structural LAYOUT (grid, scroll
+ * regions, panel sizing) lives in the entydad package
+ * (entydad-conversation-list.css / entydad-conversation-thread.css). This file
+ * owns colors, borders, radii, typography — all via var(--token), no literals.
+ * Reuses the existing pyeza token catalog; the only new token is the
+ * layout-structural --msg-list-width (defined here so the layout adapts to the
+ * component's default).
+ * ==========================================================================
+ */
+
+:root {
+    /* Layout-structural token (the single new token; no color values added). */
+    --msg-list-width: 20rem; /* left panel width */
+}
+
+/* ========================================
+   THREAD ROW (left panel list item)
+   ======================================== */
+.msg-thread {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--spacing-2xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    border-bottom: var(--border-width) solid var(--border-subtle);
+    transition: background var(--transition-fast);
+}
+
+.msg-thread:hover {
+    background: var(--bg-hover);
+}
+
+.msg-thread--active {
+    background: var(--bg-subtle);
+    border-left: 3px solid var(--accent-primary);
+}
+
+.msg-thread-title {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.msg-thread-preview {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.msg-thread-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-2xs);
+}
+
+.msg-thread-time {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+}
+
+/* Unread indicator dot. */
+.msg-unread {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-full);
+    background: var(--accent-primary);
+    flex-shrink: 0;
+}
+
+.msg-thread:not(.msg-thread--unread) .msg-unread {
+    visibility: hidden; /* reserve space; hide when read */
+}
+
+/* ========================================
+   THREAD HEADER (right panel)
+   ======================================== */
+.msg-thread-subject {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.msg-thread-back {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.msg-thread-back:hover {
+    color: var(--accent-primary);
+}
+
+/* ========================================
+   MESSAGE BUBBLE (base + direction variants)
+   ======================================== */
+.msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 72%;
+    gap: var(--spacing-2xs);
+}
+
+/* Other party's post: left-aligned, neutral bubble. */
+.msg.them {
+    align-self: flex-start;
+}
+
+.msg.them .msg-body {
+    background: var(--bg-subtle);
+    border: var(--border-width) solid var(--border-light);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+    color: var(--text-primary);
+}
+
+/* Viewer's own post: right-aligned, accent bubble. */
+.msg.us {
+    align-self: flex-end;
+}
+
+.msg.us .msg-body {
+    background: var(--accent-primary);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 var(--radius-lg);
+    color: var(--text-inverse);
+}
+
+.msg-body {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.msg-sender {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+}
+
+.msg-timestamp {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+/* ========================================
+   COMPOSER (reply input + send)
+   ======================================== */
+.msg-composer-input {
+    flex: 1;
+    min-height: 2.5rem;
+    max-height: 7.5rem;
+    resize: none;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: var(--border-width) solid var(--border-light);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background: var(--bg-input);
+    font-family: inherit;
+}
+
+.msg-composer-input:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 1px;
+}
+
+.msg-composer-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.msg-composer-send {
+    flex-shrink: 0;
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+.msg-empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-3xl);
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.msg-empty-state-icon {
+    width: 3rem;
+    height: 3rem;
+    color: var(--border-light);
+}
+
+.msg-empty-state-title {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.msg-empty-state-subtitle {
+    font-size: var(--text-xs);
+}
+
+/* ========================================
+   STAFF INBOX FILTER CHIPS (active state)
+   ======================================== */
+.msg-inbox-filter--active {
+    background: var(--accent-primary);
+    color: var(--text-inverse);
+    border-color: var(--accent-primary);
+}

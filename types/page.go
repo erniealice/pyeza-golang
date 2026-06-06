@@ -45,6 +45,14 @@ type PageData struct {
 	HeaderBreadcrumbURL string // optional href; when set, the breadcrumb renders as a link
 	SearchPlaceholder   string
 	HasNotifications    bool
+	// HasMessages gates the "Messages" header button (secure-messaging, Plan-4).
+	// Set true when the session principal has conversation:list permission.
+	HasMessages         bool
+	// MessagesURL is the navigation target for the header Messages button —
+	// the staff inbox for staff principals, the portal for client principals.
+	MessagesURL         string
+	// MessagesUnreadCount drives the optional unread indicator on the button.
+	MessagesUnreadCount int
 	HelpContent         template.HTML     // Server-rendered markdown content for help pane
 	HasHelp             bool              // Whether this page has help content
 	HeaderIconHTML      template.HTML     // Pre-rendered icon HTML for header

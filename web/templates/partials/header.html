@@ -33,6 +33,14 @@
             <input type="text" id="header-search" aria-label="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}" placeholder="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}">
             <span class="search-shortcut">{{.CommonLabels.Header.SearchShortcut}}</span>
         </div>
+        {{if .HasMessages}}
+        <a href="{{.MessagesURL}}" class="header-btn" id="messagesBtn"
+           aria-label="Messages" title="Messages"
+           data-testid="header-messages-btn">
+            {{template "icon-message-square" .}}
+            {{if gt .MessagesUnreadCount 0}}<span class="notification-indicator" aria-hidden="true"></span>{{end}}
+        </a>
+        {{end}}
         <button class="header-btn" id="notificationBtn" aria-label="{{.CommonLabels.Header.Notifications}}">
             {{template "icon-bell" .}}
             {{if .HasNotifications}}<span class="notification-indicator"></span>{{end}}
