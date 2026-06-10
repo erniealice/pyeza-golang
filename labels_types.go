@@ -560,7 +560,7 @@ type DurationUnitLabels struct {
 // (same role it plays for every other common-block label type) so any
 // consumer view can declare a field of this type and have lyngua's loader
 // populate it from a JSON bundle. Pyeza never owns the curated list — that
-// lives in the consuming domain (e.g. centymo.DefaultCurrencyOptions).
+// lives here in pyeza (DefaultCurrencyOptions, BuildCurrencyOptions).
 //
 // Conventionally loaded from translations/en/common/currency.json by each
 // view that renders a currency picker, mirroring how DurationUnitLabels is
