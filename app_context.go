@@ -162,4 +162,14 @@ type AppContext struct {
 	// session cookie. Required when SecureWorkspaceSwitch is set.
 	// Type-assert to func(w http.ResponseWriter, token string).
 	SecureWorkspaceSwitchSetSessionCookie any
+
+	// ComposeResult accumulates Nav contributions and RouteMap entries from
+	// each per-package Engine.Assemble call. After all domain blocks have run,
+	// the host reads this merged Result to build a NavResolver that can resolve
+	// sidebar hrefs across all packages. Initialized by the host before blocks
+	// run; each block type-asserts to *compose.Result and calls
+	// ComposeResult.MergeFrom(blockResult) after its own eng.Assemble
+	// returns successfully. Typed as `any` to avoid an import cycle
+	// (compose imports pyeza; pyeza cannot import compose).
+	ComposeResult any
 }

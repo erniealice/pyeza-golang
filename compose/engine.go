@@ -81,6 +81,11 @@ type Result struct {
 	// (phase-3 fail-closed check), so a sidebar href can never dangle.
 	Nav map[string]NavContrib
 
+	// navPrefixes maps mount key -> RouteKeyPrefix, stored during Assemble
+	// so ResolveNavItemHref can resolve nav routes without the caller
+	// knowing the prefix.
+	navPrefixes map[string]string
+
 	// Templates collects every mounted unit's TemplatesFS (nil entries
 	// dropped) for pyeza.NewHTMLRendererFromFS.
 	Templates []fs.FS
@@ -145,6 +150,80 @@ func (res *Result) PickNav(unitKey string, itemKeys ...string) []NavItem {
 	return out
 }
 
+// ResolveNavItemHref resolves a single NavItem (identified by unit key + item
+// key) to its final href URL. It handles RouteKeyPrefix automatically so
+// callers don't need to track prefixes. Returns ("", false) when the unit,
+// item, or route is not found.
+func (res *Result) ResolveNavItemHref(unitKey, itemKey string) (string, bool) {
+	nc, ok := res.Nav[unitKey]
+	if !ok {
+		return "", false
+	}
+	prefix := res.navPrefixes[unitKey]
+	for _, item := range nc.Items {
+		if item.Key == itemKey {
+			return res.ResolveNavHref(prefix, item)
+		}
+	}
+	return "", false
+}
+
+// ResolveAppEntryURL resolves a unit's AppEntry route to a final href URL.
+// Returns ("", false) when the unit has no AppEntry or its route is unresolvable.
+func (res *Result) ResolveAppEntryURL(unitKey string) (string, bool) {
+	nc, ok := res.Nav[unitKey]
+	if !ok || nc.AppEntry == nil {
+		return "", false
+	}
+	entry := nc.AppEntry
+	item := NavItem{
+		Key:    entry.Key,
+		Route:  entry.Route,
+		Params: entry.Params,
+	}
+	prefix := res.navPrefixes[unitKey]
+	return res.ResolveNavHref(prefix, item)
+}
+
+// MergeFrom copies the Nav contributions, navPrefixes, and RouteMap entries
+// from other into res. Used to accumulate results from multiple per-package
+// Engine.Assemble calls into a single Result that the NavResolver can query
+// across all packages. Duplicate keys in Nav/RouteMap are silently
+// overwritten (last writer wins) — callers must ensure mount keys are
+// globally unique across packages.
+func (res *Result) MergeFrom(other *Result) {
+	if other == nil {
+		return
+	}
+	if res.Nav == nil {
+		res.Nav = make(map[string]NavContrib)
+	}
+	if res.navPrefixes == nil {
+		res.navPrefixes = make(map[string]string)
+	}
+	if res.RouteMap == nil {
+		res.RouteMap = make(map[string]string)
+	}
+	for k, v := range other.Nav {
+		res.Nav[k] = v
+	}
+	for k, v := range other.navPrefixes {
+		res.navPrefixes[k] = v
+	}
+	for k, v := range other.RouteMap {
+		res.RouteMap[k] = v
+	}
+}
+
+// NewResult creates an empty Result ready for MergeFrom calls.
+func NewResult() *Result {
+	return &Result{
+		RouteMap:    make(map[string]string),
+		Nav:         make(map[string]NavContrib),
+		navPrefixes: make(map[string]string),
+	}
+}
+
 // Assemble runs the three-phase assembly. It is fail-closed: any duplicate
 // mount key, route-key collision, overlay parse error, or dangling nav
 // reference is returned as an error and NO partial Result escapes — the app
@@ -161,8 +240,9 @@ func (res *Result) PickNav(unitKey string, itemKeys ...string) []NavItem {
 //	          final RouteMap (duplicate keys already caught in phase 1).
 func (e *Engine) Assemble(units []Unit, registrar view.RouteRegistrar) (*Result, error) {
 	res := &Result{
-		RouteMap: make(map[string]string),
-		Nav:      make(map[string]NavContrib),
+		RouteMap:    make(map[string]string),
+		Nav:         make(map[string]NavContrib),
+		navPrefixes: make(map[string]string),
 	}
 
 	// Stable working copies so we can take stable pointers for the cross-unit
@@ -222,6 +302,7 @@ func (e *Engine) Assemble(units []Unit, registrar view.RouteRegistrar) (*Result,
 
 		// Nav contribution (resolved hrefs validated in phase 3).
 		res.Nav[u.Key] = u.Nav
+		res.navPrefixes[u.Key] = u.RouteKeyPrefix
 
 		// Template FS collection.
 		if u.Templates != nil {
