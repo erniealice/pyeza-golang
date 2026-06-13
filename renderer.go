@@ -2,6 +2,7 @@ package pyeza
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"html/template"
 	"io/fs"
@@ -12,6 +13,9 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+
+	"github.com/erniealice/pyeza-golang/render"
+	"github.com/erniealice/pyeza-golang/route"
 )
 
 // WorkspaceFormSigner is the minimal contract pyeza needs in order to render
@@ -40,6 +44,13 @@ type HTMLRenderer struct {
 	parseErr         error
 	routeMap         map[string]string   // route key → URL pattern (populated before first render)
 	wsFormSigner     WorkspaceFormSigner // signs (_workspace_id, _workspace_id_sig) for action forms
+
+	// virginTemplates is a clone of templates taken immediately after parsing,
+	// before any Execute() call. html/template.Clone() fails after Execute()
+	// (escape analysis state is modified during execution and cannot be cloned),
+	// so workspace-prefixed renders that need per-request FuncMap overrides
+	// clone from this never-executed copy instead.
+	virginTemplates *template.Template
 }
 
 // NewHTMLRenderer creates a new HTMLRenderer.
@@ -144,6 +155,9 @@ func (r *HTMLRenderer) Init() error {
 	r.parseOnce.Do(func() {
 		if len(r.templateFS) > 0 {
 			r.parseErr = r.initFromFS()
+			if r.parseErr == nil {
+				r.initVirginClone()
+			}
 			return
 		}
 
@@ -186,8 +200,29 @@ func (r *HTMLRenderer) Init() error {
 
 			log.Printf("Parsed %d templates from: %s", len(matches), pattern)
 		}
+
+		r.initVirginClone()
 	})
 	return r.parseErr
+}
+
+// initVirginClone creates a never-executed clone of the parsed templates.
+// This must be called immediately after parsing and before any Execute() call.
+// html/template.Clone() fails after Execute() due to escape analysis state
+// mutations, so this "virgin" copy serves as the source for per-request
+// clones needed by workspace-prefixed rendering.
+func (r *HTMLRenderer) initVirginClone() {
+	if r.templates == nil {
+		return
+	}
+	var err error
+	r.virginTemplates, err = r.templates.Clone()
+	if err != nil {
+		// Non-fatal: workspace route map overrides will fall back to boot-time
+		// routes (the sidebar will still carry workspace-prefixed URLs, but
+		// {{route}} / {{routeWith}} links in template bodies won't).
+		log.Printf("Warning: failed to create virgin template clone for workspace rendering: %v", err)
+	}
 }
 
 // Render renders a template with the given data and writes it to the response writer.
@@ -271,4 +306,139 @@ func (r *HTMLRenderer) RenderIcon(iconName string) template.HTML {
 	}
 
 	return template.HTML(buf.String())
+}
+
+// RenderWithContext renders a template with optional per-request route map
+// override. If the request context carries a workspace-prefixed route map
+// (installed by the workspace route rewriter), the template's {{route}} and
+// {{routeWith}} functions resolve against that map instead of the boot-time
+// routeMap. For non-workspace requests (no override in context), this is
+// identical to Render.
+func (r *HTMLRenderer) RenderWithContext(w http.ResponseWriter, ctx context.Context, templateName string, data interface{}) error {
+	if r.templates == nil {
+		if err := r.Init(); err != nil {
+			return err
+		}
+	}
+
+	reqRouteMap := render.RouteMapFromContext(ctx)
+	if reqRouteMap == nil || r.virginTemplates == nil {
+		// No per-request override or no virgin clone available — fast path.
+		return r.Render(w, templateName, data)
+	}
+
+	// Clone from the never-executed virgin template set and override
+	// route/routeWith with closures that read from the per-request
+	// workspace-prefixed route map. The virgin clone is safe to clone
+	// concurrently because it has never been executed (html/template
+	// prohibits Clone after Execute due to escape analysis state).
+	cloned, err := r.virginTemplates.Clone()
+	if err != nil {
+		// Fall back to boot-time routes rather than failing the request.
+		log.Printf("RenderWithContext: clone failed, falling back to boot-time routes: %v", err)
+		return r.Render(w, templateName, data)
+	}
+	cloned.Funcs(r.workspaceFuncsFor(reqRouteMap, cloned))
+
+	tmpl := cloned.Lookup(templateName)
+	if tmpl == nil {
+		return fmt.Errorf("template not found: %s", templateName)
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	return tmpl.Execute(w, data)
+}
+
+// RenderBufferedWithContext is the buffered variant of RenderWithContext. It
+// renders into an internal buffer first — nothing is written to w on error.
+func (r *HTMLRenderer) RenderBufferedWithContext(w http.ResponseWriter, ctx context.Context, templateName string, data interface{}) error {
+	if r.templates == nil {
+		if err := r.Init(); err != nil {
+			return err
+		}
+	}
+
+	reqRouteMap := render.RouteMapFromContext(ctx)
+	if reqRouteMap == nil || r.virginTemplates == nil {
+		return r.RenderBuffered(w, templateName, data)
+	}
+
+	cloned, err := r.virginTemplates.Clone()
+	if err != nil {
+		log.Printf("RenderBufferedWithContext: clone failed, falling back to boot-time routes: %v", err)
+		return r.RenderBuffered(w, templateName, data)
+	}
+	cloned.Funcs(r.workspaceFuncsFor(reqRouteMap, cloned))
+
+	tmpl := cloned.Lookup(templateName)
+	if tmpl == nil {
+		return fmt.Errorf("template not found: %s", templateName)
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, writeErr := buf.WriteTo(w)
+	return writeErr
+}
+
+// workspaceFuncsFor builds a template.FuncMap that overrides route, routeWith,
+// and renderContent for workspace-prefixed rendering. The route/routeWith
+// closures read from the supplied per-request map (falling back to the
+// boot-time routeMap for keys not present). The renderContent closure looks
+// up sub-templates in the cloned template set so that sub-templates rendered
+// via {{renderContent .ContentTemplate .}} also use the workspace-prefixed
+// route functions.
+func (r *HTMLRenderer) workspaceFuncsFor(m map[string]string, cloned *template.Template) template.FuncMap {
+	return template.FuncMap{
+		"route": func(key string) string {
+			if url, ok := m[key]; ok {
+				return url
+			}
+			// Fall back to boot-time map for keys not in the override
+			// (e.g., auth routes that are workspace-independent).
+			if r.routeMap != nil {
+				if url, ok := r.routeMap[key]; ok {
+					return url
+				}
+			}
+			return key
+		},
+		"routeWith": func(key string, pairs ...any) string {
+			pattern := key
+			if url, ok := m[key]; ok {
+				pattern = url
+			} else if r.routeMap != nil {
+				if url, ok := r.routeMap[key]; ok {
+					pattern = url
+				}
+			}
+			if len(pairs) == 0 || len(pairs)%2 != 0 {
+				return pattern
+			}
+			strPairs := make([]string, len(pairs))
+			for i, p := range pairs {
+				strPairs[i] = fmt.Sprintf("%v", p)
+			}
+			return route.ResolveURL(pattern, strPairs...)
+		},
+		"renderContent": func(name string, data any) template.HTML {
+			if name == "" {
+				log.Printf("renderContent: empty template name; data type=%T", data)
+				return template.HTML("")
+			}
+			t := cloned.Lookup(name)
+			if t == nil {
+				log.Printf("renderContent: template %q NOT REGISTERED (data type=%T)", name, data)
+				return template.HTML(`<div class="page-content"><p>Page content not available</p></div>`)
+			}
+			var buf bytes.Buffer
+			if err := t.Execute(&buf, data); err != nil {
+				log.Printf("renderContent: Execute(%q) FAILED: %v (data type=%T)", name, err, data)
+				return template.HTML(`<div class="page-content"><p>Page content not available</p></div>`)
+			}
+			return template.HTML(buf.String())
+		},
+	}
 }

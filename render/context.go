@@ -70,6 +70,34 @@ func PostRotationBannerFromContext(ctx context.Context) *PostRotationBannerData 
 	return nil
 }
 
+// ── Per-Request Route Map ────────────────────────────────────────────────────
+
+// routeMapCtxKey carries a workspace-prefixed route map for the current request.
+// When present, the renderer's {{route}} and {{routeWith}} template functions
+// prefer this map over the boot-time routeMap so that links rendered inside
+// /w/{slug}/* pages carry the workspace prefix.
+type routeMapCtxKey struct{}
+
+// WithRouteMap stores a per-request route map in ctx. Called by the workspace
+// route rewriter (composition layer) to install a workspace-prefixed copy of
+// the boot-time route map.
+func WithRouteMap(ctx context.Context, m map[string]string) context.Context {
+	if m == nil {
+		return ctx
+	}
+	return context.WithValue(ctx, routeMapCtxKey{}, m)
+}
+
+// RouteMapFromContext returns the per-request route map stored by WithRouteMap,
+// or nil when no override is present (non-workspace requests).
+func RouteMapFromContext(ctx context.Context) map[string]string {
+	if ctx == nil {
+		return nil
+	}
+	m, _ := ctx.Value(routeMapCtxKey{}).(map[string]string)
+	return m
+}
+
 // ── Per-Request Sidebar Builder ───────────────────────────────────────────────
 
 // requestSidebarBuilderCtxKey carries a workspace-rewritten SidebarBuilder
