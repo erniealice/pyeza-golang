@@ -93,6 +93,22 @@ type NavItem struct {
 type NavContrib struct {
 	Permission string    // unit default permission, e.g. "job:list"
 	Items      []NavItem // every item this entity offers
+	AppEntry   *AppEntry // optional top-level app registration for this unit
+}
+
+// AppEntry describes how a unit registers as a top-level app in the sidebar
+// app switcher. Only the "primary" unit for each app carries an AppEntry;
+// supporting units (job_activity, outcome_criteria, etc.) contribute only
+// Items, not an AppEntry.
+type AppEntry struct {
+	Key        string
+	Route      string
+	Params     map[string]string
+	LabelKey   string
+	IconKey    string
+	Label      string
+	Icon       string
+	Permission string
 }
 
 // Unit is ONE mountable entity block — the self-describing "prefab room" the

@@ -123,6 +123,28 @@ func (res *Result) ResolveNavHref(prefix string, item NavItem) (string, bool) {
 	return href, true
 }
 
+// PickNav returns the NavItems for the given unit, filtered to only the
+// specified item keys (in the order given). Items whose key is not found
+// in the unit's Nav are silently skipped. Returns nil if the unit is not
+// in the result.
+func (res *Result) PickNav(unitKey string, itemKeys ...string) []NavItem {
+	nc, ok := res.Nav[unitKey]
+	if !ok {
+		return nil
+	}
+	byKey := make(map[string]NavItem, len(nc.Items))
+	for _, item := range nc.Items {
+		byKey[item.Key] = item
+	}
+	var out []NavItem
+	for _, k := range itemKeys {
+		if item, ok := byKey[k]; ok {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
 // Assemble runs the three-phase assembly. It is fail-closed: any duplicate
 // mount key, route-key collision, overlay parse error, or dangling nav
 // reference is returned as an error and NO partial Result escapes — the app
