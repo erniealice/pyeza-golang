@@ -172,4 +172,13 @@ type AppContext struct {
 	// returns successfully. Typed as `any` to avoid an import cycle
 	// (compose imports pyeza; pyeza cannot import compose).
 	ComposeResult any
+
+	// AuthDeps carries the pre-assembled auth module dependencies (login,
+	// signup, reset-password, change-password, logout, multi-principal
+	// chooser). The host's composition layer builds the full deps struct
+	// including type bridges and passes it here; the entydad engine block
+	// copies it into block.Infra.AuthDeps for the AuthUnit. Typed as `any`
+	// to avoid pulling entydad/service/auth as a pyeza dependency.
+	// Type-assert to *auth.Deps inside the entydad block.
+	AuthDeps any
 }

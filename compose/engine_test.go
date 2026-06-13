@@ -320,3 +320,146 @@ func TestRoutesOf_AbsentUnit(t *testing.T) {
 		t.Error("RoutesOf for absent unit returned ok=true, want false")
 	}
 }
+
+// --- MergeFrom tests (F5) -------------------------------------------------
+
+// TestMergeFrom_BasicMerge: two disjoint Results merge correctly.
+func TestMergeFrom_BasicMerge(t *testing.T) {
+	a := NewResult()
+	a.RouteMap["job.list"] = "/jobs/list"
+	a.RouteMap["job.detail"] = "/jobs/detail/{id}"
+	a.Nav["operation.job"] = NavContrib{Permission: "job:list"}
+
+	b := NewResult()
+	b.RouteMap["event.list"] = "/events/list"
+	b.Nav["schedule.event"] = NavContrib{Permission: "event:list"}
+
+	if err := a.MergeFrom(b); err != nil {
+		t.Fatalf("MergeFrom: unexpected error: %v", err)
+	}
+
+	if len(a.RouteMap) != 3 {
+		t.Errorf("RouteMap size = %d, want 3; contents: %v", len(a.RouteMap), a.RouteMap)
+	}
+	if got := a.RouteMap["event.list"]; got != "/events/list" {
+		t.Errorf("RouteMap[event.list] = %q, want /events/list", got)
+	}
+	if _, ok := a.Nav["schedule.event"]; !ok {
+		t.Error("Nav missing schedule.event after merge")
+	}
+	if _, ok := a.Nav["operation.job"]; !ok {
+		t.Error("Nav missing operation.job after merge (original entry lost)")
+	}
+}
+
+// TestMergeFrom_NilOther: merging nil does not panic and returns no error.
+func TestMergeFrom_NilOther(t *testing.T) {
+	a := NewResult()
+	a.RouteMap["job.list"] = "/jobs/list"
+
+	if err := a.MergeFrom(nil); err != nil {
+		t.Fatalf("MergeFrom(nil): unexpected error: %v", err)
+	}
+	if len(a.RouteMap) != 1 {
+		t.Errorf("RouteMap size = %d after nil merge, want 1", len(a.RouteMap))
+	}
+}
+
+// TestMergeFrom_SameValueIdempotent: merging a key with the same value is
+// accepted (idempotent merge, not an error).
+func TestMergeFrom_SameValueIdempotent(t *testing.T) {
+	a := NewResult()
+	a.RouteMap["job.list"] = "/jobs/list"
+
+	b := NewResult()
+	b.RouteMap["job.list"] = "/jobs/list" // same key, same value
+
+	if err := a.MergeFrom(b); err != nil {
+		t.Fatalf("MergeFrom same-value: unexpected error: %v", err)
+	}
+	if got := a.RouteMap["job.list"]; got != "/jobs/list" {
+		t.Errorf("RouteMap[job.list] = %q, want /jobs/list", got)
+	}
+}
+
+// TestMergeFrom_CollisionFailsClosed: merging a key with a DIFFERENT value
+// is a collision error (fail-closed).
+func TestMergeFrom_CollisionFailsClosed(t *testing.T) {
+	a := NewResult()
+	a.RouteMap["product.list"] = "/products/list"
+
+	b := NewResult()
+	b.RouteMap["product.list"] = "/inventory/list" // same key, different value
+
+	err := a.MergeFrom(b)
+	if err == nil {
+		t.Fatal("MergeFrom collision: expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "collision") {
+		t.Errorf("error = %v, want collision error", err)
+	}
+	if !strings.Contains(err.Error(), "product.list") {
+		t.Errorf("error = %v, want it to name the colliding key", err)
+	}
+}
+
+// TestMergeFrom_EmptyIntoEmpty: merging two empty results is fine.
+func TestMergeFrom_EmptyIntoEmpty(t *testing.T) {
+	a := NewResult()
+	b := NewResult()
+	if err := a.MergeFrom(b); err != nil {
+		t.Fatalf("MergeFrom empty+empty: unexpected error: %v", err)
+	}
+	if len(a.RouteMap) != 0 {
+		t.Errorf("RouteMap should be empty, got %v", a.RouteMap)
+	}
+}
+
+// --- RequireRoute tests (F2) -----------------------------------------------
+
+// TestRequireRoute_Present: key exists with non-empty value.
+func TestRequireRoute_Present(t *testing.T) {
+	r := NewResult()
+	r.RouteMap["job.list"] = "/jobs/list"
+
+	got, err := r.RequireRoute("job.list")
+	if err != nil {
+		t.Fatalf("RequireRoute: unexpected error: %v", err)
+	}
+	if got != "/jobs/list" {
+		t.Errorf("RequireRoute = %q, want /jobs/list", got)
+	}
+}
+
+// TestRequireRoute_Missing: absent key returns error.
+func TestRequireRoute_Missing(t *testing.T) {
+	r := NewResult()
+	_, err := r.RequireRoute("does.not.exist")
+	if err == nil {
+		t.Fatal("RequireRoute for missing key: expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "not found") {
+		t.Errorf("error = %v, want not-found error", err)
+	}
+}
+
+// TestRequireRoute_EmptyValue: key exists but maps to "".
+func TestRequireRoute_EmptyValue(t *testing.T) {
+	r := NewResult()
+	r.RouteMap["broken.key"] = ""
+	_, err := r.RequireRoute("broken.key")
+	if err == nil {
+		t.Fatal("RequireRoute for empty value: expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "empty string") {
+		t.Errorf("error = %v, want empty-string error", err)
+	}
+}
+
+// TestRouteOrEmpty_Absent: absent key returns "".
+func TestRouteOrEmpty_Absent(t *testing.T) {
+	r := NewResult()
+	if got := r.RouteOrEmpty("absent.key"); got != "" {
+		t.Errorf("RouteOrEmpty = %q, want empty string", got)
+	}
+}

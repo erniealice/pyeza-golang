@@ -188,12 +188,19 @@ func (res *Result) ResolveAppEntryURL(unitKey string) (string, bool) {
 // MergeFrom copies the Nav contributions, navPrefixes, and RouteMap entries
 // from other into res. Used to accumulate results from multiple per-package
 // Engine.Assemble calls into a single Result that the NavResolver can query
-// across all packages. Duplicate keys in Nav/RouteMap are silently
-// overwritten (last writer wins) — callers must ensure mount keys are
-// globally unique across packages.
-func (res *Result) MergeFrom(other *Result) {
+// across all packages.
+//
+// Fail-closed: if a RouteMap key in other already exists in res with a
+// different value, MergeFrom returns an error describing the collision.
+// Same-value duplicates are silently accepted (idempotent merges).
+// Nav keys are last-writer-wins because the same unit key never appears
+// in two independent Engine.Assemble results.
+//
+// MergeFrom is safe for sequential use. Concurrent callers must
+// synchronize externally.
+func (res *Result) MergeFrom(other *Result) error {
 	if other == nil {
-		return
+		return nil
 	}
 	if res.Nav == nil {
 		res.Nav = make(map[string]NavContrib)
@@ -211,8 +218,36 @@ func (res *Result) MergeFrom(other *Result) {
 		res.navPrefixes[k] = v
 	}
 	for k, v := range other.RouteMap {
+		if existing, clash := res.RouteMap[k]; clash && existing != v {
+			return fmt.Errorf(
+				"compose: MergeFrom route key collision %q: incoming value %q conflicts with existing %q",
+				k, v, existing)
+		}
 		res.RouteMap[k] = v
 	}
+	return nil
+}
+
+// RequireRoute returns the URL for the given route key, or an error when
+// the key is absent or maps to an empty string. Use this instead of bare
+// map lookups in module initializers to get fail-closed boot behavior.
+func (res *Result) RequireRoute(key string) (string, error) {
+	v, ok := res.RouteMap[key]
+	if !ok {
+		return "", fmt.Errorf("compose: required route key %q not found in RouteMap", key)
+	}
+	if v == "" {
+		return "", fmt.Errorf("compose: required route key %q maps to empty string", key)
+	}
+	return v, nil
+}
+
+// RouteOrEmpty returns the URL for the given route key, or "" when the
+// key is absent. Use this for optional routes (e.g., messages URL when
+// messaging is disabled) where the caller explicitly opts in to empty-
+// string behavior.
+func (res *Result) RouteOrEmpty(key string) string {
+	return res.RouteMap[key]
 }
 
 // NewResult creates an empty Result ready for MergeFrom calls.
