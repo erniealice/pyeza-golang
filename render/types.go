@@ -42,6 +42,41 @@ const (
 	PrincipalTypeSupplierDelegate PrincipalType = 6
 )
 
+// String returns the canonical lowercase token for a principal type. The
+// token is used in route URLs (`/portal/{kind}/`) and in `data-testid`
+// attributes (`select-workspace-role-{kind}`). Keep these stable.
+func (t PrincipalType) String() string {
+	switch t {
+	case PrincipalTypeOperatorOwner:
+		return "operator_owner"
+	case PrincipalTypeOperatorStaff:
+		return "operator_staff"
+	case PrincipalTypeClient:
+		return "client"
+	case PrincipalTypeClientDelegate:
+		return "client_delegate"
+	case PrincipalTypeSupplier:
+		return "supplier"
+	case PrincipalTypeSupplierDelegate:
+		return "supplier_delegate"
+	default:
+		return "unspecified"
+	}
+}
+
+// HomeRoute returns the post-login home route for a given principal type.
+// All principal types land on /me/inbox.
+func (t PrincipalType) HomeRoute() string {
+	switch t {
+	case PrincipalTypeOperatorOwner, PrincipalTypeOperatorStaff,
+		PrincipalTypeClient, PrincipalTypeSupplier,
+		PrincipalTypeClientDelegate, PrincipalTypeSupplierDelegate:
+		return "/me/inbox"
+	default:
+		return "/auth/no-access"
+	}
+}
+
 // PermissionBindingHint is the full binding identification surfaced from
 // the session row for the active request — used by the permission loader
 // to scope RBAC resolution. Mirrors the four session columns
