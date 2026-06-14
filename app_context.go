@@ -181,4 +181,56 @@ type AppContext struct {
 	// to avoid pulling entydad/service/auth as a pyeza dependency.
 	// Type-assert to *auth.Deps inside the entydad block.
 	AuthDeps any
+
+	// === HTTP-adapter finalize slots (Wave B D1) ===
+
+	// UI is the complete app-supplied UI/labels bundle (*AppUIBundle). The
+	// Server stamps it into the AppContext from the WithUI(...) option AFTER
+	// the opt loop is set up; espyna's finalizeHTTPAdapter reads + fail-loud
+	// type-asserts every field, and the entydad block reads the auth half.
+	// Typed as `any` so pyeza takes no espyna/lyngua/template-FS dependency.
+	UI any // *AppUIBundle
+
+	// WorkspaceLoader is the per-request sidebar workspace switcher loader.
+	// The entydad block sets it (the proto-backed impl imports workspacepb,
+	// illegal in espyna); the Server asserts consumerhttp.WorkspaceLoader.
+	WorkspaceLoader any
+
+	// === CSRF injection slots (Wave B D1) ===
+	// Set by the Server BEFORE the opt loop via resolveSecurity() so the
+	// entydad block reads the SAME resolved secret / cookie-secure / issuer
+	// the legacy finalizePreset path uses (single source of truth, one env
+	// read, one boot fatal).
+
+	// CSRFSecret is the resolved HMAC secret. Type-assert to []byte.
+	CSRFSecret any
+	// CookieSecure is the resolved cookie-secure policy. Type-assert to bool.
+	CookieSecure any
+	// CSRFIssuer issues a fresh workspace-claim CSRF cookie. Type-assert to
+	// func(w http.ResponseWriter, secret []byte, sessionToken, workspaceID string) string.
+	CSRFIssuer any
+}
+
+// AppUIBundle is the COMPLETE app-supplied UI/labels contract the espyna
+// consumer/http adapter (and the entydad auth.Deps) need from the host (Wave B
+// D1, codex round-2). The app builds it once from its own renderer / labels /
+// sidebars / translations and passes it via the Server's WithUI(...) option;
+// finalizeHTTPAdapter type-asserts each field to its concrete type and
+// boot-fatals on a missing or wrong-type slot (fail-closed — a non-mock binary
+// must NEVER serve a page with a nil renderer / empty labels / nil translation
+// table). Every field is `any`-typed because pyeza imports no espyna / lyngua /
+// app-template-FS package.
+type AppUIBundle struct {
+	Renderer         any // *pyeza.HTMLRenderer
+	RenderIcon       any // func(string) template.HTML
+	CommonLabels     any // pyeza.CommonLabels  (also mirrored into AppContext.Common)
+	TableLabels      any // types.TableLabels   (also mirrored into AppContext.Table)
+	Messages         any // map[string]string
+	Translations     any // *lynguaV1.TranslationProvider (also mirrored into AppContext.Translations)
+	SidebarBuilder   any // consumerhttp.SidebarBuilder
+	BottomNavBuilder any // consumerhttp.SidebarBuilder
+	PortalSidebars   any // map[consumerhttp.PrincipalType]consumerhttp.SidebarBuilder
+	ExtLabels        any // the app's extended sidebar/label set
+	RouteRewriter    any // func(context.Context) context.Context (calls the app's nav.WithWorkspace)
+	AuthLabels       any // auth.AuthLabels (D2: Login02/Signup02/ResetPassword02/ChangePassword/Common/Messages)
 }
