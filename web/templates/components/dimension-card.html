@@ -1,0 +1,90 @@
+{{/*
+================================================================================
+DIMENSION-CARD — Per-Rubric-Dimension Score Card
+================================================================================
+Displays a single evaluation dimension (one OutcomeCriteria / one
+evaluation_response row) in the Scores tab of an Evaluation detail page.
+Renders the dimension label, weight chip, the typed answer value, and —
+for numeric dimensions — an embedded lf-rating-bar.
+
+Non-numeric dimensions (PASS_FAIL, CATEGORICAL, TEXT, MULTI_CHECK) show the
+answer verbatim with "(not scored)" in place of the bar, matching the spec note
+that non-numeric dims are excluded from overall_score.
+
+BEM class root: lf-dim-card
+
+USAGE:
+    {{template "lf-dimension-card" (dict
+        "CriteriaID"    "crit-abc123"
+        "Label"         "Reliability"
+        "Weight"        20
+        "CriteriaType"  "NUMERIC_SCORE"
+        "NumericValue"  4
+        "MaxScore"      5
+        "TextValue"     ""
+        "NotScored"     false
+        "TestID"        "dim-card-crit-abc123")}}
+
+PARAMETERS:
+    CriteriaID    - Stable ID for the criteria row; used in sub-element IDs/testids.
+    Label         - Dimension display name.
+    Weight        - Integer weight percentage (0–100). 0 → weight chip hidden.
+    CriteriaType  - One of: NUMERIC_SCORE | NUMERIC_RANGE | PASS_FAIL |
+                    CATEGORICAL | TEXT | MULTI_CHECK.
+    NumericValue  - Float score value (for NUMERIC_SCORE / NUMERIC_RANGE).
+    MaxScore      - Maximum score (for NUMERIC_*). Defaults to 5.
+    TextValue     - Freetext or categorical answer (for non-numeric types).
+    PassFailValue - Bool pass (true) / fail (false) for PASS_FAIL type.
+    NotScored     - true → show "(not scored)" note; set when criteria_type is
+                    non-numeric and excluded from overall_score computation.
+    TestID        - data-testid on the card wrapper.
+================================================================================
+*/}}
+
+{{define "lf-dimension-card"}}
+{{- $criteriaID := .CriteriaID -}}
+{{- $label := .Label -}}
+{{- $weight := .Weight -}}
+{{- $ctype := .CriteriaType -}}
+{{- $numVal := .NumericValue -}}
+{{- $maxScore := .MaxScore -}}
+{{- if le $maxScore 0 -}}{{- $maxScore = 5 -}}{{- end -}}
+{{- $testID := or .TestID (printf "dim-card-%s" $criteriaID) -}}
+{{- $isNumeric := or (eq $ctype "NUMERIC_SCORE") (eq $ctype "NUMERIC_RANGE") -}}
+<div class="lf-dim-card"
+     id="dim-card-{{$criteriaID}}"
+     data-testid="{{$testID}}"
+     data-criteria-id="{{$criteriaID}}"
+     data-criteria-type="{{$ctype}}">
+    <div class="lf-dim-card__header">
+        <span class="lf-dim-card__label">{{$label}}</span>
+        {{- if gt $weight 0}}
+        <span class="lf-dim-card__weight" title="Weight {{$weight}}%">{{$weight}}%</span>
+        {{- end}}
+        {{- if .NotScored}}
+        <span class="lf-dim-card__not-scored">(not scored)</span>
+        {{- end}}
+    </div>
+    <div class="lf-dim-card__body">
+        {{- if $isNumeric}}
+        {{template "lf-rating-bar" (dict
+            "CriteriaID" $criteriaID
+            "Value"      $numVal
+            "Max"        $maxScore
+            "Label"      $label
+            "Color"      "primary"
+            "ShowValue"  true)}}
+        {{- else if eq $ctype "PASS_FAIL"}}
+        <span class="lf-dim-card__answer lf-dim-card__answer--{{if .PassFailValue}}pass{{else}}fail{{end}}"
+              data-testid="dim-answer-{{$criteriaID}}">
+            {{- if .PassFailValue}}Pass{{else}}Fail{{end -}}
+        </span>
+        {{- else}}
+        <span class="lf-dim-card__answer"
+              data-testid="dim-answer-{{$criteriaID}}">
+            {{- or .TextValue "&mdash;" -}}
+        </span>
+        {{- end}}
+    </div>
+</div>
+{{end}}

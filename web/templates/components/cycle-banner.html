@@ -1,0 +1,115 @@
+{{/*
+================================================================================
+CYCLE-BANNER — Evaluation Cycle "X of Y" Progress Banner
+================================================================================
+READ-PROJECTION banner displayed on:
+  - Evaluation Cycle detail page
+  - Admin Performance panel (per-cycle row)
+  - Client portal "Rate My Team" page
+
+This is a display-only (read projection) component. It NEVER triggers a write
+or materialization — it simply renders the frozen denominator Y (COUNT of
+cycle members) and the live numerator X (COUNT of submitted/signed-off
+evaluations). See view-delta.md §3 file #48 and STR-2 / SR-1.
+
+BEM class root: lf-cycle-banner
+
+USAGE:
+    {{template "lf-cycle-banner" (dict
+        "CycleID"     "cycle-q2-2026"
+        "CycleName"   "Q2 2026 Review"
+        "Status"      "open"
+        "Submitted"   7
+        "Total"       12
+        "SignOffDue"  "2026-06-30"
+        "CloseDate"   "2026-07-15"
+        "Labels"      .Labels.CycleBanner)}}
+
+PARAMETERS:
+    CycleID     - Used for id="evaluation-cycle-banner-{CycleID}" and progress
+                  id="cycle-progress-{CycleID}". Required.
+    CycleName   - Display name of the cycle. Optional.
+    Status      - "open" | "sign_off" | "closed". Drives colour modifier.
+    Submitted   - X: count of submitted + signed-off evaluations (numerator).
+    Total       - Y: frozen denominator (total cycle members). When 0, renders
+                  "–" to avoid divide-by-zero display.
+    SignOffDue  - ISO date string for sign-off deadline. Optional.
+    CloseDate   - ISO date string for cycle close date. Optional.
+    Labels      - Struct with .XOfY / .SignOffDue / .Closes / .Open / .SignOff
+                  / .Closed label strings. Falls back to English literals when nil.
+
+TESTIDS (flow.md §12 canonical):
+    data-testid="evaluation-cycle-banner-{CycleID}"   — wrapper
+    data-testid="cycle-progress-{CycleID}"            — the X/Y fraction element
+================================================================================
+*/}}
+
+{{define "lf-cycle-banner"}}
+{{- $cycleID := .CycleID -}}
+{{- $status := or .Status "open" -}}
+{{- $submitted := .Submitted -}}
+{{- $total := .Total -}}
+{{- $wrapID := printf "evaluation-cycle-banner-%s" $cycleID -}}
+{{- $progID := printf "cycle-progress-%s" $cycleID -}}
+
+{{- /* Colour modifier from status */ -}}
+{{- $mod := "open" -}}
+{{- if eq $status "sign_off" -}}{{- $mod = "sign-off" -}}
+{{- else if eq $status "closed" -}}{{- $mod = "closed" -}}
+{{- end -}}
+
+{{- /* Progress fraction for the fill bar */ -}}
+{{- $fill := 0.0 -}}
+{{- if gt $total 0 -}}{{- $fill = div $submitted $total -}}{{- end -}}
+
+<div class="lf-cycle-banner lf-cycle-banner--{{$mod}}"
+     id="{{$wrapID}}"
+     data-testid="{{$wrapID}}"
+     data-cycle-id="{{$cycleID}}"
+     data-status="{{$status}}">
+
+    {{- if .CycleName}}
+    <div class="lf-cycle-banner__name">{{.CycleName}}</div>
+    {{- end}}
+
+    <div class="lf-cycle-banner__progress"
+         id="{{$progID}}"
+         data-testid="{{$progID}}"
+         role="status"
+         aria-live="polite">
+        <span class="lf-cycle-banner__fraction"
+              aria-label="{{$submitted}} of {{$total}} evaluations submitted">
+            <strong>{{$submitted}}</strong>
+            <span class="lf-cycle-banner__sep">/</span>
+            {{if gt $total 0}}{{$total}}{{else}}&mdash;{{end}}
+        </span>
+        <div class="lf-cycle-banner__bar-wrap"
+             role="progressbar"
+             aria-valuenow="{{$submitted}}"
+             aria-valuemin="0"
+             aria-valuemax="{{if gt $total 0}}{{$total}}{{else}}1{{end}}"
+             style="--lf-fill:{{printf "%.4f" $fill}}">
+            <div class="lf-cycle-banner__bar-fill"></div>
+        </div>
+    </div>
+
+    <div class="lf-cycle-banner__meta">
+        {{- if .SignOffDue}}
+        <span class="lf-cycle-banner__meta-item">
+            <span class="lf-cycle-banner__meta-label">
+                {{- if and .Labels .Labels.SignOffDue}}{{.Labels.SignOffDue}}{{else}}Sign-off due{{end -}}
+            </span>
+            <span class="lf-cycle-banner__meta-value">{{.SignOffDue}}</span>
+        </span>
+        {{- end}}
+        {{- if .CloseDate}}
+        <span class="lf-cycle-banner__meta-item">
+            <span class="lf-cycle-banner__meta-label">
+                {{- if and .Labels .Labels.Closes}}{{.Labels.Closes}}{{else}}Closes{{end -}}
+            </span>
+            <span class="lf-cycle-banner__meta-value">{{.CloseDate}}</span>
+        </span>
+        {{- end}}
+    </div>
+</div>
+{{end}}

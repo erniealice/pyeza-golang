@@ -1,0 +1,133 @@
+/*
+ * ==========================================================================
+ * DIMENSION-CARD COMPONENT STYLES
+ * ==========================================================================
+ * Card container for a single evaluation rubric dimension (one
+ * OutcomeCriteria / evaluation_response row). Shows label + weight chip +
+ * typed answer (numeric → lf-rating-bar; pass/fail → coloured text;
+ * text/categorical → verbatim).
+ *
+ * All visual values use pyeza theme/layout tokens. No raw hex/px/rem
+ * literals for colour or type scale.
+ *
+ * BEM root: lf-dim-card
+ * Elements:  __header, __label, __weight, __not-scored, __body, __answer
+ * Modifiers (on __answer): --pass, --fail
+ * ==========================================================================
+ */
+
+/* ========================================
+   CARD WRAPPER
+   ======================================== */
+
+.lf-dim-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border-light);
+    border-radius: var(--radius-md);
+}
+
+/* Subtle hover lift — pointer indicates interaction context only on clickable wrappers */
+.lf-dim-card:hover {
+    border-color: var(--border);
+}
+
+/* ========================================
+   HEADER ROW  (label  +  weight chip  +  not-scored note)
+   ======================================== */
+
+.lf-dim-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.lf-dim-card__label {
+    flex: 1 1 auto;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.lf-dim-card__weight {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    border-radius: var(--radius-full);
+    background: var(--accent-primary-light);
+    color: var(--accent-primary);
+    font-size: var(--text-2xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.lf-dim-card__not-scored {
+    flex: 0 0 auto;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ========================================
+   BODY  (rating-bar or answer text)
+   ======================================== */
+
+.lf-dim-card__body {
+    display: flex;
+    align-items: center;
+    min-height: var(--spacing-lg); /* prevent collapse when empty */
+}
+
+/* ========================================
+   ANSWER TEXT  (non-numeric types)
+   ======================================== */
+
+.lf-dim-card__answer {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.lf-dim-card__answer--pass {
+    color: var(--status-success);
+    font-weight: var(--font-weight-semibold);
+}
+
+.lf-dim-card__answer--fail {
+    color: var(--status-error);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* ========================================
+   GRID LAYOUT (used by Scores tab in Evaluation detail)
+   ======================================== */
+
+.lf-dim-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--spacing-md);
+}
+
+/* ========================================
+   HIGH CONTRAST
+   ======================================== */
+
+@media (prefers-contrast: high) {
+    .lf-dim-card {
+        border-color: var(--border);
+    }
+
+    .lf-dim-card__answer--pass,
+    .lf-dim-card__answer--fail {
+        text-decoration: underline;
+    }
+}

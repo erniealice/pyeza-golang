@@ -1,0 +1,71 @@
+{{/*
+================================================================================
+RATING-BAR — Numeric Score Progress Indicator
+================================================================================
+An accessible fill indicator for numeric evaluation scores. Fill is driven by
+the --lf-fill CSS custom property (0.0–1.0) which is set via data attributes
+and a small inline attribute initialiser written by the template itself.
+No inline `style` attribute is written for colors or decorative properties —
+only the structural --lf-fill custom property is set inline, which is
+permitted under CSP (custom properties are not executable).
+
+BEM class root: lf-rating-bar
+
+USAGE (Go template):
+    {{template "lf-rating-bar" (dict
+        "CriteriaID"  "crit-abc123"
+        "Value"       3
+        "Max"         5
+        "Label"       "Reliability"
+        "Color"       "primary"
+        "ShowValue"   true
+        "TestID"      "dim-bar-crit-abc123")}}
+
+PARAMETERS:
+    CriteriaID  - Suffix for the element id: id="dim-bar-{CriteriaID}".
+                  Also written to data-criteria-id for JS delegation.
+    Value       - Current numeric score (number). 0 or omitted → empty fill.
+    Max         - Maximum score value (number). Defaults to 5 when 0/omitted.
+    Label       - Text for aria-label on the progressbar element.
+    Color       - BEM colour modifier: primary | success | warning | danger | info.
+                  Defaults to primary.
+    ShowValue   - true → render a "{Value} / {Max}" caption.
+    TestID      - data-testid on the wrapper. Defaults to "dim-bar-{CriteriaID}".
+
+ACCESSIBILITY:
+    role=progressbar + aria-valuenow/min/max expose full ARIA semantics.
+    The ::before pseudo-element width is set via --lf-fill (0–1) so the fill
+    never requires inline color declarations.
+================================================================================
+*/}}
+
+{{define "lf-rating-bar"}}
+{{- $max := .Max -}}
+{{- if le $max 0 -}}{{- $max = 5 -}}{{- end -}}
+{{- $value := .Value -}}
+{{- $color := or .Color "primary" -}}
+{{- $elemID := printf "dim-bar-%s" .CriteriaID -}}
+{{- $testID := or .TestID $elemID -}}
+{{- /* Compute fill fraction for the custom property (0.0–1.0). */ -}}
+{{- $fill := 0.0 -}}
+{{- if gt $value 0 -}}{{- $fill = div $value $max -}}{{- end -}}
+<div class="lf-rating-bar lf-rating-bar--{{$color}}"
+     id="{{$elemID}}"
+     data-testid="{{$testID}}"
+     data-criteria-id="{{.CriteriaID}}"
+     data-value="{{$value}}"
+     data-max="{{$max}}"
+     role="progressbar"
+     aria-valuenow="{{$value}}"
+     aria-valuemin="0"
+     aria-valuemax="{{$max}}"
+     {{- if .Label}} aria-label="{{.Label}}"{{end}}
+     style="--lf-fill:{{printf "%.4f" $fill}}">
+    <div class="lf-rating-bar__track">
+        <div class="lf-rating-bar__fill"></div>
+    </div>
+    {{- if .ShowValue}}
+    <span class="lf-rating-bar__value">{{$value}} / {{$max}}</span>
+    {{- end}}
+</div>
+{{end}}

@@ -1,0 +1,65 @@
+{{/*
+================================================================================
+SCORE-PILL — Numeric Overall Score Display
+================================================================================
+Compact pill for displaying a numeric evaluation score (e.g. overall_score on
+an Evaluation row). Renders blank when Value is 0 / nil so list columns stay
+clean for DRAFT evaluations that have no score yet.
+
+BEM class root: lf-score-pill
+
+USAGE:
+    {{template "lf-score-pill" (dict
+        "EvalID"  "eval-abc123"
+        "Value"   4.2
+        "Max"     5
+        "Label"   "Overall score")}}
+
+PARAMETERS:
+    EvalID   - Used for id="overall-score-{EvalID}" and data-testid.
+    Value    - Numeric score (float). When 0 or not provided the pill renders
+               as an em dash (—) in the muted/empty state.
+    Max      - Maximum possible score. Defaults to 5 when 0/omitted.
+    Label    - aria-label text (for screen readers). Optional.
+    Size     - sm | md (default: md). "sm" for table cells.
+
+EMPTY STATE:
+    When Value == 0 the pill renders class "lf-score-pill--empty" with "—".
+    This keeps table cells aligned without conveying a false 0/5 score.
+
+COLOR BANDS (applied automatically from Value/Max ratio):
+    >= 0.8 (4/5)  → success (green)
+    >= 0.6 (3/5)  → warning (amber)
+    < 0.6         → danger  (red)
+    empty         → muted
+================================================================================
+*/}}
+
+{{define "lf-score-pill"}}
+{{- $max := .Max -}}
+{{- if le $max 0 -}}{{- $max = 5 -}}{{- end -}}
+{{- $value := .Value -}}
+{{- $evalID := .EvalID -}}
+{{- $size := or .Size "md" -}}
+{{- $id := printf "overall-score-%s" $evalID -}}
+{{- $isEmpty := not (gt $value 0) -}}
+
+{{- /* Determine colour band from ratio */ -}}
+{{- $band := "danger" -}}
+{{- if $isEmpty -}}{{- $band = "empty" -}}
+{{- else if ge (div $value $max) 0.8 -}}{{- $band = "success" -}}
+{{- else if ge (div $value $max) 0.6 -}}{{- $band = "warning" -}}
+{{- end -}}
+
+<span class="lf-score-pill lf-score-pill--{{$band}}{{if eq $size "sm"}} lf-score-pill--sm{{end}}"
+      id="{{$id}}"
+      data-testid="{{$id}}"
+      {{- if .Label}} aria-label="{{.Label}}"{{end -}}
+      {{- if not $isEmpty}} title="{{$value}} / {{$max}}"{{end -}}>
+    {{- if $isEmpty -}}
+    <span aria-hidden="true">&mdash;</span>
+    {{- else -}}
+    {{printf "%.1f" $value}}
+    {{- end -}}
+</span>
+{{end}}

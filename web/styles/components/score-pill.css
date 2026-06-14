@@ -1,0 +1,82 @@
+/*
+ * ==========================================================================
+ * SCORE-PILL COMPONENT STYLES
+ * ==========================================================================
+ * Compact numeric score display pill for evaluation list/detail views.
+ * Three automatic colour bands (success/warning/danger) + empty state.
+ * All colours are theme tokens — no raw hex/rgb values.
+ *
+ * BEM root: lf-score-pill
+ * Modifiers: --success, --warning, --danger, --empty, --sm
+ * ==========================================================================
+ */
+
+/* ========================================
+   BASE
+   ======================================== */
+
+.lf-score-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+/* ========================================
+   SIZE MODIFIER
+   ======================================== */
+
+.lf-score-pill--sm {
+    min-width: 1.75rem;
+    padding: var(--spacing-2xs) var(--spacing-2xs);
+    font-size: var(--text-xs);
+}
+
+/* ========================================
+   COLOUR BAND MODIFIERS
+   ======================================== */
+
+.lf-score-pill--success {
+    background: var(--status-success-light);
+    color: var(--status-success);
+}
+
+.lf-score-pill--warning {
+    background: var(--status-warning-light);
+    color: var(--status-warning);
+}
+
+.lf-score-pill--danger {
+    background: var(--status-error-light);
+    color: var(--status-error);
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+
+.lf-score-pill--empty {
+    background: transparent;
+    color: var(--text-muted);
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    letter-spacing: 0;
+}
+
+/* ========================================
+   HIGH CONTRAST
+   ======================================== */
+
+@media (prefers-contrast: high) {
+    .lf-score-pill {
+        border: var(--border-width) solid currentColor;
+    }
+}

@@ -1,0 +1,128 @@
+/*
+ * ==========================================================================
+ * RATING-BAR COMPONENT STYLES
+ * ==========================================================================
+ * Evaluation score fill indicator. Fill width is controlled exclusively via
+ * the --lf-fill CSS custom property (range 0.0–1.0) written by the Go
+ * template. No inline color or size declarations — all visual tokens come
+ * from the pyeza theme/layout system (var(--lf-*) / var(--accent-*) /
+ * var(--status-*) etc.).
+ *
+ * BEM root: lf-rating-bar
+ * Elements:  __track, __fill, __value
+ * Modifiers: --primary, --success, --warning, --danger, --info
+ * ==========================================================================
+ */
+
+/* ========================================
+   WRAPPER
+   ======================================== */
+
+.lf-rating-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    font-family: var(--font-body);
+    --lf-fill: 0; /* overridden inline by the template */
+}
+
+/* ========================================
+   TRACK + FILL
+   ======================================== */
+
+.lf-rating-bar__track {
+    flex: 1 1 auto;
+    height: var(--spacing-sm); /* 8px — matches pyeza-progress default track height */
+    background: var(--bg-sidebar);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    position: relative;
+}
+
+.lf-rating-bar__fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: calc(var(--lf-fill) * 100%);
+    background: var(--accent-primary);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-base);
+}
+
+/* ========================================
+   VALUE CAPTION
+   ======================================== */
+
+.lf-rating-bar__value {
+    flex: 0 0 auto;
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    min-width: 2.5rem;
+    text-align: right;
+}
+
+/* ========================================
+   COLOUR MODIFIERS
+   ======================================== */
+
+.lf-rating-bar--primary .lf-rating-bar__fill {
+    background: var(--accent-primary);
+}
+
+.lf-rating-bar--success .lf-rating-bar__fill {
+    background: var(--status-success);
+}
+
+.lf-rating-bar--warning .lf-rating-bar__fill {
+    background: var(--status-warning);
+}
+
+.lf-rating-bar--danger .lf-rating-bar__fill {
+    background: var(--status-error);
+}
+
+.lf-rating-bar--info .lf-rating-bar__fill {
+    background: var(--status-info);
+}
+
+/* ========================================
+   HIGH-SCORE SENTINEL (fill >= 0.8 → success tint)
+   Applied by JS via data-high attribute when JS runs;
+   degrades gracefully without JS (fill colour unchanged).
+   ======================================== */
+
+.lf-rating-bar[data-high="true"] .lf-rating-bar__fill {
+    background: var(--status-success);
+}
+
+/* ========================================
+   COMPACT MODIFIER
+   ======================================== */
+
+.lf-rating-bar--compact .lf-rating-bar__track {
+    height: var(--spacing-2xs); /* 4px */
+}
+
+/* ========================================
+   ACCESSIBILITY — Reduced Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .lf-rating-bar__fill {
+        transition: none;
+    }
+}
+
+/* ========================================
+   HIGH CONTRAST
+   ======================================== */
+
+@media (prefers-contrast: high) {
+    .lf-rating-bar__track {
+        border: var(--border-width) solid var(--border);
+    }
+}
