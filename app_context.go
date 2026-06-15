@@ -209,6 +209,24 @@ type AppContext struct {
 	// CSRFIssuer issues a fresh workspace-claim CSRF cookie. Type-assert to
 	// func(w http.ResponseWriter, secret []byte, sessionToken, workspaceID string) string.
 	CSRFIssuer any
+
+	// === Auth-chain finalize slots (Wave B D2a — precondition P1) ===
+	// The relocated entydad auth chain (block/buildAuthDeps) reads these off
+	// the AppContext instead of off the app's *appBuilder fields. The host
+	// stamps them app-side in buildAppContextBase BEFORE the opt loop; the
+	// entydad EngineBlock closure type-asserts them when reconstructing the
+	// 19-field auth.Deps. Typed as `any` so pyeza takes no espyna dependency.
+
+	// SessionManager writes/clears the session cookie on HTTP responses.
+	// Type-assert to *consumer.SessionMiddleware (satisfies auth.SessionManager)
+	// inside the entydad block. nil when the session middleware is unavailable.
+	SessionManager any
+
+	// AuthAdapter performs credential operations (login, register, reset,
+	// change-password, validate/invalidate session). Type-assert to
+	// *consumer.AuthAdapter inside the entydad block; the block wraps it in
+	// its authAdapterBridge to satisfy auth.AuthAdapter. nil when unavailable.
+	AuthAdapter any
 }
 
 // AppUIBundle is the COMPLETE app-supplied UI/labels contract the espyna
