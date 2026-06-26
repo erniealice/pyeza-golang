@@ -205,6 +205,22 @@ func (p *Pipeline) InjectPageData(ctx context.Context, data any, path string) {
 		}
 	}
 
+	// Inject the active workspace_id into any exported WorkspaceID string field
+	// (only if not already set by the view). This makes the field-comment promise
+	// real for every form Data struct — "// injected by
+	// ViewAdapter.injectWorkspaceID for action_workspace_guard" — so the
+	// {{actionForm}} helper emits a non-empty signed _workspace_id and the
+	// /action/* guard accepts the POST. FieldByName resolves both a form's own
+	// top-level WorkspaceID field and the promoted types.PageData.WorkspaceID on
+	// full pages. We never overwrite a non-empty value, so the handful of handlers
+	// that set it explicitly stay authoritative. Mirrors the Nonce reflective set
+	// above (find-field-by-name, only-if-settable, only-if-empty).
+	if wsID := p.getWorkspaceID(ctx); wsID != "" {
+		if f := v.FieldByName("WorkspaceID"); f.IsValid() && f.CanSet() && f.Kind() == reflect.String && f.String() == "" {
+			f.SetString(wsID)
+		}
+	}
+
 	// Render HeaderIcon → HeaderIconHTML if icon name is set but HTML isn't
 	if p.RenderIcon != nil {
 		iconField := v.FieldByName("HeaderIcon")

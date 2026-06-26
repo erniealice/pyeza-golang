@@ -320,7 +320,7 @@ func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 	// PageData.WorkspaceID.
 	//
 	// Safe-mode returns (empty HTML) when:
-	//   - no signer is wired (dev boots without WORKSPACE_FORM_HMAC_KEY) — the
+	//   - no signer is wired (dev boots without SECURITY_WORKSPACEFORM_HMAC_KEY) — the
 	//     guard is also disabled in that case so the missing fields don't
 	//     break anything.
 	//   - workspaceID is empty (e.g. pre-workspace auth pages) — the guard
