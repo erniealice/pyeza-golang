@@ -40,6 +40,7 @@ const (
 	PrincipalTypeClientDelegate   PrincipalType = 4
 	PrincipalTypeSupplier         PrincipalType = 5
 	PrincipalTypeSupplierDelegate PrincipalType = 6
+	PrincipalTypeStaff            PrincipalType = 7
 )
 
 // String returns the canonical lowercase token for a principal type. The
@@ -59,6 +60,8 @@ func (t PrincipalType) String() string {
 		return "supplier"
 	case PrincipalTypeSupplierDelegate:
 		return "supplier_delegate"
+	case PrincipalTypeStaff:
+		return "staff"
 	default:
 		return "unspecified"
 	}
@@ -70,7 +73,8 @@ func (t PrincipalType) HomeRoute() string {
 	switch t {
 	case PrincipalTypeOperatorOwner, PrincipalTypeOperatorStaff,
 		PrincipalTypeClient, PrincipalTypeSupplier,
-		PrincipalTypeClientDelegate, PrincipalTypeSupplierDelegate:
+		PrincipalTypeClientDelegate, PrincipalTypeSupplierDelegate,
+		PrincipalTypeStaff:
 		return "/me/inbox"
 	default:
 		return "/auth/no-access"
