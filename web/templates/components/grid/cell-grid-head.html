@@ -1,0 +1,34 @@
+{{/*
+cell-grid-head — 3-row sticky <thead> for the CellGridConfig grid.
+Dot-context: *types.CellGridConfig.
+
+Row 1 (L1 = phase):     frozen corner <th rowspan=3> + one <th> per Level1,
+                        colspan = total leaf (Level3) count under that Level1.
+Row 2 (L2 = task):      one <th> per Level2, colspan = len(.Level3).
+Row 3 (L3 = criterion): one leaf <th> per Level3.
+
+Colspans are summed inline with the `add`/`len` template funcs (no derived struct
+fields, no view-side pass) — Go's text/template allows reassigning a $var declared
+before a range with `=` inside the loop.
+*/}}
+{{define "cell-grid-head"}}
+<thead class="cell-grid-thead">
+    <tr class="cell-grid-row--l1">
+        <th class="cell-grid-corner{{if .FreezeFirstCol}} cell-grid-col--frozen{{end}}" rowspan="3" scope="col">{{.Labels.ClientColumn}}</th>
+        {{range .Columns}}
+        {{$l1span := 0}}{{range .Level2}}{{$l1span = add $l1span (len .Level3)}}{{end}}
+        <th class="cell-grid-l1" colspan="{{$l1span}}" scope="colgroup">{{.Label}}</th>
+        {{end}}
+    </tr>
+    <tr class="cell-grid-row--l2">
+        {{range .Columns}}{{range .Level2}}
+        <th class="cell-grid-l2" colspan="{{len .Level3}}" scope="colgroup">{{.Label}}</th>
+        {{end}}{{end}}
+    </tr>
+    <tr class="cell-grid-row--l3">
+        {{range .Columns}}{{range .Level2}}{{range .Level3}}
+        <th class="cell-grid-l3{{if .FrozenCol}} cell-grid-col--frozen{{end}}" scope="col">{{.Label}}</th>
+        {{end}}{{end}}{{end}}
+    </tr>
+</thead>
+{{end}}

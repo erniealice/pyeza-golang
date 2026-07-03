@@ -203,6 +203,21 @@ func (p *Pipeline) InjectPageData(ctx context.Context, data any, path string) {
 				}
 			}
 		}
+		// Same for the nested Grid field (types.CellGridConfig.Nonce) — the
+		// spreadsheet grid block renders via {{template "cell-grid-card" .Grid}}
+		// with a narrowed dot-context, so its Nonce must be set on the nested
+		// value the same way. Additive + inert for any PageData without a Grid
+		// field (FieldByName returns an invalid Value → skipped).
+		if gridField := v.FieldByName("Grid"); gridField.IsValid() {
+			if gridField.Kind() == reflect.Ptr {
+				gridField = gridField.Elem()
+			}
+			if gridField.Kind() == reflect.Struct {
+				if gf := gridField.FieldByName("Nonce"); gf.IsValid() && gf.CanSet() && gf.String() == "" {
+					gf.SetString(n)
+				}
+			}
+		}
 	}
 
 	// Inject the active workspace_id into any exported WorkspaceID string field
@@ -218,6 +233,21 @@ func (p *Pipeline) InjectPageData(ctx context.Context, data any, path string) {
 	if wsID := p.getWorkspaceID(ctx); wsID != "" {
 		if f := v.FieldByName("WorkspaceID"); f.IsValid() && f.CanSet() && f.Kind() == reflect.String && f.String() == "" {
 			f.SetString(wsID)
+		}
+		// Same for the nested Grid field (types.CellGridConfig.WorkspaceID) —
+		// the grid's batch form renders in a narrowed {{.Grid}} dot-context,
+		// and {{actionForm}} emits an empty (guard-rejected) token unless the
+		// nested value carries the workspace id. Additive + inert for any
+		// PageData without a Grid field.
+		if gridField := v.FieldByName("Grid"); gridField.IsValid() {
+			if gridField.Kind() == reflect.Ptr {
+				gridField = gridField.Elem()
+			}
+			if gridField.Kind() == reflect.Struct {
+				if gf := gridField.FieldByName("WorkspaceID"); gf.IsValid() && gf.CanSet() && gf.Kind() == reflect.String && gf.String() == "" {
+					gf.SetString(wsID)
+				}
+			}
 		}
 	}
 

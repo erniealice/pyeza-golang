@@ -1,0 +1,74 @@
+{{/*
+================================================================================
+cell-grid-card — outer wrapper for the CellGridConfig spreadsheet grid.
+
+Component family (all flat {{define}} names, globally unique cell-grid-* prefix):
+    cell-grid-card   this file      — .cell-grid-card wrapper + batch <form> + scroll box
+    cell-grid-head   cell-grid-head.html — 3-row sticky <thead> (L1/L2 colspans + frozen 1st col)
+    cell-grid-body   cell-grid-body.html — <tbody> rows; frozen row-head <th> + per-cell dispatch
+    cell-grid-cell   cell-grid-cell.html — one <td>; branches on CellInputDescriptor.Type
+
+Dot-context: a *types.CellGridConfig (narrowed by {{template "cell-grid-card" .Grid}}).
+Anything the body needs — Nonce, WorkspaceID, CacheVersion — is a field on that struct,
+NOT reachable via the outer PageData.
+
+Save model: one BATCH <form hx-post SaveURL hx-swap="none"> around the whole table.
+  - {{actionForm .SaveURL .WorkspaceID}} emits the signed hidden pair the
+    action_workspace_guard middleware requires on every /action/* POST.
+  - data-hx-on="form-result" routes htmx:afterRequest → lf.ui.handleFormResult
+    (registered in lf-hx-on.js) for the inline success/error banner.
+  - cell-grid.js owns dirty-tracking + Save enable/disable (OOB-swap-safe via lf.on).
+
+Self-included scripts: this card ends with a REAL {{template "grid-scripts" .}} call
+(partials/grid-scripts.html), so the grid JS loads on both the full-page render AND an
+HTMX content-only swap — unlike the table component, whose equivalent is only a doc-comment.
+================================================================================
+*/}}
+{{define "cell-grid-card"}}
+<div class="cell-grid-card{{with .CardClass}} {{.}}{{end}}" data-testid="outcome-matrix-grid">
+    <div id="{{.ID}}-result"
+         class="form-result form-result--hidden"
+         aria-live="polite"
+         aria-atomic="true"
+         data-success-message="{{.Labels.SavedBanner}}"
+         data-error-message="{{.Labels.ErrorBanner}}"
+         data-testid="om-saved-banner"></div>
+
+    <form id="{{.ID}}-form"
+          class="cell-grid-form"
+          hx-post="{{.SaveURL}}"
+          hx-swap="none"
+          data-hx-on="form-result"
+          data-result-id="{{.ID}}-result"
+          data-success-source="dataset"
+          data-success-fallback="{{.Labels.SavedBanner}}"
+          data-error-fallback="{{.Labels.ErrorBanner}}"
+          data-hide-mode="classList">
+        {{actionForm .SaveURL .WorkspaceID}}
+        <input type="hidden" name="job_template_id" value="{{.JobTemplateID}}">
+        <input type="hidden" name="scope" value="{{.Scope}}">
+
+        <div class="cell-grid-scroll" data-freeze-rows="{{.FreezeHeaderRows}}">
+            {{if .Rows}}
+            <table class="cell-grid-table"{{if .FreezeFirstCol}} data-freeze-first-col="1"{{end}}{{if .Caption}} aria-describedby="{{.ID}}-caption"{{end}}>
+                {{if .Caption}}<caption id="{{.ID}}-caption" class="cell-grid-caption">{{.Caption}}</caption>{{end}}
+                {{template "cell-grid-head" .}}
+                {{template "cell-grid-body" .}}
+            </table>
+            {{else}}
+            <div class="cell-grid-empty" data-testid="om-empty">{{.Labels.EmptyGrid}}</div>
+            {{end}}
+        </div>
+
+        <div class="cell-grid-actions">
+            <button type="submit"
+                    class="btn btn-primary cell-grid-save"
+                    data-testid="om-save"
+                    data-label-save="{{.Labels.SaveButton}}"
+                    data-label-saving="{{.Labels.SavingButton}}"
+                    {{if .SaveDisabled}}disabled{{end}}>{{.Labels.SaveButton}}</button>
+        </div>
+    </form>
+</div>
+{{template "grid-scripts" .}}
+{{end}}

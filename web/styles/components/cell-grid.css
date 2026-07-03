@@ -1,0 +1,153 @@
+/* ============================================================================
+   cell-grid.css — CellGridConfig spreadsheet grid (web/templates/components/grid/).
+
+   A dense bulk-edit grid: sticky 3-row header, frozen first column, typed cell
+   inputs. Pyeza-owned component layer — may carry raw layout literals per the CSS
+   Provenance Manifest, but this file references only real design tokens:
+     --z-popover, --z-sidebar (layout.css) · --bg-card, --bg-sidebar, --bg-hover,
+     --text-muted, --border (themes/*.css) · --border-width-thick (layout.css).
+
+   Stacking (OQ-4): the sticky <thead> and the sticky first column each open their
+   own stacking context. The header×frozen-col intersection must sit above BOTH, so
+   it gets calc(var(--z-popover) + 10). Body frozen cells use --z-sidebar (below the
+   header, above scrolled body cells).
+   ============================================================================ */
+
+.cell-grid-card {
+    position: relative;
+    width: 100%;
+}
+
+/* Scroll container — owns BOTH axes so sticky top/left anchor to it. */
+.cell-grid-scroll {
+    position: relative;
+    overflow: auto;
+    max-height: 80vh;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cell-grid-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    width: max-content;
+    min-width: 100%;
+}
+
+.cell-grid-caption {
+    caption-side: top;
+    text-align: left;
+    padding: 0.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* --- Sticky header ------------------------------------------------------- */
+.cell-grid-thead th {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-popover); /* above body rows during vertical scroll */
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 0.375rem 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Stack the three header rows so each sits below its parent. Row heights are
+   uniform enough that fixed offsets keep rows 2/3 pinned under row 1. */
+.cell-grid-row--l1 th { top: 0; }
+.cell-grid-row--l2 th { top: 2rem; }
+.cell-grid-row--l3 th { top: 4rem; }
+
+/* --- Frozen first column ------------------------------------------------- */
+.cell-grid-table .cell-grid-col--frozen {
+    position: sticky;
+    left: 0;
+    z-index: var(--z-sidebar); /* above scrolled body cells */
+    background: var(--bg-sidebar);
+    border-right: var(--border-width-thick) solid var(--border);
+}
+
+/* Header×column intersection — above BOTH sticky contexts. */
+.cell-grid-thead .cell-grid-col--frozen {
+    z-index: calc(var(--z-popover) + 10);
+}
+
+/* Row-head (frozen first <td>/<th> of each body row). */
+.cell-grid-rowhead {
+    padding: 0.375rem 0.5rem;
+    text-align: left;
+    font-weight: 500;
+    white-space: nowrap;
+    background: var(--bg-sidebar);
+    border-bottom: 1px solid var(--border);
+}
+
+/* --- Body cells ---------------------------------------------------------- */
+.cell-grid-cell {
+    padding: 0.125rem 0.25rem;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.cell-grid-input {
+    width: 100%;
+    min-width: 3.5rem;
+    box-sizing: border-box;
+    padding: 0.25rem 0.375rem;
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    background: var(--bg-card);
+    font: inherit;
+    text-align: center;
+}
+
+.cell-grid-input--text {
+    text-align: left;
+    min-width: 8rem;
+}
+
+.cell-grid-input-wrap {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+}
+
+.cell-grid-unit {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.cell-grid-cell--empty {
+    color: var(--text-muted);
+    user-select: none;
+}
+
+/* --- Read-only cell ------------------------------------------------------ */
+.cell-grid-cell--ro input,
+.cell-grid-cell--ro select,
+.cell-grid-cell--ro textarea {
+    background: var(--bg-hover);
+    color: var(--text-muted);
+    border-style: dashed;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* --- Actions / empty ----------------------------------------------------- */
+.cell-grid-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.75rem 0;
+}
+
+.cell-grid-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+}

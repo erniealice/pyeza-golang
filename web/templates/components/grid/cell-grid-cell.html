@@ -1,0 +1,91 @@
+{{/*
+cell-grid-cell — one <td> in the CellGridConfig grid.
+Dot-context: a dict {Cell: types.CellGridCell, Col: types.CellGridLevel3}.
+
+Branches on .Col.CellInput.Type using SEPARATE {{if eq}} blocks (NOT an
+{{else if}} chain) — per the pyeza convention that html/template's context-
+escaping analysis degrades past ~2 {{else if}} branches (see table.html vs the
+broken table-actions.html else-if chain). Five types: numeric, pass_fail,
+categorical, text, multi_check (V1 → "—" placeholder, gated for V2).
+
+Input name encoding (flat, parseable by Go r.Form in the batch handler):
+    existing outcome (OutcomeID != "")  → name="cells.{outcome_id}"
+    new record       (OutcomeID == "")  → name="new.{job_task_id}:{criteria_id}"
+
+Editable=false (no job_task spawned yet) renders "—" and no input.
+ReadOnly=true (recorded by another grader / no perm) renders a disabled input
+with .cell-grid-cell--ro + a tooltip; the value is still submitted-safe because a
+disabled control is simply omitted from the POST (server-side IDOR guard is the
+backstop).
+
+Pointer enforcement fields (Min/Max/Step/MaxLength) are read via the *Attr()
+methods on CellInputDescriptor — a *float64 / *int cannot be interpolated
+directly (html/template prints the pointer address, not the value).
+*/}}
+{{define "cell-grid-cell"}}
+{{- $cell := .Cell -}}
+{{- $col := .Col -}}
+{{- $input := $col.CellInput -}}
+<td class="cell-grid-cell{{if $cell.ReadOnly}} cell-grid-cell--ro{{end}}"{{if $cell.ReadOnly}} title="{{$cell.ReadOnlyTooltip}}"{{end}}>
+    {{if not $cell.Editable}}
+        <span class="cell-grid-cell--empty" aria-hidden="true">—</span>
+    {{else}}
+        {{if eq $input.Type "numeric"}}
+        <span class="cell-grid-input-wrap">
+            <input type="number"
+                   class="cell-grid-input cell-grid-input--numeric"
+                   name="{{if $cell.OutcomeID}}cells.{{$cell.OutcomeID}}{{else}}new.{{$cell.JobTaskID}}:{{$cell.CriteriaID}}{{end}}"
+                   value="{{$cell.Value}}"
+                   {{with $input.MinAttr}}min="{{.}}"{{end}}
+                   {{with $input.MaxAttr}}max="{{.}}"{{end}}
+                   {{with $input.StepAttr}}step="{{.}}"{{end}}
+                   data-decimals="{{$input.Decimals}}"
+                   {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
+                   data-testid="{{$cell.TestID}}">
+            {{with $input.Unit}}<span class="cell-grid-unit">{{.}}</span>{{end}}
+        </span>
+        {{end}}
+
+        {{if eq $input.Type "pass_fail"}}
+        <select class="cell-grid-input cell-grid-input--select"
+                name="{{if $cell.OutcomeID}}cells.{{$cell.OutcomeID}}{{else}}new.{{$cell.JobTaskID}}:{{$cell.CriteriaID}}{{end}}"
+                {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
+                data-testid="{{$cell.TestID}}">
+            <option value=""></option>
+            {{/* Option values must match the server's boolean serialization
+                 ("true"/"false") — a mismatched value renders stored cells as
+                 the blank option and a batch save would then overwrite them. */}}
+            <option value="true"{{if eq $cell.Value "true"}} selected{{end}}>{{$input.PassLabel}}</option>
+            <option value="false"{{if eq $cell.Value "false"}} selected{{end}}>{{$input.FailLabel}}</option>
+        </select>
+        {{end}}
+
+        {{if eq $input.Type "categorical"}}
+        <select class="cell-grid-input cell-grid-input--select"
+                name="{{if $cell.OutcomeID}}cells.{{$cell.OutcomeID}}{{else}}new.{{$cell.JobTaskID}}:{{$cell.CriteriaID}}{{end}}"
+                {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
+                data-testid="{{$cell.TestID}}">
+            <option value=""></option>
+            {{range $input.Options}}
+            <option value="{{.Value}}"{{if eq $cell.Value .Value}} selected{{end}}{{if .Disabled}} disabled{{end}}>{{.Label}}</option>
+            {{end}}
+        </select>
+        {{end}}
+
+        {{if eq $input.Type "text"}}
+        <input type="text"
+               class="cell-grid-input cell-grid-input--text"
+               name="{{if $cell.OutcomeID}}cells.{{$cell.OutcomeID}}{{else}}new.{{$cell.JobTaskID}}:{{$cell.CriteriaID}}{{end}}"
+               value="{{$cell.Value}}"
+               {{with $input.MaxLengthAttr}}maxlength="{{.}}"{{end}}
+               {{with $input.Prompt}}placeholder="{{.}}"{{end}}
+               {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
+               data-testid="{{$cell.TestID}}">
+        {{end}}
+
+        {{if eq $input.Type "multi_check"}}
+        <span class="cell-grid-cell--empty" aria-hidden="true" title="multi_check (V2)">—</span>
+        {{end}}
+    {{end}}
+</td>
+{{end}}

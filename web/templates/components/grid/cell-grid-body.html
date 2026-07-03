@@ -1,0 +1,29 @@
+{{/*
+cell-grid-body — <tbody> for the CellGridConfig grid.
+Dot-context: *types.CellGridConfig.
+
+For each row (client/entity): a frozen row-head <th scope="row"> carrying the
+label, then one <td> per Level3 leaf in column order. The cell for a leaf is
+looked up by ColumnKey in the row's Cells map; a MISSING key yields the zero
+CellGridCell (Editable=false → renders "—"), which is exactly the OQ-3 "job not
+spawned / no cell" case, so no explicit-existence branch is needed here.
+
+Each cell is dispatched to cell-grid-cell via a dict {Cell, Col} — the narrowed
+dot inside cell-grid-cell then reads .Cell (CellGridCell) and .Col (CellGridLevel3).
+*/}}
+{{define "cell-grid-body"}}
+<tbody class="cell-grid-tbody">
+    {{$grid := .}}
+    {{range .Rows}}
+    {{$row := .}}
+    <tr class="cell-grid-row" data-testid="{{.TestID}}"{{range $k, $v := .DataAttrs}} data-{{$k}}="{{$v}}"{{end}}>
+        <th scope="row"
+            class="cell-grid-rowhead{{if $grid.FreezeFirstCol}} cell-grid-col--frozen{{end}}"
+            data-testid="om-client-{{.ID}}">{{with .Label}}{{.}}{{else}}{{$row.ID}}{{end}}</th>
+        {{range $grid.Columns}}{{range .Level2}}{{range .Level3}}
+        {{template "cell-grid-cell" (dict "Cell" (index $row.Cells .ColumnKey) "Col" .)}}
+        {{end}}{{end}}{{end}}
+    </tr>
+    {{end}}
+</tbody>
+{{end}}

@@ -1,0 +1,17 @@
+{{/*
+grid-scripts — the CellGridConfig grid's JS include.
+
+Genuinely self-included by cell-grid-card (its {{define}} block ends with
+{{template "grid-scripts" .}}), so cell-grid.js loads on BOTH the full-page
+render and an HTMX content-only swap to the grid — with zero dependency on the
+page-end / app-shell script plumbing. This is the real version of the pattern
+the wiki mistakenly attributes to the table component (where the equivalent line
+sits inside a doc-comment, not a live block).
+
+Dot-context: *types.CellGridConfig — only .CacheVersion is used (copied in by the
+view handler from viewCtx.CacheVersion). The script is same-origin external so
+CSP `script-src 'self'` admits it without a nonce.
+*/}}
+{{define "grid-scripts"}}
+<script src="/assets/js/pyeza/cell-grid.js?v={{.CacheVersion}}"></script>
+{{end}}
