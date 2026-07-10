@@ -1,0 +1,133 @@
+/*
+ * ==========================================================================
+ * THEME: RISO POP
+ * Risograph print pop — cream paper, cobalt/pink/acid spot inks,
+ * hard-offset ink shadows, chunky outlines. Loud on purpose.
+ * Think: zine fairs, screen-printed gig posters, riso duotones
+ * ==========================================================================
+ */
+[data-theme="riso-pop"] {
+    /* Backgrounds */
+    --bg-base: #FBF6EA;
+    --bg-sidebar: #F5EDDA;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F1E8D2;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(24, 20, 45, 0.55);
+
+    /* Text */
+    --text-primary: #17153A;
+    --text-secondary: #45426B;
+    --text-muted: #8B87A8;
+    --text-inverse: #FFFCF3;
+
+    /* Primary Accent — riso cobalt ink */
+    --accent-primary: #2B3FE0;
+    --accent-primary-light: #E4E7FD;
+    --accent-primary-dark: #1E2DB0;
+
+    /* Secondary Accents */
+    --accent-terracotta: #F0388B;
+    --accent-terracotta-light: #FDE3F0;
+    --accent-terracotta-dark: #C22370;
+    --accent-sage: #00A25D;
+    --accent-sage-light: #DFF5EA;
+    --accent-navy: #2B3FE0;
+    --accent-navy-light: #E4E7FD;
+    --accent-navy-dark: #1E2DB0;
+    --accent-amber: #F5A300;
+    --accent-amber-light: #FEF0D2;
+    --accent-plum: #7C3AED;
+    --accent-slate: #5E5B80;
+
+    /* Status Colors */
+    --status-success: #00A25D;
+    --status-success-light: #DFF5EA;
+    --status-warning: #F5A300;
+    --status-warning-light: #FEF0D2;
+    --status-error: #E23A2E;
+    --status-error-light: #FBE2DF;
+    --status-info: #2B3FE0;
+    --status-info-light: #E4E7FD;
+
+    /* Borders & Shadows — ink outlines, hard offset print shadows */
+    --border: #262350;
+    --border-light: #E8E0CC;
+    --border-focus: var(--accent-primary);
+    --border-default: #262350;
+    --border-subtle: #E8E0CC;
+    --bg-muted: #F1E8D2;
+    --bg-subtle: #F5EDDA;
+    --text-subtle: #8B87A8;
+    --shadow-sm: 2px 2px 0 rgba(23, 21, 58, 0.9);
+    --shadow-md: 4px 4px 0 rgba(23, 21, 58, 0.9);
+    --shadow-lg: 6px 6px 0 rgba(23, 21, 58, 0.9);
+    --shadow-card: 3px 3px 0 rgba(23, 21, 58, 0.85);
+    --shadow-card-hover: 5px 5px 0 rgba(23, 21, 58, 0.9);
+    --shadow-float: 8px 8px 0 rgba(23, 21, 58, 0.9);
+    --shadow-xl: 10px 10px 0 rgba(23, 21, 58, 0.9);
+
+    /* App Icon Colors — spot-ink brights with pastel plates */
+    --app-color-user: #F5A300;
+    --app-color-user-dark: #CC8800;
+    --app-color-user-light: #FEF0D2;
+    --app-color-client: #F0388B;
+    --app-color-client-dark: #C22370;
+    --app-color-client-light: #FDE3F0;
+    --app-color-inventory: #2B3FE0;
+    --app-color-inventory-dark: #1E2DB0;
+    --app-color-inventory-light: #E4E7FD;
+    --app-color-service: #7C3AED;
+    --app-color-service-dark: #6229C4;
+    --app-color-service-light: #F0E7FD;
+    --app-color-location: #F06D28;
+    --app-color-location-dark: #C85417;
+    --app-color-location-light: #FDEAE0;
+    --app-color-asset: #0E9BAA;
+    --app-color-asset-dark: #0A7B87;
+    --app-color-asset-light: #DFF3F5;
+    --app-color-supplier: #4756D6;
+    --app-color-supplier-dark: #3542B3;
+    --app-color-supplier-light: #E8EAFB;
+    --app-color-revenue: #00A25D;
+    --app-color-revenue-dark: #00814A;
+    --app-color-revenue-light: #DFF5EA;
+    --app-color-purchase: #3FAE3F;
+    --app-color-purchase-dark: #2F8C2F;
+    --app-color-purchase-light: #E5F4E5;
+    --app-color-expense: #E23A2E;
+    --app-color-expense-dark: #BA2B21;
+    --app-color-expense-light: #FBE2DF;
+    --app-color-cash: #E0940B;
+    --app-color-cash-dark: #B87807;
+    --app-color-cash-light: #FBF0D9;
+    --app-color-report: #0E86C4;
+    --app-color-report-dark: #0A6A9C;
+    --app-color-report-light: #DFEFF8;
+    --app-color-admin: #5E5B80;
+    --app-color-admin-dark: #484566;
+    --app-color-admin-light: #ECEBF2;
+    --app-color-job: #B87F0F;
+    --app-color-job-dark: #93650A;
+    --app-color-job-light: #F8EFDA;
+    --app-color-payroll: #0F8F86;
+    --app-color-payroll-dark: #0B716A;
+    --app-color-payroll-light: #DFF2F1;
+    --app-color-loan: #A16A15;
+    --app-color-loan-dark: #80530F;
+    --app-color-loan-light: #F5ECDC;
+    --app-color-equity: #4438B8;
+    --app-color-equity-dark: #342A94;
+    --app-color-equity-light: #E7E5F7;
+    --app-color-ledger: #0B7A47;
+    --app-color-ledger-dark: #086038;
+    --app-color-ledger-light: #DEF1E7;
+    --app-color-home: #2B3FE0;
+    --app-color-home-dark: #1E2DB0;
+    --app-color-home-light: #E4E7FD;
+
+    /* Theme Meta */
+    --theme-name: "Riso Pop";
+    --theme-icon-bg: linear-gradient(135deg, #FBF6EA 0%, #F0388B 100%);
+    --theme-icon-accent: #2B3FE0;
+}

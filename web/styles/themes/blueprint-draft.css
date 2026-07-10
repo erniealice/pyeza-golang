@@ -1,0 +1,132 @@
+/*
+ * ==========================================================================
+ * THEME: BLUEPRINT DRAFT
+ * Cyanotype cobalt with drafting-cyan linework and redline markup
+ * Think: architect's blueprints, technical pens, drafting tables
+ * ==========================================================================
+ */
+[data-theme="blueprint-draft"] {
+    /* Backgrounds */
+    --bg-base: #0C2340;
+    --bg-sidebar: #0F2A4C;
+    --bg-card: #123157;
+    --bg-hover: #1A3D68;
+    --bg-input: #123157;
+    --bg-overlay: rgba(4, 15, 30, 0.8);
+
+    /* Text */
+    --text-primary: #E6F1FB;
+    --text-secondary: #9FBBD8;
+    --text-muted: #6E8CAB;
+    --text-inverse: #0C2340;
+
+    /* Primary Accent — drafting cyan */
+    --accent-primary: #53C0F0;
+    --accent-primary-light: rgba(83, 192, 240, 0.15);
+    --accent-primary-dark: #2FA8DE;
+
+    /* Secondary Accents */
+    --accent-terracotta: #EF6461;
+    --accent-terracotta-light: rgba(239, 100, 97, 0.16);
+    --accent-terracotta-dark: #D94F4C;
+    --accent-sage: #4FD1A1;
+    --accent-sage-light: rgba(79, 209, 161, 0.15);
+    --accent-navy: #6C9BE8;
+    --accent-navy-light: rgba(108, 155, 232, 0.15);
+    --accent-navy-dark: #5583D1;
+    --accent-amber: #F5C242;
+    --accent-amber-light: rgba(245, 194, 66, 0.15);
+    --accent-plum: #A78BDB;
+    --accent-slate: #8FA8C2;
+
+    /* Status Colors */
+    --status-success: #4FD1A1;
+    --status-success-light: rgba(79, 209, 161, 0.15);
+    --status-warning: #F5C242;
+    --status-warning-light: rgba(245, 194, 66, 0.15);
+    --status-error: #EF6461;
+    --status-error-light: rgba(239, 100, 97, 0.16);
+    --status-info: #53C0F0;
+    --status-info-light: rgba(83, 192, 240, 0.15);
+
+    /* Borders & Shadows — inked gridlines */
+    --border: #1D4470;
+    --border-light: #275081;
+    --border-focus: var(--accent-primary);
+    --border-default: #1D4470;
+    --border-subtle: #275081;
+    --bg-muted: #1A3D68;
+    --bg-subtle: #0F2A4C;
+    --text-subtle: #6E8CAB;
+    --shadow-sm: 0 1px 2px rgba(2, 10, 20, 0.3);
+    --shadow-md: 0 4px 12px rgba(2, 10, 20, 0.4);
+    --shadow-lg: 0 8px 24px rgba(2, 10, 20, 0.5);
+    --shadow-card: 0 2px 8px rgba(2, 10, 20, 0.3);
+    --shadow-card-hover: 0 2px 8px rgba(2, 10, 20, 0.4);
+    --shadow-float: 0 12px 40px rgba(2, 10, 20, 0.55);
+    --shadow-xl: 0 20px 50px rgba(2, 10, 20, 0.6);
+
+    /* App Icon Colors — technical-pen brights on cobalt, rgba light variants */
+    --app-color-user: #F5C242;
+    --app-color-user-dark: #DBA92C;
+    --app-color-user-light: rgba(245, 194, 66, 0.15);
+    --app-color-client: #EF6461;
+    --app-color-client-dark: #D94F4C;
+    --app-color-client-light: rgba(239, 100, 97, 0.16);
+    --app-color-inventory: #53C0F0;
+    --app-color-inventory-dark: #2FA8DE;
+    --app-color-inventory-light: rgba(83, 192, 240, 0.15);
+    --app-color-service: #A78BDB;
+    --app-color-service-dark: #8E6FC7;
+    --app-color-service-light: rgba(167, 139, 219, 0.15);
+    --app-color-location: #F59E5B;
+    --app-color-location-dark: #E08540;
+    --app-color-location-light: rgba(245, 158, 91, 0.15);
+    --app-color-asset: #45CFDB;
+    --app-color-asset-dark: #29B6C3;
+    --app-color-asset-light: rgba(69, 207, 219, 0.15);
+    --app-color-supplier: #6C9BE8;
+    --app-color-supplier-dark: #5583D1;
+    --app-color-supplier-light: rgba(108, 155, 232, 0.15);
+    --app-color-revenue: #4FD1A1;
+    --app-color-revenue-dark: #35B788;
+    --app-color-revenue-light: rgba(79, 209, 161, 0.15);
+    --app-color-purchase: #6FDB8B;
+    --app-color-purchase-dark: #4EC271;
+    --app-color-purchase-light: rgba(111, 219, 139, 0.15);
+    --app-color-expense: #F0798D;
+    --app-color-expense-dark: #DB5F75;
+    --app-color-expense-light: rgba(240, 121, 141, 0.16);
+    --app-color-cash: #F5B93E;
+    --app-color-cash-dark: #DBA029;
+    --app-color-cash-light: rgba(245, 185, 62, 0.15);
+    --app-color-report: #4FC3DB;
+    --app-color-report-dark: #34A9C2;
+    --app-color-report-light: rgba(79, 195, 219, 0.15);
+    --app-color-admin: #8FA8C2;
+    --app-color-admin-dark: #7590AD;
+    --app-color-admin-light: rgba(143, 168, 194, 0.16);
+    --app-color-job: #E8A94E;
+    --app-color-job-dark: #D09037;
+    --app-color-job-light: rgba(232, 169, 78, 0.15);
+    --app-color-payroll: #62D5E8;
+    --app-color-payroll-dark: #43BDD2;
+    --app-color-payroll-light: rgba(98, 213, 232, 0.15);
+    --app-color-loan: #F0CE6B;
+    --app-color-loan-dark: #DBB64F;
+    --app-color-loan-light: rgba(240, 206, 107, 0.15);
+    --app-color-equity: #8E9FF0;
+    --app-color-equity-dark: #7385DB;
+    --app-color-equity-light: rgba(142, 159, 240, 0.15);
+    --app-color-ledger: #6FE0B2;
+    --app-color-ledger-dark: #4EC796;
+    --app-color-ledger-light: rgba(111, 224, 178, 0.15);
+    --app-color-home: #53C0F0;
+    --app-color-home-dark: #2FA8DE;
+    --app-color-home-light: rgba(83, 192, 240, 0.15);
+
+    /* Theme Meta */
+    --theme-name: "Blueprint Draft";
+    --theme-icon-bg: linear-gradient(135deg, #0F2A4C 0%, #0C2340 100%);
+    --theme-icon-accent: #53C0F0;
+}

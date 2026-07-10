@@ -7,7 +7,7 @@ type CommonLabels struct {
 	Notifications NotificationLabels `json:"notifications"`
 	Settings      SettingsLabels     `json:"settings"`
 	Theme         ThemeLabels        `json:"theme"`
-	HelpPane      HelpPaneLabels     `json:"helpPane"`
+	HelpPane      HelpPaneLabels     `json:"help_pane"`
 	Table         CommonTableLabels  `json:"table"`
 	Columns       CommonColumnLabels `json:"columns"`
 	Pagination    PaginationLabels   `json:"pagination"`
@@ -24,7 +24,7 @@ type CommonLabels struct {
 	Card          CardLabels         `json:"card"`
 	Tabs          TabLabels          `json:"tabs"`
 	Audit         AuditLabels        `json:"audit"`
-	DurationUnit  DurationUnitLabels `json:"durationUnit"`
+	DurationUnit  DurationUnitLabels `json:"duration_unit"`
 	Currency      CurrencyLabels     `json:"currency"`
 	Toast         ToastLabels        `json:"toast"`
 	Sheet         SheetLabels        `json:"sheet"`

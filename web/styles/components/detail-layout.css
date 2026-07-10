@@ -38,6 +38,17 @@
     padding-bottom: var(--spacing-md);
     border-bottom: var(--border-width) solid var(--border-light);
 }
+/* A section title that follows other content (multi-section tabs) needs
+   breathing room above it; the base rule keeps zero top margin so the
+   first title still hugs the tab top. */
+.detail-section-title:not(:first-child) {
+    margin-top: var(--spacing-3xl);
+}
+/* Stacked grids inside one section = intentional row groups; match the
+   grid's own cell gap between them. */
+.detail-info-grid + .detail-info-grid {
+    margin-top: var(--spacing-2xl);
+}
 .detail-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));

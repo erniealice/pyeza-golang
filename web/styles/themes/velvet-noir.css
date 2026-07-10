@@ -1,0 +1,132 @@
+/*
+ * ==========================================================================
+ * THEME: VELVET NOIR
+ * Wine-black velvet with dusty rose and champagne — plush, low-lit luxury
+ * Think: cocktail lounges, jewel boxes, opera intermissions
+ * ==========================================================================
+ */
+[data-theme="velvet-noir"] {
+    /* Backgrounds */
+    --bg-base: #1A0C12;
+    --bg-sidebar: #211016;
+    --bg-card: #281419;
+    --bg-hover: #331A21;
+    --bg-input: #281419;
+    --bg-overlay: rgba(10, 4, 7, 0.8);
+
+    /* Text */
+    --text-primary: #F2E4E4;
+    --text-secondary: #C09FA6;
+    --text-muted: #8A6B72;
+    --text-inverse: #1A0C12;
+
+    /* Primary Accent — dusty rose */
+    --accent-primary: #DB8598;
+    --accent-primary-light: rgba(219, 133, 152, 0.14);
+    --accent-primary-dark: #C46A80;
+
+    /* Secondary Accents */
+    --accent-terracotta: #D96C57;
+    --accent-terracotta-light: rgba(217, 108, 87, 0.15);
+    --accent-terracotta-dark: #B85543;
+    --accent-sage: #7FAE8B;
+    --accent-sage-light: rgba(127, 174, 139, 0.14);
+    --accent-navy: #7A88C2;
+    --accent-navy-light: rgba(122, 136, 194, 0.14);
+    --accent-navy-dark: #6371AB;
+    --accent-amber: #D9B36A;
+    --accent-amber-light: rgba(217, 179, 106, 0.14);
+    --accent-plum: #B37FC6;
+    --accent-slate: #997F86;
+
+    /* Status Colors */
+    --status-success: #7FAE8B;
+    --status-success-light: rgba(127, 174, 139, 0.14);
+    --status-warning: #D9B36A;
+    --status-warning-light: rgba(217, 179, 106, 0.14);
+    --status-error: #D96C57;
+    --status-error-light: rgba(217, 108, 87, 0.15);
+    --status-info: #7A88C2;
+    --status-info-light: rgba(122, 136, 194, 0.14);
+
+    /* Borders & Shadows — velvet folds, deep pooled dark */
+    --border: #3D2029;
+    --border-light: #4A2A34;
+    --border-focus: var(--accent-primary);
+    --border-default: #3D2029;
+    --border-subtle: #4A2A34;
+    --bg-muted: #331A21;
+    --bg-subtle: #211016;
+    --text-subtle: #8A6B72;
+    --shadow-sm: 0 2px 4px rgba(8, 2, 5, 0.4);
+    --shadow-md: 0 6px 16px rgba(8, 2, 5, 0.45);
+    --shadow-lg: 0 10px 28px rgba(8, 2, 5, 0.5);
+    --shadow-card: 0 3px 10px rgba(8, 2, 5, 0.4);
+    --shadow-card-hover: 0 5px 14px rgba(8, 2, 5, 0.5);
+    --shadow-float: 0 16px 44px rgba(8, 2, 5, 0.6);
+    --shadow-xl: 0 24px 56px rgba(8, 2, 5, 0.65);
+
+    /* App Icon Colors — jewel-box tones, rgba light variants */
+    --app-color-user: #D9B36A;
+    --app-color-user-dark: #BD9752;
+    --app-color-user-light: rgba(217, 179, 106, 0.14);
+    --app-color-client: #DB8598;
+    --app-color-client-dark: #C46A80;
+    --app-color-client-light: rgba(219, 133, 152, 0.14);
+    --app-color-inventory: #7A88C2;
+    --app-color-inventory-dark: #6371AB;
+    --app-color-inventory-light: rgba(122, 136, 194, 0.14);
+    --app-color-service: #B37FC6;
+    --app-color-service-dark: #9966AC;
+    --app-color-service-light: rgba(179, 127, 198, 0.14);
+    --app-color-location: #D98D5F;
+    --app-color-location-dark: #BD744A;
+    --app-color-location-light: rgba(217, 141, 95, 0.14);
+    --app-color-asset: #6FAEA8;
+    --app-color-asset-dark: #58928C;
+    --app-color-asset-light: rgba(111, 174, 168, 0.14);
+    --app-color-supplier: #9297C9;
+    --app-color-supplier-dark: #797EB1;
+    --app-color-supplier-light: rgba(146, 151, 201, 0.14);
+    --app-color-revenue: #7FAE8B;
+    --app-color-revenue-dark: #689273;
+    --app-color-revenue-light: rgba(127, 174, 139, 0.14);
+    --app-color-purchase: #96B87C;
+    --app-color-purchase-dark: #7C9C64;
+    --app-color-purchase-light: rgba(150, 184, 124, 0.14);
+    --app-color-expense: #D96C57;
+    --app-color-expense-dark: #B85543;
+    --app-color-expense-light: rgba(217, 108, 87, 0.15);
+    --app-color-cash: #D9A84E;
+    --app-color-cash-dark: #BD8E3B;
+    --app-color-cash-light: rgba(217, 168, 78, 0.14);
+    --app-color-report: #74A3B8;
+    --app-color-report-dark: #5D889C;
+    --app-color-report-light: rgba(116, 163, 184, 0.14);
+    --app-color-admin: #997F86;
+    --app-color-admin-dark: #7E666D;
+    --app-color-admin-light: rgba(153, 127, 134, 0.14);
+    --app-color-job: #C29A56;
+    --app-color-job-dark: #A68043;
+    --app-color-job-light: rgba(194, 154, 86, 0.14);
+    --app-color-payroll: #6BA8A0;
+    --app-color-payroll-dark: #548C85;
+    --app-color-payroll-light: rgba(107, 168, 160, 0.14);
+    --app-color-loan: #BA9A62;
+    --app-color-loan-dark: #9E804D;
+    --app-color-loan-light: rgba(186, 154, 98, 0.14);
+    --app-color-equity: #8D82C9;
+    --app-color-equity-dark: #746AB1;
+    --app-color-equity-light: rgba(141, 130, 201, 0.14);
+    --app-color-ledger: #82B394;
+    --app-color-ledger-dark: #6A977B;
+    --app-color-ledger-light: rgba(130, 179, 148, 0.14);
+    --app-color-home: #DB8598;
+    --app-color-home-dark: #C46A80;
+    --app-color-home-light: rgba(219, 133, 152, 0.14);
+
+    /* Theme Meta */
+    --theme-name: "Velvet Noir";
+    --theme-icon-bg: linear-gradient(135deg, #281419 0%, #1A0C12 100%);
+    --theme-icon-accent: #DB8598;
+}

@@ -1,0 +1,132 @@
+/*
+ * ==========================================================================
+ * THEME: MIDNIGHT SCHOLAR
+ * Dark academia — espresso wood, antique brass, parchment text
+ * Think: library reading rooms after hours, leather-bound ledgers
+ * ==========================================================================
+ */
+[data-theme="midnight-scholar"] {
+    /* Backgrounds */
+    --bg-base: #16120D;
+    --bg-sidebar: #1D1812;
+    --bg-card: #241E16;
+    --bg-hover: #2E261C;
+    --bg-input: #241E16;
+    --bg-overlay: rgba(10, 8, 5, 0.8);
+
+    /* Text */
+    --text-primary: #EDE4D3;
+    --text-secondary: #B3A78F;
+    --text-muted: #857A64;
+    --text-inverse: #16120D;
+
+    /* Primary Accent — antique brass */
+    --accent-primary: #CBA135;
+    --accent-primary-light: rgba(203, 161, 53, 0.15);
+    --accent-primary-dark: #A88425;
+
+    /* Secondary Accents */
+    --accent-terracotta: #C25546;
+    --accent-terracotta-light: rgba(194, 85, 70, 0.16);
+    --accent-terracotta-dark: #9E4236;
+    --accent-sage: #7FA05F;
+    --accent-sage-light: rgba(127, 160, 95, 0.16);
+    --accent-navy: #5D7BA6;
+    --accent-navy-light: rgba(93, 123, 166, 0.16);
+    --accent-navy-dark: #48628A;
+    --accent-amber: #D9A441;
+    --accent-amber-light: rgba(217, 164, 65, 0.16);
+    --accent-plum: #9B7FB0;
+    --accent-slate: #8C8272;
+
+    /* Status Colors */
+    --status-success: #7FA05F;
+    --status-success-light: rgba(127, 160, 95, 0.16);
+    --status-warning: #D9A441;
+    --status-warning-light: rgba(217, 164, 65, 0.16);
+    --status-error: #C25546;
+    --status-error-light: rgba(194, 85, 70, 0.16);
+    --status-info: #5D7BA6;
+    --status-info-light: rgba(93, 123, 166, 0.16);
+
+    /* Borders & Shadows — candle-lit depth */
+    --border: #383021;
+    --border-light: #453B2A;
+    --border-focus: var(--accent-primary);
+    --border-default: #383021;
+    --border-subtle: #453B2A;
+    --bg-muted: #2E261C;
+    --bg-subtle: #1D1812;
+    --text-subtle: #857A64;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.55);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+    /* App Icon Colors — burnished library hues, rgba light variants */
+    --app-color-user: #D9A441;
+    --app-color-user-dark: #B8882F;
+    --app-color-user-light: rgba(217, 164, 65, 0.16);
+    --app-color-client: #C25546;
+    --app-color-client-dark: #9E4236;
+    --app-color-client-light: rgba(194, 85, 70, 0.16);
+    --app-color-inventory: #5D7BA6;
+    --app-color-inventory-dark: #48628A;
+    --app-color-inventory-light: rgba(93, 123, 166, 0.16);
+    --app-color-service: #9B7FB0;
+    --app-color-service-dark: #7F6494;
+    --app-color-service-light: rgba(155, 127, 176, 0.16);
+    --app-color-location: #C97F4A;
+    --app-color-location-dark: #A66538;
+    --app-color-location-light: rgba(201, 127, 74, 0.16);
+    --app-color-asset: #6FA3A0;
+    --app-color-asset-dark: #578683;
+    --app-color-asset-light: rgba(111, 163, 160, 0.16);
+    --app-color-supplier: #8493B8;
+    --app-color-supplier-dark: #69789E;
+    --app-color-supplier-light: rgba(132, 147, 184, 0.16);
+    --app-color-revenue: #7FA05F;
+    --app-color-revenue-dark: #66844A;
+    --app-color-revenue-light: rgba(127, 160, 95, 0.16);
+    --app-color-purchase: #94AE6A;
+    --app-color-purchase-dark: #799253;
+    --app-color-purchase-light: rgba(148, 174, 106, 0.16);
+    --app-color-expense: #B85C50;
+    --app-color-expense-dark: #96473D;
+    --app-color-expense-light: rgba(184, 92, 80, 0.16);
+    --app-color-cash: #CBA135;
+    --app-color-cash-dark: #A88425;
+    --app-color-cash-light: rgba(203, 161, 53, 0.16);
+    --app-color-report: #6F9EA8;
+    --app-color-report-dark: #58828B;
+    --app-color-report-light: rgba(111, 158, 168, 0.16);
+    --app-color-admin: #8C8272;
+    --app-color-admin-dark: #71685A;
+    --app-color-admin-light: rgba(140, 130, 114, 0.16);
+    --app-color-job: #B08D3F;
+    --app-color-job-dark: #91732F;
+    --app-color-job-light: rgba(176, 141, 63, 0.16);
+    --app-color-payroll: #5F9490;
+    --app-color-payroll-dark: #4A7875;
+    --app-color-payroll-light: rgba(95, 148, 144, 0.16);
+    --app-color-loan: #A98A55;
+    --app-color-loan-dark: #8B7042;
+    --app-color-loan-light: rgba(169, 138, 85, 0.16);
+    --app-color-equity: #7D7BB3;
+    --app-color-equity-dark: #636197;
+    --app-color-equity-light: rgba(125, 123, 179, 0.16);
+    --app-color-ledger: #6D9A72;
+    --app-color-ledger-dark: #567E5B;
+    --app-color-ledger-light: rgba(109, 154, 114, 0.16);
+    --app-color-home: #CBA135;
+    --app-color-home-dark: #A88425;
+    --app-color-home-light: rgba(203, 161, 53, 0.16);
+
+    /* Theme Meta */
+    --theme-name: "Midnight Scholar";
+    --theme-icon-bg: linear-gradient(135deg, #241E16 0%, #16120D 100%);
+    --theme-icon-accent: #CBA135;
+}

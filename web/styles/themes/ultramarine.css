@@ -1,0 +1,133 @@
+/*
+ * ==========================================================================
+ * THEME: ULTRAMARINE
+ * Klein-blue duotone — one color, total commitment; blue-white paper,
+ * ultramarine ink, blue-tinted shadows. Alarm red is the only outsider.
+ * Think: Yves Klein, silkscreen monochromes, international style posters
+ * ==========================================================================
+ */
+[data-theme="ultramarine"] {
+    /* Backgrounds */
+    --bg-base: #F4F6FF;
+    --bg-sidebar: #E9EDFE;
+    --bg-card: #FFFFFF;
+    --bg-hover: #E1E7FD;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(15, 32, 150, 0.5);
+
+    /* Text */
+    --text-primary: #101A66;
+    --text-secondary: #3D4AA0;
+    --text-muted: #8792CC;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — Klein ultramarine */
+    --accent-primary: #1433C7;
+    --accent-primary-light: #E5E9FC;
+    --accent-primary-dark: #0C22A0;
+
+    /* Secondary Accents */
+    --accent-terracotta: #E8442B;
+    --accent-terracotta-light: #FCE6E1;
+    --accent-terracotta-dark: #C33118;
+    --accent-sage: #1F9D61;
+    --accent-sage-light: #E2F4EA;
+    --accent-navy: #1433C7;
+    --accent-navy-light: #E5E9FC;
+    --accent-navy-dark: #0C22A0;
+    --accent-amber: #E8A20C;
+    --accent-amber-light: #FBF0D7;
+    --accent-plum: #5A2FD0;
+    --accent-slate: #5F6AA8;
+
+    /* Status Colors */
+    --status-success: #1F9D61;
+    --status-success-light: #E2F4EA;
+    --status-warning: #E8A20C;
+    --status-warning-light: #FBF0D7;
+    --status-error: #E8442B;
+    --status-error-light: #FCE6E1;
+    --status-info: #1433C7;
+    --status-info-light: #E5E9FC;
+
+    /* Borders & Shadows — blue-cast lines and lift */
+    --border: #CBD4F4;
+    --border-light: #DEE4FA;
+    --border-focus: var(--accent-primary);
+    --border-default: #CBD4F4;
+    --border-subtle: #DEE4FA;
+    --bg-muted: #E1E7FD;
+    --bg-subtle: #E9EDFE;
+    --text-subtle: #8792CC;
+    --shadow-sm: 0 1px 2px rgba(20, 51, 199, 0.06);
+    --shadow-md: 0 4px 12px rgba(20, 51, 199, 0.10);
+    --shadow-lg: 0 8px 24px rgba(20, 51, 199, 0.13);
+    --shadow-card: 0 1px 4px rgba(20, 51, 199, 0.08), 0 1px 2px rgba(20, 51, 199, 0.05);
+    --shadow-card-hover: 0 3px 10px rgba(20, 51, 199, 0.14);
+    --shadow-float: 0 12px 40px rgba(20, 51, 199, 0.18);
+    --shadow-xl: 0 20px 50px rgba(20, 51, 199, 0.17);
+
+    /* App Icon Colors — a ramp of blues; money keeps semantic hues */
+    --app-color-user: #4C63E8;
+    --app-color-user-dark: #3549C7;
+    --app-color-user-light: #E9EDFD;
+    --app-color-client: #1433C7;
+    --app-color-client-dark: #0C22A0;
+    --app-color-client-light: #E5E9FC;
+    --app-color-inventory: #2377D6;
+    --app-color-inventory-dark: #175EB3;
+    --app-color-inventory-light: #E5F0FB;
+    --app-color-service: #5A2FD0;
+    --app-color-service-dark: #4620AD;
+    --app-color-service-light: #EBE6FA;
+    --app-color-location: #0C64A8;
+    --app-color-location-dark: #084D85;
+    --app-color-location-light: #E2EFF7;
+    --app-color-asset: #1289B4;
+    --app-color-asset-dark: #0C6C91;
+    --app-color-asset-light: #E3F2F8;
+    --app-color-supplier: #3D4AA0;
+    --app-color-supplier-dark: #2D3781;
+    --app-color-supplier-light: #E8EAF4;
+    --app-color-revenue: #1F9D61;
+    --app-color-revenue-dark: #157D4B;
+    --app-color-revenue-light: #E2F4EA;
+    --app-color-purchase: #12867A;
+    --app-color-purchase-dark: #0C6A60;
+    --app-color-purchase-light: #E2F2F1;
+    --app-color-expense: #E8442B;
+    --app-color-expense-dark: #C33118;
+    --app-color-expense-light: #FCE6E1;
+    --app-color-cash: #E8A20C;
+    --app-color-cash-dark: #C28608;
+    --app-color-cash-light: #FBF0D7;
+    --app-color-report: #0891B2;
+    --app-color-report-dark: #067490;
+    --app-color-report-light: #E1F3F7;
+    --app-color-admin: #5F6AA8;
+    --app-color-admin-dark: #495389;
+    --app-color-admin-light: #ECEEF5;
+    --app-color-job: #2352C7;
+    --app-color-job-dark: #1840A3;
+    --app-color-job-light: #E6EBFA;
+    --app-color-payroll: #1273C4;
+    --app-color-payroll-dark: #0D5BA0;
+    --app-color-payroll-light: #E3EFF9;
+    --app-color-loan: #8A6D15;
+    --app-color-loan-dark: #6E570F;
+    --app-color-loan-light: #F4EFDC;
+    --app-color-equity: #3A2F9E;
+    --app-color-equity-dark: #2B2280;
+    --app-color-equity-light: #E8E6F5;
+    --app-color-ledger: #146B8A;
+    --app-color-ledger-dark: #0E546D;
+    --app-color-ledger-light: #E3EFF4;
+    --app-color-home: #1433C7;
+    --app-color-home-dark: #0C22A0;
+    --app-color-home-light: #E5E9FC;
+
+    /* Theme Meta */
+    --theme-name: "Ultramarine";
+    --theme-icon-bg: linear-gradient(135deg, #F4F6FF 0%, #1433C7 100%);
+    --theme-icon-accent: #1433C7;
+}

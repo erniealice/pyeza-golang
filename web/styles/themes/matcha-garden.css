@@ -1,0 +1,132 @@
+/*
+ * ==========================================================================
+ * THEME: MATCHA GARDEN
+ * Calm matcha green with warm clay and pine-teal accents
+ * Think: tea houses, moss gardens, quiet focus
+ * ==========================================================================
+ */
+[data-theme="matcha-garden"] {
+    /* Backgrounds */
+    --bg-base: #F3F6EF;
+    --bg-sidebar: #EBF0E4;
+    --bg-card: #FFFFFF;
+    --bg-hover: #E4EBDA;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(38, 50, 32, 0.5);
+
+    /* Text */
+    --text-primary: #26331F;
+    --text-secondary: #51604A;
+    --text-muted: #8A9682;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — deep matcha */
+    --accent-primary: #567A3E;
+    --accent-primary-light: #ECF3E6;
+    --accent-primary-dark: #42602E;
+
+    /* Secondary Accents */
+    --accent-terracotta: #BC6742;
+    --accent-terracotta-light: #F8ECE5;
+    --accent-terracotta-dark: #98512F;
+    --accent-sage: #6E9861;
+    --accent-sage-light: #ECF4E9;
+    --accent-navy: #3E6B71;
+    --accent-navy-light: #E7F0F1;
+    --accent-navy-dark: #2E5257;
+    --accent-amber: #C29B3B;
+    --accent-amber-light: #F8F2E2;
+    --accent-plum: #8A6E9E;
+    --accent-slate: #77826E;
+
+    /* Status Colors */
+    --status-success: #4E8A50;
+    --status-success-light: #E8F4E9;
+    --status-warning: #C29B3B;
+    --status-warning-light: #F8F2E2;
+    --status-error: #C05248;
+    --status-error-light: #F8E9E7;
+    --status-info: #3E6B71;
+    --status-info-light: #E7F0F1;
+
+    /* Borders & Shadows — soft leaf-litter */
+    --border: #DCE3D2;
+    --border-light: #E6ECDD;
+    --border-focus: var(--accent-primary);
+    --border-default: #DCE3D2;
+    --border-subtle: #E6ECDD;
+    --bg-muted: #E4EBDA;
+    --bg-subtle: #EBF0E4;
+    --text-subtle: #8A9682;
+    --shadow-sm: 0 1px 2px rgba(38, 50, 32, 0.05);
+    --shadow-md: 0 4px 12px rgba(38, 50, 32, 0.07);
+    --shadow-lg: 0 8px 24px rgba(38, 50, 32, 0.10);
+    --shadow-card: 0 1px 4px rgba(38, 50, 32, 0.06), 0 1px 2px rgba(38, 50, 32, 0.04);
+    --shadow-card-hover: 0 2px 8px rgba(38, 50, 32, 0.09);
+    --shadow-float: 0 12px 40px rgba(38, 50, 32, 0.15);
+    --shadow-xl: 0 20px 50px rgba(38, 50, 32, 0.14);
+
+    /* App Icon Colors — botanical, earth-toned */
+    --app-color-user: #B3922F;
+    --app-color-user-dark: #927621;
+    --app-color-user-light: #F7F1DF;
+    --app-color-client: #BC6742;
+    --app-color-client-dark: #98512F;
+    --app-color-client-light: #F8ECE5;
+    --app-color-inventory: #3E6B71;
+    --app-color-inventory-dark: #2E5257;
+    --app-color-inventory-light: #E7F0F1;
+    --app-color-service: #8A6E9E;
+    --app-color-service-dark: #6F577F;
+    --app-color-service-light: #F2EEF6;
+    --app-color-location: #B5713A;
+    --app-color-location-dark: #92592B;
+    --app-color-location-light: #F7EEE4;
+    --app-color-asset: #4B8A7E;
+    --app-color-asset-dark: #396D63;
+    --app-color-asset-light: #E9F3F1;
+    --app-color-supplier: #5C7291;
+    --app-color-supplier-dark: #475A75;
+    --app-color-supplier-light: #EBEFF4;
+    --app-color-revenue: #4E8A50;
+    --app-color-revenue-dark: #3C6E3E;
+    --app-color-revenue-light: #E8F4E9;
+    --app-color-purchase: #6E9861;
+    --app-color-purchase-dark: #577C4C;
+    --app-color-purchase-light: #ECF4E9;
+    --app-color-expense: #B15048;
+    --app-color-expense-dark: #8F3E37;
+    --app-color-expense-light: #F7EAE8;
+    --app-color-cash: #C29B3B;
+    --app-color-cash-dark: #A07E2C;
+    --app-color-cash-light: #F8F2E2;
+    --app-color-report: #46818D;
+    --app-color-report-dark: #356671;
+    --app-color-report-light: #E8F1F3;
+    --app-color-admin: #77826E;
+    --app-color-admin-dark: #5D6755;
+    --app-color-admin-light: #EFF1ED;
+    --app-color-job: #8F7A34;
+    --app-color-job-dark: #726127;
+    --app-color-job-light: #F4F1E3;
+    --app-color-payroll: #3E7E86;
+    --app-color-payroll-dark: #2F636A;
+    --app-color-payroll-light: #E7F1F2;
+    --app-color-loan: #866A34;
+    --app-color-loan-dark: #6B5428;
+    --app-color-loan-light: #F4EFE4;
+    --app-color-equity: #55558E;
+    --app-color-equity-dark: #414173;
+    --app-color-equity-light: #EDEDF4;
+    --app-color-ledger: #35704A;
+    --app-color-ledger-dark: #275939;
+    --app-color-ledger-light: #E6F1EA;
+    --app-color-home: #567A3E;
+    --app-color-home-dark: #42602E;
+    --app-color-home-light: #ECF3E6;
+
+    /* Theme Meta */
+    --theme-name: "Matcha Garden";
+    --theme-icon-bg: linear-gradient(135deg, #F3F6EF 0%, #DCE3D2 100%);
+    --theme-icon-accent: #567A3E;
+}

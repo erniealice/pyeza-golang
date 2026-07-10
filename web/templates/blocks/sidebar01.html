@@ -172,28 +172,28 @@
          Labels via lyngua keys under "sidebarProfile.*" in
          packages/lyngua/translations/en/general/sidebar.json. */}}
     <div class="sidebar-profile" id="sidebarProfile" data-sidebar-profile>
-        <div class="sidebar-profile-menu" id="sidebarProfileMenu" role="menu" aria-label="{{.T "sidebarProfile.menuAriaLabel"}}" hidden>
+        <div class="sidebar-profile-menu" id="sidebarProfileMenu" role="menu" aria-label="{{.T "sidebar_profile.menu_aria_label"}}" hidden>
             <a href="{{.Sidebar.CurrentUser.ProfileURL}}" class="sidebar-profile-menu-item" role="menuitem" data-testid="sidebar-profile-menu-profile">
                 <span class="sidebar-profile-menu-icon">{{template "icon-user"}}</span>
-                <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.profile"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebar_profile.profile"}}</span>
             </a>
             <a href="{{.Sidebar.CurrentUser.AccountURL}}" class="sidebar-profile-menu-item" role="menuitem" data-testid="sidebar-profile-menu-account">
                 <span class="sidebar-profile-menu-icon">{{template "icon-shield"}}</span>
-                <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.account"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebar_profile.account"}}</span>
             </a>
             <a href="{{.Sidebar.CurrentUser.BillingURL}}" class="sidebar-profile-menu-item" role="menuitem" data-testid="sidebar-profile-menu-billing">
                 <span class="sidebar-profile-menu-icon">{{template "icon-credit-card"}}</span>
-                <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.billing"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebar_profile.billing"}}</span>
             </a>
             <a href="{{.Sidebar.CurrentUser.PreferencesURL}}" class="sidebar-profile-menu-item" role="menuitem" data-testid="sidebar-profile-menu-preferences">
                 <span class="sidebar-profile-menu-icon">{{template "icon-sliders-horizontal"}}</span>
-                <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.preferences"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebar_profile.preferences"}}</span>
             </a>
             <div class="sidebar-profile-menu-divider" role="separator"></div>
             <form method="POST" action="{{.Sidebar.CurrentUser.LogoutActionURL}}" class="sidebar-profile-menu-form" role="none">
                 <button type="submit" class="sidebar-profile-menu-item sidebar-profile-menu-item--danger" role="menuitem" data-testid="sidebar-profile-menu-logout">
                     <span class="sidebar-profile-menu-icon">{{template "icon-log-out"}}</span>
-                    <span class="sidebar-profile-menu-label">{{.T "sidebarProfile.signOut"}}</span>
+                    <span class="sidebar-profile-menu-label">{{.T "sidebar_profile.sign_out"}}</span>
                 </button>
             </form>
         </div>
@@ -203,7 +203,7 @@
                 id="sidebarProfileTrigger"
                 aria-haspopup="menu"
                 aria-expanded="false"
-                aria-label="{{.T "sidebarProfile.triggerAriaLabel"}}"
+                aria-label="{{.T "sidebar_profile.trigger_aria_label"}}"
                 aria-controls="sidebarProfileMenu"
                 data-sidebar-profile-trigger
                 data-testid="sidebar-profile-trigger"

@@ -1,0 +1,132 @@
+/*
+ * ==========================================================================
+ * THEME: KYOTO INDIGO
+ * Washi-paper warmth with aizome indigo and a vermillion seal accent
+ * Think: hand-dyed textiles, calligraphy ink, temple stationery
+ * ==========================================================================
+ */
+[data-theme="kyoto-indigo"] {
+    /* Backgrounds */
+    --bg-base: #F7F5F0;
+    --bg-sidebar: #F0EDE5;
+    --bg-card: #FFFFFF;
+    --bg-hover: #EBE7DC;
+    --bg-input: #FFFFFF;
+    --bg-overlay: rgba(28, 32, 51, 0.5);
+
+    /* Text */
+    --text-primary: #22263B;
+    --text-secondary: #4E5370;
+    --text-muted: #8B8FA3;
+    --text-inverse: #FFFFFF;
+
+    /* Primary Accent — deep aizome indigo */
+    --accent-primary: #2E4372;
+    --accent-primary-light: #E9EDF6;
+    --accent-primary-dark: #1F3055;
+
+    /* Secondary Accents */
+    --accent-terracotta: #C43E2F;
+    --accent-terracotta-light: #F9E9E6;
+    --accent-terracotta-dark: #9C2F23;
+    --accent-sage: #58805A;
+    --accent-sage-light: #EAF2EA;
+    --accent-navy: #2E4372;
+    --accent-navy-light: #E9EDF6;
+    --accent-navy-dark: #1F3055;
+    --accent-amber: #C99118;
+    --accent-amber-light: #F9F1DF;
+    --accent-plum: #7A5C94;
+    --accent-slate: #6A7183;
+
+    /* Status Colors */
+    --status-success: #3E7D4E;
+    --status-success-light: #E8F3EB;
+    --status-warning: #C99118;
+    --status-warning-light: #F9F1DF;
+    --status-error: #C43E2F;
+    --status-error-light: #F9E9E6;
+    --status-info: #2E6E8E;
+    --status-info-light: #E7F1F5;
+
+    /* Borders & Shadows — soft washi grain */
+    --border: #DED9CC;
+    --border-light: #E9E5DA;
+    --border-focus: var(--accent-primary);
+    --border-default: #DED9CC;
+    --border-subtle: #E9E5DA;
+    --bg-muted: #EBE7DC;
+    --bg-subtle: #F0EDE5;
+    --text-subtle: #8B8FA3;
+    --shadow-sm: 0 1px 2px rgba(34, 38, 59, 0.05);
+    --shadow-md: 0 4px 12px rgba(34, 38, 59, 0.07);
+    --shadow-lg: 0 8px 24px rgba(34, 38, 59, 0.10);
+    --shadow-card: 0 1px 4px rgba(34, 38, 59, 0.06), 0 1px 2px rgba(34, 38, 59, 0.04);
+    --shadow-card-hover: 0 2px 8px rgba(34, 38, 59, 0.09);
+    --shadow-float: 0 12px 40px rgba(34, 38, 59, 0.15);
+    --shadow-xl: 0 20px 50px rgba(34, 38, 59, 0.14);
+
+    /* App Icon Colors — muted Japanese traditional pigments */
+    --app-color-user: #B8912E;
+    --app-color-user-dark: #967420;
+    --app-color-user-light: #F8F2E2;
+    --app-color-client: #C43E2F;
+    --app-color-client-dark: #9C2F23;
+    --app-color-client-light: #F9E9E6;
+    --app-color-inventory: #2E4372;
+    --app-color-inventory-dark: #1F3055;
+    --app-color-inventory-light: #E9EDF6;
+    --app-color-service: #7A5C94;
+    --app-color-service-dark: #614878;
+    --app-color-service-light: #F2EDF6;
+    --app-color-location: #BC6A3C;
+    --app-color-location-dark: #99532C;
+    --app-color-location-light: #F8EEE6;
+    --app-color-asset: #33707E;
+    --app-color-asset-dark: #255762;
+    --app-color-asset-light: #E8F1F3;
+    --app-color-supplier: #4A5D8C;
+    --app-color-supplier-dark: #384870;
+    --app-color-supplier-light: #ECEFF6;
+    --app-color-revenue: #3E7D4E;
+    --app-color-revenue-dark: #2F633C;
+    --app-color-revenue-light: #E8F3EB;
+    --app-color-purchase: #58805A;
+    --app-color-purchase-dark: #446546;
+    --app-color-purchase-light: #EAF2EA;
+    --app-color-expense: #AD4438;
+    --app-color-expense-dark: #8A342B;
+    --app-color-expense-light: #F7EAE8;
+    --app-color-cash: #C99118;
+    --app-color-cash-dark: #A67612;
+    --app-color-cash-light: #F9F1DF;
+    --app-color-report: #2E6E8E;
+    --app-color-report-dark: #225670;
+    --app-color-report-light: #E7F1F5;
+    --app-color-admin: #6A7183;
+    --app-color-admin-dark: #525868;
+    --app-color-admin-light: #EEF0F3;
+    --app-color-job: #8A6D30;
+    --app-color-job-dark: #6E5624;
+    --app-color-job-light: #F4F0E4;
+    --app-color-payroll: #33707E;
+    --app-color-payroll-dark: #255762;
+    --app-color-payroll-light: #E8F1F3;
+    --app-color-loan: #7A5828;
+    --app-color-loan-dark: #60451E;
+    --app-color-loan-light: #F4EFE6;
+    --app-color-equity: #3D3A78;
+    --app-color-equity-dark: #2E2B60;
+    --app-color-equity-light: #ECECF6;
+    --app-color-ledger: #2E6040;
+    --app-color-ledger-dark: #1E4C30;
+    --app-color-ledger-light: #E8F2EC;
+    --app-color-home: #2E4372;
+    --app-color-home-dark: #1F3055;
+    --app-color-home-light: #E9EDF6;
+
+    /* Theme Meta */
+    --theme-name: "Kyoto Indigo";
+    --theme-icon-bg: linear-gradient(135deg, #F7F5F0 0%, #DED9CC 100%);
+    --theme-icon-accent: #2E4372;
+}

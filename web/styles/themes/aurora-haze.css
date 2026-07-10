@@ -1,0 +1,132 @@
+/*
+ * ==========================================================================
+ * THEME: AURORA HAZE
+ * Deep violet night sky with aurora teal, sky and magenta accents
+ * Think: northern lights, nebula gradients, after-dark dashboards
+ * ==========================================================================
+ */
+[data-theme="aurora-haze"] {
+    /* Backgrounds */
+    --bg-base: #120F1E;
+    --bg-sidebar: #171329;
+    --bg-card: #1D1834;
+    --bg-hover: #262043;
+    --bg-input: #1D1834;
+    --bg-overlay: rgba(10, 8, 20, 0.8);
+
+    /* Text */
+    --text-primary: #E9E6F7;
+    --text-secondary: #9D97BC;
+    --text-muted: #6F6990;
+    --text-inverse: #120F1E;
+
+    /* Primary Accent — aurora violet */
+    --accent-primary: #8B7CF6;
+    --accent-primary-light: rgba(139, 124, 246, 0.16);
+    --accent-primary-dark: #6F5EE8;
+
+    /* Secondary Accents */
+    --accent-terracotta: #EC5FA1;
+    --accent-terracotta-light: rgba(236, 95, 161, 0.16);
+    --accent-terracotta-dark: #D14A8B;
+    --accent-sage: #34D399;
+    --accent-sage-light: rgba(52, 211, 153, 0.15);
+    --accent-navy: #38BDF8;
+    --accent-navy-light: rgba(56, 189, 248, 0.15);
+    --accent-navy-dark: #0EA5E9;
+    --accent-amber: #FBBF24;
+    --accent-amber-light: rgba(251, 191, 36, 0.15);
+    --accent-plum: #C084FC;
+    --accent-slate: #9D97BC;
+
+    /* Status Colors */
+    --status-success: #34D399;
+    --status-success-light: rgba(52, 211, 153, 0.15);
+    --status-warning: #FBBF24;
+    --status-warning-light: rgba(251, 191, 36, 0.15);
+    --status-error: #FB7185;
+    --status-error-light: rgba(251, 113, 133, 0.16);
+    --status-info: #38BDF8;
+    --status-info-light: rgba(56, 189, 248, 0.15);
+
+    /* Borders & Shadows — nebula depth */
+    --border: #2C2650;
+    --border-light: #37305F;
+    --border-focus: var(--accent-primary);
+    --border-default: #2C2650;
+    --border-subtle: #37305F;
+    --bg-muted: #262043;
+    --bg-subtle: #171329;
+    --text-subtle: #6F6990;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.55);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+    /* App Icon Colors — aurora neon on violet dark, rgba light variants */
+    --app-color-user: #FBBF24;
+    --app-color-user-dark: #D9A51E;
+    --app-color-user-light: rgba(251, 191, 36, 0.15);
+    --app-color-client: #EC5FA1;
+    --app-color-client-dark: #D14A8B;
+    --app-color-client-light: rgba(236, 95, 161, 0.16);
+    --app-color-inventory: #38BDF8;
+    --app-color-inventory-dark: #0EA5E9;
+    --app-color-inventory-light: rgba(56, 189, 248, 0.15);
+    --app-color-service: #8B7CF6;
+    --app-color-service-dark: #6F5EE8;
+    --app-color-service-light: rgba(139, 124, 246, 0.16);
+    --app-color-location: #FB923C;
+    --app-color-location-dark: #EA7A22;
+    --app-color-location-light: rgba(251, 146, 60, 0.15);
+    --app-color-asset: #2DD4BF;
+    --app-color-asset-dark: #14B8A6;
+    --app-color-asset-light: rgba(45, 212, 191, 0.15);
+    --app-color-supplier: #818CF8;
+    --app-color-supplier-dark: #6366F1;
+    --app-color-supplier-light: rgba(129, 140, 248, 0.15);
+    --app-color-revenue: #34D399;
+    --app-color-revenue-dark: #10B981;
+    --app-color-revenue-light: rgba(52, 211, 153, 0.15);
+    --app-color-purchase: #4ADE80;
+    --app-color-purchase-dark: #22C55E;
+    --app-color-purchase-light: rgba(74, 222, 128, 0.15);
+    --app-color-expense: #FB7185;
+    --app-color-expense-dark: #F43F5E;
+    --app-color-expense-light: rgba(251, 113, 133, 0.16);
+    --app-color-cash: #FBBF24;
+    --app-color-cash-dark: #D9A51E;
+    --app-color-cash-light: rgba(251, 191, 36, 0.15);
+    --app-color-report: #22D3EE;
+    --app-color-report-dark: #06B6D4;
+    --app-color-report-light: rgba(34, 211, 238, 0.15);
+    --app-color-admin: #9D97BC;
+    --app-color-admin-dark: #7F78A3;
+    --app-color-admin-light: rgba(157, 151, 188, 0.16);
+    --app-color-job: #F59E0B;
+    --app-color-job-dark: #D48806;
+    --app-color-job-light: rgba(245, 158, 11, 0.15);
+    --app-color-payroll: #5EEAD4;
+    --app-color-payroll-dark: #2DD4BF;
+    --app-color-payroll-light: rgba(94, 234, 212, 0.15);
+    --app-color-loan: #FCD34D;
+    --app-color-loan-dark: #FBBF24;
+    --app-color-loan-light: rgba(252, 211, 77, 0.15);
+    --app-color-equity: #A78BFA;
+    --app-color-equity-dark: #8B5CF6;
+    --app-color-equity-light: rgba(167, 139, 250, 0.15);
+    --app-color-ledger: #6EE7B7;
+    --app-color-ledger-dark: #34D399;
+    --app-color-ledger-light: rgba(110, 231, 183, 0.15);
+    --app-color-home: #C084FC;
+    --app-color-home-dark: #A855F7;
+    --app-color-home-light: rgba(192, 132, 252, 0.15);
+
+    /* Theme Meta */
+    --theme-name: "Aurora Haze";
+    --theme-icon-bg: linear-gradient(135deg, #1D1834 0%, #120F1E 100%);
+    --theme-icon-accent: #8B7CF6;
+}

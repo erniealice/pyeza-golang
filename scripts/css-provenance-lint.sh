@@ -54,7 +54,7 @@ fi
 
 THEMES_DIR="$ROOT/packages/pyeza-golang/web/styles/themes"
 BASE_DIR="$ROOT/packages/pyeza-golang/web/styles/base"
-MANIFEST="$ROOT/docs/wiki/articles/css-provenance-manifest.md"
+MANIFEST="$ROOT/docs/wiki/articles/ui-css-provenance-manifest.md"
 
 # Non-pyeza domain/app CSS roots (RULE 2 + RULE 4 scope). Pyeza web/styles/** is
 # the design-system implementation layer and is intentionally NOT in this list.
@@ -133,8 +133,8 @@ for f in "${theme_files[@]}"; do
     diff <(printf '%s\n' "$canon_set") <(token_names_of "$f") | sed 's/^/          /'
   fi
 done
-if [ "$theme_count" -ne 15 ]; then
-  violation "RULE 5: expected 15 theme files, found $theme_count"
+if [ "$theme_count" -ne 25 ]; then
+  violation "RULE 5: expected 25 theme files, found $theme_count"
 fi
 [ "$fail" -eq 0 ] && note "  OK — all $theme_count themes define the identical $canon_count-token set"
 note ""
@@ -150,6 +150,7 @@ while IFS= read -r f; do
     "$THEMES_DIR"/*) continue ;;                                  # themes: allowed
     "$BASE_DIR"/layout.css|"$BASE_DIR"/main-base.css) continue ;; # base: allowed
     */assets/css/app/main.css) continue ;;                        # auto-generated
+    */docs/*) continue ;;                                         # doc/plan artifacts, not served CSS
   esac
   # match a theme-token DEFINITION whether it starts a line or sits mid-line after
   # `{` or `;` (e.g. `.x { --accent-foo: #abc; }`) — both are real declarations.

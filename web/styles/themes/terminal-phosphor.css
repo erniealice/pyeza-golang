@@ -1,0 +1,132 @@
+/*
+ * ==========================================================================
+ * THEME: TERMINAL PHOSPHOR
+ * True-black CRT with P1 phosphor green — shadows are glows, not drops
+ * Think: green-screen terminals, server rooms, machine rooms at 3am
+ * ==========================================================================
+ */
+[data-theme="terminal-phosphor"] {
+    /* Backgrounds */
+    --bg-base: #050A06;
+    --bg-sidebar: #081108;
+    --bg-card: #0B150C;
+    --bg-hover: #122112;
+    --bg-input: #0B150C;
+    --bg-overlay: rgba(2, 5, 3, 0.85);
+
+    /* Text */
+    --text-primary: #BFF5C8;
+    --text-secondary: #6FBF7E;
+    --text-muted: #4A8455;
+    --text-inverse: #050A06;
+
+    /* Primary Accent — phosphor green */
+    --accent-primary: #34E86B;
+    --accent-primary-light: rgba(52, 232, 107, 0.12);
+    --accent-primary-dark: #22C455;
+
+    /* Secondary Accents */
+    --accent-terracotta: #FF5540;
+    --accent-terracotta-light: rgba(255, 85, 64, 0.14);
+    --accent-terracotta-dark: #E03E2B;
+    --accent-sage: #58D08A;
+    --accent-sage-light: rgba(88, 208, 138, 0.13);
+    --accent-navy: #35BBD4;
+    --accent-navy-light: rgba(53, 187, 212, 0.13);
+    --accent-navy-dark: #22A0B8;
+    --accent-amber: #FFB627;
+    --accent-amber-light: rgba(255, 182, 39, 0.13);
+    --accent-plum: #9B6BE8;
+    --accent-slate: #5E7A64;
+
+    /* Status Colors */
+    --status-success: #34E86B;
+    --status-success-light: rgba(52, 232, 107, 0.12);
+    --status-warning: #FFB627;
+    --status-warning-light: rgba(255, 182, 39, 0.13);
+    --status-error: #FF5540;
+    --status-error-light: rgba(255, 85, 64, 0.14);
+    --status-info: #35BBD4;
+    --status-info-light: rgba(53, 187, 212, 0.13);
+
+    /* Borders & Shadows — phosphor glow instead of drop shadow */
+    --border: #163A1D;
+    --border-light: #1E4A26;
+    --border-focus: var(--accent-primary);
+    --border-default: #163A1D;
+    --border-subtle: #1E4A26;
+    --bg-muted: #122112;
+    --bg-subtle: #081108;
+    --text-subtle: #4A8455;
+    --shadow-sm: 0 0 6px rgba(52, 232, 107, 0.10);
+    --shadow-md: 0 0 14px rgba(52, 232, 107, 0.14);
+    --shadow-lg: 0 0 24px rgba(52, 232, 107, 0.16);
+    --shadow-card: 0 0 10px rgba(52, 232, 107, 0.10);
+    --shadow-card-hover: 0 0 16px rgba(52, 232, 107, 0.18);
+    --shadow-float: 0 0 32px rgba(52, 232, 107, 0.20);
+    --shadow-xl: 0 0 44px rgba(52, 232, 107, 0.22);
+
+    /* App Icon Colors — phosphor set: greens, cyans, ambers, alert reds */
+    --app-color-user: #FFB627;
+    --app-color-user-dark: #E09D15;
+    --app-color-user-light: rgba(255, 182, 39, 0.13);
+    --app-color-client: #FF5540;
+    --app-color-client-dark: #E03E2B;
+    --app-color-client-light: rgba(255, 85, 64, 0.14);
+    --app-color-inventory: #35BBD4;
+    --app-color-inventory-dark: #22A0B8;
+    --app-color-inventory-light: rgba(53, 187, 212, 0.13);
+    --app-color-service: #9B6BE8;
+    --app-color-service-dark: #8052CC;
+    --app-color-service-light: rgba(155, 107, 232, 0.13);
+    --app-color-location: #FF8A3D;
+    --app-color-location-dark: #E07128;
+    --app-color-location-light: rgba(255, 138, 61, 0.13);
+    --app-color-asset: #2FD6C3;
+    --app-color-asset-dark: #1DB8A6;
+    --app-color-asset-light: rgba(47, 214, 195, 0.13);
+    --app-color-supplier: #64A8E8;
+    --app-color-supplier-dark: #4B8CCC;
+    --app-color-supplier-light: rgba(100, 168, 232, 0.13);
+    --app-color-revenue: #34E86B;
+    --app-color-revenue-dark: #22C455;
+    --app-color-revenue-light: rgba(52, 232, 107, 0.12);
+    --app-color-purchase: #8FE83A;
+    --app-color-purchase-dark: #74C427;
+    --app-color-purchase-light: rgba(143, 232, 58, 0.12);
+    --app-color-expense: #FF6B6B;
+    --app-color-expense-dark: #E05252;
+    --app-color-expense-light: rgba(255, 107, 107, 0.13);
+    --app-color-cash: #E8D23A;
+    --app-color-cash-dark: #C4B027;
+    --app-color-cash-light: rgba(232, 210, 58, 0.12);
+    --app-color-report: #3AE8D2;
+    --app-color-report-dark: #27C4B0;
+    --app-color-report-light: rgba(58, 232, 210, 0.12);
+    --app-color-admin: #5E7A64;
+    --app-color-admin-dark: #49604E;
+    --app-color-admin-light: rgba(94, 122, 100, 0.14);
+    --app-color-job: #D0A83A;
+    --app-color-job-dark: #B08C27;
+    --app-color-job-light: rgba(208, 168, 58, 0.13);
+    --app-color-payroll: #58D0D0;
+    --app-color-payroll-dark: #3FB4B4;
+    --app-color-payroll-light: rgba(88, 208, 208, 0.13);
+    --app-color-loan: #E8B93A;
+    --app-color-loan-dark: #C49D27;
+    --app-color-loan-light: rgba(232, 185, 58, 0.13);
+    --app-color-equity: #7BA8F0;
+    --app-color-equity-dark: #5E8CD6;
+    --app-color-equity-light: rgba(123, 168, 240, 0.13);
+    --app-color-ledger: #58E89B;
+    --app-color-ledger-dark: #3FC480;
+    --app-color-ledger-light: rgba(88, 232, 155, 0.12);
+    --app-color-home: #34E86B;
+    --app-color-home-dark: #22C455;
+    --app-color-home-light: rgba(52, 232, 107, 0.12);
+
+    /* Theme Meta */
+    --theme-name: "Terminal Phosphor";
+    --theme-icon-bg: linear-gradient(135deg, #0B150C 0%, #050A06 100%);
+    --theme-icon-accent: #34E86B;
+}
