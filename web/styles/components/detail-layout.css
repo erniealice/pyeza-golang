@@ -94,6 +94,18 @@
     border-top: var(--border-width) solid var(--border);
 }
 
+/* Table-flavored tabs: the embedded table-card already paints its own card
+   chrome, so the tab panel painting a second card around it reads as a box
+   inside a box. Drop the outer chrome and let the table-card be the tab
+   surface. Info/audit/attachment tabs (no .tab-scroll--table) keep the card. */
+.detail-body:has(> .tab-scroll--table) {
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
 @media (max-width: 768px) {
     .detail-body { padding: var(--spacing-xl); }
     .detail-info-grid { grid-template-columns: 1fr 1fr; }
