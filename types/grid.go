@@ -177,6 +177,18 @@ type CellGridCell struct {
 	// Current value — always as string, the template coerces to the descriptor type
 	Value string
 
+	// TextValue holds an optional descriptor recorded ALONGSIDE the primary
+	// Value — e.g. task_outcome.text_value coexisting with
+	// task_outcome.numeric_value (an IB-MYP grade descriptor stored next to
+	// a numeric score). Populated by the view ONLY when a numeric value took
+	// priority for Value and a text descriptor was also recorded — a
+	// genuinely text-typed criterion never sets this (there TextValue IS
+	// already Value; no duplication). Rendered by the component as a small
+	// secondary line under Value, non-editable display only (S7:
+	// docs/plan/20260710-staff-class-list/s7pre-data-parity.md gap 5 —
+	// "text ratings/text_value invisible: no UI slot for descriptors").
+	TextValue string
+
 	// Editable is false when the underlying job_task does not exist yet (job not
 	// spawned) — the cell renders as "—" and is not editable. Distinct from
 	// ReadOnly (which is a permission/ownership gate on an editable cell).

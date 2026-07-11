@@ -5,11 +5,25 @@
    inputs. Pyeza-owned component layer — may carry raw layout literals per the CSS
    Provenance Manifest, but this file references only real design tokens:
      --z-popover, --z-sidebar (layout.css) · --bg-card, --bg-sidebar, --bg-hover,
-     --text-muted, --border (themes/*.css) · --border-width-thick, --spacing-*
-     (base/layout.css) · --header-height (app-owned :root — see
-     .page-content--grid below; the same token detail-layout.css's
-     .page-content.detail-layout and app/layout.css's .page-content--table
-     already depend on).
+     --text-muted, --text-secondary, --border, --accent-primary,
+     --accent-primary-light (themes/*.css) · --border-width, --border-width-thick,
+     --radius-sm, --spacing-*, --duration-fast (base/layout.css) ·
+     --text-2xs/--text-xs/--text-sm (type scale), --leading-tight,
+     --font-weight-medium, --font-weight-semibold (base/main-base.css) ·
+     --header-height (app-owned :root — see .page-content--grid below; the same
+     token detail-layout.css's .page-content.detail-layout and app/layout.css's
+     .page-content--table already depend on).
+
+   Density + polish pass (S7, 2026-07-12): row height was previously driven by
+   the AMBIENT body font-size (--text-base, 15px) and body's line-height:1.6
+   (main-base.css) — neither was ever overridden here, so every row carried far
+   more vertical padding than intended for a dense spreadsheet. This pass sets
+   an explicit --text-sm/--leading-tight baseline on the table (small steps on
+   the type scale, no hardcoded px) and tokenizes every border/radius/padding
+   declaration that was previously a raw literal, so the grid now also responds
+   to the border/radius design axes (it silently ignored both before). Header
+   row height shrank accordingly — the .cell-grid-row--l2/--l3 sticky top
+   offsets below were recomputed to match (see their own comment).
 
    Stacking (OQ-4): the sticky <thead> and the sticky first column each open their
    own stacking context. The header×frozen-col intersection must sit above BOTH, so
@@ -89,14 +103,21 @@
     table-layout: fixed;
     width: max-content;
     min-width: 100%;
+    /* Density baseline (S7): --text-sm + --leading-tight replace the
+       previously-inherited body defaults (--text-base / line-height:1.6),
+       cascading to every th/td/input below unless overridden. This is the
+       single biggest row-height win — a spreadsheet grid reads dense at
+       table-cell type scale, not body-copy type scale. */
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
 }
 
 .cell-grid-caption {
     caption-side: top;
     text-align: left;
-    padding: 0.5rem 0;
+    padding: var(--spacing-sm) 0;
     color: var(--text-muted);
-    font-size: 0.875rem;
+    font-size: var(--text-md);
 }
 
 /* --- Sticky header ------------------------------------------------------- */
@@ -105,19 +126,23 @@
     top: 0;
     z-index: var(--z-popover); /* above body rows during vertical scroll */
     background: var(--bg-card);
-    border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    padding: 0.375rem 0.5rem;
+    border-bottom: var(--border-width) solid var(--border);
+    border-right: var(--border-width) solid var(--border);
+    padding: var(--spacing-2xs) var(--spacing-sm);
     text-align: center;
-    font-weight: 600;
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
     white-space: nowrap;
 }
 
 /* Stack the three header rows so each sits below its parent. Row heights are
-   uniform enough that fixed offsets keep rows 2/3 pinned under row 1. */
+   uniform enough that fixed offsets keep rows 2/3 pinned under row 1.
+   Recomputed for S7's tighter header (--text-xs/--leading-tight/
+   --spacing-2xs padding/--border-width bottom border ≈ 1.5rem per row at
+   default density — was 2rem under the old inherited-body-text sizing). */
 .cell-grid-row--l1 th { top: 0; }
-.cell-grid-row--l2 th { top: 2rem; }
-.cell-grid-row--l3 th { top: 4rem; }
+.cell-grid-row--l2 th { top: 1.5rem; }
+.cell-grid-row--l3 th { top: 3rem; }
 
 /* --- Frozen first column ------------------------------------------------- */
 .cell-grid-table .cell-grid-col--frozen {
@@ -133,21 +158,26 @@
     z-index: calc(var(--z-popover) + 10);
 }
 
-/* Row-head (frozen first <td>/<th> of each body row). */
+/* Row-head (frozen first <td>/<th> of each body row). Padding matches
+   .cell-grid-cell exactly (S7) so the frozen label column and the scrolled
+   data columns share one row height — previously mismatched (0.375rem/0.5rem
+   here vs 0.125rem/0.25rem on .cell-grid-cell), which could jitter row
+   alignment. */
 .cell-grid-rowhead {
-    padding: 0.375rem 0.5rem;
+    padding: var(--spacing-2xs) var(--spacing-sm);
     text-align: left;
-    font-weight: 500;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
     white-space: nowrap;
     background: var(--bg-sidebar);
-    border-bottom: 1px solid var(--border);
+    border-bottom: var(--border-width) solid var(--border);
 }
 
 /* --- Body cells ---------------------------------------------------------- */
 .cell-grid-cell {
-    padding: 0.125rem 0.25rem;
-    border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border);
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    border-bottom: var(--border-width) solid var(--border);
+    border-right: var(--border-width) solid var(--border);
     text-align: center;
     vertical-align: middle;
 }
@@ -156,12 +186,34 @@
     width: 100%;
     min-width: 3.5rem;
     box-sizing: border-box;
-    padding: 0.25rem 0.375rem;
-    border: 1px solid var(--border);
-    border-radius: 0.25rem;
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-sm);
     background: var(--bg-card);
-    font: inherit;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
     text-align: center;
+    transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+/* Focus / hover — mirrors form.css's .form-input treatment (the same real
+   <input>/<select> element family) so a grid cell's focus ring reads as the
+   same control as every other pyeza input, not a bespoke one. */
+.cell-grid-input:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 var(--border-width-focus) var(--accent-primary-light);
+}
+
+.cell-grid-input:hover:not(:focus):not(:disabled) {
+    border-color: var(--text-muted);
+}
+
+/* Aligned numerics — digits line up column-to-column while typing/scanning. */
+.cell-grid-input--numeric {
+    font-variant-numeric: tabular-nums;
 }
 
 .cell-grid-input--text {
@@ -172,12 +224,12 @@
 .cell-grid-input-wrap {
     display: inline-flex;
     align-items: baseline;
-    gap: 0.25rem;
+    gap: var(--spacing-2xs);
 }
 
 .cell-grid-unit {
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
 }
 
 .cell-grid-cell--empty {
@@ -185,12 +237,32 @@
     user-select: none;
 }
 
-/* Recorded value shown to viewers without write access. */
+/* Recorded value shown to viewers without write access. Font-size is
+   inherited from .cell-grid-table's --text-sm baseline (S7) — the same size
+   as .cell-grid-input's own text, so the read-only VALUE and the editable
+   INPUT read as the same "cell content", just two different affordances. */
 .cell-grid-cell--value {
     display: inline-block;
     padding: var(--spacing-2xs) var(--spacing-xs);
     color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
+}
+
+/* Optional descriptor recorded alongside a numeric value (S7, s7pre gap 5 —
+   e.g. an IB-MYP grade descriptor stored next to a numeric score). Mirrors
+   table.css's .author-date secondary-line convention: small, muted, own
+   line under the primary value. Truncated with the full text in `title` —
+   these are free-text sentences and must never force the cell/column wide. */
+.cell-grid-cell--note {
+    display: block;
+    max-width: 100%;
+    margin-top: var(--spacing-2xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--text-2xs);
+    color: var(--text-muted);
+    line-height: var(--leading-tight);
 }
 
 /* --- Read-only cell ------------------------------------------------------ */
@@ -204,6 +276,18 @@
     pointer-events: none;
 }
 
+/* --- Row hover (S7) — mirrors table.css's .data-table tbody tr:hover.
+   Targets every cell explicitly (rather than a plain tr:hover background)
+   because the sticky frozen column and sticky header cells each need their
+   OWN opaque background during scroll — a <tr>-level background wouldn't
+   show through them. Higher specificity than the base
+   .cell-grid-cell/.cell-grid-rowhead/.cell-grid-col--frozen rules wins
+   regardless of source order, so this applies to frozen cells too. */
+.cell-grid-tbody .cell-grid-row:hover .cell-grid-cell,
+.cell-grid-tbody .cell-grid-row:hover .cell-grid-rowhead {
+    background: var(--bg-hover);
+}
+
 /* --- Actions / empty ----------------------------------------------------- */
 /* A sibling of .cell-grid-scroll inside the flex-column .cell-grid-form
    (never inside the scroll region) — flex-shrink:0 keeps Save at its
@@ -213,12 +297,12 @@
 .cell-grid-actions {
     display: flex;
     justify-content: flex-end;
-    padding: 0.75rem 0;
+    padding: var(--spacing-md) 0;
     flex-shrink: 0;
 }
 
 .cell-grid-empty {
-    padding: 2rem;
+    padding: var(--spacing-4xl);
     text-align: center;
     color: var(--text-muted);
 }

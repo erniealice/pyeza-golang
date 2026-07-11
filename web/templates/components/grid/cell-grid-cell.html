@@ -18,6 +18,12 @@ with .cell-grid-cell--ro + a tooltip; the value is still submitted-safe because 
 disabled control is simply omitted from the POST (server-side IDOR guard is the
 backstop).
 
+$cell.TextValue (S7, s7pre gap 5) is an OPTIONAL descriptor recorded alongside
+a numeric Value (e.g. an IB-MYP grade descriptor coexisting with a numeric
+score) — rendered as a small secondary line under the read-only value. It is
+only ever set by the view for the non-editable display path; a genuinely
+text-typed criterion never populates it (there TextValue IS already Value).
+
 Pointer enforcement fields (Min/Max/Step/MaxLength) are read via the *Attr()
 methods on CellInputDescriptor — a *float64 / *int cannot be interpolated
 directly (html/template prints the pointer address, not the value).
@@ -40,6 +46,7 @@ directly (html/template prints the pointer address, not the value).
              the recorded value; the dash is reserved for truly empty cells. */ -}}
         {{if $cell.Value}}
         <span class="cell-grid-cell--value" data-testid="{{$cell.TestID}}">{{$cell.Value}}{{with $input.Unit}} {{.}}{{end}}</span>
+        {{with $cell.TextValue}}<span class="cell-grid-cell--note" title="{{.}}">{{.}}</span>{{end}}
         {{else}}
         <span class="cell-grid-cell--empty" aria-hidden="true">—</span>
         {{end}}
