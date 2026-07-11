@@ -5,24 +5,81 @@
    inputs. Pyeza-owned component layer — may carry raw layout literals per the CSS
    Provenance Manifest, but this file references only real design tokens:
      --z-popover, --z-sidebar (layout.css) · --bg-card, --bg-sidebar, --bg-hover,
-     --text-muted, --border (themes/*.css) · --border-width-thick (layout.css).
+     --text-muted, --border (themes/*.css) · --border-width-thick, --spacing-*
+     (base/layout.css) · --header-height (app-owned :root — see
+     .page-content--grid below; the same token detail-layout.css's
+     .page-content.detail-layout and app/layout.css's .page-content--table
+     already depend on).
 
    Stacking (OQ-4): the sticky <thead> and the sticky first column each open their
    own stacking context. The header×frozen-col intersection must sit above BOTH, so
    it gets calc(var(--z-popover) + 10). Body frozen cells use --z-sidebar (below the
    header, above scrolled body cells).
+
+   Full-page height chain (round 4 item 3, 2026-07-11): a full-page grid view
+   (currently only outcome-matrix) wraps this component in `.page-content--grid`
+   (defined below — same "page-content--*" variant family as app/layout.css's
+   already-proven `.page-content--table`, kept here instead of that app-owned
+   file so the whole fix stays inside pyeza source; CSS class selectors don't
+   care which loaded stylesheet defines them). `.page-content--grid` supplies
+   the height BUDGET; the rest of this file supplies the FLEX CHAIN that
+   consumes it, so page chrome (the host page's toolbar, e.g. matrix.html's
+   `.om-toolbar`) stays visible and ONLY `.cell-grid-scroll` scrolls —
+   mirroring `.table-card`/`.table-scroll-wrapper` (table.css), the proven
+   pattern for the generic table component. `.cell-grid-scroll`'s prior
+   `max-height: 80vh` is REMOVED here: it capped the grid to a flat fraction
+   of the viewport with no awareness of the page chrome around it (header nav
+   + toolbar + the Save button below), so on a real page the total content
+   could still exceed 100vh and push Save off-screen — the flex chain below
+   replaces it with an ancestor-driven bound instead of a fixed vh guess.
    ============================================================================ */
+
+/* Grid page variant — full height with flexbox so only the embedded grid's
+   own .cell-grid-scroll scrolls; page chrome (this page's toolbar + the
+   grid's Save button) stays on-screen. Same recipe as app/layout.css's
+   `.page-content--table` (mirrored, not duplicated in meaning — that file
+   owns the *table* list-page variant; this is the *grid* full-page variant,
+   scoped here because it's a direct extension of the CellGridConfig
+   component's own scroll contract, not a generic page shell decision). */
+.page-content--grid {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--header-height));
+    padding: var(--spacing-2xl) var(--spacing-4xl);
+    gap: var(--spacing-xl);
+    overflow: hidden;
+}
 
 .cell-grid-card {
     position: relative;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
 }
 
-/* Scroll container — owns BOTH axes so sticky top/left anchor to it. */
+/* The batch-save <form> — sits between the (usually-hidden) save-result
+   banner and fills the rest of .cell-grid-card. */
+.cell-grid-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Scroll container — owns BOTH axes so sticky top/left anchor to it. Fills
+   whatever height its ancestor chain gives it (flex:1, no vh guess); when
+   NOT inside a flex ancestor (e.g. an embedding this component gains in the
+   future with no height budget), these flex properties are simply inert and
+   the box falls back to its natural (content) height — non-breaking. */
 .cell-grid-scroll {
     position: relative;
     overflow: auto;
-    max-height: 80vh;
+    flex: 1 1 0;
+    min-height: 0;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -128,6 +185,14 @@
     user-select: none;
 }
 
+/* Recorded value shown to viewers without write access. */
+.cell-grid-cell--value {
+    display: inline-block;
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
 /* --- Read-only cell ------------------------------------------------------ */
 .cell-grid-cell--ro input,
 .cell-grid-cell--ro select,
@@ -140,14 +205,34 @@
 }
 
 /* --- Actions / empty ----------------------------------------------------- */
+/* A sibling of .cell-grid-scroll inside the flex-column .cell-grid-form
+   (never inside the scroll region) — flex-shrink:0 keeps Save at its
+   natural size and always visible below the (now internally-scrolling)
+   grid, the same "small chrome piece never shrinks" contract as
+   detail-layout.css's .detail-tab-actions--bottom. */
 .cell-grid-actions {
     display: flex;
     justify-content: flex-end;
     padding: 0.75rem 0;
+    flex-shrink: 0;
 }
 
 .cell-grid-empty {
     padding: 2rem;
     text-align: center;
     color: var(--text-muted);
+}
+
+/* --- Host-page toolbar (round 4 item 3) ----------------------------------
+   .om-toolbar (outcome_matrix/templates/matrix.html — the scope Mine/All
+   toggle row) is a direct flex-column sibling of .cell-grid-card inside
+   .page-content--grid. flex-shrink:0 keeps it — page chrome — from ever
+   being squeezed by .cell-grid-card's flex:1 fill, matching the
+   .cell-grid-actions contract above (same "chrome piece never shrinks"
+   rule, applied to the piece ABOVE the grid instead of below it). Named
+   generically per this class family's existing convention (om- = the
+   generic outcome_matrix Unit, not an education noun) even though
+   outcome-matrix is its only consumer today. */
+.om-toolbar {
+    flex-shrink: 0;
 }

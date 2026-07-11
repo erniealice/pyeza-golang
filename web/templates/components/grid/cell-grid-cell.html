@@ -26,9 +26,23 @@ directly (html/template prints the pointer address, not the value).
 {{- $cell := .Cell -}}
 {{- $col := .Col -}}
 {{- $input := $col.CellInput -}}
-<td class="cell-grid-cell{{if $cell.ReadOnly}} cell-grid-cell--ro{{end}}"{{if $cell.ReadOnly}} title="{{$cell.ReadOnlyTooltip}}"{{end}}>
+{{- /* $showRO folds gap 6 (the report's "dead ReadOnly path") into gap 1's
+     fix: the <td>'s read-only class/tooltip must apply whenever a
+     non-editable value is being SHOWN, not only when the adapter's
+     independently-computed ReadOnly flag happens to also be true (true for
+     every real recorded cell today, since ReadOnly derives from
+     recorded_by != "" — but the two are not the SAME signal, so this
+     doesn't rely on that coincidence holding forever). */ -}}
+{{- $showRO := or $cell.ReadOnly (and (not $cell.Editable) $cell.Value) -}}
+<td class="cell-grid-cell{{if $showRO}} cell-grid-cell--ro{{end}}"{{if $showRO}} title="{{$cell.ReadOnlyTooltip}}"{{end}}>
     {{if not $cell.Editable}}
+        {{- /* Non-editable ≠ empty: a viewer without write access still sees
+             the recorded value; the dash is reserved for truly empty cells. */ -}}
+        {{if $cell.Value}}
+        <span class="cell-grid-cell--value" data-testid="{{$cell.TestID}}">{{$cell.Value}}{{with $input.Unit}} {{.}}{{end}}</span>
+        {{else}}
         <span class="cell-grid-cell--empty" aria-hidden="true">—</span>
+        {{end}}
     {{else}}
         {{if eq $input.Type "numeric"}}
         <span class="cell-grid-input-wrap">
