@@ -320,3 +320,39 @@
 .om-toolbar {
     flex-shrink: 0;
 }
+
+/* --- Group band rows (view-driven row grouping) ---------------------------
+   A CellGridRow with GroupLabel set emits one full-width band <tr> above it
+   (cell-grid-body.html). The band <th> spans row-head + every leaf column;
+   the label lives in an inner position:sticky span so it stays readable
+   while the grid scrolls horizontally. Uppercase is the band convention
+   (a section divider, not data rendering — the raw value is preserved in
+   the DOM). */
+.cell-grid-group-band {
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    text-align: left;
+    background: var(--bg-hover);
+    border-bottom: var(--border-width) solid var(--border);
+    border-top: var(--border-width-thick) solid var(--border);
+}
+
+.cell-grid-group-label {
+    position: sticky;
+    left: var(--spacing-sm);
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+/* --- Row-head description (secondary line under the row label) ------------ */
+.cell-grid-rowhead-desc {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-muted);
+    text-transform: capitalize;
+    line-height: var(--leading-tight);
+}

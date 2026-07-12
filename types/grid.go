@@ -75,6 +75,26 @@ type CellGridConfig struct {
 	WorkspaceID string
 }
 
+// LeafColumnCount returns the number of Level3 leaf columns across the whole
+// column tree. The group-band row's cell spans this many columns plus the
+// frozen row-head column.
+func (c CellGridConfig) LeafColumnCount() int {
+	n := 0
+	for _, l1 := range c.Columns {
+		for _, l2 := range l1.Level2 {
+			n += len(l2.Level3)
+		}
+	}
+	return n
+}
+
+// BandColSpan is the colspan for a group-band row: every leaf column plus the
+// frozen row-head column. Exposed as a method because html/template cannot do
+// arithmetic without a registered func.
+func (c CellGridConfig) BandColSpan() int {
+	return c.LeafColumnCount() + 1
+}
+
 // CellGridLevel1 is the top header level (e.g. a semester / job_template_phase).
 type CellGridLevel1 struct {
 	Key    string // maps to job_template_phase_id
@@ -165,6 +185,13 @@ type CellGridRow struct {
 	DataAttrs map[string]string
 	// TestID for the row wrapper (convention: "om-row-{short_client_id}").
 	TestID string
+	// Description is an optional secondary line rendered under Label in the
+	// frozen row-head (e.g. an entity attribute value the view surfaces).
+	Description string
+	// GroupLabel, when non-empty, emits a full-width band row ABOVE this row
+	// (this row starts a new group). Row ordering is the view's concern — the
+	// component only renders a band where the view marked one.
+	GroupLabel string
 }
 
 // CellGridCell is one cell in the grid (one client × one criterion).
@@ -205,13 +232,16 @@ type CellGridCell struct {
 	TestID string
 }
 
-// CellGridLabels holds user-visible strings for the grid.
+// CellGridLabels holds user-visible strings for the grid. The json tags match
+// the snake_case "grid" object keys in the lyngua translation files — without
+// them the per-tier overrides silently fail to unmarshal and every consumer
+// falls back to the compiled-in defaults.
 type CellGridLabels struct {
-	SaveButton     string // "Save grades"
-	SavingButton   string // "Saving…"
-	SavedBanner    string // "Grades saved."
-	ErrorBanner    string // "Save failed — please try again."
-	ReadOnlyMarker string // "(read only)"
-	EmptyGrid      string // "No rows to display."
-	ClientColumn   string // "Student" / "Client" (frozen header)
+	SaveButton     string `json:"save_button"`      // "Save grades"
+	SavingButton   string `json:"saving_button"`    // "Saving…"
+	SavedBanner    string `json:"saved_banner"`     // "Grades saved."
+	ErrorBanner    string `json:"error_banner"`     // "Save failed — please try again."
+	ReadOnlyMarker string `json:"read_only_marker"` // "(read only)"
+	EmptyGrid      string `json:"empty_grid"`       // "No rows to display."
+	ClientColumn   string `json:"client_column"`    // "Student" / "Client" (frozen header)
 }

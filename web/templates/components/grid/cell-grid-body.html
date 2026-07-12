@@ -8,6 +8,14 @@ looked up by ColumnKey in the row's Cells map; a MISSING key yields the zero
 CellGridCell (Editable=false → renders "—"), which is exactly the OQ-3 "job not
 spawned / no cell" case, so no explicit-existence branch is needed here.
 
+A row whose GroupLabel is non-empty starts a new group: a full-width band row
+is emitted above it (row ordering/grouping is the view's concern — the
+component only renders a band where the view marked one). The band label sits
+in an inner sticky span so it stays visible under horizontal scroll.
+
+A row's optional Description renders as a secondary line under the label in
+the frozen row-head.
+
 Each cell is dispatched to cell-grid-cell via a dict {Cell, Col} — the narrowed
 dot inside cell-grid-cell then reads .Cell (CellGridCell) and .Col (CellGridLevel3).
 */}}
@@ -16,10 +24,15 @@ dot inside cell-grid-cell then reads .Cell (CellGridCell) and .Col (CellGridLeve
     {{$grid := .}}
     {{range .Rows}}
     {{$row := .}}
+    {{if .GroupLabel}}
+    <tr class="cell-grid-group-row">
+        <th scope="colgroup" colspan="{{$grid.BandColSpan}}" class="cell-grid-group-band"><span class="cell-grid-group-label">{{.GroupLabel}}</span></th>
+    </tr>
+    {{end}}
     <tr class="cell-grid-row" data-testid="{{.TestID}}"{{range $k, $v := .DataAttrs}} data-{{$k}}="{{$v}}"{{end}}>
         <th scope="row"
             class="cell-grid-rowhead{{if $grid.FreezeFirstCol}} cell-grid-col--frozen{{end}}"
-            data-testid="om-client-{{.ID}}">{{with .Label}}{{.}}{{else}}{{$row.ID}}{{end}}</th>
+            data-testid="om-client-{{.ID}}">{{with .Label}}{{.}}{{else}}{{$row.ID}}{{end}}{{if .Description}}<span class="cell-grid-rowhead-desc">{{.Description}}</span>{{end}}</th>
         {{range $grid.Columns}}{{range .Level2}}{{range .Level3}}
         {{template "cell-grid-cell" (dict "Cell" (index $row.Cells .ColumnKey) "Col" .)}}
         {{end}}{{end}}{{end}}
