@@ -20,8 +20,9 @@
             const tableCard = table.closest('.table-card');
             const isServerMode = tableCard && tableCard.dataset.serverPagination === 'true';
 
-            const tbody = table.querySelector('tbody');
-            const rows = tbody ? tbody.querySelectorAll('tr[data-id]') : [];
+            // Query across ALL tbody elements — grouped tables render one
+            // tbody per band, so a first-tbody query would search no rows.
+            const rows = table.querySelectorAll('tbody tr[data-id]');
 
             const debounce = lf.TableCore ? lf.TableCore.debounce : function(fn, wait) {
                 let timeout;

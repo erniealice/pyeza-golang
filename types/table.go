@@ -636,7 +636,21 @@ type TableConfig struct {
 	// Nonce is the per-request CSP nonce, populated by the ViewAdapter via
 	// reflection (same mechanism as PageData.Nonce). Templates use it as
 	// nonce="{{.Nonce}}" on inline <script> tags inside the table component.
-	Nonce                 string
+	Nonce string
+}
+
+// RowCount returns the total data-row count across both body layouts — flat
+// Rows or grouped Groups (rows live inside each group). The footer's initial
+// "Showing X to Y of Z" render uses it so grouped tables don't report 0.
+func (c *TableConfig) RowCount() int {
+	if len(c.Groups) > 0 {
+		n := 0
+		for _, g := range c.Groups {
+			n += len(g.Rows)
+		}
+		return n
+	}
+	return len(c.Rows)
 }
 
 // ImportAction defines the import button configuration

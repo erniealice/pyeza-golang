@@ -294,11 +294,9 @@
         const table = document.getElementById(tableId);
         if (!table) return [];
 
-        const tbody = table.querySelector('tbody');
-        if (!tbody) return [];
-
-        // Get all data rows that are not hidden by filters/search
-        const allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
+        // Query across ALL tbody elements — grouped tables render one tbody
+        // per band (table-row-group), so a first-tbody query sees no rows.
+        const allRows = Array.from(table.querySelectorAll('tbody tr[data-id]'));
         return allRows.filter(row => {
             // Check if row is hidden by search/filter (not pagination)
             const style = row.style.display;
@@ -311,10 +309,7 @@
         const table = document.getElementById(tableId);
         if (!table) return [];
 
-        const tbody = table.querySelector('tbody');
-        if (!tbody) return [];
-
-        return Array.from(tbody.querySelectorAll('tr[data-id]'));
+        return Array.from(table.querySelectorAll('tbody tr[data-id]'));
     }
 
     function getTotalPages(tableId) {
@@ -334,10 +329,7 @@
         const table = document.getElementById(tableId);
         if (!table) return;
 
-        const tbody = table.querySelector('tbody');
-        if (!tbody) return;
-
-        const allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
+        const allRows = Array.from(table.querySelectorAll('tbody tr[data-id]'));
         const { currentPage, entriesPerPage } = state;
 
         // Filter out rows hidden by search/filter
@@ -366,6 +358,19 @@
                 }
                 visibleIndex++;
             }
+        });
+
+        // Grouped tables: hide a band (header + rows tbody) when none of its
+        // rows are visible on the current page/filter; keep collapsed bands'
+        // rows hidden but let their headers show whenever they hold matches.
+        table.querySelectorAll('tbody.table-group-rows').forEach(groupBody => {
+            const anyVisible = Array.from(groupBody.querySelectorAll('tr[data-id]'))
+                .some(row => row.style.display !== 'none');
+            const groupId = groupBody.id.replace(/^group-/, '');
+            const header = table.querySelector(`tbody.table-group[data-group="${CSS.escape(groupId)}"]`);
+            const collapsed = header && header.classList.contains('collapsed');
+            groupBody.style.display = (anyVisible && !collapsed) ? '' : 'none';
+            if (header) header.style.display = anyVisible ? '' : 'none';
         });
 
         // Update pagination UI

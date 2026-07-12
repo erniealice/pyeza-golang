@@ -43,6 +43,7 @@ type PageData struct {
 	HeaderSubtitle      string
 	HeaderBreadcrumb    string // optional text shown above the title (e.g., "← Rate Card XYZ")
 	HeaderBreadcrumbURL string // optional href; when set, the breadcrumb renders as a link
+	HeaderSubtitleURL   string // optional href; when set, HeaderSubtitle renders as a link
 	SearchPlaceholder   string
 	HasNotifications    bool
 	// HasMessages gates the "Messages" header button (secure-messaging, Plan-4).

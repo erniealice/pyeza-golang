@@ -45,9 +45,10 @@
             const table = document.getElementById(tableId);
             if (!table) return;
 
-            const tbody = table.querySelector('tbody');
-            const allRows = tbody.querySelectorAll('tr[data-id]');
-            const visibleRows = tbody.querySelectorAll('tr[data-id]:not([style*="display: none"])');
+            // Query across ALL tbody elements — grouped tables render one
+            // tbody per band, so a first-tbody query sees no rows.
+            const allRows = table.querySelectorAll('tbody tr[data-id]');
+            const visibleRows = table.querySelectorAll('tbody tr[data-id]:not([style*="display: none"])');
 
             const startEl = document.getElementById(`${tableId}-start`);
             const endEl = document.getElementById(`${tableId}-end`);
@@ -58,6 +59,23 @@
             if (totalEl) totalEl.textContent = allRows.length;
         }
     }
+
+    // Row-group collapse/expand (table-row-group in table.html). Delegated so
+    // it covers tables swapped in after load (HTMX).
+    document.addEventListener('click', function(e) {
+        const toggle = e.target.closest('.table-group-toggle');
+        if (!toggle) return;
+        const headerRow = toggle.closest('tr.table-group-header');
+        const headerBody = toggle.closest('tbody.table-group');
+        if (!headerRow || !headerBody) return;
+        const groupId = headerRow.dataset.groupToggle;
+        const table = headerBody.closest('table');
+        const rowsBody = table && groupId ? table.querySelector(`tbody.table-group-rows#group-${CSS.escape(groupId)}`) : null;
+        if (!rowsBody) return;
+        const collapsed = headerBody.classList.toggle('collapsed');
+        rowsBody.style.display = collapsed ? 'none' : '';
+        toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
 
     // Expose utilities
     window.lf.ui = window.lf.ui || {};

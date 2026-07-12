@@ -23,7 +23,7 @@
                 </button>
                 {{end}}
             </div>
-            <p>{{if .HeaderSubtitle}}{{.HeaderSubtitle}}{{else}}{{.CommonLabels.Header.WelcomeBack}}{{end}}</p>
+            <p>{{if .HeaderSubtitle}}{{if .HeaderSubtitleURL}}<a href="{{.HeaderSubtitleURL}}" class="greeting-subtitle-link">{{.HeaderSubtitle}}</a>{{else}}{{.HeaderSubtitle}}{{end}}{{else}}{{.CommonLabels.Header.WelcomeBack}}{{end}}</p>
         </div>
     </div>
 

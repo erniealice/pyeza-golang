@@ -24,11 +24,11 @@
     {{/* Info - center */}}
     <div class="footer-info">
         {{.Labels.Showing}}
-        <strong><span id="{{.ID}}-start">1</span></strong>
+        <strong><span id="{{.ID}}-start">{{if gt .RowCount 0}}1{{else}}0{{end}}</span></strong>
         {{.Labels.To}}
-        <strong><span id="{{.ID}}-end">{{min (len .Rows) 25}}</span></strong>
+        <strong><span id="{{.ID}}-end">{{min .RowCount 25}}</span></strong>
         {{.Labels.Of}}
-        <strong><span id="{{.ID}}-total">{{len .Rows}}</span></strong>
+        <strong><span id="{{.ID}}-total">{{.RowCount}}</span></strong>
         {{.Labels.EntriesLabel}}
     </div>
     {{/* Pagination - right */}}
