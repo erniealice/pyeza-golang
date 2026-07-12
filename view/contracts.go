@@ -3,6 +3,8 @@ package view
 import (
 	"context"
 	"net/http"
+
+	"github.com/erniealice/pyeza-golang/types"
 )
 
 // View interface defines the contract for presentation-layer views.
@@ -88,19 +90,15 @@ func Error(err error) ViewResult {
 
 // ForbiddenPageData is the template data shape for the shared "forbidden"
 // page. Carries the missing permission code so the AWS-style tooltip pattern
-// ("Missing permission: plan:create") can render. CommonLabels is populated
-// by the ViewAdapter via reflection on render — views just call
-// view.Forbidden(perm); they do not construct this struct directly.
+// ("Missing permission: plan:create") can render. It embeds the full
+// types.PageData shell surface — the app-shell layout (sidebar, header,
+// theme, nonce, session fields) dereferences those fields unconditionally,
+// and the render pipeline populates them by reflection; without the full
+// surface the 403 page fails to execute and surfaces as a blank 500.
+// Views just call view.Forbidden(perm); they do not construct this struct
+// directly.
 type ForbiddenPageData struct {
-	CacheVersion    string
-	Title           string
-	ContentTemplate string
-	CurrentPath     string
-	HeaderIcon      string
-	HeaderTitle     string
-	HeaderSubtitle  string
-	CommonLabels    any
-	Messages        map[string]string
+	types.PageData
 	// Perm carries the entity:action code that was missing, e.g., "plan:create".
 	// Rendered inside the "Missing permission: %s" tooltip / page body.
 	Perm string
@@ -119,11 +117,13 @@ func Forbidden(perm string) ViewResult {
 	return ViewResult{
 		Template: "forbidden",
 		Data: &ForbiddenPageData{
-			Title:           "Forbidden",
-			ContentTemplate: "forbidden-content",
-			HeaderIcon:      "icon-lock",
-			HeaderTitle:     "Forbidden",
-			Perm:            perm,
+			PageData: types.PageData{
+				Title:           "Forbidden",
+				ContentTemplate: "forbidden-content",
+				HeaderIcon:      "icon-lock",
+				HeaderTitle:     "Forbidden",
+			},
+			Perm: perm,
 		},
 		StatusCode: http.StatusForbidden,
 	}
