@@ -2814,6 +2814,55 @@ body.density-comfortable .action-buttons {
 }
 
 /* ========================================
+   FROZEN LEADING COLUMNS (horizontal scroll)
+   .data-table-freeze2 pins the first two BODY columns (e.g. a report card's
+   student name + per-row action) while the remaining columns scroll
+   horizontally inside .table-scroll-wrapper. Opt in via
+   TableConfig.TableClass = "data-table-freeze2". Band-header rows (a single
+   colspan cell) are excluded so their MALE/FEMALE title + toggle are not
+   clipped to the frozen column width. --freeze2-c2 is BOTH the first column's
+   pinned width AND the second column's left offset — keep them equal.
+   ======================================== */
+.data-table-freeze2 { --freeze2-c2: 14rem; }
+
+.data-table-freeze2 tbody tr:not(.table-group-header) td:nth-child(1),
+.data-table-freeze2 thead th:nth-child(1) {
+    position: sticky;
+    left: 0;
+    width: var(--freeze2-c2);
+    min-width: var(--freeze2-c2);
+    max-width: var(--freeze2-c2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: var(--bg-base);
+}
+.data-table-freeze2 tbody tr:not(.table-group-header) td:nth-child(2),
+.data-table-freeze2 thead th:nth-child(2) {
+    position: sticky;
+    left: var(--freeze2-c2);
+    background: var(--bg-base);
+    box-shadow: 1px 0 0 0 var(--border);
+}
+/* z-index layering: header corner cells above everything; body frozen cells
+   above the scrolling body but below the sticky header row. */
+.data-table-freeze2 tbody tr:not(.table-group-header) td:nth-child(1),
+.data-table-freeze2 tbody tr:not(.table-group-header) td:nth-child(2) { z-index: 3; }
+.data-table-freeze2 thead th:nth-child(1),
+.data-table-freeze2 thead th:nth-child(2) { z-index: 5; }
+
+/* Band-header (e.g. MALE / FEMALE) label stays pinned at the left while the grid
+   scrolls horizontally. The band row is a single full-colspan cell deliberately
+   left OUT of the frozen columns (so its title/toggle isn't clipped to the
+   frozen width), so pin the toggle itself instead. It floats over its own
+   always-present cell background, so no explicit fill is needed. */
+.data-table-freeze2 tr.table-group-header .table-group-toggle {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+}
+
+/* ========================================
    MATRIX INPUT / SELECT CELLS
    ======================================== */
 

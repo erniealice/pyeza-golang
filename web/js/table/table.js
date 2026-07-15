@@ -79,8 +79,16 @@
         init();
     }
 
-    // Re-initialize tables after HTMX settles (preserves pagination state)
-    // Using afterSettle instead of afterSwap to ensure DOM is fully updated
+    // Re-initialize tables after HTMX settles (preserves pagination state).
+    // Using afterSettle instead of afterSwap to ensure DOM is fully updated.
+    // Bound EXACTLY once per document via a window guard: this file lives in
+    // page-end.html, which the full-page render re-emits, so a boosted nav /
+    // htmx history-restore re-executes this IIFE. Without the guard each
+    // re-execution stacked another afterSettle handler, so a single settle
+    // fired init() N times (the console showed "Re-initializing table modules"
+    // repeating) — wasteful and a source of duplicate-listener bugs downstream.
+    if (!window.__lfTableAfterSettleBound) {
+    window.__lfTableAfterSettleBound = true;
     document.body.addEventListener('htmx:afterSettle', function(event) {
         const swappedContent = event.detail.target;
         if (!swappedContent) return;
@@ -122,6 +130,7 @@
             init();
         }
     });
+    }
 
     // Expose public API via lf.TableToolbar for backwards compatibility
     window.lf = window.lf || {};

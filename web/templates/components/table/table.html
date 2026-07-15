@@ -133,7 +133,7 @@ JavaScript:
 {{$caption := .Caption}}
 {{if and (not $caption) .Title}}{{$caption = .Title}}{{end}}
 {{if not $caption}}{{$caption = "Data table"}}{{end}}
-<table class="data-table{{if .ColumnGroups}} data-table-grouped{{end}}{{if .FixedLayout}} data-table-fixed{{end}}" id="{{.ID}}"{{if .DefaultSortColumn}} data-default-sort="{{.DefaultSortColumn}}" data-default-direction="{{if .DefaultSortDirection}}{{.DefaultSortDirection}}{{else}}asc{{end}}"{{end}}>
+<table class="data-table{{if .ColumnGroups}} data-table-grouped{{end}}{{if .FixedLayout}} data-table-fixed{{end}}{{if .TableClass}} {{.TableClass}}{{end}}" id="{{.ID}}"{{if .DefaultSortColumn}} data-default-sort="{{.DefaultSortColumn}}" data-default-direction="{{if .DefaultSortDirection}}{{.DefaultSortDirection}}{{else}}asc{{end}}"{{end}}>
     <caption class="visually-hidden">{{$caption}}</caption>
     {{if .ColumnGroups}}
     {{/* Multi-level headers with column groups */}}

@@ -61,21 +61,30 @@
     }
 
     // Row-group collapse/expand (table-row-group in table.html). Delegated so
-    // it covers tables swapped in after load (HTMX).
-    document.addEventListener('click', function(e) {
-        const toggle = e.target.closest('.table-group-toggle');
-        if (!toggle) return;
-        const headerRow = toggle.closest('tr.table-group-header');
-        const headerBody = toggle.closest('tbody.table-group');
-        if (!headerRow || !headerBody) return;
-        const groupId = headerRow.dataset.groupToggle;
-        const table = headerBody.closest('table');
-        const rowsBody = table && groupId ? table.querySelector(`tbody.table-group-rows#group-${CSS.escape(groupId)}`) : null;
-        if (!rowsBody) return;
-        const collapsed = headerBody.classList.toggle('collapsed');
-        rowsBody.style.display = collapsed ? 'none' : '';
-        toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    });
+    // it covers tables swapped in after load (HTMX). Bound EXACTLY once per
+    // document via a window guard: these table scripts live in page-end.html,
+    // which the full-page render re-emits, so a boosted navigation / htmx
+    // history-restore re-executes this IIFE and — without the guard — stacked a
+    // fresh delegated click listener each time. With an even number of
+    // duplicate listeners a single toggle click fired an even number of times
+    // and cancelled out, which is the "accordion dead until hard refresh" bug.
+    if (!window.__lfTableGroupToggleBound) {
+        window.__lfTableGroupToggleBound = true;
+        document.addEventListener('click', function(e) {
+            const toggle = e.target.closest('.table-group-toggle');
+            if (!toggle) return;
+            const headerRow = toggle.closest('tr.table-group-header');
+            const headerBody = toggle.closest('tbody.table-group');
+            if (!headerRow || !headerBody) return;
+            const groupId = headerRow.dataset.groupToggle;
+            const table = headerBody.closest('table');
+            const rowsBody = table && groupId ? table.querySelector(`tbody.table-group-rows#group-${CSS.escape(groupId)}`) : null;
+            if (!rowsBody) return;
+            const collapsed = headerBody.classList.toggle('collapsed');
+            rowsBody.style.display = collapsed ? 'none' : '';
+            toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        });
+    }
 
     // Expose utilities
     window.lf.ui = window.lf.ui || {};
