@@ -139,19 +139,19 @@ JavaScript:
     {{/* Multi-level headers with column groups */}}
     <thead>
         <tr class="column-group-header">
-            <th class="column-group-spacer" rowspan="2" scope="col">{{if .NameColumnLabel}}<span class="column-label">{{.NameColumnLabel}}</span>{{end}}</th>
+            <th class="column-group-spacer" rowspan="2" scope="col" data-leaf-col>{{if .NameColumnLabel}}<span class="column-label">{{.NameColumnLabel}}</span>{{end}}</th>
             {{range .ColumnGroups}}
             <th class="column-group-label" colspan="{{len .Columns}}" scope="colgroup">{{.Label}}</th>
             {{end}}
         </tr>
         <tr class="column-sub-header">
-            {{range .ColumnGroups}}
+            {{range $grp := .ColumnGroups}}
             {{range .Columns}}
             {{$isActive := false}}
             {{$activeDirection := ""}}
             {{$wireKey := .Key}}{{if .SortKey}}{{$wireKey = .SortKey}}{{end}}
             {{if $.ServerPagination}}{{if $.ServerPagination.SortColumn}}{{if eq $.ServerPagination.SortColumn $wireKey}}{{$isActive = true}}{{$activeDirection = $.ServerPagination.SortDirection}}{{end}}{{end}}{{end}}
-            <th scope="col" {{if .Sortable}}class="sortable{{if $isActive}} active sort-{{$activeDirection}}{{end}}{{if .WidthClass}} {{.WidthClass}}{{end}}" data-sort="{{if .SortKey}}{{.SortKey}}{{else}}{{.Key}}{{end}}"{{if .SortKind}} data-sort-kind="{{.SortKind}}"{{end}} aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{else}}{{if .WidthClass}}class="{{.WidthClass}}"{{end}}{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}}{{if or .Width .MinWidth .Align}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}"{{end}}>
+            <th scope="col" data-leaf-col data-group-label="{{$grp.Label}}" {{if .Sortable}}class="sortable{{if $isActive}} active sort-{{$activeDirection}}{{end}}{{if .WidthClass}} {{.WidthClass}}{{end}}" data-sort="{{if .SortKey}}{{.SortKey}}{{else}}{{.Key}}{{end}}"{{if .SortKind}} data-sort-kind="{{.SortKind}}"{{end}} aria-sort="{{if $isActive}}{{if eq $activeDirection "asc"}}ascending{{else if eq $activeDirection "desc"}}descending{{else}}none{{end}}{{else}}none{{end}}"{{else}}{{if .WidthClass}}class="{{.WidthClass}}"{{end}}{{end}}{{if $isActive}} data-sort-direction="{{$activeDirection}}"{{end}}{{if or .Width .MinWidth .Align}} style="{{if .Width}}width: {{.Width}};{{end}}{{if .MinWidth}}min-width: {{.MinWidth}};{{end}}{{if .Align}}text-align: {{.Align}}{{end}}"{{end}}>
                 {{if .Sortable}}<button type="button" class="sort-btn column-label">{{.Label}}</button>{{else}}<span class="column-label">{{.Label}}</span>{{end}}
                 {{if .Sortable}}
                 <span class="sort-indicator">

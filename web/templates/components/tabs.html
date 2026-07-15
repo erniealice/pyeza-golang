@@ -35,9 +35,17 @@ VARIANTS:
     category - Minimal category filter tabs (marketplace)
 
 ACCESSIBILITY:
-    - Uses role="tablist" and role="tab"
-    - Proper aria-selected state
-    - Keyboard navigation support via JS
+    Two interaction models, chosen automatically per strip:
+
+    - Link-flavor tabs (items carry Href and NO HxGet): rendered as a plain
+      navigation of anchors in the natural tab order. NO role="tab" / roving
+      tabindex — the container is a <nav> (not role="tablist") and the active
+      link carries aria-current="page". This keeps them keyboard-operable
+      (WCAG 2.1.1 Level A) without needing an APG arrow-key handler.
+
+    - JS-driven tabs (items carry HxGet, or plain <button> tabs toggled by app
+      JS): keep true tablist semantics — role="tablist" on the container,
+      role="tab" + aria-selected + roving tabindex on each tab.
 ================================================================================
 */}}
 
@@ -48,7 +56,14 @@ ACCESSIBILITY:
 
 {{/* Default variant - Pill-style tabs */}}
 {{if or (eq $variant "default") (eq $variant "")}}
-<div class="tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
+{{/* Link-flavor detection: a strip is nav-style when it has Href links and no
+     JS-driven (HxGet) tab. Link strips drop tablist/role=tab for a keyboard-
+     operable natural tab order; JS-driven strips keep true tablist semantics. */}}
+{{$hasHxGet := false}}{{$hasHref := false}}
+{{range .Items}}{{if .HxGet}}{{$hasHxGet = true}}{{end}}{{if .Href}}{{$hasHref = true}}{{end}}{{end}}
+{{$linkNav := and $hasHref (not $hasHxGet)}}
+{{$ariaLabel := "Tabs"}}{{if .Label}}{{$ariaLabel = .Label}}{{else if $id}}{{$ariaLabel = printf "%s tabs" $id}}{{end}}
+{{if $linkNav}}<nav class="tabs"{{if $id}} id="{{$id}}"{{end}} aria-label="{{$ariaLabel}}">{{else}}<div class="tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{$ariaLabel}}">{{end}}
     {{range .Items}}
     {{if .HxGet}}
     <button type="button"
@@ -73,12 +88,9 @@ ACCESSIBILITY:
     {{else if .Href}}
     <a href="{{.Href}}"
        class="tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
-       role="tab"
        id="tab-{{.Key}}"
        data-testid="tab-{{.Key}}"
-       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
-       aria-controls="tabContent"
-       tabindex="{{if eq .Key $activeTab}}0{{else}}-1{{end}}"
+       {{if eq .Key $activeTab}}aria-current="page"{{end}}
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
@@ -102,20 +114,23 @@ ACCESSIBILITY:
     </button>
     {{end}}
     {{end}}
-</div>
+{{if $linkNav}}</nav>{{else}}</div>{{end}}
 {{end}}
 
 {{/* Main variant - Large icon+text with underline (regulations page) */}}
 {{if eq $variant "main"}}
-<div class="main-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
+{{$hasHxGet := false}}{{$hasHref := false}}
+{{range .Items}}{{if .HxGet}}{{$hasHxGet = true}}{{end}}{{if .Href}}{{$hasHref = true}}{{end}}{{end}}
+{{$linkNav := and $hasHref (not $hasHxGet)}}
+{{$ariaLabel := "Tabs"}}{{if .Label}}{{$ariaLabel = .Label}}{{else if $id}}{{$ariaLabel = printf "%s tabs" $id}}{{end}}
+{{if $linkNav}}<nav class="main-tabs"{{if $id}} id="{{$id}}"{{end}} aria-label="{{$ariaLabel}}">{{else}}<div class="main-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{$ariaLabel}}">{{end}}
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
        class="main-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
-       role="tab"
        id="tab-{{.Key}}"
        data-testid="tab-{{.Key}}"
-       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       {{if eq .Key $activeTab}}aria-current="page"{{end}}
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
@@ -137,20 +152,23 @@ ACCESSIBILITY:
     </button>
     {{end}}
     {{end}}
-</div>
+{{if $linkNav}}</nav>{{else}}</div>{{end}}
 {{end}}
 
 {{/* Sub variant - Compact secondary tabs */}}
 {{if eq $variant "sub"}}
-<div class="sub-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
+{{$hasHxGet := false}}{{$hasHref := false}}
+{{range .Items}}{{if .HxGet}}{{$hasHxGet = true}}{{end}}{{if .Href}}{{$hasHref = true}}{{end}}{{end}}
+{{$linkNav := and $hasHref (not $hasHxGet)}}
+{{$ariaLabel := "Tabs"}}{{if .Label}}{{$ariaLabel = .Label}}{{else if $id}}{{$ariaLabel = printf "%s tabs" $id}}{{end}}
+{{if $linkNav}}<nav class="sub-tabs"{{if $id}} id="{{$id}}"{{end}} aria-label="{{$ariaLabel}}">{{else}}<div class="sub-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{$ariaLabel}}">{{end}}
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
        class="sub-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
-       role="tab"
        id="tab-{{.Key}}"
        data-testid="tab-{{.Key}}"
-       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       {{if eq .Key $activeTab}}aria-current="page"{{end}}
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
@@ -172,7 +190,7 @@ ACCESSIBILITY:
     </button>
     {{end}}
     {{end}}
-</div>
+{{if $linkNav}}</nav>{{else}}</div>{{end}}
 {{end}}
 
 {{/* Client variant - Horizontal sticky tabs with icons */}}
@@ -197,15 +215,18 @@ ACCESSIBILITY:
 
 {{/* Help variant - Rounded pill tabs with counts (helpdesk) */}}
 {{if eq $variant "help"}}
-<div class="help-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{if .Label}}{{.Label}}{{else if $id}}{{$id}} tabs{{else}}Tabs{{end}}">
+{{$hasHxGet := false}}{{$hasHref := false}}
+{{range .Items}}{{if .HxGet}}{{$hasHxGet = true}}{{end}}{{if .Href}}{{$hasHref = true}}{{end}}{{end}}
+{{$linkNav := and $hasHref (not $hasHxGet)}}
+{{$ariaLabel := "Tabs"}}{{if .Label}}{{$ariaLabel = .Label}}{{else if $id}}{{$ariaLabel = printf "%s tabs" $id}}{{end}}
+{{if $linkNav}}<nav class="help-tabs"{{if $id}} id="{{$id}}"{{end}} aria-label="{{$ariaLabel}}">{{else}}<div class="help-tabs"{{if $id}} id="{{$id}}"{{end}} role="tablist" aria-label="{{$ariaLabel}}">{{end}}
     {{range .Items}}
     {{if .Href}}
     <a href="{{.Href}}"
        class="help-tab{{if eq .Key $activeTab}} active{{end}}{{if .Disabled}} disabled{{end}}"
-       role="tab"
        id="tab-{{.Key}}"
        data-testid="tab-{{.Key}}"
-       aria-selected="{{if eq .Key $activeTab}}true{{else}}false{{end}}"
+       {{if eq .Key $activeTab}}aria-current="page"{{end}}
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
@@ -227,7 +248,7 @@ ACCESSIBILITY:
     </button>
     {{end}}
     {{end}}
-</div>
+{{if $linkNav}}</nav>{{else}}</div>{{end}}
 {{end}}
 
 {{/* Category variant - Minimal filter tabs (marketplace) — URL-based nav pattern */}}

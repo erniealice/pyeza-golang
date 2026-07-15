@@ -50,11 +50,24 @@
         const hasCheckbox = table.querySelector('.row-checkbox');
         const actualIndex = hasCheckbox ? columnIndex + 1 : columnIndex;
 
-        // Toggle header
-        const th = table.querySelector(`thead th:nth-child(${actualIndex + 1})`);
-        if (th) th.style.display = isVisible ? '' : 'none';
+        // Toggle header.
+        // Grouped tables have two header rows (a group-label row + a leaf row),
+        // so `thead th:nth-child()` would hit the wrong first-row group-label
+        // th. The leaf th are marked data-leaf-col in document order matching
+        // body-cell order (columnIndex is that leaf position; grouped tables
+        // carry no checkbox so actualIndex === columnIndex). Toggle the leaf th
+        // directly; fall back to nth-child for flat single-row headers.
+        const leafThs = table.querySelectorAll('thead th[data-leaf-col]');
+        if (leafThs.length) {
+            const leafTh = leafThs[columnIndex];
+            if (leafTh) leafTh.style.display = isVisible ? '' : 'none';
+        } else {
+            const th = table.querySelector(`thead th:nth-child(${actualIndex + 1})`);
+            if (th) th.style.display = isVisible ? '' : 'none';
+        }
 
-        // Toggle all cells in that column
+        // Toggle all cells in that column (body rows are single-level, so
+        // nth-child aligns for both flat and grouped tables).
         const cells = table.querySelectorAll(`tbody td:nth-child(${actualIndex + 1})`);
         cells.forEach(cell => {
             cell.style.display = isVisible ? '' : 'none';

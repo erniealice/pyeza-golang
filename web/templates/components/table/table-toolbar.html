@@ -171,6 +171,7 @@
                 {{template "icon-chevron-down" .}}
             </button>
             <div class="toolbar-dropdown-menu columns-menu" data-sort-active-column="{{if .ServerPagination}}{{.ServerPagination.SortColumn}}{{end}}">
+                {{if .Columns}}
                 {{range $index, $col := .Columns}}
                 {{$isActiveSort := false}}
                 {{if $.ServerPagination}}{{if and $.ServerPagination.SortColumn (eq $.ServerPagination.SortColumn $col.Key)}}{{$isActiveSort = true}}{{end}}{{end}}
@@ -184,6 +185,26 @@
                     <small class="column-toggle-hint">{{$.Labels.ColumnSortLockedHint}}</small>
                     {{end}}
                 </label>
+                {{end}}
+                {{else if .ColumnGroups}}
+                {{/* Grouped tables carry no flat .Columns — list the leaf columns
+                     instead so the menu isn't empty. data-index is the leaf's
+                     position in the data-leaf-col set (0 = the auto name column,
+                     so group leaves start at 1); table-columns.js maps that index
+                     to the leaf <th> and body cell. Group label is prefixed
+                     because leaf labels repeat across groups. */}}
+                {{$leafIdx := 0}}
+                {{range $grp := .ColumnGroups}}
+                {{range $grp.Columns}}
+                {{$leafIdx = add $leafIdx 1}}
+                <label class="column-toggle">
+                    <input type="checkbox" checked
+                           data-column="{{.Key}}"
+                           data-index="{{$leafIdx}}">
+                    <span>{{$grp.Label}} — {{.Label}}</span>
+                </label>
+                {{end}}
+                {{end}}
                 {{end}}
             </div>
         </div>

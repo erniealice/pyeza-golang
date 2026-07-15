@@ -69,9 +69,29 @@
                 && !th.classList.contains('actions-column');
         }
 
-        const ths = Array.from(table.querySelectorAll('thead th'));
+        // Column model. Grouped (multi-level) headers emit a spacer + group-label
+        // (colspan) row plus a leaf (sub-header) row, so the raw `thead th` list
+        // does NOT line up 1:1 with body `<td>`s. The real data columns are the
+        // th marked data-leaf-col (the rowspan name cell + every sub-header th),
+        // which querySelectorAll returns in document order matching body-cell
+        // order. Fall back to the flat single-row header for ungrouped tables.
+        const leafThs = table.querySelectorAll('thead th[data-leaf-col]');
+        const grouped = leafThs.length > 0;
+        const ths = grouped
+            ? Array.from(leafThs)
+            : Array.from(table.querySelectorAll('thead th'));
+
+        // Grouped leaf labels can repeat across groups (e.g. "Final" under both
+        // "Semester 1" and "Semester 2"), so prefix the parent group label to
+        // keep the exported header unambiguous.
+        function exportHeader(th) {
+            const leaf = headerText(th);
+            const grp = th.dataset.groupLabel;
+            return grp ? grp + ' — ' + leaf : leaf;
+        }
+
         ths.forEach(th => {
-            if (isExportable(th)) headers.push(csvField(headerText(th)));
+            if (isExportable(th)) headers.push(csvField(exportHeader(th)));
         });
         rows.push(headers.join(','));
 
