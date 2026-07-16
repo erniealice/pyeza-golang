@@ -14,7 +14,8 @@ func WithUserPermissions(ctx context.Context, perms *types.UserPermissions) cont
 }
 
 // GetUserPermissions retrieves UserPermissions from the context.
-// Returns nil if not set (nil permissions = no restrictions in dev mode).
+// Returns nil if not set — and nil is FAIL-CLOSED: (*UserPermissions).Can returns
+// false for a nil receiver, so an absent permission set denies everything.
 func GetUserPermissions(ctx context.Context) *types.UserPermissions {
 	perms, _ := ctx.Value(permissionsKey{}).(*types.UserPermissions)
 	return perms
