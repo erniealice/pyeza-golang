@@ -10,15 +10,6 @@
 */}}
 <script nonce="{{.Nonce}}">
 (function() {
-    // Keyboard shortcut for search (Ctrl+K)
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            const searchInput = document.querySelector('.search-bar input');
-            if (searchInput) searchInput.focus();
-        }
-    });
-
     // CSRF: mirror ws_csrf cookie into X-Ws-Csrf-Token header for every
     // non-GET HTMX request. The server's WorkspaceCSRFMiddleware (scoped
     // to /action/*) requires cookie + header to match. Pre-action GETs

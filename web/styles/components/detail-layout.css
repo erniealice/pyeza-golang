@@ -12,8 +12,12 @@
     overflow: hidden;
 }
 .detail-tabs {
-    margin-bottom: 0;
-    border-bottom: var(--border-width) solid var(--border-light);
+    /* Same page-level rhythm as .page-content--table (app layout.css): the
+       tab strip floats above the body card with one token of separation.
+       Carried as margin on the strip itself — not gap on .detail-layout —
+       because many detail templates mount .detail-tabs/.detail-body inside
+       other .page-content flavors (bare, supplier-detail-layout, …). */
+    margin-bottom: var(--spacing-xl);
     flex-shrink: 0;
 }
 .detail-body {
@@ -24,8 +28,7 @@
     padding: var(--spacing-3xl);
     background: var(--bg-card);
     border: var(--border-width) solid var(--border);
-    border-top: none;
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     animation: tabContentFadeIn 0.25s ease;
 }

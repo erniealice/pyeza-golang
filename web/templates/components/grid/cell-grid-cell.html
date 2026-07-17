@@ -57,6 +57,12 @@ directly (html/template prints the pointer address, not the value).
                    class="cell-grid-input cell-grid-input--numeric"
                    name="{{if $cell.OutcomeID}}cells.{{$cell.OutcomeID}}{{else}}new.{{$cell.JobTaskID}}:{{$cell.CriteriaID}}{{end}}"
                    value="{{$cell.Value}}"
+                   {{with $cell.InputID}}id="{{.}}"{{end}}
+                   data-row-index="{{$cell.RowIndex}}"
+                   data-col-index="{{$cell.ColIndex}}"
+                   data-saved-value="{{$cell.SavedValue}}"
+                   data-cg-state=""
+                   {{with $cell.StatusID}}aria-describedby="{{.}}"{{end}}
                    {{with $input.MinAttr}}min="{{.}}"{{end}}
                    {{with $input.MaxAttr}}max="{{.}}"{{end}}
                    {{with $input.StepAttr}}step="{{.}}"{{end}}
@@ -64,12 +70,19 @@ directly (html/template prints the pointer address, not the value).
                    {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
                    data-testid="{{$cell.TestID}}">
             {{with $input.Unit}}<span class="cell-grid-unit">{{.}}</span>{{end}}
+            {{with $cell.StatusID}}<span id="{{.}}" class="cell-grid-cell-status" role="status" aria-live="polite" aria-atomic="true"></span>{{end}}
         </span>
         {{end}}
 
         {{if eq $input.Type "pass_fail"}}
         <select class="cell-grid-input cell-grid-input--select"
                 name="{{if $cell.OutcomeID}}cells.{{$cell.OutcomeID}}{{else}}new.{{$cell.JobTaskID}}:{{$cell.CriteriaID}}{{end}}"
+                {{with $cell.InputID}}id="{{.}}"{{end}}
+                data-row-index="{{$cell.RowIndex}}"
+                data-col-index="{{$cell.ColIndex}}"
+                data-saved-value="{{$cell.SavedValue}}"
+                data-cg-state=""
+                {{with $cell.StatusID}}aria-describedby="{{.}}"{{end}}
                 {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
                 data-testid="{{$cell.TestID}}">
             <option value=""></option>
@@ -79,11 +92,18 @@ directly (html/template prints the pointer address, not the value).
             <option value="true"{{if eq $cell.Value "true"}} selected{{end}}>{{$input.PassLabel}}</option>
             <option value="false"{{if eq $cell.Value "false"}} selected{{end}}>{{$input.FailLabel}}</option>
         </select>
+        {{with $cell.StatusID}}<span id="{{.}}" class="cell-grid-cell-status" role="status" aria-live="polite" aria-atomic="true"></span>{{end}}
         {{end}}
 
         {{if eq $input.Type "categorical"}}
         <select class="cell-grid-input cell-grid-input--select"
                 name="{{if $cell.OutcomeID}}cells.{{$cell.OutcomeID}}{{else}}new.{{$cell.JobTaskID}}:{{$cell.CriteriaID}}{{end}}"
+                {{with $cell.InputID}}id="{{.}}"{{end}}
+                data-row-index="{{$cell.RowIndex}}"
+                data-col-index="{{$cell.ColIndex}}"
+                data-saved-value="{{$cell.SavedValue}}"
+                data-cg-state=""
+                {{with $cell.StatusID}}aria-describedby="{{.}}"{{end}}
                 {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
                 data-testid="{{$cell.TestID}}">
             <option value=""></option>
@@ -91,6 +111,7 @@ directly (html/template prints the pointer address, not the value).
             <option value="{{.Value}}"{{if eq $cell.Value .Value}} selected{{end}}{{if .Disabled}} disabled{{end}}>{{.Label}}</option>
             {{end}}
         </select>
+        {{with $cell.StatusID}}<span id="{{.}}" class="cell-grid-cell-status" role="status" aria-live="polite" aria-atomic="true"></span>{{end}}
         {{end}}
 
         {{if eq $input.Type "text"}}
@@ -98,10 +119,17 @@ directly (html/template prints the pointer address, not the value).
                class="cell-grid-input cell-grid-input--text"
                name="{{if $cell.OutcomeID}}cells.{{$cell.OutcomeID}}{{else}}new.{{$cell.JobTaskID}}:{{$cell.CriteriaID}}{{end}}"
                value="{{$cell.Value}}"
+               {{with $cell.InputID}}id="{{.}}"{{end}}
+               data-row-index="{{$cell.RowIndex}}"
+               data-col-index="{{$cell.ColIndex}}"
+               data-saved-value="{{$cell.SavedValue}}"
+               data-cg-state=""
+               {{with $cell.StatusID}}aria-describedby="{{.}}"{{end}}
                {{with $input.MaxLengthAttr}}maxlength="{{.}}"{{end}}
                {{with $input.Prompt}}placeholder="{{.}}"{{end}}
                {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
                data-testid="{{$cell.TestID}}">
+        {{with $cell.StatusID}}<span id="{{.}}" class="cell-grid-cell-status" role="status" aria-live="polite" aria-atomic="true"></span>{{end}}
         {{end}}
 
         {{if eq $input.Type "multi_check"}}

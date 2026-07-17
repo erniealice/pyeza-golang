@@ -30,7 +30,7 @@
     <div class="header-actions">
         <div class="search-bar">
             {{template "icon-search" .}}
-            <input type="text" id="header-search" aria-label="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}" placeholder="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}">
+            <input type="text" id="header-search" readonly aria-haspopup="dialog" aria-label="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}" placeholder="{{if .SearchPlaceholder}}{{.SearchPlaceholder}}{{else}}{{.CommonLabels.Header.SearchPlaceholder}}{{end}}">
             <span class="search-shortcut">{{.CommonLabels.Header.SearchShortcut}}</span>
         </div>
         {{if .HasMessages}}

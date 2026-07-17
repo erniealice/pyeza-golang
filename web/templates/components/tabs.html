@@ -53,6 +53,7 @@ ACCESSIBILITY:
 {{$variant := .Variant}}
 {{$activeTab := .ActiveTab}}
 {{$id := .ID}}
+{{$indicator := .Indicator}}
 
 {{/* Default variant - Pill-style tabs */}}
 {{if or (eq $variant "default") (eq $variant "")}}
@@ -79,6 +80,7 @@ ACCESSIBILITY:
             hx-target="#tabContent"
             hx-swap="innerHTML"
             hx-trigger="click"
+            {{if $indicator}}hx-indicator="{{$indicator}}"{{end}}
             {{if .Href}}hx-push-url="{{.Href}}"{{end}}
             {{if .Disabled}}aria-disabled="true" disabled{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
@@ -92,6 +94,7 @@ ACCESSIBILITY:
        data-testid="tab-{{.Key}}"
        {{if eq .Key $activeTab}}aria-current="page"{{end}}
        data-tab="{{.Key}}" data-tab-slug="{{or .URLSlug .Key}}"
+       {{if $indicator}}hx-indicator="{{$indicator}}"{{end}}
        {{if .Disabled}}aria-disabled="true" tabindex="-1"{{end}}>
         {{if .Icon}}<!-- icon: {{.Icon}} -->{{end}}
         {{.Label}}

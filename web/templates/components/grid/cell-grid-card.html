@@ -34,6 +34,19 @@ HTMX content-only swap — unlike the table component, whose equivalent is only 
          data-error-message="{{.Labels.ErrorBanner}}"
          data-testid="om-saved-banner"></div>
 
+    {{if .AutoSave}}
+    {{/* Form-level aria-live region for the AutoSave (W2) edit-mode client:
+         the soft "rating not yet recomputed" note + an aggregate unsaved/error
+         count. Polite so it never interrupts typing. cell-grid.js owns its
+         text; it carries no server content, only lyngua-backed strings. */}}
+    <div id="{{.ID}}-notice"
+         class="cell-grid-notice"
+         role="status"
+         aria-live="polite"
+         aria-atomic="true"
+         data-testid="om-cell-notice"></div>
+    {{end}}
+
     <form id="{{.ID}}-form"
           class="cell-grid-form"
           hx-post="{{.SaveURL}}"
@@ -43,7 +56,15 @@ HTMX content-only swap — unlike the table component, whose equivalent is only 
           data-success-source="dataset"
           data-success-fallback="{{.Labels.SavedBanner}}"
           data-error-fallback="{{.Labels.ErrorBanner}}"
-          data-hide-mode="classList">
+          data-hide-mode="classList"
+          {{if .AutoSave}}data-cg-autosave="1"
+          data-result-event="{{.ResultEventName}}"
+          data-notice-id="{{.ID}}-notice"
+          data-msg-saving="{{.Labels.CellSaving}}"
+          data-msg-saved="{{.Labels.CellSaved}}"
+          data-msg-error="{{.Labels.CellError}}"
+          data-msg-rating-stale="{{.Labels.RatingStale}}"
+          data-msg-unsaved="{{.Labels.UnsavedWarn}}"{{end}}>
         {{actionForm .SaveURL .WorkspaceID}}
         <input type="hidden" name="job_template_id" value="{{.JobTemplateID}}">
         <input type="hidden" name="scope" value="{{.Scope}}">
@@ -64,9 +85,9 @@ HTMX content-only swap — unlike the table component, whose equivalent is only 
             <button type="submit"
                     class="btn btn-primary cell-grid-save"
                     data-testid="om-save"
-                    data-label-save="{{.Labels.SaveButton}}"
+                    data-label-save="{{if and .AutoSave .Labels.RetryButton}}{{.Labels.RetryButton}}{{else}}{{.Labels.SaveButton}}{{end}}"
                     data-label-saving="{{.Labels.SavingButton}}"
-                    {{if .SaveDisabled}}disabled{{end}}>{{.Labels.SaveButton}}</button>
+                    {{if .SaveDisabled}}disabled{{end}}>{{if and .AutoSave .Labels.RetryButton}}{{.Labels.RetryButton}}{{else}}{{.Labels.SaveButton}}{{end}}</button>
         </div>
     </form>
 </div>

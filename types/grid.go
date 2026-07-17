@@ -42,7 +42,25 @@ type CellGridConfig struct {
 
 	// Save config. The batch <form> POSTs the whole grid to SaveURL on Save.
 	SaveURL  string // batch POST target (also the {{actionForm}} FormAction)
-	SaveMode string // "batch" | "per_cell" (default: "batch")
+	SaveMode string // "batch" | "per_cell" | "cell" (default: "batch")
+
+	// AutoSave turns on the W2 edit-mode client: keyboard grid-nav + focusout
+	// micro-batch auto-save (a ~150ms-coalesced single-flight POST of ONLY the
+	// dirty cells to SaveURL, with a hidden save_mode=cell). The manual batch
+	// Save button is retained as the a11y/retry fallback. When false the grid
+	// renders and behaves exactly as before (manual whole-grid batch only), so
+	// existing callers stay valid — this field is purely additive.
+	//
+	// Populated by the fayna outcome_matrix view (W2 server half) once the
+	// matching per-cell response handler lands; every field below that the
+	// client needs is likewise additive and zero-valued for legacy callers.
+	AutoSave bool
+
+	// ResultEvent is the HX-Trigger event name the AutoSave client listens for
+	// (the per-cell ack event). Empty → the "omcell-result" default (see
+	// ResultEventName). Rendered as data-result-event on the form; the server
+	// half emits `HX-Trigger: {"<ResultEvent>": {cells:[…]}}`.
+	ResultEvent string
 
 	// Hidden form context — round-tripped to the batch-save handler so it can
 	// scope the write without re-deriving it from the URL alone.
@@ -73,6 +91,17 @@ type CellGridConfig struct {
 	// cell-grid-card, the outer PageData.WorkspaceID is not reachable — the view
 	// handler must copy it in explicitly.
 	WorkspaceID string
+}
+
+// ResultEventName returns the HX-Trigger event name the AutoSave client binds
+// to for per-cell acks, defaulting to "omcell-result" when ResultEvent is
+// unset (html/template cannot default a field inline). The JS reads this from
+// the form's data-result-event attribute; keep the two in sync.
+func (c CellGridConfig) ResultEventName() string {
+	if c.ResultEvent == "" {
+		return "omcell-result"
+	}
+	return c.ResultEvent
 }
 
 // LeafColumnCount returns the number of Level3 leaf columns across the whole
@@ -230,6 +259,33 @@ type CellGridCell struct {
 	// Convention: "om-cell-{short_client_id}-{column_key_slug}"
 	// (read-only cells use "om-cell-ro-{short_client_id}-{column_key_slug}").
 	TestID string
+
+	// --- W2 edit-mode addressing (AutoSave only; additive, zero-valued for
+	// legacy callers so the manual-batch grid is unaffected) ---------------
+
+	// RowIndex / ColIndex are the cell's zero-based logical coordinates used by
+	// the keyboard grid-nav (Enter/Arrow same-column, Left/Right cell-nav).
+	// RowIndex counts data rows only (group-band rows do not advance it);
+	// ColIndex counts Level3 leaf columns left-to-right. Both are plain ints —
+	// no *Attr() accessor is needed (html/template prints ints directly; the
+	// pointer-print gotcha only bites *float64/*int on CellInputDescriptor).
+	RowIndex int
+	ColIndex int
+
+	// SavedValue is the last server-acknowledged baseline for this cell,
+	// rendered as data-saved-value. The client compares the live input value
+	// against it on focusout (dirty-check) and reverts to it on Escape; on a
+	// successful save the client updates the DOM baseline to the server's
+	// canonical returned value. For a fresh (unsaved) cell this is "".
+	SavedValue string
+
+	// InputID is a stable, unique id for the cell's <input>/<select> (rendered
+	// as the id attribute), used as aria-describedby's antecedent and as the
+	// focus target for keyboard nav. StatusID is the id of the per-cell
+	// visually-hidden aria-live status region the input points at via
+	// aria-describedby (announces queued/saving/saved/error to screen readers).
+	InputID  string
+	StatusID string
 }
 
 // CellGridLabels holds user-visible strings for the grid. The json tags match
@@ -244,4 +300,17 @@ type CellGridLabels struct {
 	ReadOnlyMarker string `json:"read_only_marker"` // "(read only)"
 	EmptyGrid      string `json:"empty_grid"`       // "No rows to display."
 	ClientColumn   string `json:"client_column"`    // "Student" / "Client" (frozen header)
+
+	// --- W2 edit-mode (AutoSave) per-cell + notice strings. All JSON-tagged
+	// so the lyngua per-tier overrides unmarshal into the "grid" object; empty
+	// values fall back to the compiled-in defaults resolved by the JS
+	// (data-cg-msg-* attributes on the form). Generic record/value vocabulary
+	// only — vertical wording (Student/Grade) enters via lyngua, never here. ---
+
+	CellSaving  string `json:"cell_saving"`  // "Saving…" (per-cell, screen-reader)
+	CellSaved   string `json:"cell_saved"`   // "Saved."
+	CellError   string `json:"cell_error"`   // "Not saved — will retry on next edit."
+	RatingStale string `json:"rating_stale"` // "Saved — rating not yet recomputed."
+	UnsavedWarn string `json:"unsaved_warn"` // beforeunload guard message
+	RetryButton string `json:"retry_button"` // "Save now / Retry unsaved" (AutoSave mode)
 }
