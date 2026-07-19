@@ -638,6 +638,12 @@ type TableConfig struct {
 	// reflection (same mechanism as PageData.Nonce). Templates use it as
 	// nonce="{{.Nonce}}" on inline <script> tags inside the table component.
 	Nonce string
+	// WorkspaceID is the session's active workspace_id, populated by the
+	// ViewAdapter via reflection (same mechanism as PageData.WorkspaceID and
+	// Nonce). The table-card carries it (data-ws-id) alongside the signed
+	// row-action token map (see the rowActionTokens template func) so raw-fetch
+	// row-action POSTs can satisfy the action_workspace_guard.
+	WorkspaceID string
 }
 
 // RowCount returns the total data-row count across both body layouts — flat

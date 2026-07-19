@@ -182,13 +182,23 @@
                 // Check if dialog has an action URL stored
                 const actionUrl = dialog.dataset.actionUrl;
                 if (actionUrl) {
+                    // Attach the workspace CSRF header + signed
+                    // action_workspace_guard fields (_workspace_id /
+                    // _workspace_id_sig). Without them this raw fetch fails
+                    // closed (CSRF 403 / guard 409) — the pre-existing app-wide
+                    // row-action limitation. Helpers are defined in scripts.html;
+                    // fall back to the bare request if (unexpectedly) unavailable.
+                    var actHeaders = (window.lf && window.lf.actionRequestHeaders)
+                        ? window.lf.actionRequestHeaders()
+                        : { 'HX-Request': 'true', 'Content-Type': 'application/x-www-form-urlencoded' };
+                    var actBody = (window.lf && window.lf.actionGuardBody)
+                        ? window.lf.actionGuardBody(actionUrl)
+                        : '';
                     // Perform the action
                     fetch(actionUrl, {
                         method: 'POST',
-                        headers: {
-                            'HX-Request': 'true',
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
+                        headers: actHeaders,
+                        body: actBody
                     }).then(function(response) {
                         // Always close dialog after server response
                         closeDialog();

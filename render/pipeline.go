@@ -185,70 +185,38 @@ func (p *Pipeline) InjectPageData(ctx context.Context, data any, path string) {
 		}
 	}
 
-	// Inject the per-request CSP nonce minted by the SecurityHeaders middleware
-	// (only if not already set by the view).
-	if n := NonceFromContext(ctx); n != "" {
-		if f := v.FieldByName("Nonce"); f.IsValid() && f.CanSet() && f.String() == "" {
-			f.SetString(n)
-		}
-		// Also inject into the nested Table field (types.TableConfig.Nonce) so that
-		// inline <script> blocks inside the table component can carry the CSP nonce.
-		if tableField := v.FieldByName("Table"); tableField.IsValid() {
-			if tableField.Kind() == reflect.Ptr {
-				tableField = tableField.Elem()
-			}
-			if tableField.Kind() == reflect.Struct {
-				if tf := tableField.FieldByName("Nonce"); tf.IsValid() && tf.CanSet() && tf.String() == "" {
-					tf.SetString(n)
-				}
-			}
-		}
-		// Same for the nested Grid field (types.CellGridConfig.Nonce) — the
-		// spreadsheet grid block renders via {{template "cell-grid-card" .Grid}}
-		// with a narrowed dot-context, so its Nonce must be set on the nested
-		// value the same way. Additive + inert for any PageData without a Grid
-		// field (FieldByName returns an invalid Value → skipped).
-		if gridField := v.FieldByName("Grid"); gridField.IsValid() {
-			if gridField.Kind() == reflect.Ptr {
-				gridField = gridField.Elem()
-			}
-			if gridField.Kind() == reflect.Struct {
-				if gf := gridField.FieldByName("Nonce"); gf.IsValid() && gf.CanSet() && gf.String() == "" {
-					gf.SetString(n)
-				}
-			}
+	// Inject the per-request CSP nonce (minted by SecurityHeaders) and the active
+	// workspace_id into the PAGE-LEVEL fields (only if not already set by the
+	// view). FieldByName resolves both a form's own top-level field and the
+	// promoted types.PageData field on full pages. The workspace_id set makes the
+	// field-comment promise real for every form Data struct so the {{actionForm}}
+	// helper emits a non-empty signed _workspace_id and the /action/* guard
+	// accepts the POST; we never overwrite a non-empty value, so the handful of
+	// handlers that set it explicitly stay authoritative.
+	nonce := NonceFromContext(ctx)
+	wsID := p.getWorkspaceID(ctx)
+	if nonce != "" {
+		if f := v.FieldByName("Nonce"); f.IsValid() && f.CanSet() && f.Kind() == reflect.String && f.String() == "" {
+			f.SetString(nonce)
 		}
 	}
-
-	// Inject the active workspace_id into any exported WorkspaceID string field
-	// (only if not already set by the view). This makes the field-comment promise
-	// real for every form Data struct — "// injected by
-	// ViewAdapter.injectWorkspaceID for action_workspace_guard" — so the
-	// {{actionForm}} helper emits a non-empty signed _workspace_id and the
-	// /action/* guard accepts the POST. FieldByName resolves both a form's own
-	// top-level WorkspaceID field and the promoted types.PageData.WorkspaceID on
-	// full pages. We never overwrite a non-empty value, so the handful of handlers
-	// that set it explicitly stay authoritative. Mirrors the Nonce reflective set
-	// above (find-field-by-name, only-if-settable, only-if-empty).
-	if wsID := p.getWorkspaceID(ctx); wsID != "" {
+	if wsID != "" {
 		if f := v.FieldByName("WorkspaceID"); f.IsValid() && f.CanSet() && f.Kind() == reflect.String && f.String() == "" {
 			f.SetString(wsID)
 		}
-		// Same for the nested Grid field (types.CellGridConfig.WorkspaceID) —
-		// the grid's batch form renders in a narrowed {{.Grid}} dot-context,
-		// and {{actionForm}} emits an empty (guard-rejected) token unless the
-		// nested value carries the workspace id. Additive + inert for any
-		// PageData without a Grid field.
-		if gridField := v.FieldByName("Grid"); gridField.IsValid() {
-			if gridField.Kind() == reflect.Ptr {
-				gridField = gridField.Elem()
-			}
-			if gridField.Kind() == reflect.Struct {
-				if gf := gridField.FieldByName("WorkspaceID"); gf.IsValid() && gf.CanSet() && gf.Kind() == reflect.String && gf.String() == "" {
-					gf.SetString(wsID)
-				}
-			}
-		}
+	}
+	// Type-based injection of Nonce + WorkspaceID into EVERY embedded
+	// types.TableConfig / types.CellGridConfig (value or non-nil pointer),
+	// regardless of the field's name. This covers the conventional list-page
+	// `.Table` / `.Grid` fields AND detail-page sub-tables (LineItemTable,
+	// PaymentTable, AuditTable, AttachmentTable, …), so each such table-card emits
+	// data-ws-id + data-action-tokens and its raw-fetch row-action POSTs satisfy
+	// the action_workspace_guard. The {{rowActionTokens}} helper signs an empty
+	// (guard-rejected) token map unless the nested value carries the workspace id,
+	// so this must run for all tables, not just the conventionally-named one.
+	// Replaces the former field-name-based (Table/Grid) nested injectors.
+	if nonce != "" || wsID != "" {
+		injectTableConfigContext(v, nonce, wsID)
 	}
 
 	// Render HeaderIcon → HeaderIconHTML if icon name is set but HTML isn't
@@ -312,6 +280,65 @@ func (p *Pipeline) InjectPageData(ctx context.Context, data any, path string) {
 				groupsField.Set(reflect.ValueOf(appGroups))
 			}
 		}
+	}
+}
+
+// tableConfigType and cellGridConfigType are the concrete reflect.Types matched
+// by injectTableConfigContext for type-based (not field-name-based) Nonce /
+// WorkspaceID injection.
+var (
+	tableConfigType    = reflect.TypeOf(types.TableConfig{})
+	cellGridConfigType = reflect.TypeOf(types.CellGridConfig{})
+)
+
+// injectTableConfigContext walks the exported fields of a page-data struct and
+// sets Nonce / WorkspaceID on every types.TableConfig / types.CellGridConfig it
+// finds (value or non-nil pointer), only when the target field is empty. It
+// recurses ONLY into anonymous embedded structs — matching the promotion reach
+// of the FieldByName sets in InjectPageData — so it stays a shallow struct-field
+// walk, not a deep recursive scan of arbitrary nested data (slices, maps, and
+// named sub-structs are not descended into).
+func injectTableConfigContext(v reflect.Value, nonce, workspaceID string) {
+	if v.Kind() != reflect.Struct {
+		return
+	}
+	t := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		sf := t.Field(i)
+		if sf.PkgPath != "" {
+			continue // unexported — reflection cannot set it
+		}
+		target := v.Field(i)
+		if target.Kind() == reflect.Ptr {
+			if target.IsNil() {
+				continue
+			}
+			target = target.Elem()
+		}
+		if target.Kind() != reflect.Struct {
+			continue
+		}
+		switch target.Type() {
+		case tableConfigType, cellGridConfigType:
+			setStringFieldIfEmpty(target, "Nonce", nonce)
+			setStringFieldIfEmpty(target, "WorkspaceID", workspaceID)
+		default:
+			if sf.Anonymous {
+				injectTableConfigContext(target, nonce, workspaceID)
+			}
+		}
+	}
+}
+
+// setStringFieldIfEmpty sets a named string field to val when the field exists,
+// is a settable string, is currently empty, and val is non-empty.
+func setStringFieldIfEmpty(structVal reflect.Value, name, val string) {
+	if val == "" {
+		return
+	}
+	f := structVal.FieldByName(name)
+	if f.IsValid() && f.CanSet() && f.Kind() == reflect.String && f.String() == "" {
+		f.SetString(val)
 	}
 }
 

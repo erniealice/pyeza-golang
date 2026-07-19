@@ -1,4 +1,5 @@
 {{define "header-oob"}}
+{{if .Title}}<title>{{.Title}}</title>{{end}}
 <header id="page-header" hx-swap-oob="true" class="header">
     {{template "header-content" .}}
 </header>

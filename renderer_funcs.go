@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"net/url"
 	"strings"
 
 	"github.com/erniealice/pyeza-golang/route"
@@ -346,6 +347,103 @@ func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 			template.HTMLEscapeString(workspaceID),
 			template.HTMLEscapeString(sig),
 		))
+	}
+
+	// rowActionTokens signs every distinct POST-ing action path present in a
+	// TableConfig — both per-row actions (delete/deactivate/…) and bulk-action
+	// endpoints — and returns a JSON object mapping action path ->
+	// _workspace_id_sig value. Usage on the table-card container:
+	//
+	//	<div class="table-card" data-ws-id="{{.WorkspaceID}}"
+	//	     data-action-tokens="{{rowActionTokens .}}">
+	//
+	// Row-action buttons POST via a raw fetch (table-actions.js / dialog.js) and
+	// bulk actions POST via bulk-action.js, not an HTMX <form>, so the
+	// {{actionForm}} hidden inputs never reach them and the action_workspace_guard
+	// rejects the POST (409). Instead the table-card carries this map; the JS
+	// derives the POST path from the action URL, looks up the signature, and
+	// appends _workspace_id / _workspace_id_sig to the request body.
+	//
+	// The guard verifies over r.URL.Path, so each map key is an action's full
+	// path (NOT a coalesced base path): id-in-query row actions (the row id rides
+	// as ?id=) share ONE signature across every row because their path is
+	// identical, while id-in-path actions get one signature per distinct path.
+	// Disabled actions are skipped — they never POST.
+	//
+	// Returns "{}" in safe mode (no signer wired, or no workspace bound) — the
+	// guard is disabled in exactly those cases, so an empty map is correct and
+	// matches the {{actionForm}} safe-mode behavior above.
+	base["rowActionTokens"] = func(cfg types.TableConfig) string {
+		if r.wsFormSigner == nil || cfg.WorkspaceID == "" {
+			return "{}"
+		}
+		// POST-ing row actions — mirrors the raw-fetch handlers in
+		// table-actions.js / dialog.js. Drawer-open (edit/clone), navigations
+		// (view/details/manage), and download (GET) are deliberately excluded:
+		// they never POST to /action/*.
+		posting := map[string]bool{
+			"delete": true, "deactivate": true, "activate": true, "undo": true,
+			"complete": true, "cancel": true, "reclassify": true, "send-email": true,
+		}
+		tokens := map[string]string{}
+		signPath := func(rawURL string) {
+			if rawURL == "" {
+				return
+			}
+			p := rawURL
+			if u, err := url.Parse(rawURL); err == nil {
+				p = u.Path
+			} else if i := strings.IndexByte(rawURL, '?'); i >= 0 {
+				p = rawURL[:i]
+			}
+			if p == "" {
+				return
+			}
+			if _, done := tokens[p]; done {
+				return
+			}
+			sig, err := r.wsFormSigner.SignFields(cfg.WorkspaceID, p)
+			if err != nil {
+				log.Printf("rowActionTokens: SignFields failed (path=%q): %v", p, err)
+				return
+			}
+			tokens[p] = sig
+		}
+		walk := func(rows []types.TableRow) {
+			for _, row := range rows {
+				for _, a := range row.Actions {
+					// Skip Disabled actions — the view renders them inert (no POST
+					// is ever issued), so signing their path is dead weight and
+					// would publish a token for a path the user can't reach.
+					if a.Disabled {
+						continue
+					}
+					if posting[a.Action] {
+						signPath(a.URL)
+					}
+				}
+			}
+		}
+		walk(cfg.Rows)
+		for _, g := range cfg.Groups {
+			walk(g.Rows)
+		}
+		// Bulk-action endpoints POST via bulk-action.js (raw fetch) and hit the
+		// same action_workspace_guard on their own distinct path, so sign each
+		// enabled bulk endpoint too. Skips Disabled bulk actions (rendered inert).
+		if cfg.BulkActions != nil && cfg.BulkActions.Enabled {
+			for _, ba := range cfg.BulkActions.Actions {
+				if ba.Disabled {
+					continue
+				}
+				signPath(ba.Endpoint)
+			}
+		}
+		b, err := json.Marshal(tokens)
+		if err != nil {
+			return "{}"
+		}
+		return string(b)
 	}
 
 	// renderContent dynamically executes a named template and returns the result

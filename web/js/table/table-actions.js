@@ -366,12 +366,21 @@
      * navigation instead of a partial swap, which is why we use `#${tableCard.id}`.
      */
     function executeRowAction(actionUrl) {
+        // Attach the workspace CSRF header + signed action_workspace_guard
+        // fields (_workspace_id / _workspace_id_sig). Without them this raw
+        // fetch fails closed (CSRF 403 / guard 409) — the pre-existing
+        // app-wide row-action limitation. Helpers are defined in scripts.html;
+        // fall back to the bare request if (unexpectedly) unavailable.
+        var headers = (window.lf && window.lf.actionRequestHeaders)
+            ? window.lf.actionRequestHeaders()
+            : { 'HX-Request': 'true', 'Content-Type': 'application/x-www-form-urlencoded' };
+        var body = (window.lf && window.lf.actionGuardBody)
+            ? window.lf.actionGuardBody(actionUrl)
+            : '';
         fetch(actionUrl, {
             method: 'POST',
-            headers: {
-                'HX-Request': 'true',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+            headers: headers,
+            body: body
         }).then(function(response) {
             if (response.ok) {
                 // Refresh table after successful action

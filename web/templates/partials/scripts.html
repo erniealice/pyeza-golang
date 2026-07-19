@@ -24,6 +24,61 @@
             evt.detail.headers['X-Ws-Csrf-Token'] = m[1];
         }
     });
+
+    // Shared helpers for RAW-fetch POSTs to /action/* (row-action confirm /
+    // execute in table-actions.js + dialog.js). HTMX requests get the CSRF
+    // header via the hook above and the signed _workspace_id fields via the
+    // actionForm template helper in the form; raw fetch()es have neither, so
+    // these helpers reconstruct both from the material the page already carries:
+    //   - X-Ws-Csrf-Token   : mirrored from the ws_csrf cookie (double-submit).
+    //   - _workspace_id      : the table-card's data-ws-id.
+    //   - _workspace_id_sig  : looked up from the table-card's data-action-tokens
+    //                          map by the action's URL path (server-signed once
+    //                          per distinct base path — see rowActionTokens).
+    window.lf = window.lf || {};
+
+    // actionRequestHeaders returns the header bag for a raw-fetch /action/* POST.
+    window.lf.actionRequestHeaders = function() {
+        var h = {
+            'HX-Request': 'true',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        };
+        var m = document.cookie.match(/(?:^|;\s*)ws_csrf=([^;]+)/);
+        if (m) h['X-Ws-Csrf-Token'] = m[1];
+        return h;
+    };
+
+    // actionGuardBody returns the urlencoded action_workspace_guard fields
+    // (_workspace_id + _workspace_id_sig) for the given action URL, or "" when
+    // no signed token is published for its path (safe-mode / non-guarded page).
+    window.lf.actionGuardBody = function(actionUrl) {
+        var path = actionUrl;
+        try {
+            path = new URL(actionUrl, window.location.origin).pathname;
+        } catch (e) {
+            var q = actionUrl.indexOf('?');
+            path = q >= 0 ? actionUrl.slice(0, q) : actionUrl;
+        }
+        var wsId = '', sig = '';
+        var nodes = document.querySelectorAll('[data-action-tokens]');
+        for (var i = 0; i < nodes.length; i++) {
+            var map;
+            try {
+                map = JSON.parse(nodes[i].getAttribute('data-action-tokens') || '{}');
+            } catch (e) {
+                map = {};
+            }
+            if (map && map[path]) {
+                sig = map[path];
+                wsId = nodes[i].getAttribute('data-ws-id') || '';
+                break;
+            }
+        }
+        var params = new URLSearchParams();
+        if (wsId) params.set('_workspace_id', wsId);
+        if (sig) params.set('_workspace_id_sig', sig);
+        return params.toString();
+    };
 })();
 </script>
 {{end}}

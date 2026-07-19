@@ -1,10 +1,13 @@
 package pyeza
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"strings"
 	"testing"
+
+	"github.com/erniealice/pyeza-golang/types"
 )
 
 func TestGetDefaultFuncMap_Add(t *testing.T) {
@@ -536,6 +539,77 @@ func TestActionForm_EmptyOnSignError(t *testing.T) {
 	}
 	if got := buf.String(); got != `<form></form>` {
 		t.Errorf("actionForm should render empty on signer error; got %q", got)
+	}
+}
+
+// TestRowActionTokens_SignsEnabledSkipsDisabledIncludesBulk locks in the FIX-2/
+// FIX-5 contract: rowActionTokens signs enabled POST-ing row actions AND enabled
+// bulk-action endpoints, keys them by their query-stripped path, and skips both
+// Disabled actions and non-POST-ing (drawer/nav) actions.
+func TestRowActionTokens_SignsEnabledSkipsDisabledIncludesBulk(t *testing.T) {
+	r := NewHTMLRenderer(nil)
+	r.SetWorkspaceFormSigner(&stubWorkspaceFormSigner{})
+
+	fn, ok := r.templateFuncs["rowActionTokens"].(func(types.TableConfig) string)
+	if !ok {
+		t.Fatalf("rowActionTokens func not registered with expected signature")
+	}
+
+	cfg := types.TableConfig{
+		WorkspaceID: "ws-9",
+		Rows: []types.TableRow{{
+			ID: "row-1",
+			Actions: []types.TableAction{
+				{Action: "delete", URL: "/action/client/delete?id=row-1"},
+				{Action: "deactivate", URL: "/action/client/deactivate?id=row-1", Disabled: true},
+				{Action: "edit", URL: "/action/client/edit?id=row-1"}, // non-POST → skipped
+			},
+		}},
+		BulkActions: &types.BulkActionsConfig{
+			Enabled: true,
+			Actions: []types.BulkAction{
+				{Key: "bulk-delete", Endpoint: "/action/client/bulk-delete"},
+				{Key: "bulk-archive", Endpoint: "/action/client/bulk-archive", Disabled: true},
+			},
+		},
+	}
+
+	var tokens map[string]string
+	if err := json.Unmarshal([]byte(fn(cfg)), &tokens); err != nil {
+		t.Fatalf("rowActionTokens returned invalid JSON: %v", err)
+	}
+
+	if got := tokens["/action/client/delete"]; got != "sig-for-ws-9-on-/action/client/delete" {
+		t.Errorf("enabled delete row action should be signed under its query-stripped path; got %q", got)
+	}
+	if got := tokens["/action/client/bulk-delete"]; got != "sig-for-ws-9-on-/action/client/bulk-delete" {
+		t.Errorf("enabled bulk endpoint should be signed; got %q", got)
+	}
+	if _, present := tokens["/action/client/deactivate"]; present {
+		t.Errorf("Disabled row action must not be signed")
+	}
+	if _, present := tokens["/action/client/bulk-archive"]; present {
+		t.Errorf("Disabled bulk endpoint must not be signed")
+	}
+	if _, present := tokens["/action/client/edit"]; present {
+		t.Errorf("non-POST edit action must not be signed")
+	}
+}
+
+// TestRowActionTokens_SafeModeNoWorkspace confirms the safe-mode escape hatch:
+// no workspace bound → "{}" (the action_workspace_guard is disabled in that case).
+func TestRowActionTokens_SafeModeNoWorkspace(t *testing.T) {
+	r := NewHTMLRenderer(nil)
+	r.SetWorkspaceFormSigner(&stubWorkspaceFormSigner{})
+	fn := r.templateFuncs["rowActionTokens"].(func(types.TableConfig) string)
+
+	cfg := types.TableConfig{
+		Rows: []types.TableRow{{ID: "1", Actions: []types.TableAction{
+			{Action: "delete", URL: "/action/x/delete"},
+		}}},
+	}
+	if got := fn(cfg); got != "{}" {
+		t.Errorf("expected {} in safe mode (no workspace bound); got %q", got)
 	}
 }
 

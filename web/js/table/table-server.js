@@ -375,9 +375,17 @@
      * @param {HTMLElement} meta - The metadata carrier element
      */
     function applyPaginationMeta(card, meta) {
+        // 'actionTokens' (data-action-tokens) + 'wsId' (data-ws-id) refresh the
+        // card's signed row-action token map for the just-swapped page, so
+        // late-appearing id-in-path row actions (whose full path differs per row
+        // and was therefore absent from the initial page's token map) can still
+        // satisfy the action_workspace_guard instead of 409-ing. The server
+        // re-signs them into the OOB meta div (only when a workspace is bound);
+        // when absent, meta.dataset[...] is undefined and the card's existing
+        // tokens are left untouched.
         const attrs = ['currentPage', 'pageSize', 'totalRows', 'search',
                        'sortColumn', 'sortDirection', 'hasNext', 'hasPrev',
-                       'nextCursor', 'prevCursor'];
+                       'nextCursor', 'prevCursor', 'actionTokens', 'wsId'];
         attrs.forEach(attr => {
             const val = meta.dataset[attr];
             if (val !== undefined) {

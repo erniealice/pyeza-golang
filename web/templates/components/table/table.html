@@ -71,7 +71,7 @@ JavaScript:
 
 {{/* TABLE CARD - Complete table with toolbar and footer */}}
 {{define "table-card"}}
-<div class="table-card{{if .CardClass}} {{.CardClass}}{{end}}{{if .Minimal}} table-card-minimal{{end}}" id="{{.ID}}-card"{{if .RefreshURL}} data-refresh-url="{{.RefreshURL}}"{{end}}{{if .BulkActions}}{{if .BulkActions.Enabled}} data-bulk-enabled="true"{{end}}{{end}}{{if .ServerPagination}}{{if .ServerPagination.Enabled}} data-server-pagination="true" hx-push-url="false" data-pagination-mode="{{.ServerPagination.Mode}}" data-pagination-url="{{.ServerPagination.PaginationURL}}" data-current-page="{{.ServerPagination.CurrentPage}}" data-page-size="{{.ServerPagination.PageSize}}" data-total-rows="{{.ServerPagination.TotalRows}}"{{if .ServerPagination.SearchQuery}} data-search="{{.ServerPagination.SearchQuery}}"{{end}}{{if .ServerPagination.SortColumn}} data-sort-column="{{.ServerPagination.SortColumn}}"{{end}}{{if .ServerPagination.SortDirection}} data-sort-direction="{{.ServerPagination.SortDirection}}"{{end}}{{if eq .ServerPagination.Mode "cursor"}}{{if .ServerPagination.NextCursor}} data-next-cursor="{{.ServerPagination.NextCursor}}"{{end}}{{if .ServerPagination.PrevCursor}} data-prev-cursor="{{.ServerPagination.PrevCursor}}"{{end}} data-has-next="{{.ServerPagination.HasNextPage}}" data-has-prev="{{.ServerPagination.HasPrevPage}}"{{end}}{{if .ServerPagination.PaginationBodyURL}} data-pagination-body-url="{{.ServerPagination.PaginationBodyURL}}"{{end}}{{end}}{{end}}>
+<div class="table-card{{if .CardClass}} {{.CardClass}}{{end}}{{if .Minimal}} table-card-minimal{{end}}" id="{{.ID}}-card"{{if .RefreshURL}} data-refresh-url="{{.RefreshURL}}"{{end}}{{if .WorkspaceID}} data-ws-id="{{.WorkspaceID}}" data-action-tokens="{{rowActionTokens .}}"{{end}}{{if .BulkActions}}{{if .BulkActions.Enabled}} data-bulk-enabled="true"{{end}}{{end}}{{if .ServerPagination}}{{if .ServerPagination.Enabled}} data-server-pagination="true" hx-push-url="false" data-pagination-mode="{{.ServerPagination.Mode}}" data-pagination-url="{{.ServerPagination.PaginationURL}}" data-current-page="{{.ServerPagination.CurrentPage}}" data-page-size="{{.ServerPagination.PageSize}}" data-total-rows="{{.ServerPagination.TotalRows}}"{{if .ServerPagination.SearchQuery}} data-search="{{.ServerPagination.SearchQuery}}"{{end}}{{if .ServerPagination.SortColumn}} data-sort-column="{{.ServerPagination.SortColumn}}"{{end}}{{if .ServerPagination.SortDirection}} data-sort-direction="{{.ServerPagination.SortDirection}}"{{end}}{{if eq .ServerPagination.Mode "cursor"}}{{if .ServerPagination.NextCursor}} data-next-cursor="{{.ServerPagination.NextCursor}}"{{end}}{{if .ServerPagination.PrevCursor}} data-prev-cursor="{{.ServerPagination.PrevCursor}}"{{end}} data-has-next="{{.ServerPagination.HasNextPage}}" data-has-prev="{{.ServerPagination.HasPrevPage}}"{{end}}{{if .ServerPagination.PaginationBodyURL}} data-pagination-body-url="{{.ServerPagination.PaginationBodyURL}}"{{end}}{{end}}{{end}}>
     {{if not .Minimal}}
     {{if .BulkActions}}{{if .BulkActions.Enabled}}
     {{template "table-bulk-toolbar" .}}
@@ -528,7 +528,9 @@ JavaScript:
 {{end}}{{end}}
 </div>
 <div id="{{.ID}}-meta" hx-swap-oob="outerHTML" hidden
-    data-targeted-swap="true"
+    data-targeted-swap="true"{{if .WorkspaceID}}
+    data-ws-id="{{.WorkspaceID}}"
+    data-action-tokens="{{rowActionTokens .}}"{{end}}
     data-current-page="{{.ServerPagination.CurrentPage}}"
     data-page-size="{{.ServerPagination.PageSize}}"
     data-total-rows="{{.ServerPagination.TotalRows}}"

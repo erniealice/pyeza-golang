@@ -190,12 +190,33 @@
             }
         }
 
+        // Attach the workspace CSRF header + signed action_workspace_guard
+        // fields (_workspace_id / _workspace_id_sig) so the bulk POST passes both
+        // the WorkspaceCSRF (403) and action_workspace_guard (409) middlewares.
+        // Without them a bulk delete/status POST fails closed. Helpers are
+        // defined in scripts.html; fall back to the bare request if unavailable.
+        var headers = { 'HX-Request': 'true' };
+        if (window.lf && window.lf.actionRequestHeaders) {
+            Object.assign(headers, window.lf.actionRequestHeaders());
+            // The body is FormData (multipart) — the browser sets its own
+            // Content-Type with a boundary, so drop the helper's urlencoded
+            // Content-Type or the server mis-parses the payload.
+            delete headers['Content-Type'];
+        }
+        if (window.lf && window.lf.actionGuardBody) {
+            // actionGuardBody returns urlencoded _workspace_id/_sig for this
+            // endpoint's path (the bulk endpoint is signed by rowActionTokens).
+            // Parse and append the two fields onto the FormData body.
+            var guardParams = new URLSearchParams(window.lf.actionGuardBody(endpoint));
+            guardParams.forEach(function(value, key) {
+                formData.append(key, value);
+            });
+        }
+
         fetch(endpoint, {
             method: 'POST',
             body: formData,
-            headers: {
-                'HX-Request': 'true'
-            }
+            headers: headers
         })
         .then(response => {
             console.log('[BulkAction] Response status:', response.status);
