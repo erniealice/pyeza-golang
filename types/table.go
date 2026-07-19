@@ -2,7 +2,9 @@ package types
 
 import (
 	"html/template"
+	"net/url"
 	"strconv"
+	"strings"
 )
 
 // FilterColumnType identifies the input type rendered in the filter panel
@@ -166,7 +168,7 @@ type PersonData struct {
 
 // TableCell defines a cell value with optional formatting
 type TableCell struct {
-	Type       string        // Cell type: "text", "badge", "name", "link", "chips", "html", "author", "input", "select", "money", "datetime", "single-person", "multi-person", "email", "phone", "number"
+	Type       string        // Cell type: "text", "badge", "name", "link", "chips", "html", "author", "input", "select", "money", "datetime", "single-person", "multi-person", "email", "phone", "number", "composite"
 	Value      string        // Text value to display
 	Variant    string        // For badges: variant class (e.g., "success", "error", "warning")
 	BadgeType  string        // For badges: badge type ("status", "count", "type") - defaults to "status"
@@ -205,6 +207,11 @@ type TableCell struct {
 	// When empty, the template falls back to a single-line .Value rendering.
 	DateText string // Date portion (e.g., "Jan 02, 2026")
 	TimeText string // Time portion (e.g., "3:04 PM")
+	// Composite fields for "composite" type — a typed count + optional per-status
+	// chip distribution + optional "eye" deep-link, rendered ENTIRELY from typed
+	// fields (never template.HTML). Nil for every non-composite cell, so string
+	// cells are unaffected. Build with BuildCompositeCell (composite.go).
+	Composite *CompositeCellData
 	// TestID is an optional data-testid override for the cell's inner container.
 	// When set, the cell wrapper (e.g., .table-cell-chips div) renders with data-testid="{{.TestID}}".
 	TestID string
@@ -234,6 +241,12 @@ func CellCSV(c TableCell) string {
 	case "money", "number":
 		// Numeric. Drop currency prefix and number prefix/suffix — those are
 		// presentation. Caller can override via CSVValue if they want raw cents.
+		return c.Value
+	case "composite":
+		// The count is the sane scalar export (the eye link and chips are
+		// presentation). Value is set to the count string by BuildCompositeCell,
+		// so this is never blank — cf. the rc-actions blank-column defect. Caller
+		// can override via CSVValue to export a richer status distribution.
 		return c.Value
 	case "datetime":
 		if c.DateText != "" && c.TimeText != "" {
@@ -293,7 +306,9 @@ func joinSemi(parts []string) string {
 // Returns "" for unknown cell types (the template treats this as "text" by default).
 func DeriveSortKind(cellType string) string {
 	switch cellType {
-	case "number", "money":
+	case "number", "money", "composite":
+		// composite sorts by its count scalar (the primary number), which
+		// BuildCompositeCell mirrors into Value / renders first in the cell.
 		return "number"
 	case "datetime", "author":
 		return "date"
@@ -313,7 +328,8 @@ func DeriveSortKind(cellType string) string {
 // Returns "" for unknown cell types (the JS treats this as "string" by default).
 func DeriveFilterType(cellType string, hasOptions bool) FilterColumnType {
 	switch cellType {
-	case "money", "number":
+	case "money", "number", "composite":
+		// composite filters on its count scalar (same key it sorts by).
 		return FilterTypeNumericRange
 	case "datetime", "author":
 		return FilterTypeDateRange
@@ -330,6 +346,115 @@ func DeriveFilterType(cellType string, hasOptions bool) FilterColumnType {
 		return "" // interactive cell — skip filtering
 	default:
 		return FilterTypeString
+	}
+}
+
+// CompositeStatusChip is one approval-status count in a composite landing cell's
+// distribution (Phase B): a localized status Label, its subject Count, and a
+// theme-aware pyeza status token Variant (e.g. "success", "warning"). The
+// accessible meaning comes from the Count + Label text, never from color alone
+// (Q-R9-4). Zero chips ⇒ a Phase-A count-only cell.
+type CompositeStatusChip struct {
+	Label   string // localized status label (e.g. "Published")
+	Count   int    // subjects in this status
+	Variant string // pyeza status-badge variant token (theme-aware; never a raw hex)
+}
+
+// CompositeCellData is the typed payload for a "composite" report-card landing
+// cell: a subject Count, an optional per-status chip distribution, and an
+// optional "eye" deep-link into the section's category tab. Every field renders
+// from the typed template (table-cell-composite) — no Go-built markup, no
+// template.HTML — so the cell carries no XSS surface (Q-R9-3, FIX-FIRST 6). Build
+// it with BuildCompositeCell so the eye href is URL-query-encoded and the test ID
+// is collision-proof.
+type CompositeCellData struct {
+	Count     int                   // subject count — the cell's primary number
+	Chips     []CompositeStatusChip // optional approval-status distribution (Phase B)
+	EyeHref   string                // pre-encoded deep link; empty ⇒ no eye (the unknown/foreign/inactive/NULL fallback)
+	EyeName   string                // accessible name naming category AND section
+	EyeTestID string                // collision-proof "rc-eye-<section>-<category>"
+}
+
+// CompositeCellParams are the inputs to BuildCompositeCell.
+type CompositeCellParams struct {
+	Count int                   // subject count for this (section, category) cell
+	Chips []CompositeStatusChip // optional per-status distribution (Phase B)
+	// BasePath is the already-resolved section URL (e.g. "/report-cards/section/sec-1").
+	// The category id is appended as a query param; any pre-existing query is
+	// preserved and re-encoded.
+	BasePath string
+	QueryKey string // category query-param name (defaults to "jc")
+	// SectionID / CategoryID identify the target cell. When either is empty the
+	// eye is omitted (the cell degrades to a bare count) — the unknown / foreign /
+	// inactive / NULL-category fallback.
+	SectionID  string
+	CategoryID string
+	// SectionName / CategoryName are the human labels used to compose the default
+	// accessible name (which names both).
+	SectionName  string
+	CategoryName string
+	// AccessibleName, when set, is used verbatim — the caller is responsible for
+	// naming category AND section (e.g. from a lyngua template). When empty a
+	// default naming both is composed.
+	AccessibleName string
+}
+
+// BuildCompositeCell constructs a "composite" TableCell. It URL-query-encodes the
+// eye deep-link with url.Values (never string concat), composes a collision-proof
+// test ID "rc-eye-<SectionID>-<CategoryID>" from the FULL ids (not a truncated
+// short(), which is collision-resistant but not unique), and an accessible name
+// that names both the category and the section. When SectionID or CategoryID is
+// empty (unknown / foreign / inactive / NULL category) the eye is dropped and the
+// cell renders as a bare count; Value still carries the count so CSV export and
+// numeric sort stay sane.
+func BuildCompositeCell(p CompositeCellParams) TableCell {
+	data := &CompositeCellData{Count: p.Count, Chips: p.Chips}
+	if p.BasePath != "" && p.SectionID != "" && p.CategoryID != "" {
+		data.EyeHref = compositeEyeHref(p.BasePath, p.QueryKey, p.CategoryID)
+		data.EyeName = strings.TrimSpace(p.AccessibleName)
+		if data.EyeName == "" {
+			data.EyeName = compositeDefaultName(p.CategoryName, p.SectionName)
+		}
+		data.EyeTestID = "rc-eye-" + p.SectionID + "-" + p.CategoryID
+	}
+	return TableCell{
+		Type:      "composite",
+		Value:     strconv.Itoa(p.Count),
+		Align:     "center",
+		Composite: data,
+	}
+}
+
+// compositeEyeHref appends categoryID to basePath under queryKey using proper
+// URL-query encoding (url.Values.Encode), preserving any pre-existing query. On a
+// parse failure it degrades to basePath unchanged.
+func compositeEyeHref(basePath, queryKey, categoryID string) string {
+	key := queryKey
+	if key == "" {
+		key = "jc"
+	}
+	u, err := url.Parse(basePath)
+	if err != nil {
+		return basePath
+	}
+	q := u.Query()
+	q.Set(key, categoryID)
+	u.RawQuery = q.Encode()
+	return u.String()
+}
+
+// compositeDefaultName composes an accessible name that includes both the
+// category and the section, degrading gracefully when one is blank.
+func compositeDefaultName(category, section string) string {
+	category = strings.TrimSpace(category)
+	section = strings.TrimSpace(section)
+	switch {
+	case category != "" && section != "":
+		return category + " — " + section
+	case category != "":
+		return category
+	default:
+		return section
 	}
 }
 
@@ -564,6 +689,13 @@ type PrimaryAction struct {
 	Disabled        bool   // If true, render as disabled button (no click, no HTMX)
 	DisabledTooltip string // Tooltip shown when hovering over disabled button
 	TestID          string // Optional custom data-testid attribute for the button
+	// Download, when true on a Href (link) primary action, makes the toolbar
+	// anchor emit download + hx-boost="false". Body-boosted apps (e.g.
+	// school-admin boosts <body>) would otherwise intercept a file download as
+	// an HTMX navigation; hx-boost="false" opts the anchor out so the browser
+	// performs a real download. Zero-value (false) leaves the anchor unchanged;
+	// no effect on the ActionURL or Disabled branches.
+	Download bool
 }
 
 // BulkAction defines an action available when multiple rows are selected

@@ -227,6 +227,23 @@ JavaScript:
 </div>
 {{end}}
 
+{{/* COMPOSITE CELL — typed count + optional per-status chip distribution +
+     optional "eye" deep-link (Q-R9-3 / FIX-FIRST 6). Renders ENTIRELY from typed
+     fields on .Composite — never template.HTML — so no Go-built markup reaches
+     the DOM. Reuses .table-cell-chips (flex, centered, wraps), .status-badge
+     status tokens, and .action-btn view (2rem hit target, :focus-visible ring,
+     icon-eye) — zero new CSS. The eye renders only when EyeHref is set; the
+     unknown/foreign/inactive/NULL-category fallback is a bare count. */}}
+{{define "table-cell-composite"}}
+{{with .Composite}}
+<div class="table-cell-chips"{{if $.TestID}} data-testid="{{$.TestID}}"{{end}}>
+    <span class="composite-count">{{.Count}}</span>
+    {{range .Chips}}<span class="status-badge {{.Variant}}">{{.Count}} {{.Label}}</span>{{end}}
+    {{if .EyeHref}}<a href="{{.EyeHref}}" class="action-btn view" aria-label="{{.EyeName}}" title="{{.EyeName}}"{{if .EyeTestID}} data-testid="{{.EyeTestID}}"{{end}} hx-push-url="true">{{template "icon-eye" .}}</a>{{end}}
+</div>
+{{end}}
+{{end}}
+
 {{/* TABLE DATA ROW - Renders a single data row */}}
 {{define "table-data-row"}}
 {{$rowVAlign := "top"}}{{if .VAlign}}{{$rowVAlign = .VAlign}}{{end}}
@@ -256,6 +273,7 @@ JavaScript:
         {{else if eq .Type "email"}}{{template "table-cell-email" .}}
         {{else if eq .Type "phone"}}{{template "table-cell-phone" .}}
         {{else if eq .Type "number"}}{{template "table-cell-number" .}}
+        {{else if eq .Type "composite"}}{{template "table-cell-composite" .}}
         {{else}}{{.Value}}
         {{end}}
     </td>

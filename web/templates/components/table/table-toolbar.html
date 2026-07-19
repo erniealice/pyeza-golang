@@ -305,7 +305,7 @@
             {{.PrimaryAction.Label}}
         </button>
         {{else}}
-        <a href="{{.PrimaryAction.Href}}" class="btn-primary toolbar-primary-action"{{if .PrimaryAction.TestID}} data-testid="{{.PrimaryAction.TestID}}"{{else}} data-testid="{{.ID}}-primary-action"{{end}}>
+        <a href="{{.PrimaryAction.Href}}" class="btn-primary toolbar-primary-action"{{if .PrimaryAction.TestID}} data-testid="{{.PrimaryAction.TestID}}"{{else}} data-testid="{{.ID}}-primary-action"{{end}}{{if .PrimaryAction.Download}} download hx-boost="false"{{end}}>
             {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
             {{.PrimaryAction.Label}}
         </a>
