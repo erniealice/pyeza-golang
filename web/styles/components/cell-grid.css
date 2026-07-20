@@ -73,6 +73,11 @@
     flex: 1 1 0;
     min-height: 0;
     overflow: hidden;
+    /* Own stacking context: the sticky header/frozen-column z-indexes below
+       (--z-popover scale) order layers INSIDE the grid only and must never
+       compete with page overlays — the sheet/drawer sits at z 200 and a
+       leaked 1000-level thead would paint across it. */
+    isolation: isolate;
 }
 
 /* The batch-save <form> — sits between the (usually-hidden) save-result
@@ -376,8 +381,10 @@
 /* --- Columns selector (server-prune toggle links; matrix.html .om-cols) ----
    A native <details> dropdown: summary = the trigger button, menu = an
    absolutely positioned card. Every row is a plain <a> whose href is the
-   server-computed toggle URL — no JS state. The menu must float above the
-   grid's sticky header stack (thead th sits at --z-popover). */
+   server-computed toggle URL — no JS state. The grid card is an isolated
+   stacking context (see .cell-grid-card), so the menu needs only a small
+   positive z to float above it — and must stay BELOW the sheet overlay
+   (z 200) so an open drawer covers the menu, not vice versa. */
 .om-cols {
     position: relative;
 }
@@ -407,7 +414,7 @@
     position: absolute;
     right: 0;
     top: calc(100% + var(--spacing-2xs));
-    z-index: calc(var(--z-popover) + 20);
+    z-index: 10; /* above the isolated grid card; below the sheet (200) */
     /* Viewport-bounded: .page-content--grid clips overflow, so a menu wider/
        taller than the remaining viewport would be unreachable, not scrolled. */
     min-width: min(18rem, calc(100vw - 2 * var(--spacing-lg)));
