@@ -97,7 +97,7 @@
 
 /* None: borderless (shadow-driven depth) */
 [data-border="none"] {
-    --border-width: 0;
+    --border-width: 0px; /* 0px not unitless 0: consumers compare it in max() with lengths (cell-grid.css --cg-line), and max() cannot mix <number> 0 with <length> */
     --border-width-thick: 1px;
     --border-width-focus: 2px;
     --input-shadow: inset 0 0 0 1px var(--border-light);  /* ghost border for input definition */

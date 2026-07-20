@@ -7,7 +7,8 @@
      --z-popover, --z-sidebar (layout.css) · --bg-card, --bg-sidebar, --bg-hover,
      --text-muted, --text-secondary, --border, --accent-primary,
      --accent-primary-light (themes/*.css) · --border-width, --border-width-thick,
-     --radius-sm, --spacing-*, --duration-fast (base/layout.css) ·
+     --input-shadow (border axis), --radius-sm/-md/-lg, --spacing-*,
+     --duration-fast (base/layout.css) ·
      --text-2xs/--text-xs/--text-sm (type scale), --leading-tight,
      --font-weight-medium, --font-weight-semibold (base/main-base.css) ·
      --header-height (app-owned :root — see .page-content--grid below; the same
@@ -110,6 +111,14 @@
        table-cell type scale, not body-copy type scale. */
     font-size: var(--text-sm);
     line-height: var(--leading-tight);
+    /* Structural gridline width. Cell boundaries are what make this read as a
+       spreadsheet at all, so the border AXIS may thin them but never remove
+       them: [data-border="none"] sets --border-width to 0 (borderless cards,
+       shadow-driven depth) and rendered the whole grid line-less. Floor at
+       1px — the same judgment that axis itself makes by keeping
+       --border-width-thick at 1px for structural separators. Every gridline
+       and save-state ring below uses --cg-line, never raw --border-width. */
+    --cg-line: max(var(--border-width), 1px);
 }
 
 .cell-grid-caption {
@@ -126,8 +135,8 @@
     top: 0;
     z-index: var(--z-popover); /* above body rows during vertical scroll */
     background: var(--bg-card);
-    border-bottom: var(--border-width) solid var(--border);
-    border-right: var(--border-width) solid var(--border);
+    border-bottom: var(--cg-line) solid var(--border);
+    border-right: var(--cg-line) solid var(--border);
     padding: var(--spacing-2xs) var(--spacing-sm);
     text-align: center;
     font-size: var(--text-xs);
@@ -170,7 +179,7 @@
     font-weight: var(--font-weight-medium);
     white-space: nowrap;
     background: var(--bg-sidebar);
-    border-bottom: var(--border-width) solid var(--border);
+    border-bottom: var(--cg-line) solid var(--border);
 }
 
 /* --- Body cells — spreadsheet grid ---------------------------------------
@@ -181,8 +190,8 @@
 .cell-grid-cell {
     padding: 0;
     height: 2rem;
-    border-bottom: var(--border-width) solid var(--border);
-    border-right: var(--border-width) solid var(--border);
+    border-bottom: var(--cg-line) solid var(--border);
+    border-right: var(--cg-line) solid var(--border);
     text-align: center;
     vertical-align: middle;
 }
@@ -277,10 +286,16 @@
    e.g. an IB-MYP grade descriptor stored next to a numeric score). Mirrors
    table.css's .author-date secondary-line convention: small, muted, own
    line under the primary value. Truncated with the full text in `title` —
-   these are free-text sentences and must never force the cell/column wide. */
+   these are free-text sentences and must never force the cell/column wide.
+   The cap MUST be an absolute length: the table is width:max-content, and a
+   percentage max-width cannot resolve during intrinsic sizing, so with
+   max-width:100% each full nowrap sentence fed its entire length into the
+   column's max-content (observed live: 700px+ columns, a 3400px table).
+   18rem bounds the descriptor column while staying wide enough to preview
+   the sentence's first clause. */
 .cell-grid-cell--note {
     display: block;
-    max-width: 100%;
+    max-width: 18rem;
     margin-top: var(--spacing-2xs);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -343,6 +358,318 @@
    outcome-matrix is its only consumer today. */
 .om-toolbar {
     flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap; /* .page-content--grid clips overflow — controls must wrap, not vanish */
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Right-aligned toolbar cluster: the columns selector + export actions. */
+.om-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-left: auto;
+}
+
+/* --- Columns selector (server-prune toggle links; matrix.html .om-cols) ----
+   A native <details> dropdown: summary = the trigger button, menu = an
+   absolutely positioned card. Every row is a plain <a> whose href is the
+   server-computed toggle URL — no JS state. The menu must float above the
+   grid's sticky header stack (thead th sits at --z-popover). */
+.om-cols {
+    position: relative;
+}
+
+.om-cols__btn {
+    list-style: none;
+    cursor: pointer;
+}
+
+.om-cols__btn::-webkit-details-marker {
+    display: none;
+}
+
+/* Hidden-count pip on the trigger — signals a narrowed view at a glance. */
+.om-cols__count {
+    display: inline-block;
+    min-width: 1.25em;
+    padding: 0 var(--spacing-2xs);
+    border-radius: var(--radius-full, 9999px);
+    background: var(--accent-primary);
+    color: var(--bg-card);
+    font-size: var(--text-2xs);
+    text-align: center;
+}
+
+.om-cols__menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + var(--spacing-2xs));
+    z-index: calc(var(--z-popover) + 20);
+    /* Viewport-bounded: .page-content--grid clips overflow, so a menu wider/
+       taller than the remaining viewport would be unreachable, not scrolled. */
+    min-width: min(18rem, calc(100vw - 2 * var(--spacing-lg)));
+    max-width: min(26rem, calc(100vw - 2 * var(--spacing-lg)));
+    max-height: min(24rem, 60vh);
+    overflow: auto;
+    padding: var(--spacing-sm);
+    background: var(--bg-card);
+    /* Panel chrome per dropdown.css's .dropdown-menu: literal 1px edge (a
+       floating panel needs its boundary on every border axis) + --radius-lg
+       (stays a panel radius under [data-radius="full"], where -sm/-md pill
+       out to 9999px) + --shadow-lg. */
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.om-cols__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    padding: 0 var(--spacing-sm) var(--spacing-2xs);
+}
+
+.om-cols__title {
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.om-cols__showall {
+    font-size: var(--text-xs);
+    white-space: nowrap;
+}
+
+.om-cols__group {
+    padding: var(--spacing-2xs) 0;
+    border-top: var(--cg-line, 1px) solid var(--border-light);
+}
+
+.om-cols__task {
+    padding: var(--spacing-2xs) var(--spacing-sm) 0;
+    font-size: var(--text-2xs);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.om-cols__item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    text-decoration: none;
+}
+
+.om-cols__item:hover {
+    background: var(--bg-hover);
+}
+
+.om-cols__item--l1 {
+    font-weight: var(--font-weight-semibold);
+}
+
+.om-cols__item--leaf {
+    padding-left: var(--spacing-xl);
+}
+
+.om-cols__item--off {
+    color: var(--text-muted);
+}
+
+/* Visibility mark — filled when the column is shown, hollow when hidden.
+   Purely presentational (aria-hidden); the row's link text carries meaning. */
+.om-cols__mark {
+    flex: 0 0 auto;
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--accent-primary);
+}
+
+.om-cols__item--off .om-cols__mark {
+    background: transparent;
+}
+
+/* Scope toggle (Mine/All) inside .om-toolbar — a segmented control: recessed
+   track (--bg-sidebar) with the active segment raised on --bg-card. Same
+   visual family as tabs.css pills, scoped to the om- page-chrome namespace
+   because these are <a> navigations, not tab buttons. */
+.om-scope-toggle {
+    display: inline-flex;
+    gap: var(--spacing-2xs);
+    padding: var(--spacing-2xs);
+    background: var(--bg-sidebar);
+    border-radius: var(--radius-md);
+}
+
+.om-scope {
+    padding: var(--spacing-2xs) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.om-scope:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.om-scope--active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* --- Phase-approval bar (matrix.html outcome-matrix-approval-bar) ---------
+   Page chrome ABOVE the grid — flex-shrink:0, the same "chrome piece never
+   shrinks" contract as .om-toolbar/.cell-grid-actions. Phases lay out as
+   wrapping columns (flex row) so N phases share one shallow band: vertical
+   space on this page belongs to the grid, and the height budget is a hard
+   100vh flex chain (.page-content--grid). Card chrome uses raw
+   --border-width deliberately — the bar is a decorative card, so under
+   [data-border="none"] it goes borderless like every other card; only the
+   grid's structural lines get the --cg-line floor. */
+.pa-bar {
+    flex-shrink: 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-lg);
+    /* Same floor as .cell-grid-table declares for gridlines — the bar is a
+       SIBLING of .cell-grid-card, outside the table's scope, and its
+       form-result status borders below are semantic (must survive
+       [data-border="none"]), so it needs its own copy of the token. */
+    --cg-line: max(var(--border-width), 1px);
+}
+
+.pa-bar__title {
+    margin: 0 0 var(--spacing-sm);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.pa-bar__phases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm) var(--spacing-2xl);
+}
+
+.pa-phase {
+    flex: 1 1 18rem;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+}
+
+.pa-phase__head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.pa-phase__label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.pa-phase__count,
+.pa-phase__muted {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.pa-phase__hint {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    line-height: var(--leading-tight);
+}
+
+.pa-phase__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* No :empty guard here — the four action forms are state-gated in the
+   template, and matrix.html only renders .pa-phase__actions when at least
+   one action is available (template conditionals leave whitespace text
+   nodes, which defeat :empty). */
+
+.pa-form {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: 0;
+}
+
+/* Return-reason inline input — mirrors form.css input chrome at the bar's
+   compact scale. --input-shadow carries the ghost border under
+   [data-border="none"] (same contract as every other input). */
+.pa-form__reason {
+    min-width: 12rem;
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--input-shadow);
+}
+
+.pa-form__reason:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: inset 0 0 0 1px var(--accent-primary);
+}
+
+/* Per-phase result banner — the shared data-hx-on="form-result" handler's
+   swap target. Scoped copy of the .form-result convention (entydad-user-
+   detail.css / fycha-asset-detail.css carry their own) at this bar's
+   compact scale; none of those files is linked on grid pages. */
+.pa-phase .form-result {
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+.pa-phase .form-result--hidden {
+    display: none;
+}
+
+.pa-phase .form-result--success {
+    background: var(--status-success-light);
+    color: var(--status-success);
+    border: var(--cg-line) solid var(--status-success);
+}
+
+.pa-phase .form-result--error {
+    background: var(--status-error-light);
+    color: var(--status-error);
+    border: var(--cg-line) solid var(--status-error);
 }
 
 /* --- Group band rows (view-driven row grouping) ---------------------------
@@ -356,7 +683,7 @@
     padding: var(--spacing-2xs) var(--spacing-sm);
     text-align: left;
     background: var(--bg-hover);
-    border-bottom: var(--border-width) solid var(--border);
+    border-bottom: var(--cg-line) solid var(--border);
     border-top: var(--border-width-thick) solid var(--border);
 }
 
@@ -396,20 +723,20 @@
    ring distinguishes "changed but not yet saved" from the neutral idle input. */
 .cell-grid-input[data-cg-state="dirty"],
 .cell-grid-input[data-cg-state="queued"] {
-    box-shadow: inset 0 0 0 var(--border-width) var(--accent-primary);
+    box-shadow: inset 0 0 0 var(--cg-line) var(--accent-primary);
     background: var(--accent-primary-light);
 }
 
 /* Saving — a snapshot is in flight. A muted inset ring + a gentle pulse
    (motion is gated by prefers-reduced-motion below). */
 .cell-grid-input[data-cg-state="saving"] {
-    box-shadow: inset 0 0 0 var(--border-width) var(--status-warning);
+    box-shadow: inset 0 0 0 var(--cg-line) var(--status-warning);
     animation: cell-grid-pulse 1s ease-in-out infinite;
 }
 
 /* Saved — transient success confirmation before returning to clean. */
 .cell-grid-input[data-cg-state="saved"] {
-    box-shadow: inset 0 0 0 var(--border-width) var(--status-success);
+    box-shadow: inset 0 0 0 var(--cg-line) var(--status-success);
     background: var(--status-success-light);
 }
 
@@ -426,19 +753,22 @@
 }
 
 @keyframes cell-grid-pulse {
-    0%, 100% { box-shadow: inset 0 0 0 var(--border-width) var(--status-warning); }
-    50%      { box-shadow: inset 0 0 0 var(--border-width) var(--accent-primary); }
+    0%, 100% { box-shadow: inset 0 0 0 var(--cg-line) var(--status-warning); }
+    50%      { box-shadow: inset 0 0 0 var(--cg-line) var(--accent-primary); }
 }
 
 /* Per-cell screen-reader status region (aria-describedby target). Visually
    hidden but announced by AT — the standard visually-hidden clip pattern,
-   token-free by nature (geometry-only, no colour). */
+   token-free by nature (geometry-only, no colour). 1px literals, NOT
+   --border-width: the axis's "none" preset zeroes that token, and a 0×0 box
+   risks being treated as display-none by AT — the clip pattern is 1px by
+   contract, not by theme. */
 .cell-grid-cell-status {
     position: absolute;
-    width: var(--border-width);
-    height: var(--border-width);
+    width: 1px;
+    height: 1px;
     padding: 0;
-    margin: calc(-1 * var(--border-width));
+    margin: -1px;
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
