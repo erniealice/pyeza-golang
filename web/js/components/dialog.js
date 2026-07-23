@@ -23,6 +23,28 @@
     let _opener = null;
 
     // ========================================
+    // ACTION-ERROR SURFACING
+    // ========================================
+
+    /**
+     * Surface a row-action error (HX-Error-Message on a 4xx) as an error toast.
+     * Defensive against the toast module's public-API shape: prefers the
+     * canonical window.lf.ui.Toast, falls back to the lf.Toast back-compat alias,
+     * and no-ops (console) if neither loaded. Never throws.
+     */
+    function showDialogActionError(message) {
+        if (!message) return;
+        var toast = (window.lf && window.lf.ui && window.lf.ui.Toast)
+            || (window.lf && window.lf.Toast)
+            || null;
+        if (toast && typeof toast.show === 'function') {
+            toast.show(message, 'error');
+            return;
+        }
+        console.error('Action failed:', message);
+    }
+
+    // ========================================
     // INERT HELPERS (P3)
     // ========================================
 
@@ -222,9 +244,21 @@
                                 detail: { url: actionUrl, success: true }
                             }));
                         } else {
-                            console.error('Action failed:', response.status);
+                            // Fail-loud: surface the server's HX-Error-Message
+                            // (the 4xx row-action convention — e.g. a referential
+                            // delete guard enumerating active dependents) as an
+                            // error toast. The dialog has already closed, so the
+                            // drawer's inline alert path has nowhere to render;
+                            // a toast is the app-wide surface for a closed-dialog
+                            // action error. Mirrors sheet.js's HX-Error-Message read.
+                            var dlgErr = response.headers.get('HX-Error-Message');
+                            if (dlgErr) {
+                                showDialogActionError(dlgErr);
+                            } else {
+                                console.error('Action failed:', response.status);
+                            }
                             dialog.dispatchEvent(new CustomEvent('dialog:confirm', {
-                                detail: { url: actionUrl, success: false, status: response.status }
+                                detail: { url: actionUrl, success: false, status: response.status, errorMessage: dlgErr || '' }
                             }));
                         }
                     }).catch(function(err) {
