@@ -286,6 +286,47 @@ type CellGridCell struct {
 	// aria-describedby (announces queued/saving/saved/error to screen readers).
 	InputID  string
 	StatusID string
+
+	// --- Per-cell narrative affordance (additive, zero-valued for legacy
+	// callers) ------------------------------------------------------------
+	//
+	// A recorded cell (an outcome exists) may carry a free-text narrative the
+	// operator views/edits behind a message-glyph icon → drawer. The component
+	// stays VERTICAL-NEUTRAL: it renders a pre-composed aria-label / sheet-title
+	// string handed down by the view; it never sees "student"/"criterion".
+
+	// NarrativeURL is the GET target for the drawer (already carrying its
+	// ?outcome_id=… query). EMPTY suppresses the icon entirely — the view leaves
+	// it unset for a cell with no recorded outcome (nothing to annotate). The
+	// component gates the whole affordance on {{if .NarrativeURL}}.
+	NarrativeURL string
+
+	// HasNarrative drives the icon's two visual states: filled glyph (a narrative
+	// is recorded) vs outline glyph (none yet). Presentational only — the state is
+	// ALSO carried in NarrativeAria for assistive tech (the glyph fill is invisible
+	// to a screen reader).
+	HasNarrative bool
+
+	// NarrativeAria is the fully-composed accessible name for the icon button
+	// (names the entity, the column, and the has/empty/read-only state). Composed
+	// in the view from its labels + resolved names so the generic component never
+	// embeds vertical vocabulary.
+	NarrativeAria string
+
+	// NarrativeTitle is the pre-composed drawer/sheet heading (e.g. entity +
+	// column) surfaced via data-lf-sheet-title on the trigger — the sheet shell
+	// copies it into the dialog's labelled title on open.
+	NarrativeTitle string
+
+	// NarrativeBtnID is the stable id of the icon <button>, so a save round-trip
+	// can refresh just this button out-of-band (hx-swap-oob) without a full-grid
+	// reload.
+	NarrativeBtnID string
+
+	// NarrativeTestID is the Playwright selector for the icon button (convention:
+	// "om-note-{short_entity_id}-{column_key_slug}"). The button also exposes the
+	// state as data-has-narrative for state-aware assertions.
+	NarrativeTestID string
 }
 
 // CellGridLabels holds user-visible strings for the grid. The json tags match

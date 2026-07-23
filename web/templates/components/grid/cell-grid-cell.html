@@ -18,11 +18,16 @@ with .cell-grid-cell--ro + a tooltip; the value is still submitted-safe because 
 disabled control is simply omitted from the POST (server-side IDOR guard is the
 backstop).
 
-$cell.TextValue (S7, s7pre gap 5) is an OPTIONAL descriptor recorded alongside
-a numeric Value (e.g. an IB-MYP grade descriptor coexisting with a numeric
-score) — rendered as a small secondary line under the read-only value. It is
-only ever set by the view for the non-editable display path; a genuinely
-text-typed criterion never populates it (there TextValue IS already Value).
+$cell.NarrativeURL (20260723 narrative drawer) drives a per-cell message-glyph
+icon → drawer affordance that REPLACED the old under-value descriptor line (the
+former .cell-grid-cell--note, bound to $cell.TextValue, which bloated row height
+and column width and previewed only one clause). The icon renders — in BOTH the
+read-only-value branch and the editable branch — ONLY when NarrativeURL is set
+(the view sets it only for a cell with a recorded outcome; nothing to annotate
+otherwise). It is a real <button type="button"> (keyboard-reachable; never an
+href-less <a>) opening the drawer via the sheet-open trigger convention (the
+download-drawer precedent). $cell.TextValue is retained on the type for legacy
+callers but is no longer rendered here.
 
 Pointer enforcement fields (Min/Max/Step/MaxLength) are read via the *Attr()
 methods on CellInputDescriptor — a *float64 / *int cannot be interpolated
@@ -46,7 +51,7 @@ directly (html/template prints the pointer address, not the value).
              the recorded value; the dash is reserved for truly empty cells. */ -}}
         {{if $cell.Value}}
         <span class="cell-grid-cell--value" data-testid="{{$cell.TestID}}">{{$cell.Value}}{{with $input.Unit}} {{.}}{{end}}</span>
-        {{with $cell.TextValue}}<span class="cell-grid-cell--note" title="{{.}}">{{.}}</span>{{end}}
+        {{if $cell.NarrativeURL}}{{template "cell-grid-note-btn" $cell}}{{end}}
         {{else}}
         <span class="cell-grid-cell--empty" aria-hidden="true">—</span>
         {{end}}
@@ -135,6 +140,39 @@ directly (html/template prints the pointer address, not the value).
         {{if eq $input.Type "multi_check"}}
         <span class="cell-grid-cell--empty" aria-hidden="true" title="multi_check (V2)">—</span>
         {{end}}
+
+        {{/* Narrative icon on an editable, already-recorded cell (an outcome
+             exists) — opens the drawer in add/edit mode. Suppressed on a
+             not-yet-recorded editable cell (NarrativeURL unset by the view). */}}
+        {{if $cell.NarrativeURL}}{{template "cell-grid-note-btn" $cell}}{{end}}
     {{end}}
 </td>
+{{end}}
+
+{{/* cell-grid-note-btn — the per-cell narrative affordance (20260723). Dot is a
+     types.CellGridCell. A real <button type="button"> (keyboard-reachable,
+     never an href-less <a>) carrying the sheet-open trigger set byte-for-byte
+     from the download-drawer precedent: hx-get into #sheetContent + innerHTML
+     swap + data-lf-action="sheet-open" (+ the labelled sheet title). The has/
+     empty state is presentational (glyph fill via a modifier class) AND encoded
+     in the accessible name (NarrativeAria) for assistive tech. Event handling is
+     the existing lf.on delegation — no inline on*= (CSP-safe). */}}
+{{define "cell-grid-note-btn"}}
+<button type="button"
+        {{with .NarrativeBtnID}}id="{{.}}"{{end}}
+        class="cell-grid-note-btn{{if .HasNarrative}} cell-grid-note-btn--has{{else}} cell-grid-note-btn--empty{{end}}"
+        hx-get="{{.NarrativeURL}}"
+        hx-target="#sheetContent"
+        hx-swap="innerHTML"
+        hx-push-url="false"
+        {{/* This button lives INSIDE the cell-grid batch <form>; the outcome_id
+             already rides the hx-get URL, so serialize NONE of the grid's inputs
+             into the drawer GET (no giant query string / URL-length blowout). */}}
+        hx-params="none"
+        data-lf-action="sheet-open"
+        data-lf-sheet-title="{{.NarrativeTitle}}"
+        aria-haspopup="dialog"
+        aria-label="{{.NarrativeAria}}"
+        data-has-narrative="{{.HasNarrative}}"
+        data-testid="{{.NarrativeTestID}}">{{template "icon-message-square" .}}</button>
 {{end}}

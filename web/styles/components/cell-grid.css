@@ -287,27 +287,60 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* Optional descriptor recorded alongside a numeric value (S7, s7pre gap 5 —
-   e.g. an IB-MYP grade descriptor stored next to a numeric score). Mirrors
-   table.css's .author-date secondary-line convention: small, muted, own
-   line under the primary value. Truncated with the full text in `title` —
-   these are free-text sentences and must never force the cell/column wide.
-   The cap MUST be an absolute length: the table is width:max-content, and a
-   percentage max-width cannot resolve during intrinsic sizing, so with
-   max-width:100% each full nowrap sentence fed its entire length into the
-   column's max-content (observed live: 700px+ columns, a 3400px table).
-   18rem bounds the descriptor column while staying wide enough to preview
-   the sentence's first clause. */
-.cell-grid-cell--note {
-    display: block;
-    max-width: 18rem;
-    margin-top: var(--spacing-2xs);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: var(--text-2xs);
+/* Per-cell narrative affordance (20260723 narrative drawer) — REPLACES the
+   former .cell-grid-cell--note under-value descriptor line (removed for the
+   density win: the free-text sentence bloated row height + column width and
+   previewed only one clause). A small message-glyph <button> sits inline beside
+   the value / input; clicking (or Enter/Space) opens the narrative drawer. Two
+   states: outline glyph = no narrative yet, filled glyph = a narrative exists.
+   Icon-only affordance, so it must stay compact and never widen the max-content
+   column. */
+.cell-grid-note-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: var(--spacing-2xs);
+    padding: var(--spacing-2xs);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
     color: var(--text-muted);
-    line-height: var(--leading-tight);
+    cursor: pointer;
+    vertical-align: middle;
+    line-height: 0;
+    transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.cell-grid-note-btn svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    display: block;
+}
+
+.cell-grid-note-btn:hover {
+    background: var(--bg-hover);
+    color: var(--accent-primary);
+}
+
+.cell-grid-note-btn:focus-visible {
+    outline: var(--border-width-focus) solid var(--accent-primary);
+    outline-offset: 1px;
+}
+
+/* Empty state: outline bubble, muted — reads as "add a narrative". */
+.cell-grid-note-btn--empty svg {
+    fill: none;
+}
+
+/* Has state: filled bubble, accent — reads at a glance as "a narrative exists".
+   The message-square glyph is a single closed path, so fill:currentColor renders
+   it as a solid speech bubble. */
+.cell-grid-note-btn--has {
+    color: var(--accent-primary);
+}
+
+.cell-grid-note-btn--has svg {
+    fill: currentColor;
 }
 
 /* --- Read-only cell ------------------------------------------------------ */
