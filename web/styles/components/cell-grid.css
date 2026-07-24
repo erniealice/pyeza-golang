@@ -124,6 +124,14 @@
        --border-width-thick at 1px for structural separators. Every gridline
        and save-state ring below uses --cg-line, never raw --border-width. */
     --cg-line: max(var(--border-width), 1px);
+    /* Exact border-box height of ONE sticky <thead> row (.cell-grid-thead th):
+       line-box (--text-xs × --leading-tight) + vertical padding
+       (2 × --spacing-2xs) + bottom gridline (--cg-line). Unlike the 1.5rem/3rem
+       sticky top-offset ESTIMATES below, this tracks the font/density/border
+       axes exactly. Consumed by the row-cell scroll-margin (see below) so a body
+       cell scrolled to the top of .cell-grid-scroll lands BELOW the 3-row sticky
+       header rather than tucked under it. */
+    --cg-head-row-h: calc(var(--text-xs) * var(--leading-tight) + 2 * var(--spacing-2xs) + var(--cg-line));
 }
 
 .cell-grid-caption {
@@ -341,6 +349,24 @@
 
 .cell-grid-note-btn--has svg {
     fill: currentColor;
+}
+
+/* Sticky-header scroll clearance — the row-0 pointer-intercept fix. The 3-row
+   sticky <thead> pins to the top of .cell-grid-scroll (z-index --z-popover,
+   opaque). Anything that scrolls a body cell to that same top edge — keyboard
+   focus, an in-page anchor, or the scrollIntoView step of a click's
+   actionability check — would otherwise land the cell UNDER the header, which
+   then intercepts the pointer (row-0's narrative button was unreachable by
+   mouse while the keyboard/focus path still worked). Reserving the header band
+   as scroll-margin lands the target just below the header instead. This is
+   scroll-positioning only: zero effect on the resting layout or paint order, so
+   the header still overlays genuinely-scrolled body content exactly as before.
+   Applied to the grid's two interactive scroll targets only; the +cushion
+   absorbs sub-pixel row-height rounding and keeps the target off the header
+   edge. */
+.cell-grid-input,
+.cell-grid-note-btn {
+    scroll-margin-top: calc(3 * var(--cg-head-row-h) + var(--spacing-xs));
 }
 
 /* --- Read-only cell ------------------------------------------------------ */
