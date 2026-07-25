@@ -356,6 +356,23 @@
     font-size: var(--text-2xs);
 }
 
+/* Icon-only download link in an L1 header cell (each phase + the trailing
+   composite column). btn-primary supplies the background colour; this squares
+   the padding to the header-control scale and sizes the glyph. line-height:0
+   kills the inline-svg baseline gap so the control stays badge-height. */
+.cell-grid-headactions .om-dl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xs);
+    line-height: 0;
+}
+
+.cell-grid-headactions .om-dl-btn svg {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
 /* Opt-in left alignment for the two grouping header rows, via CardClass. L3
    (leaf) rows stay centered over their numeric columns — a consumer wanting
    otherwise should say so explicitly rather than inherit it here. */
@@ -703,6 +720,27 @@
        the row can get tall enough to need its own baseline: keep every direct
        child vertically centred and let the whole band wrap as a unit. */
     min-width: 0;
+}
+
+/* Page chrome temporarily retired (20260725 owner request). The band still
+   RENDERS — the approval form HOSTS live inside it and the phase-header
+   buttons submit them via form="…" (a display:none form submits normally) —
+   it just paints nothing. Must FOLLOW .om-toolbar in source order so
+   display:none wins over its display:flex. Remove the modifier in
+   outcome_matrix/templates/matrix.html to bring the band back. */
+.om-toolbar--hidden {
+    display: none;
+}
+
+/* Visible landing strip for the per-phase approval result banners while the
+   toolbar band is hidden: an aria-live region inside a display:none subtree
+   announces nothing and shows nothing. The forms resolve these by id
+   (data-result-id), never by position. Zero-height until a banner unhides. */
+.om-results {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
 }
 
 /* Right-aligned toolbar cluster: the columns selector + export actions.
