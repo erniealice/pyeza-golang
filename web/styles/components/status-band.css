@@ -1,0 +1,180 @@
+/* ============================================================================
+   status-band.css — a titled band of state rows, each with trailing actions.
+
+   GENERIC BY DESIGN. This started life as the grade sheet's `.pa-*` ("phase
+   approval") block inside cell-grid.css, which was wrong on two counts: the
+   markup is not grid-specific (it is a toolbar band that happens to sit above a
+   grid), and the vocabulary named one consumer's domain. It is now its own
+   component with domain-free names, so any surface needing
+
+       [ label ] [ state badge ] [ meta ] ·············· [ actions ]
+
+   repeated per item can use it — approval periods, deployment stages, import
+   batches, payout runs, reconciliation steps.
+
+   ANATOMY
+     .status-band                 column stack; the band itself
+       .status-band__title        optional caption (omit when the row labels
+                                  already say what the band is)
+       .status-band__rows         the stack of rows
+         .status-row              ONE item = one line
+           .status-row__head      label + badges + meta, packed left
+             .status-row__label
+             .status-row__meta    muted secondary text (a count, "not started")
+           .status-row__actions   trailing controls, PUSHED RIGHT
+           .status-row__note      full-width line below (a hint / explanation)
+           .form-result           full-width result banner (shared convention)
+
+   LAYOUT CONTRACT
+   Each .status-row is a wrapping flex line. __actions carries margin-left:auto
+   so controls sit at the far end and the label/meta cluster reads as one group
+   at the near end — the same right-pinning idiom .om-tools uses. When the line
+   is too narrow the row wraps rather than overflowing, and __note / .form-result
+   always take their own line via flex-basis:100%.
+
+   TOKENS ONLY — no raw literals. Sizing follows the compact toolbar scale
+   (--text-xs/--text-sm), not the page body scale.
+   ============================================================================ */
+
+.status-band {
+    /* Sized to share a flex band with a right-pinned tool cluster: grow to fill,
+       but stay shrinkable (min-width:0) so a long row can never widen an
+       overflow-clipped page container. */
+    flex: 1 1 24rem;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2xs);
+}
+
+.status-band__title {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+/* Rows STACK one per line. align-self:stretch + width:100% keep the column
+   bounded by .status-band (itself min-width:0) so nothing pushes the band
+   wider than its container. */
+.status-band__rows {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    align-self: stretch;
+    flex: 0 0 auto;
+    min-width: 0;
+    width: 100%;
+    gap: var(--spacing-2xs);
+}
+
+/* One item = ONE line. Wraps internally when too narrow — that wrap is the
+   overflow valve, since rows no longer compete for a single row. */
+.status-row {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-2xs) var(--spacing-sm);
+}
+
+/* The near-end cluster: label, state badge(s), muted meta. */
+.status-row__head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    min-width: 0;
+    gap: var(--spacing-sm);
+}
+
+.status-row__label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.status-row__meta {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+/* Trailing controls, pinned to the far end. margin-left:auto is what ties each
+   action visually to ITS OWN row — the whole point of this layout. It degrades
+   safely: once the row wraps, auto-margin collapses and the actions simply
+   start the next line. */
+.status-row__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-left: auto;
+}
+
+/* Full-width members break onto their own line. */
+.status-row__note,
+.status-row .form-result {
+    flex-basis: 100%;
+}
+
+.status-row__note {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    line-height: var(--leading-tight);
+}
+
+/* A form participating in a row — inline so its control sits on the row line
+   rather than opening a block. */
+.status-form {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: 0;
+}
+
+/* Inline text input at the band's compact scale — mirrors form.css input
+   chrome. --input-shadow carries the ghost border under [data-border="none"]
+   (same contract as every other input). */
+.status-form__input {
+    min-width: 12rem;
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--input-shadow);
+}
+
+.status-form__input:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: inset 0 0 0 1px var(--accent-primary);
+}
+
+/* A form that exists only to HOST hidden fields for a button rendered elsewhere
+   (via the standard form="id" attribute). It has no visible controls of its
+   own, so it must not occupy a flex slot or add a gap. Its inputs still submit
+   normally — display:contents removes the box, not the form semantics. */
+.status-form--host {
+    display: contents;
+}
+
+/* A band reduced to form-hosts and result banners — every visible member moved
+   elsewhere (the grade sheet moved its phase title, badge and controls into the
+   sticky column header). It must then occupy NO vertical space, or it leaves a
+   gap where the caption used to be. The result banners still un-hide in place. */
+.status-band:not(:has(.status-row__head)) {
+    gap: 0;
+}
+
+.status-row:not(:has(.status-row__head)) {
+    gap: 0;
+}

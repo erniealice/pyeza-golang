@@ -198,11 +198,27 @@
     font-size: var(--text-md);
 }
 
-/* --- Sticky header ------------------------------------------------------- */
-.cell-grid-thead th {
+/* --- Sticky header -------------------------------------------------------
+   The WHOLE <thead> sticks as one block, and the rows inside it keep their
+   natural stacking. This replaces per-row `top` offsets computed from a single
+   --cg-head-row-h, which silently assumed every header row is the SAME height.
+   That assumption held only while every row held one line of plain text: as
+   soon as row 1 gained a state badge and an action button it grew taller than
+   rows 2-3, whose offsets were still derived from the old uniform height, so on
+   scroll they slid up under row 1 (visible as the "Summative Assessment" row
+   creeping). Sticking the container needs no arithmetic and is correct for any
+   row height, now and after any future header content. */
+.cell-grid-thead {
     position: sticky;
     top: 0;
     z-index: var(--z-popover); /* above body rows during vertical scroll */
+}
+
+.cell-grid-thead th {
+    /* NOT position:sticky — the thead above owns vertical stickiness now. The
+       frozen first column still opts back in for the HORIZONTAL axis below
+       (.cell-grid-col--frozen), which nests correctly inside a sticky thead. */
+    z-index: var(--z-popover);
     background: var(--bg-card);
     border-bottom: var(--cg-line) solid var(--border);
     border-right: var(--cg-line) solid var(--border);
@@ -213,17 +229,140 @@
     white-space: nowrap;
 }
 
-/* Stack the three header rows so each sits below its parent. These offsets are
-   DERIVED, not estimated: --cg-head-row-h (declared on .cell-grid-table above,
-   inherited down to these th) is the exact border-box height of one header row
-   across the font/density/border axes. They previously carried the hardcoded
-   1.5rem/3rem estimates from S7, which drift the moment any of those axes move
-   (measured 19.87px actual vs the 19.2px the estimate assumed at dense density
-   — rows 2/3 rode ~0.7px/1.3px too high). The fallback keeps the old estimate
-   in case --cg-head-row-h ever stops inheriting. */
-.cell-grid-row--l1 th { top: 0; }
-.cell-grid-row--l2 th { top: var(--cg-head-row-h, 1.5rem); }
-.cell-grid-row--l3 th { top: calc(2 * var(--cg-head-row-h, 1.5rem)); }
+/* Per-row `top` offsets deliberately REMOVED — see the .cell-grid-thead comment
+   above. --cg-head-row-h is still declared on the table and still feeds
+   scroll-margin-top for keyboard grid-nav, which wants one row's height, not a
+   cumulative header offset. */
+
+/* --- Header slots (CellGridConfig.RowHeadHTML / CellGridLevel1.LabelHTML) ---
+   Presentational scaffolding for caller-supplied header fragments. Deliberately
+   GENERIC: a stack of lines, and a row of items on a line. This component does
+   not know what a consumer puts in them, which is the point — the fragment comes
+   from the accessor, pyeza just gives it somewhere to live.
+
+   NOTE these override the .cell-grid-thead th defaults above (center + nowrap),
+   which are right for a one-word column label and wrong for a stacked caption.
+   Scoped to the slot classes so a th WITHOUT a fragment is untouched. */
+.cell-grid-headstack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+    align-items: flex-start;
+    text-align: left;
+    white-space: normal;
+}
+
+.cell-grid-headstack-caption {
+    font-weight: var(--font-weight-semibold);
+}
+
+/* A secondary summary line — quieter than the caption, and NOT nowrap, so a
+   long breakdown wraps inside the column instead of widening it. */
+.cell-grid-headstack-breakdown {
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    font-weight: var(--font-weight-normal);
+}
+
+/* Optical alignment: a leading pill's own left padding insets its TEXT, so it
+   reads as indented against the plain-text lines above and below it — and
+   .badge-neutral's fill is nearly invisible on a header, so the pill edge does
+   not visually justify the gap. Pull it back by exactly that padding
+   (--spacing-sm == .badge-sm's 0.5rem inline padding) so the glyphs line up.
+   Scoped to a FIRST-child badge inside a headstack, so a pill that follows text
+   on the same line (an L1 phase badge) keeps its normal spacing. */
+.cell-grid-headstack .cell-grid-headline > .badge:first-child {
+    margin-left: calc(-1 * var(--spacing-sm));
+}
+
+/* One line inside a stack — wraps rather than widening the column, so a long
+   breakdown can never force the frozen column to grow. */
+.cell-grid-headline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    font-weight: var(--font-weight-normal);
+}
+
+/* Title + trailing item on ONE line (an L1 phase header: title then a state
+   badge). Inline-flex so the th's own centering still applies to the group as a
+   whole when the consumer has not opted into left alignment. */
+.cell-grid-headinline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    white-space: nowrap;
+}
+
+/* Split variant: title group at the near end, controls at the far end of the
+   SAME header cell. `gap` is the MINIMUM separation — space-between distributes
+   any surplus, but never lets the two groups touch when the cell is narrow
+   (an L1 spanning few or narrow leaf columns). Once even the gap will not fit,
+   flex-wrap drops the controls to their own line inside the cell rather than
+   overflowing into the neighbouring phase. */
+.cell-grid-headinline--split {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-2xs) var(--spacing-lg);
+    white-space: normal;
+}
+
+.cell-grid-headinline__main,
+.cell-grid-headinline__end {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    min-width: 0;
+}
+
+/* Controls sit tight to the right edge and never stretch the header row. */
+.cell-grid-headinline__end {
+    flex-shrink: 0;
+}
+
+/* The consumer slot's own wrapper — several controls on one line, wrapping
+   rather than overflowing when the cell is narrow. Uppercase/letter-spacing from
+   the header th is reset: these are buttons, not column labels. */
+.cell-grid-headactions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: var(--font-weight-normal);
+}
+
+/* Controls in a header cell sit at the BADGE scale, not the page-button scale:
+   they share the line with a .badge-sm state chip, and .btn-sm's own 13px/8px
+   is a body-scale control that visually outweighs the header it lives in and
+   forces the whole header row taller. Matching --text-2xs + the badge's inline
+   padding keeps the header row at its natural height, which is the entire point
+   of moving these controls up here. */
+.cell-grid-headactions .btn {
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-tight);
+}
+
+/* Same for an inline input riding along (the return-reason field): shrink it to
+   the header scale and let it give up width first. */
+.cell-grid-headactions .status-form__input {
+    min-width: 8rem;
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    font-size: var(--text-2xs);
+}
+
+/* Opt-in left alignment for the two grouping header rows, via CardClass. L3
+   (leaf) rows stay centered over their numeric columns — a consumer wanting
+   otherwise should say so explicitly rather than inherit it here. */
+.cell-grid-card--head-left .cell-grid-l1,
+.cell-grid-card--head-left .cell-grid-l2 {
+    text-align: left;
+}
 
 /* --- Frozen first column ------------------------------------------------- */
 .cell-grid-table .cell-grid-col--frozen {
@@ -742,179 +881,17 @@
     font-weight: var(--font-weight-semibold);
 }
 
-/* --- Phase-approval block (matrix.html outcome-matrix-approval-bar) -------
-   20260725 item (c): this used to be its own stacked card BELOW .om-toolbar,
-   so the page spent two bands of vertical chrome on top of a very tall grid.
-   It is now a MEMBER of .om-toolbar — one shared row with the scope segment
-   and the Columns/Download tools. Consequences of that move, all deliberate:
+/* --- Approval band ------------------------------------------------------
+   MOVED 2026-07-25 to components/status-band.css. The `.pa-*` ("phase
+   approval") rules that lived here were never grid rules — they styled a
+   toolbar band that merely happens to sit above a grid — and their names bound
+   a generic component to one consumer's domain. They are now the domain-free
+   `.status-band` / `.status-row` component, reusable by any surface needing
+   "[label] [state badge] [meta] ... [actions]" repeated per item.
 
-     · no card chrome. Inside the toolbar it is a band segment, not a floating
-       card, so background/border/radius/padding are dropped. (--cg-line is
-       KEPT: the per-phase form-result status borders below are semantic and
-       must survive [data-border="none"], and this element is still outside
-       .cell-grid-table's scope, so it needs its own copy of the token.)
-     · flex:1 1 24rem + min-width:0 — it is the band's elastic member: the
-       tools keep their intrinsic width and this block absorbs the squeeze,
-       then wraps to its own line on a narrow viewport rather than pushing the
-       header wider than the (overflow-clipped) .page-content--grid.
-
-   20260725 regression fix: the first cut of the consolidation also flattened
-   the block's INTERNALS to a single row — title inline, then every phase side
-   by side. Two phases' worth of (label + chip + count + Submit) never fits the
-   space left over next to the tools, and because each phase's own children
-   carry intrinsic minimums (button/label text, the return-reason input), the
-   row blew past the band instead of wrapping: the second phase and the
-   Columns/Download cluster ran off the right edge at ≤1280px. The block is a
-   COLUMN again — title on its own line, then ONE phase per line, exactly as it
-   read before the consolidation. Only the internals changed: .pa-bar is still
-   a member of .om-toolbar, so the band stays single and .om-tools stays pinned
-   right. */
-.pa-bar {
-    flex: 1 1 24rem;
-    min-width: 0;
-    max-width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-2xs);
-    --cg-line: max(var(--border-width), 1px);
-}
-
-.pa-bar__title {
-    margin: 0;
-    font-size: var(--text-xs);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    white-space: nowrap;
-}
-
-/* Phases STACK: one per line. align-self:stretch + width:100% keep the column
-   bounded by .pa-bar (itself min-width:0 inside the band) so nothing can push
-   the toolbar wider than the overflow-clipped .page-content--grid. */
-.pa-bar__phases {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    align-self: stretch;
-    flex: 0 0 auto;
-    min-width: 0;
-    width: 100%;
-    gap: var(--spacing-2xs);
-}
-
-/* One phase = ONE line (label + chip + count + its action buttons). It still
-   wraps internally when the line is too narrow — that wrap is the overflow
-   valve now that the phases no longer compete for one row. The full-width
-   members below (hint, result banner) break onto their own line as before. */
-.pa-phase {
-    flex: 0 0 auto;
-    min-width: 0;
-    max-width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--spacing-2xs) var(--spacing-sm);
-}
-
-.pa-phase__hint,
-.pa-phase .form-result {
-    flex-basis: 100%;
-}
-
-.pa-phase__head {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    min-width: 0;
-    gap: var(--spacing-sm);
-}
-
-.pa-phase__label {
-    font-size: var(--text-sm);
-    font-weight: var(--font-weight-semibold);
-}
-
-.pa-phase__count,
-.pa-phase__muted {
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-}
-
-.pa-phase__hint {
-    margin: 0;
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-    line-height: var(--leading-tight);
-}
-
-.pa-phase__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-/* No :empty guard here — the four action forms are state-gated in the
-   template, and matrix.html only renders .pa-phase__actions when at least
-   one action is available (template conditionals leave whitespace text
-   nodes, which defeat :empty). */
-
-.pa-form {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    margin: 0;
-}
-
-/* Return-reason inline input — mirrors form.css input chrome at the bar's
-   compact scale. --input-shadow carries the ghost border under
-   [data-border="none"] (same contract as every other input). */
-.pa-form__reason {
-    min-width: 12rem;
-    padding: var(--spacing-2xs) var(--spacing-sm);
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    color: var(--text-primary);
-    background: var(--bg-card);
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--input-shadow);
-}
-
-.pa-form__reason:focus-visible {
-    outline: none;
-    border-color: var(--accent-primary);
-    box-shadow: inset 0 0 0 1px var(--accent-primary);
-}
-
-/* Per-phase result banner — the shared data-hx-on="form-result" handler's
-   swap target. Scoped copy of the .form-result convention (entydad-user-
-   detail.css / fycha-asset-detail.css carry their own) at this bar's
-   compact scale; none of those files is linked on grid pages. */
-.pa-phase .form-result {
-    padding: var(--spacing-2xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-xs);
-    font-weight: var(--font-weight-medium);
-}
-
-.pa-phase .form-result--hidden {
-    display: none;
-}
-
-.pa-phase .form-result--success {
-    background: var(--status-success-light);
-    color: var(--status-success);
-    border: var(--cg-line) solid var(--status-success);
-}
-
-.pa-phase .form-result--error {
-    background: var(--status-error-light);
-    color: var(--status-error);
-    border: var(--cg-line) solid var(--status-error);
-}
+   Still relevant here: that band is a flex member of .om-toolbar above, so
+   .status-band keeps `flex: 1 1 24rem; min-width: 0` to stay the elastic member
+   while .om-tools holds its intrinsic width and stays pinned right. */
 
 /* --- Group band rows (view-driven row grouping) ---------------------------
    A CellGridRow with GroupLabel set emits one full-width band <tr> above it

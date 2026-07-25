@@ -14,10 +14,24 @@ before a range with `=` inside the loop.
 {{define "cell-grid-head"}}
 <thead class="cell-grid-thead">
     <tr class="cell-grid-row--l1">
-        <th class="cell-grid-corner{{if .FreezeFirstCol}} cell-grid-col--frozen{{end}}" rowspan="3" scope="col">{{.Labels.ClientColumn}}</th>
+        <th class="cell-grid-corner{{if .FreezeFirstCol}} cell-grid-col--frozen{{end}}" rowspan="3" scope="col">{{if .RowHeadHTML}}{{.RowHeadHTML}}{{else}}{{.Labels.ClientColumn}}{{end}}</th>
         {{range .Columns}}
         {{$l1span := 0}}{{range .Level2}}{{$l1span = add $l1span (len .Level3)}}{{end}}
-        <th class="cell-grid-l1" colspan="{{$l1span}}" scope="colgroup">{{.Label}}</th>
+        {{/* $ is the CellGridConfig (range rebinds the dot to each Level1). The
+             actions slot renders a CONSUMER template with the column's own
+             opaque Actions payload as dot — pyeza never reads that payload.
+             Wrapped in a space-between row so the title/badge group sits at the
+             near end and the controls at the far end. */}}
+        <th class="cell-grid-l1" colspan="{{$l1span}}" scope="colgroup">
+            {{- if and $.L1ActionsTemplate .Actions -}}
+            <span class="cell-grid-headinline cell-grid-headinline--split">
+                <span class="cell-grid-headinline__main">{{if .LabelHTML}}{{.LabelHTML}}{{else}}{{.Label}}{{end}}</span>
+                <span class="cell-grid-headinline__end">{{renderContent $.L1ActionsTemplate (gridSlot $ .Actions)}}</span>
+            </span>
+            {{- else -}}
+            {{if .LabelHTML}}{{.LabelHTML}}{{else}}{{.Label}}{{end}}
+            {{- end -}}
+        </th>
         {{end}}
     </tr>
     <tr class="cell-grid-row--l2">

@@ -456,6 +456,15 @@ func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 	// NEVER derive it from user input (URL params, headers, form values, cookies).
 	// Doing so would allow template injection — an attacker could render
 	// arbitrary templates or trigger server errors.
+	// gridSlot pairs a CellGridConfig with a column's opaque Actions payload for
+	// CellGridConfig.L1ActionsTemplate. Needed because the slot's dot must carry
+	// BOTH — the payload the consumer defined, and the config where the
+	// render-time-injected Nonce / WorkspaceID live (a signed {{actionForm}} in
+	// the slot needs the latter). See types.CellGridSlot.
+	base["gridSlot"] = func(grid, actions any) types.CellGridSlot {
+		return types.CellGridSlot{Grid: grid, Actions: actions}
+	}
+
 	base["renderContent"] = func(name string, data any) template.HTML {
 		if name == "" {
 			// Diagnostic: empty name should never happen for content partials.

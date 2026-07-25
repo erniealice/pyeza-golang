@@ -1,6 +1,9 @@
 package types
 
-import "strconv"
+import (
+	"html/template"
+	"strconv"
+)
 
 // grid.go — CellGridConfig: a spreadsheet-style bulk-edit grid block.
 //
@@ -32,6 +35,44 @@ type CellGridConfig struct {
 	// Freeze config — CSS position:sticky applied by the component template.
 	FreezeFirstCol   bool // true → client-name column gets sticky left
 	FreezeHeaderRows int  // 0, 1, 2, or 3 — how many header rows stay sticky on vertical scroll
+
+	// L1ActionsTemplate names a CONSUMER-DEFINED template rendered at the far
+	// end of every Level1 header cell whose Actions payload is non-nil. Empty →
+	// nothing renders and the header is unchanged.
+	//
+	// Why a template NAME rather than a template.HTML string, unlike
+	// RowHeadHTML: controls in this slot are typically POST forms, and a signed
+	// form needs {{actionForm}}, which is a RENDERER func (it holds the
+	// workspace form signer). A consumer's view layer cannot produce that
+	// markup ahead of time — it must be emitted during render. So pyeza renders
+	// the named template and stays ignorant of what is in it.
+	//
+	// The template receives CellGridLevel1.Actions as its dot, NOT the grid
+	// config, so the consumer owns that payload's shape entirely. Anything the
+	// slot needs (workspace id for {{actionForm}}, labels, confirm strings) goes
+	// on that payload.
+	L1ActionsTemplate string
+
+	// RowHeadHTML is a caller-supplied fragment for the frozen corner header
+	// cell (the one above the row labels). EMPTY → the cell renders exactly
+	// Labels.ClientColumn, byte-for-byte as before, so existing consumers are
+	// unaffected.
+	//
+	// It exists so a consumer can stack a caption plus summary badges there
+	// ("Student" / "29 students" / "11 male, 15 female, 3 not assigned")
+	// WITHOUT this generic component learning what a student or a gender is.
+	// pyeza stays dumb: it renders the fragment and knows nothing about it.
+	// Same shape as accordion's TitleHTML, dashboard's Custom, PageData's
+	// HeaderIconHTML and TableCell.HTML.
+	//
+	// ESCAPING IS THE CALLER'S JOB, and it is not optional. template.HTML
+	// bypasses Go's contextual escaping, and the natural content here includes
+	// WORKSPACE-CONTROLLED data (attribute values such as a gender label), not
+	// just integers. Build it with html/template so the data values are escaped
+	// — never with string concatenation. TableCell.Composite deliberately went
+	// the other way (typed fields, never template.HTML) for exactly this reason;
+	// choose that route instead if a consumer cannot guarantee escaping.
+	RowHeadHTML template.HTML
 
 	// Column tree (3 levels). Level1 = phase, Level2 = task, Level3 = criterion.
 	// The template renders a 3-row <thead>: L1 colspans across L2, L2 colspans across L3.
@@ -125,10 +166,36 @@ func (c CellGridConfig) BandColSpan() int {
 }
 
 // CellGridLevel1 is the top header level (e.g. a semester / job_template_phase).
+// CellGridSlot is the dot handed to CellGridConfig.L1ActionsTemplate. It pairs
+// the column's opaque Actions payload with the grid config, because a slot
+// rendering a signed form needs Grid.WorkspaceID for {{actionForm}} — and that
+// field is populated at RENDER time by the pipeline's reflection pass, which
+// deliberately does not descend into slices or named sub-structs (see
+// render/pipeline.go injectTableConfigContext). A consumer therefore cannot
+// stamp the workspace id onto its own payload when it builds the grid; it has
+// to read it off the config during render. Build with the `gridSlot` func.
+type CellGridSlot struct {
+	Grid    any // the *CellGridConfig — Nonce / WorkspaceID live here
+	Actions any // the column's consumer-defined payload
+}
+
 type CellGridLevel1 struct {
 	Key    string // maps to job_template_phase_id
 	Label  string
 	Level2 []CellGridLevel2
+
+	// LabelHTML is a caller-supplied fragment replacing Label in the L1 header
+	// cell. EMPTY → the cell renders Label, unchanged. Lets a consumer put a
+	// title plus a state badge in the header without this component learning
+	// what that state means. Same escaping contract as
+	// CellGridConfig.RowHeadHTML — read it before using this.
+	LabelHTML template.HTML
+
+	// Actions is an OPAQUE payload handed to CellGridConfig.L1ActionsTemplate
+	// as its dot when that template renders at the far end of this header cell.
+	// nil → no slot renders for this column. pyeza never inspects it; only the
+	// consumer's own template knows its shape.
+	Actions any
 }
 
 // CellGridLevel2 is the mid header level (e.g. an assessment / job_template_task).
@@ -341,6 +408,17 @@ type CellGridLabels struct {
 	ReadOnlyMarker string `json:"read_only_marker"` // "(read only)"
 	EmptyGrid      string `json:"empty_grid"`       // "No rows to display."
 	ClientColumn   string `json:"client_column"`    // "Student" / "Client" (frozen header)
+
+	// Row-count summary for a consumer building a RowHeadHTML stack. Separate
+	// from ClientColumn on purpose: ClientColumn is ALSO the CSV header, so
+	// overloading it would change every exported file's first column.
+	// {count} is substituted by the consumer.
+	ClientTotal string `json:"client_total"` // "{count} records" / "{count} students"
+	// Names the ABSENCE of a grouping value ("not assigned"). The present
+	// values are DATA (an attribute value's own label) and must never get label
+	// keys — a workspace can rename or add one at any time, and the label layer
+	// would have no key for it.
+	BreakdownUnassigned string `json:"breakdown_unassigned"` // "not assigned"
 
 	// --- W2 edit-mode (AutoSave) per-cell + notice strings. All JSON-tagged
 	// so the lyngua per-tier overrides unmarshal into the "grid" object; empty
