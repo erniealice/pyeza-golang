@@ -431,6 +431,9 @@ func (r *HTMLRenderer) workspaceFuncsFor(m map[string]string, cloned *template.T
 			t := cloned.Lookup(name)
 			if t == nil {
 				log.Printf("renderContent: template %q NOT REGISTERED (data type=%T)", name, data)
+				if isDecorativeTemplate(name) {
+					return template.HTML("")
+				}
 				return template.HTML(`<div class="page-content"><p>Page content not available</p></div>`)
 			}
 			var buf bytes.Buffer

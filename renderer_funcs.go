@@ -468,6 +468,9 @@ func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 			// next request immediately reveals the cause of the "Page content not
 			// available" fallback.
 			log.Printf("renderContent: template %q NOT REGISTERED (data type=%T)", name, data)
+			if isDecorativeTemplate(name) {
+				return template.HTML("")
+			}
 			return template.HTML(`<div class="page-content"><p>Page content not available</p></div>`)
 		}
 		var buf bytes.Buffer
@@ -481,6 +484,24 @@ func (r *HTMLRenderer) buildFuncMap() template.FuncMap {
 	}
 
 	return base
+}
+
+// isDecorativeTemplate reports whether a renderContent name addresses a purely
+// decorative glyph rather than a page body.
+//
+// renderContent is used for two very different jobs: rendering a page's content
+// partial, and rendering a named icon into a small aria-hidden slot inside a
+// component (auth principal cards, logo marks, cell affordances). The
+// "Page content not available" miss-fallback is right for the first and
+// actively harmful for the second — an unknown icon name injected a page-level
+// <div class="page-content"><p>Page content not available</p></div> INSIDE a
+// <button>, which is how the select-workspace-role staff card came to announce
+// itself as "Page content not available …" and steered operators onto the wrong
+// principal binding. A missing decoration must degrade to no decoration.
+//
+// The miss is still logged either way, so the drift stays diagnosable.
+func isDecorativeTemplate(name string) bool {
+	return strings.HasPrefix(name, "icon-")
 }
 
 // defaultOperatorFor returns the JS operator string used when the filter widget renders.

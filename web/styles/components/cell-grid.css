@@ -404,6 +404,26 @@
     flex-shrink: 0;
 }
 
+/* AutoSave (W2) grids: the batch Save button is the RECOVERY/a11y fallback, not
+   the primary save path — edits persist on focusout. Standing permanently at the
+   foot of the sheet it reads as an action the operator must take, which is
+   exactly backwards. cell-grid.js now enables it in AutoSave mode ONLY while at
+   least one cell FAILED to save, so "disabled" here means "nothing to recover" —
+   hide it, and hide its whole strip so the grid keeps the reclaimed height.
+
+   The button is NEVER removed from the DOM: with JS unavailable the client-side
+   disable never runs, so the button renders enabled and remains the only way to
+   submit the grid (a form with several fields has no implicit submission without
+   a submit control). Legacy (non-AutoSave) grids are untouched — for them this
+   button IS the save path and must always show. */
+.cell-grid-form[data-cg-autosave="1"] .cell-grid-save:disabled {
+    display: none;
+}
+
+.cell-grid-form[data-cg-autosave="1"] .cell-grid-actions:has(> .cell-grid-save:disabled) {
+    display: none;
+}
+
 .cell-grid-empty {
     padding: var(--spacing-4xl);
     text-align: center;
@@ -425,16 +445,23 @@
     display: flex;
     flex-wrap: wrap; /* .page-content--grid clips overflow — controls must wrap, not vanish */
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-sm) var(--spacing-lg);
+    /* The approval block is now a MEMBER of this band (see .pa-bar below), so
+       the row can get tall enough to need its own baseline: keep every direct
+       child vertically centred and let the whole band wrap as a unit. */
+    min-width: 0;
 }
 
-/* Right-aligned toolbar cluster: the columns selector + export actions. */
+/* Right-aligned toolbar cluster: the columns selector + export actions.
+   margin-left:auto pins it to the far end of the shared band; flex-shrink:0
+   keeps the two buttons intact while the approval block absorbs the squeeze. */
 .om-tools {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--spacing-sm);
     margin-left: auto;
+    flex-shrink: 0;
 }
 
 /* --- Columns selector (server-prune toggle links; matrix.html .om-cols) ----
@@ -601,49 +628,66 @@
     font-weight: var(--font-weight-semibold);
 }
 
-/* --- Phase-approval bar (matrix.html outcome-matrix-approval-bar) ---------
-   Page chrome ABOVE the grid — flex-shrink:0, the same "chrome piece never
-   shrinks" contract as .om-toolbar/.cell-grid-actions. Phases lay out as
-   wrapping columns (flex row) so N phases share one shallow band: vertical
-   space on this page belongs to the grid, and the height budget is a hard
-   100vh flex chain (.page-content--grid). Card chrome uses raw
-   --border-width deliberately — the bar is a decorative card, so under
-   [data-border="none"] it goes borderless like every other card; only the
-   grid's structural lines get the --cg-line floor. */
+/* --- Phase-approval block (matrix.html outcome-matrix-approval-bar) -------
+   20260725 item (c): this used to be its own stacked card BELOW .om-toolbar,
+   so the page spent two bands of vertical chrome on top of a very tall grid.
+   It is now a MEMBER of .om-toolbar — one shared row with the scope segment
+   and the Columns/Download tools. Consequences of that move, all deliberate:
+
+     · no card chrome. Inside the toolbar it is a band segment, not a floating
+       card, so background/border/radius/padding are dropped. (--cg-line is
+       KEPT: the per-phase form-result status borders below are semantic and
+       must survive [data-border="none"], and this element is still outside
+       .cell-grid-table's scope, so it needs its own copy of the token.)
+     · the title sits INLINE, left of the phases, instead of stacked above.
+     · flex:1 1 24rem + min-width:0 — it is the band's elastic member: the
+       tools keep their intrinsic width and this block absorbs the squeeze,
+       then wraps to its own line on a narrow viewport rather than pushing the
+       header wider than the (overflow-clipped) .page-content--grid. */
 .pa-bar {
-    flex-shrink: 0;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: var(--bg-card);
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-lg);
-    /* Same floor as .cell-grid-table declares for gridlines — the bar is a
-       SIBLING of .cell-grid-card, outside the table's scope, and its
-       form-result status borders below are semantic (must survive
-       [data-border="none"]), so it needs its own copy of the token. */
+    flex: 1 1 24rem;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-2xs) var(--spacing-md);
     --cg-line: max(var(--border-width), 1px);
 }
 
 .pa-bar__title {
-    margin: 0 0 var(--spacing-sm);
+    margin: 0;
     font-size: var(--text-xs);
     font-weight: var(--font-weight-semibold);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-secondary);
+    white-space: nowrap;
 }
 
 .pa-bar__phases {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-sm) var(--spacing-2xl);
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: var(--spacing-2xs) var(--spacing-xl);
 }
 
+/* One phase = ONE line (label + chip + count + its action buttons), so N
+   phases fit the shared band. The full-width members below (hint, result
+   banner) still break onto their own line when they have content. */
 .pa-phase {
-    flex: 1 1 18rem;
+    flex: 0 1 auto;
     min-width: 0;
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-2xs);
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-2xs) var(--spacing-sm);
+}
+
+.pa-phase__hint,
+.pa-phase .form-result {
+    flex-basis: 100%;
 }
 
 .pa-phase__head {

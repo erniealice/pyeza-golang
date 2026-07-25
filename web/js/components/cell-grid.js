@@ -17,8 +17,12 @@
  *   HX-Trigger custom event "omcell-result" (detail {cells:[{key, ok, outcomeId,
  *   value, ratingFresh, error?}]}); a successful create renames the input's name
  *   from new.{jt}:{cr} to cells.{outcomeId} IN PLACE so the next save updates
- *   instead of re-creating. The manual Save button is retained verbatim as the
- *   a11y / retry fallback.
+ *   instead of re-creating. The manual Save button is retained as the a11y /
+ *   retry fallback, but in this mode it is enabled — and therefore, per
+ *   cell-grid.css, visible — ONLY while a cell is in the "error" state (see
+ *   needsSave). A healthy autosave grid shows no retry control; the control is
+ *   never removed from the DOM, so it remains the submit path when JS is
+ *   unavailable and the recovery path when a save actually fails.
  *
  * Contract (locked, must match the W2 server half verbatim):
  *   REQUEST  focusout of a CHANGED cell → coalesced single-flight POST of the
@@ -102,20 +106,55 @@
     }
 
     // --- manual batch: dirty-tracking + Save-button state (Layer 1) ---------
+
+    // Save/Retry button policy — the ONE predicate both layers agree on.
+    //
+    //   Layer 1 (no autosave): this button is the ONLY save path, so ANY dirty
+    //   cell must enable it. Unchanged behavior.
+    //
+    //   Layer 2 (autosave): edits persist on focusout, so the button is purely
+    //   the recovery / a11y fallback its "retry" label already describes. It is
+    //   therefore enabled ONLY while at least one cell FAILED to save. A merely
+    //   dirty/queued/saving cell is already on its way to the server and needs
+    //   no retry affordance — enabling on those made the button flash on every
+    //   keystroke and left it standing permanently on a healthy sheet.
+    //   cell-grid.css hides the button (and its strip) while it is disabled in
+    //   this mode, so a healthy autosave grid shows no retry control at all —
+    //   but the control still EXISTS, and with JS unavailable none of this runs,
+    //   leaving the button enabled as the no-JS submit path.
+    //   The cgDirty conjunct in the AutoSave branch preserves the pre-existing
+    //   "a completed manual batch turns the button off" behavior verbatim:
+    //   clearDirty() (afterRequest, successful) still hides it without this
+    //   layer having to reach in and repaint per-cell state.
+    function needsSave(form) {
+        if (isAuto(form)) {
+            return form.dataset.cgDirty === '1' &&
+                !!form.querySelector('.cell-grid-input[data-cg-state="error"]');
+        }
+        return form.dataset.cgDirty === '1';
+    }
+    function syncSaveButton(form) {
+        var btn = saveButton(form);
+        if (!btn || btn.dataset.cgLocked === '1') return;
+        btn.disabled = !needsSave(form);
+    }
     function markDirty(form) {
         if (!form) return;
         form.dataset.cgDirty = '1';
-        var btn = saveButton(form);
-        if (btn && btn.dataset.cgLocked !== '1') btn.disabled = false;
+        syncSaveButton(form);
     }
     function clearDirty(form) {
         if (!form) return;
         delete form.dataset.cgDirty;
-        var btn = saveButton(form);
-        if (btn && btn.dataset.cgLocked !== '1') btn.disabled = true;
+        syncSaveButton(form);
     }
     // Recompute the Save/Retry button enablement from live per-cell state.
     function recomputeDirty(form) {
+        if (isAuto(form)) {
+            // needsSave() already reads live per-cell state in this mode.
+            syncSaveButton(form);
+            return;
+        }
         var pending = form.querySelector(
             '.cell-grid-input[data-cg-state="dirty"],' +
             '.cell-grid-input[data-cg-state="queued"],' +
@@ -137,7 +176,7 @@
                 btn.dataset.cgLocked = '1';
             } else {
                 var form = gridForm(btn);
-                if (form && form.dataset.cgDirty !== '1') btn.disabled = true;
+                if (form) syncSaveButton(form);
             }
         }
     }
