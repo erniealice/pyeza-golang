@@ -208,7 +208,12 @@
                 data-sidebar-profile-trigger
                 data-testid="sidebar-profile-trigger"
                 data-tooltip="{{.Sidebar.CurrentUser.FirstName}} {{.Sidebar.CurrentUser.LastName}}">
-            <span class="sidebar-profile-avatar" aria-hidden="true">{{slice .Sidebar.CurrentUser.FirstName 0 1}}{{slice .Sidebar.CurrentUser.LastName 0 1}}</span>
+            {{/* Emptiness-guarded: `slice` on an empty string aborts template
+                 execution, and renderContent buffers, so ONE nameless user
+                 would blank the ENTIRE sidebar (not just the avatar). The
+                 loader now guarantees non-empty names; this is the second
+                 belt. */}}
+            <span class="sidebar-profile-avatar" aria-hidden="true">{{if .Sidebar.CurrentUser.FirstName}}{{slice .Sidebar.CurrentUser.FirstName 0 1}}{{end}}{{if .Sidebar.CurrentUser.LastName}}{{slice .Sidebar.CurrentUser.LastName 0 1}}{{end}}</span>
             <span class="sidebar-profile-name">
                 <span class="sidebar-profile-name-first">{{.Sidebar.CurrentUser.FirstName}}</span>
                 <span class="sidebar-profile-name-last">{{.Sidebar.CurrentUser.LastName}}</span>
