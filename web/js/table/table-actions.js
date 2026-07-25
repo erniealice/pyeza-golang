@@ -261,14 +261,28 @@
 
                 const url = downloadUrl + (downloadUrl.includes('?') ? '&' : '?') + 'id=' + id;
 
+                // Route through the download indicator so this row action shows the
+                // same progress toast as native download anchors/forms. track()
+                // shows the toast + returns the dltoken'd URL; falls back to the
+                // bare URL if the indicator module is unavailable (no double owner:
+                // download-indicator.js never listens for data-action="download").
+                const openDownload = function () {
+                    const dl = window.lf && window.lf.ui && window.lf.ui.DownloadIndicator;
+                    window.open(dl ? dl.track(url) : url, '_blank');
+                };
+
                 if (confirmTitle) {
+                    // Confirm copy comes from <body data-lf-download-*>
+                    // (CommonLabels.Download); English is only a last-resort
+                    // fallback when the dataset attr is absent.
+                    const ds = (document.body && document.body.dataset) || {};
+                    const confirmPrompt = ds.lfDownloadConfirmPrompt || 'Proceed with download?';
+                    const confirmAction = ds.lfDownloadConfirmAction || 'Download';
                     // Show confirmation dialog, then trigger download
-                    showRowActionDialogWithCallback(confirmTitle, confirmMessage || 'Proceed with download?', 'Download', 'primary', function() {
-                        window.open(url, '_blank');
-                    });
+                    showRowActionDialogWithCallback(confirmTitle, confirmMessage || confirmPrompt, confirmAction, 'primary', openDownload);
                 } else {
                     // Direct download without confirmation
-                    window.open(url, '_blank');
+                    openDownload();
                 }
             }
 

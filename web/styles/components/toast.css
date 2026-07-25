@@ -99,6 +99,17 @@
     background: var(--status-info);
 }
 
+/* Progress — persistent indicator (spinner + message, no auto-dismiss timer bar).
+   Dedicated outer class so it never collides with the .toast-progress timer-bar
+   element; styled like info so it reads as an ordinary toast. */
+.toast-state-progress {
+    border-left: 0.1875rem solid var(--status-info);
+}
+
+.toast-state-progress .toast-icon {
+    color: var(--status-info);
+}
+
 /* ========================================
    TOAST ICON
    ======================================== */
@@ -245,6 +256,20 @@
     }
 }
 
+/* Progress-toast spinner — CSS rotation (replaces SVG SMIL so reduced-motion
+   can freeze it). transform-origin center rotates around the 24x24 viewBox
+   center (12,12). */
+@keyframes toastSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.toast-spinner {
+    transform-origin: center;
+    animation: toastSpin 0.8s linear infinite;
+}
+
 /* ========================================
    RESPONSIVE
    ======================================== */
@@ -279,6 +304,11 @@
     }
 
     .toast-progress {
+        animation: none;
+    }
+
+    /* Freeze the download spinner to a static arc rather than spinning it. */
+    .toast-spinner {
         animation: none;
     }
 }

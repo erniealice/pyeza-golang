@@ -7,8 +7,13 @@
  * Public API (window.lf.Toast):
  *   show(message, state)
  *     - string message + optional state: "success" | "error" | "warning" | "info"
- *   show({title, message, state, duration, link, dismissible, id, class})
+ *   show({title, message, state, duration, link, dismissible, id, class, testid})
  *     - structured form: link is {url, label, icon?}, duration in ms ("0" disables)
+ *     - state "progress" renders a CSS-animated spinner icon (outer class toast-state-progress,
+     *       not toast-progress — that is the timer bar); pair it
+ *       with duration "0" + dismissible:false for a persistent indicator that
+ *       another owner dismisses via dismiss(toastEl) (e.g. the download indicator).
+ *     - testid sets data-testid on the toast element.
  *   dismiss(toastEl)        — start exit animation on a single toast
  *   dismissAll()            — dismiss every visible toast
  *
@@ -43,7 +48,11 @@
         success: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
         error: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
         warning: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-        info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+        info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+        // Spinner rotation is driven by the .toast-spinner CSS animation (external
+        // stylesheet — CSP-safe) instead of SVG SMIL, so prefers-reduced-motion
+        // can freeze it to a static arc (a media query cannot stop SMIL).
+        progress: '<svg class="toast-spinner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9"/></svg>'
     };
 
     var CLOSE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -105,6 +114,7 @@
      * @param {boolean} [opts.dismissible=true]
      * @param {string} [opts.id]
      * @param {string} [opts.class]
+     * @param {string} [opts.testid]
      */
     function render(opts) {
         var container = getContainer();
@@ -117,10 +127,15 @@
         var isUrgent = (state === 'error' || state === 'warning');
 
         var toast = document.createElement('div');
-        var classes = 'toast toast-' + state;
+        // The progress state gets a dedicated outer class: 'toast-progress' is the
+        // absolutely-positioned 2px timer-bar element, so reusing it for the outer
+        // element collapses the toast to an invisible bar.
+        var stateClass = state === 'progress' ? 'toast-state-progress' : 'toast-' + state;
+        var classes = 'toast ' + stateClass;
         if (opts.class) classes += ' ' + opts.class;
         toast.className = classes;
         if (opts.id) toast.id = opts.id;
+        if (opts.testid) toast.setAttribute('data-testid', opts.testid);
         toast.setAttribute('role', isUrgent ? 'alert' : 'status');
         toast.setAttribute('aria-live', isUrgent ? 'assertive' : 'polite');
         toast.setAttribute('data-duration', duration);

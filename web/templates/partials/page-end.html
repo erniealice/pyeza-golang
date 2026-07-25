@@ -42,6 +42,11 @@
     {{template "toast-container" .}}
     <script src="/assets/js/pyeza/toast.js?v={{.CacheVersion}}"></script>
 
+    {{/* Download Indicator — shows a progress toast on every server-generated
+         download trigger, dismissed by the lf_dl completion cookie. Loads after
+         toast.js since it drives lf.ui.Toast. */}}
+    <script src="/assets/js/pyeza/download-indicator.js?v={{.CacheVersion}}"></script>
+
     {{/* Tab Active State - toggles active class on HTMX tab clicks + arrow-key navigation */}}
     <script nonce="{{.Nonce}}">
     document.addEventListener('click', function(e) {

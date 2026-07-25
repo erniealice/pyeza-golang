@@ -604,6 +604,26 @@ type SheetLabels struct {
 	DismissAlert string `json:"dismiss_alert"`
 }
 
+// DownloadLabels holds translatable strings for the download loading indicator
+// (pyeza download-indicator.js). Surfaced to JS via <body data-lf-download-*>
+// attributes set by the app shell so no English text is hardcoded on the JS
+// side. Loaded from common/common.json#download.
+type DownloadLabels struct {
+	// Preparing is the persistent progress-toast message shown while a
+	// server-generated download is being prepared. Empty suppresses the toast.
+	Preparing string `json:"preparing"`
+	// Timeout is the warning-toast message shown when the download has not
+	// started within the client timeout window (it may still complete).
+	Timeout string `json:"timeout"`
+	// ConfirmPrompt is the confirmation-dialog body shown before a row-action
+	// download that requires confirmation (table-actions.js), used when the
+	// trigger supplies no per-row confirm message.
+	ConfirmPrompt string `json:"confirm_prompt"`
+	// ConfirmAction is the confirm button label on that download confirmation
+	// dialog.
+	ConfirmAction string `json:"confirm_action"`
+}
+
 // A11yLabels holds tier-invariant accessibility strings shared across every
 // page and component — skip-links, icon-only control labels, etc. These are
 // assistive-technology affordances, not business copy, so they live in the
