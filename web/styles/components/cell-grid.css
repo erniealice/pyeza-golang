@@ -62,7 +62,18 @@
     height: calc(100vh - var(--header-height));
     padding: var(--spacing-2xl) var(--spacing-4xl);
     gap: var(--spacing-xl);
-    overflow: hidden;
+    /* Cross axis stays CLIPPED (a wide toolbar/columns-menu must never give the
+       page a horizontal scrollbar), but the block axis is a SCROLL, not a clip.
+       `overflow: hidden` on both axes made this box a one-way trap: the chrome
+       band above the grid is flex-shrink:0, so whenever it grows past the height
+       budget (approval block wrapping, several phases, a returned-for-revision
+       banner, a short viewport) it squeezed .cell-grid-card toward zero and the
+       remainder of the grid became not just invisible but UNREACHABLE — nothing
+       in the chain could scroll to it. `auto` costs nothing while the page fits
+       (no scrollbar renders) and is the escape valve when it doesn't. Paired
+       with .cell-grid-card's min-height floor below. */
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .cell-grid-card {
@@ -71,7 +82,15 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 0;
-    min-height: 0;
+    /* min-height:0 is what lets the card SHRINK inside the flex column (without
+       it, flex-basis:auto's content-based minimum would push the card past the
+       height budget). But shrinking is only safe down to a point: page chrome
+       above is flex-shrink:0, so an unbounded shrink collapses the grid's own
+       scroll viewport to a few pixels and the sheet reads as "the bottom rows
+       are cut off". Floor it at a viewport that still shows several rows plus
+       the 3-row sticky header; .page-content--grid's overflow-y:auto absorbs
+       whatever no longer fits. */
+    min-height: min(12rem, 100%);
     overflow: hidden;
     /* Own stacking context: the sticky header/frozen-column z-indexes below
        (--z-popover scale) order layers INSIDE the grid only and must never
@@ -103,10 +122,25 @@
     -webkit-overflow-scrolling: touch;
 }
 
+/* `width: max-content` + `min-width: 100%` is the whole horizontal contract:
+   the table takes its CONTENT width and overflows .cell-grid-scroll (which then
+   scrolls, and which is what gives the sticky frozen first column something to
+   stay pinned over), but never renders narrower than the card.
+
+   `table-layout: fixed` USED to sit here and is deliberately gone. A fixed table
+   whose columns declare no width has no content-derived width to resolve
+   max-content against, so max-content collapses to the available width and
+   min-width:100% pins the table to exactly the card: columns get squeezed
+   instead of the table overflowing, .cell-grid-scroll's scrollWidth equals its
+   clientWidth, and BOTH of today's scroll regressions follow from that single
+   fact — the rightmost criterion columns are compressed until their (nowrap)
+   content is clipped with no scroll offset that can reveal it, and the frozen
+   first column's position:sticky is inert because nothing ever scrolls under
+   it. Auto layout costs a measuring pass over a grade sheet's cells (all short,
+   all inputs) and buys back a real horizontal scroll. */
 .cell-grid-table {
     border-collapse: separate;
     border-spacing: 0;
-    table-layout: fixed;
     width: max-content;
     min-width: 100%;
     /* Density baseline (S7): --text-sm + --leading-tight replace the
@@ -132,6 +166,18 @@
        cell scrolled to the top of .cell-grid-scroll lands BELOW the 3-row sticky
        header rather than tucked under it. */
     --cg-head-row-h: calc(var(--text-xs) * var(--leading-tight) + 2 * var(--spacing-2xs) + var(--cg-line));
+    /* Inner breathing room for BODY cell content. The <td> itself stays at
+       padding:0 — that is the Excel contract (the input is the cell, gridline to
+       gridline, no floating pill) — so the padding has to live on whatever the
+       cell renders INSIDE it: the input, the read-only value, the em-dash. One
+       token so those three can never drift apart and leave content flush against
+       a gridline on one branch and padded on another. */
+    --cg-cell-pad-y: var(--spacing-xs);
+    --cg-cell-pad-x: var(--spacing-sm);
+    /* Horizontal slot reserved for the per-cell narrative glyph, so the score
+       and the icon sit side by side instead of on top of one another. Glyph box
+       (.cell-grid-note-btn svg) + the button's own padding on both sides. */
+    --cg-note-slot: calc(0.875rem + 2 * var(--spacing-2xs));
 }
 
 .cell-grid-caption {
@@ -186,7 +232,11 @@
    here vs 0.125rem/0.25rem on .cell-grid-cell), which could jitter row
    alignment. */
 .cell-grid-rowhead {
-    padding: var(--spacing-2xs) var(--spacing-sm);
+    /* Same token pair the data cells' CONTENT uses (.cell-grid-input etc), so
+       the frozen label column and the scrolled data columns keep one shared
+       rhythm — the S7 contract, restated against --cg-cell-pad-* now that the
+       cell's padding lives on its content rather than on the <td>. */
+    padding: var(--cg-cell-pad-y) var(--cg-cell-pad-x);
     text-align: left;
     font-size: var(--text-sm);
     font-weight: var(--font-weight-medium);
@@ -201,8 +251,13 @@
    floating "pill" inside a padded cell. This is what makes it read as Excel
    rather than a form of rounded inputs. */
 .cell-grid-cell {
+    /* padding:0 on the <td> is structural, not a density choice — the input
+       must reach the gridlines so the focus ring is the CELL boundary. The
+       content's own padding (--cg-cell-pad-*, applied to .cell-grid-input /
+       --value / --empty below) is what keeps text off the gridlines, and the
+       height below is sized to hold it. */
     padding: 0;
-    height: 2rem;
+    height: calc(var(--text-sm) * var(--leading-tight) + 3 * var(--cg-cell-pad-y));
     border-bottom: var(--cg-line) solid var(--border);
     border-right: var(--cg-line) solid var(--border);
     text-align: center;
@@ -218,7 +273,11 @@
     height: 100%;
     min-width: 0;
     box-sizing: border-box;
-    padding: 0 var(--spacing-xs);
+    /* Was `0 var(--spacing-xs)`: no vertical padding at all and a tight
+       horizontal one, so a typed score sat flush against the gridlines. The
+       input still fills the cell edge-to-edge (border-box + height:100%); only
+       its text inset changed. */
+    padding: var(--cg-cell-pad-y) var(--cg-cell-pad-x);
     margin: 0;
     border: none;
     border-radius: 0;
@@ -280,6 +339,8 @@
 }
 
 .cell-grid-cell--empty {
+    display: inline-block;
+    padding: var(--cg-cell-pad-y) var(--cg-cell-pad-x);
     color: var(--text-muted);
     user-select: none;
 }
@@ -290,7 +351,7 @@
    INPUT read as the same "cell content", just two different affordances. */
 .cell-grid-cell--value {
     display: inline-block;
-    padding: var(--spacing-2xs) var(--spacing-xs);
+    padding: var(--cg-cell-pad-y) var(--cg-cell-pad-x);
     color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
 }
@@ -303,11 +364,48 @@
    states: outline glyph = no narrative yet, filled glyph = a narrative exists.
    Icon-only affordance, so it must stay compact and never widen the max-content
    column. */
+/* Layout, and why it is absolute rather than inline.
+
+   The glyph is emitted as the LAST child of the <td>, after whichever input
+   branch rendered. In the numeric branch that sibling is .cell-grid-input-wrap,
+   which is `display:flex` — a BLOCK-level box at width:100%/height:100%. A
+   block-level box consumes the whole line, so an inline-flex button after it
+   was pushed onto a second line and, because the cell has a fixed height, spilled
+   BELOW the cell onto the next row: measured at 1280×900 the cell ran y=247..278
+   and the glyph landed at y=277..295, i.e. painted on top of the row underneath.
+   That is the "icon sitting over the digit" — the digit it covered belonged to
+   the cell below. The select/text branches have the same shape (a width:100%
+   control followed by the button).
+
+   Taking the button out of flow fixes every branch at once and also satisfies
+   the affordance's own constraint — it can never widen the max-content column
+   or grow the row. --cg-note-slot is then reserved as padding on the cell's
+   content (below) so the score is centred to the LEFT of the glyph rather than
+   under it: "5  [glyph]", both legible, which is how it read before the icon
+   started wrapping. */
+/* Unconditional, NOT :has()-gated — this establishes the button's containing
+   block, and if :has() were ever unavailable an ungated absolute button would
+   escape to .cell-grid-scroll (itself position:relative) and float over the
+   whole sheet. A relative <td> with auto offsets shifts nothing, opens no
+   stacking context, and leaves the frozen column (z-index --z-sidebar) and the
+   sticky header (--z-popover) painting above body cells exactly as before. */
+.cell-grid-cell {
+    position: relative;
+}
+
+.cell-grid-cell:has(> .cell-grid-note-btn) .cell-grid-input,
+.cell-grid-cell:has(> .cell-grid-note-btn) .cell-grid-cell--value {
+    padding-right: calc(var(--cg-cell-pad-x) + var(--cg-note-slot));
+}
+
 .cell-grid-note-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: var(--spacing-2xs);
     padding: var(--spacing-2xs);
     border: none;
     border-radius: var(--radius-sm);
