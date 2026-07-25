@@ -639,18 +639,30 @@
        KEPT: the per-phase form-result status borders below are semantic and
        must survive [data-border="none"], and this element is still outside
        .cell-grid-table's scope, so it needs its own copy of the token.)
-     · the title sits INLINE, left of the phases, instead of stacked above.
      · flex:1 1 24rem + min-width:0 — it is the band's elastic member: the
        tools keep their intrinsic width and this block absorbs the squeeze,
        then wraps to its own line on a narrow viewport rather than pushing the
-       header wider than the (overflow-clipped) .page-content--grid. */
+       header wider than the (overflow-clipped) .page-content--grid.
+
+   20260725 regression fix: the first cut of the consolidation also flattened
+   the block's INTERNALS to a single row — title inline, then every phase side
+   by side. Two phases' worth of (label + chip + count + Submit) never fits the
+   space left over next to the tools, and because each phase's own children
+   carry intrinsic minimums (button/label text, the return-reason input), the
+   row blew past the band instead of wrapping: the second phase and the
+   Columns/Download cluster ran off the right edge at ≤1280px. The block is a
+   COLUMN again — title on its own line, then ONE phase per line, exactly as it
+   read before the consolidation. Only the internals changed: .pa-bar is still
+   a member of .om-toolbar, so the band stays single and .om-tools stays pinned
+   right. */
 .pa-bar {
     flex: 1 1 24rem;
     min-width: 0;
+    max-width: 100%;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--spacing-2xs) var(--spacing-md);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2xs);
     --cg-line: max(var(--border-width), 1px);
 }
 
@@ -664,21 +676,28 @@
     white-space: nowrap;
 }
 
+/* Phases STACK: one per line. align-self:stretch + width:100% keep the column
+   bounded by .pa-bar (itself min-width:0 inside the band) so nothing can push
+   the toolbar wider than the overflow-clipped .page-content--grid. */
 .pa-bar__phases {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: stretch;
+    align-self: stretch;
+    flex: 0 0 auto;
     min-width: 0;
-    gap: var(--spacing-2xs) var(--spacing-xl);
+    width: 100%;
+    gap: var(--spacing-2xs);
 }
 
-/* One phase = ONE line (label + chip + count + its action buttons), so N
-   phases fit the shared band. The full-width members below (hint, result
-   banner) still break onto their own line when they have content. */
+/* One phase = ONE line (label + chip + count + its action buttons). It still
+   wraps internally when the line is too narrow — that wrap is the overflow
+   valve now that the phases no longer compete for one row. The full-width
+   members below (hint, result banner) break onto their own line as before. */
 .pa-phase {
-    flex: 0 1 auto;
+    flex: 0 0 auto;
     min-width: 0;
+    max-width: 100%;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -694,6 +713,7 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    min-width: 0;
     gap: var(--spacing-sm);
 }
 
