@@ -23,10 +23,20 @@
  *      expires the cookie. A 60s timeout instead dismisses the spinner and shows
  *      an auto-dismissing warning toast.
  *
+ * It also owns the DOWNLOAD FRAME (20260726): download FORMS are retargeted at
+ * a persistent hidden iframe, because a top-level submit whose response carries
+ * no Content-Disposition RENDERS — replacing the operator's page with a bare
+ * error body and changing the URL. See ensureFrame() for the measured case. A
+ * load event in that frame is therefore a failure signal, and the server's own
+ * message is surfaced as an error toast instead of the spinner running to its
+ * 60s timeout.
+ *
  * Progressive enhancement: the delegated listeners AUGMENT the native trigger
  * (they never preventDefault) — with JS disabled every download still works,
- * just without the indicator. Labels come from <body data-lf-download-*> (set
- * by the app shell from CommonLabels.Download); no English is hardcoded here.
+ * just without the indicator (and without the frame, i.e. the old page-replacing
+ * error behaviour). Labels come from <body data-lf-download-*> (set by the app
+ * shell from CommonLabels.Download); no English is hardcoded here — a failure
+ * toast shows the SERVER's text, so it needs no label of its own.
  *
  * Public API (window.lf.ui.DownloadIndicator):
  *   begin()            — mint a token, show the spinner, start polling/timeout;
@@ -42,6 +52,8 @@
     var COOKIE_PREFIX = 'lf_dl_';
     var PARAM = 'dltoken';
     var TESTID = 'download-indicator';
+    var FRAME_NAME = 'lf-download-frame';
+    var FRAME_ID = 'lfDownloadFrame';
     var TOKEN_LEN = 24;
     var POLL_INTERVAL_MS = 500;
     var TIMEOUT_MS = 60000;
@@ -51,6 +63,10 @@
     // token -> { toastEl, timeoutId }
     var active = Object.create(null);
     var pollTimer = null;
+    // Token of the download currently aimed at the shared frame. Only ONE form
+    // download can occupy the frame at a time, so a frame error is attributable
+    // to exactly this token — never to a concurrently tracked anchor download.
+    var frameToken = null;
 
     // ========================================
     // I18N — read defaults from <body data-lf-download-*>
@@ -183,6 +199,107 @@
         }
     }
 
+    // The download FAILED and the server said why. Surface its own text, the same
+    // rule the HX-Error-Message path uses (server message preferred; the local
+    // label is only a fallback for a silent server). state "error" renders
+    // role="alert" aria-live="assertive" in toast.js.
+    function showErrorToast(message) {
+        var api = toastApi();
+        if (!api || !api.show) return;
+        api.show({
+            message: message,
+            state: 'error',
+            duration: String(WARNING_DURATION_MS)
+        });
+    }
+
+    // ========================================
+    // DOWNLOAD FRAME
+    // ========================================
+    //
+    // WHY. A native download form (method=get) submits at TOP LEVEL. For a 2xx
+    // attachment the browser converts that navigation into a download and the
+    // address bar stays put — but ANY response WITHOUT Content-Disposition
+    // RENDERS instead, so the page the operator was working on is replaced by a
+    // bare error body and the URL becomes the export URL.
+    //
+    // Measured on the grade-sheet export drawer, 2026-07-26: submitting a
+    // rejected period navigated a 29-student section sheet to a plain-text
+    // "not found" page (title emptied, grid gone). The reachable production
+    // cases are the PDF 503 (not wired / no document_template / soffice absent),
+    // the zero-row-roster 404 — which is the ORDINARY MINE-scoped teacher — and
+    // 403. On the grade sheet that navigation also discards unsaved cells,
+    // because the grid is one batch-save <form>.
+    //
+    // Submitting into a persistent same-origin iframe leaves the attachment path
+    // byte-identical (the browser still hands it to the download manager, and
+    // Set-Cookie still lands, so the token handshake below is unaffected) while
+    // an error response renders INTO THE FRAME and the page never moves.
+    //
+    // The frame is created lazily on <body> and never removed. It must NOT live
+    // inside a drawer: lf.Sheet.close() clears #sheetContent ~300ms after submit,
+    // which would destroy the frame and abort an in-flight download.
+    //
+    // CSP: the policy already carries frame-src 'self', so a same-origin frame
+    // survives the report-only policy going enforcing.
+    //
+    // Progressive enhancement: if this module never runs, no target is stamped
+    // and the form submits top-level exactly as before — the download still
+    // works, it just keeps the old page-replacing error behaviour.
+    function ensureFrame() {
+        var frame = document.getElementById(FRAME_ID);
+        if (frame) return frame;
+        if (!document.body) return null;
+        frame = document.createElement('iframe');
+        frame.id = FRAME_ID;
+        frame.name = FRAME_NAME;
+        // hidden removes it from the accessibility tree entirely, so it needs no
+        // title; aria-hidden + tabindex=-1 keep it out of AT and tab order even
+        // if a stylesheet ever overrides [hidden].
+        frame.hidden = true;
+        frame.setAttribute('aria-hidden', 'true');
+        frame.setAttribute('tabindex', '-1');
+        frame.addEventListener('load', onFrameLoad);
+        document.body.appendChild(frame);
+        return frame;
+    }
+
+    // A successful attachment never loads a document into the frame — the
+    // browser hands it to the download manager — so a load event carrying a
+    // non-empty body is an ERROR page. Surface it immediately instead of letting
+    // the spinner run the full 60s timeout.
+    function onFrameLoad(e) {
+        var frame = e.target;
+        var doc = null;
+        try {
+            doc = frame.contentDocument;
+        } catch (err) {
+            return; // opaque/cross-origin document — nothing readable to report
+        }
+        if (!doc || !doc.location || doc.location.href === 'about:blank') return;
+        var text = (doc.body && doc.body.innerText) ? doc.body.innerText.trim() : '';
+        if (!text) return; // nothing to say — leave the timeout path to handle it
+
+        var token = frameToken;
+        frameToken = null;
+        // No token, or the cookie already acknowledged success: the frame content
+        // is not a failure signal for a download we are still tracking.
+        if (!token || !active[token]) return;
+
+        var entry = active[token];
+        delete active[token];
+        window.clearTimeout(entry.timeoutId);
+        dismissToast(entry.toastEl);
+        reapPoller();
+        showErrorToast(text);
+
+        // Blank the frame so a later download can never re-surface this message.
+        // The about:blank load re-enters here and returns at the guard above.
+        try {
+            doc.location.replace('about:blank');
+        } catch (err) { /* nothing to reset */ }
+    }
+
     // ========================================
     // TRACKING LIFECYCLE
     // ========================================
@@ -264,7 +381,9 @@
         });
 
         // 2. Native download forms (grade-sheet export drawer — method=get).
-        //    Add a hidden dltoken field so it rides the GET query string.
+        //    Add a hidden dltoken field so it rides the GET query string, and
+        //    retarget the submit into the shared frame so a non-attachment
+        //    response cannot replace the page (see ensureFrame).
         document.addEventListener('submit', function (e) {
             var form = e.target;
             if (!form || !form.matches || !form.matches('form[data-download-form]')) return;
@@ -277,6 +396,17 @@
                 form.appendChild(input);
             }
             input.value = token;
+
+            // Both mutations are applied DURING the submit event on purpose: the
+            // form-submission algorithm resolves the entry list AND the target
+            // only after this event returns, so each applies to THIS submission.
+            // Target only when the frame really exists — a target naming no frame
+            // would open a new tab, which is worse than the navigation we are
+            // trying to avoid.
+            if (ensureFrame()) {
+                form.target = FRAME_NAME;
+                frameToken = token;
+            }
         });
         // The table row-action window.open path (`.action-btn[data-action="download"]`)
         // is owned by table-actions.js, which calls DownloadIndicator.track() so

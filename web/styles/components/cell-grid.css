@@ -356,10 +356,11 @@
     font-size: var(--text-2xs);
 }
 
-/* Icon-only download link in an L1 header cell (each phase + the trailing
-   composite column). btn-primary supplies the background colour; this squares
-   the padding to the header-control scale and sizes the glyph. line-height:0
-   kills the inline-svg baseline gap so the control stays badge-height. */
+/* Icon-only download trigger in an L1 header cell (each phase + the trailing
+   composite column) — a <button> opening the consumer's download drawer.
+   btn-primary supplies the background colour; this squares the padding to the
+   header-control scale and sizes the glyph. line-height:0 kills the inline-svg
+   baseline gap so the control stays badge-height. */
 .cell-grid-headactions .om-dl-btn {
     display: inline-flex;
     align-items: center;
