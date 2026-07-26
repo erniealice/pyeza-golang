@@ -60,6 +60,7 @@
     var RESULT_EVENT = 'omcell-result';
     var COALESCE_MS = 150;
     var SAVED_LINGER_MS = 1200;
+    var ERROR_LINGER_MS = 4000;
 
     // Per-form edit state lives on window so it survives a re-execution of this
     // IIFE (the card self-includes grid-scripts.html on content swaps). A fresh
@@ -167,6 +168,23 @@
     // record whether the button was permission-locked so nothing re-enables it.
     function initGrids(scope) {
         var root = (scope && scope.querySelectorAll) ? scope : document;
+
+        // Scope the htmx loading indicator away from the app shell. The shell
+        // <body> carries an inherited hx-indicator="#main-content-loading", so
+        // without an override EVERY auto-save flush lights the full-page
+        // overlay for the whole request (multi-second recomputes) — a cell
+        // save must never look like a page load. "this" points the indicator
+        // at the card itself, which has no .htmx-indicator styling → no
+        // visible spinner; per-cell state (saving/saved/error) is the
+        // feedback. Applies to the manual batch submit too (the save button's
+        // "Saving…" label is that path's feedback).
+        var cards = root.querySelectorAll('.cell-grid-card');
+        for (var c = 0; c < cards.length; c++) {
+            if (!cards[c].hasAttribute('hx-indicator')) {
+                cards[c].setAttribute('hx-indicator', 'this');
+            }
+        }
+
         var buttons = root.querySelectorAll('.cell-grid-save');
         for (var i = 0; i < buttons.length; i++) {
             var btn = buttons[i];
@@ -315,9 +333,17 @@
                 }
                 if (c.ratingFresh === false) sawStale = true;
             } else {
+                // Explicit server REJECT (value_rejected etc.): spreadsheet
+                // semantics — restore the last acknowledged value rather than
+                // keeping an unsaveable one in the cell, surface the reason on
+                // the cell + notice strip, then let the error paint clear on
+                // its own. (Transport failures keep the typed value + retry —
+                // that path is settle(), not here.)
+                if (document.activeElement !== el) el.value = baselineOf(el);
                 setState(el, 'error');
                 setStatus(el, (c.error && String(c.error)) || msg(form, 'error', 'Not saved.'));
                 el.setAttribute('aria-invalid', 'true');
+                lingerError(form, el);
             }
         });
 
@@ -333,6 +359,19 @@
                 setStatus(el, '');
             }
         }, SAVED_LINGER_MS);
+    }
+
+    // After a server reject the cell holds the REVERTED (baseline) value, so it
+    // is not dirty and nothing would ever repaint it — clear the error paint
+    // once the user has had time to read it (unless they edited again).
+    function lingerError(form, el) {
+        setTimeout(function () {
+            if (el.getAttribute('data-cg-state') === 'error' && !isDirty(el)) {
+                setState(el, 'clean');
+                setStatus(el, '');
+                updateNotice(form);
+            }
+        }, ERROR_LINGER_MS);
     }
 
     // Aggregate, screen-reader-friendly grid notice: the soft "rating not yet
@@ -476,10 +515,16 @@
         // Keyboard grid navigation (auto mode only).
         lf.on('keydown', '.cell-grid-form .cell-grid-input', onKeydown);
 
-        // Per-cell ack from the server (HX-Trigger custom event, dispatched on the
-        // form because htmx.ajax targeted it; bubbles to document).
-        lf.on(RESULT_EVENT, '.cell-grid-form', function (e) {
-            handleResult(this, e && e.detail);
+        // Per-cell ack from the server (HX-Trigger custom event). htmx dispatches
+        // response-header triggers on the REQUESTING element — the CARD for
+        // auto-save (htmx.ajax source=card), the form for the manual batch
+        // submit — so match both and resolve the form either way. Matching the
+        // form alone silently drops every auto-save ack: the cells then sit in
+        // "saving" until settle() paints them error even though the server
+        // answered ok:true (the red-cells-despite-saved failure, 2026-07-26).
+        lf.on(RESULT_EVENT, '.cell-grid-card, .cell-grid-form', function (e) {
+            var form = (this.matches && this.matches('.cell-grid-form')) ? this : this.querySelector('.cell-grid-form');
+            if (form) handleResult(form, e && e.detail);
         });
 
         // Manual batch (Layer 1) submit UX — fires only for the native form
