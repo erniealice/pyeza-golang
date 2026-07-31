@@ -624,6 +624,20 @@ type DownloadLabels struct {
 	ConfirmAction string `json:"confirm_action"`
 }
 
+// DialogLabels holds translatable strings for the app-shell confirmation
+// dialog (pyeza dialog.js). Surfaced to JS via <body data-lf-dialog-*>
+// attributes set by the app shell, with a redundant copy as data-default-*
+// on the dialog overlay itself, so no English text is hardcoded on the JS
+// side. The confirm and cancel button labels are NOT repeated here — they
+// reuse CommonLabels.Buttons.Confirm / .Cancel. Loaded from
+// common/common.json#dialog.
+type DialogLabels struct {
+	// ConfirmTitle is the dialog heading used when a caller supplies no
+	// per-action title of its own. An empty value renders no heading at all
+	// (and no dangling aria-labelledby), never an English placeholder.
+	ConfirmTitle string `json:"confirm_title"`
+}
+
 // A11yLabels holds tier-invariant accessibility strings shared across every
 // page and component — skip-links, icon-only control labels, etc. These are
 // assistive-technology affordances, not business copy, so they live in the

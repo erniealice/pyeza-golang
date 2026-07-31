@@ -29,6 +29,7 @@ type CommonLabels struct {
 	Toast         ToastLabels        `json:"toast"`
 	Sheet         SheetLabels        `json:"sheet"`
 	Download      DownloadLabels     `json:"download"`
+	Dialog        DialogLabels       `json:"dialog"`
 	A11y          A11yLabels         `json:"a11y"`
 }
 

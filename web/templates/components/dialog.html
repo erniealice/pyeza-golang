@@ -1,6 +1,7 @@
 {{/* Dialog Shell - Static component in app shell */}}
 {{define "dialog"}}
-<div id="dialog" class="dialog-overlay" hidden data-dialog-overlay>
+<div id="dialog" class="dialog-overlay" hidden data-dialog-overlay data-testid="dialog-overlay"
+    {{if .CommonLabels}}data-default-title="{{.CommonLabels.Dialog.ConfirmTitle}}" data-default-confirm="{{.CommonLabels.Buttons.Confirm}}" data-default-cancel="{{.CommonLabels.Buttons.Cancel}}"{{end}}>
     <div class="dialog-container" role="dialog" aria-modal="true" aria-labelledby="dialog-title" data-dialog-container>
         <!-- Dialog content loads here via HTMX -->
     </div>
@@ -10,22 +11,22 @@
 {{/* Dialog Confirm Fragment - HTMX partial */}}
 {{define "dialog-confirm"}}
 <div class="dialog-header">
-    <h3 class="dialog-title" id="dialog-title">{{.Title}}</h3>
+    <h3 class="dialog-title" id="dialog-title" data-testid="dialog-title">{{.Title}}</h3>
 </div>
 <div class="dialog-body">
-    <p class="dialog-message">{{.Message}}</p>
+    <p class="dialog-message" data-testid="dialog-message">{{.Message}}</p>
 </div>
 <div class="dialog-footer">
-    <button type="button" class="dialog-btn dialog-btn-cancel" data-dialog-close>{{.CancelText}}</button>
+    <button type="button" class="dialog-btn dialog-btn-cancel" data-dialog-close data-testid="dialog-cancel-btn">{{.CancelText}}</button>
     {{if .ActionURL}}
     <button type="button" class="dialog-btn dialog-btn-confirm dialog-btn-{{.Variant}}"
             hx-post="{{.ActionURL}}"
-            data-dialog-confirm>
+            data-dialog-confirm data-testid="dialog-confirm-btn">
         {{.ConfirmText}}
     </button>
     {{else}}
     <button type="button" class="dialog-btn dialog-btn-confirm dialog-btn-{{.Variant}}"
-            data-dialog-confirm>
+            data-dialog-confirm data-testid="dialog-confirm-btn">
         {{.ConfirmText}}
     </button>
     {{end}}
