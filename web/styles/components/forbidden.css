@@ -94,10 +94,13 @@
    MESSAGE + PERMISSION CODE
    ======================================== */
 
+/* --text-secondary, not --text-muted: muted fails WCAG AA on a card background
+   in dark palettes (measured 3.68:1 against velvet-noir). This is body copy on
+   an error page — it has to be readable in every palette. */
 .forbidden-message {
     font-family: var(--font-body);
     font-size: var(--text-base);
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin: 0 0 16px;
     line-height: var(--leading-normal);
     max-width: 360px;
@@ -128,7 +131,7 @@
 .forbidden-hint {
     font-family: var(--font-body);
     font-size: var(--text-md);
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin: 0;
     line-height: var(--leading-normal);
     max-width: 360px;
