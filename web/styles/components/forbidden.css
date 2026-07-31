@@ -1,0 +1,185 @@
+/*
+ * ==========================================================================
+ * FORBIDDEN.CSS - 403 Permission-Denied Page Styles
+ * ==========================================================================
+ * Styles the shared 403 block rendered by view.Forbidden(perm string)
+ * (web/templates/blocks/forbidden.html).
+ *
+ * Structure:
+ * .page-content--forbidden
+ *   .forbidden-card
+ *     .forbidden-icon      (chip wrapping the inline lock SVG)
+ *     .forbidden-title
+ *     .forbidden-message
+ *       .forbidden-perm    (<code>, the missing entity:action)
+ *     .forbidden-hint
+ *
+ * The icon rule is load-bearing: the lock is an inline <svg> that carries a
+ * viewBox but NO width/height, so without an explicit size it resolves to the
+ * container width and renders enormous. Every sizing rule here must therefore
+ * set BOTH width and height on the svg itself, not only on its wrapper.
+ *
+ * Mirrors empty-state.css so the two placeholder surfaces read as one system.
+ * ==========================================================================
+ */
+
+/* ========================================
+   PAGE WRAPPER — vertical centering
+   ======================================== */
+
+.page-content--forbidden {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 32px;
+}
+
+/* ========================================
+   CARD
+   ======================================== */
+
+.forbidden-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 64px 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* ========================================
+   ICON — see the header note: size the SVG, not just the chip
+   ======================================== */
+
+.forbidden-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
+    background: var(--status-error-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.forbidden-icon svg {
+    width: 28px;
+    height: 28px;
+    color: var(--status-error);
+    stroke-width: 1.5;
+    flex-shrink: 0;
+}
+
+/* ========================================
+   TITLE
+   ======================================== */
+
+.forbidden-title {
+    font-family: var(--font-display, inherit);
+    font-size: var(--text-3xl);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+/* ========================================
+   MESSAGE + PERMISSION CODE
+   ======================================== */
+
+.forbidden-message {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    margin: 0 0 16px;
+    line-height: var(--leading-normal);
+    max-width: 360px;
+}
+
+.forbidden-perm {
+    display: inline-block;
+    font-family: var(--font-mono, monospace);
+    font-size: var(--text-md);
+    color: var(--text-primary);
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    /* The code is an identifier, not prose: never break it mid-token, and let
+       a long entity:action scroll rather than blow out the card width. */
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+
+/* ========================================
+   HINT
+   ======================================== */
+
+.forbidden-hint {
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    color: var(--text-muted);
+    margin: 0;
+    line-height: var(--leading-normal);
+    max-width: 360px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .page-content--forbidden {
+        min-height: 50vh;
+        padding: 24px;
+    }
+
+    .forbidden-card {
+        padding: 48px 24px;
+        max-width: 100%;
+    }
+
+    .forbidden-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .forbidden-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .forbidden-title {
+        font-size: var(--text-2xl);
+    }
+
+    .forbidden-message {
+        font-size: var(--text-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .forbidden-card {
+        padding: 40px 20px;
+    }
+
+    .forbidden-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+    }
+
+    .forbidden-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+}
