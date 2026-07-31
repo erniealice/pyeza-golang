@@ -112,11 +112,12 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 4px 10px;
-    /* The code is an identifier, not prose: never break it mid-token, and let
-       a long entity:action scroll rather than blow out the card width. */
+    /* Carries the whole translated sentence (the entity:action is embedded in
+       it), so it must wrap like prose — but an unbroken code token must still
+       be allowed to break rather than widen the card. */
     max-width: 100%;
-    overflow-x: auto;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    text-align: left;
     vertical-align: baseline;
 }
 

@@ -522,7 +522,12 @@ type ErrorLabels struct {
 	// by permission-gated widgets to surface the specific entity:action code
 	// the user is missing. AWS-style — actionable. See plan
 	// docs/plan/20260514-permission-gates/plan.md §"Pyeza primitive contract".
-	MissingPermission   string `json:"missing_permission"`
+	MissingPermission string `json:"missing_permission"`
+	// ForbiddenHint is the remediation line on the shared 403 page: it tells the
+	// user what to do about the missing permission rather than only naming it.
+	// Body copy, never interpolated — the code itself is carried by
+	// MissingPermission.
+	ForbiddenHint       string `json:"forbidden_hint"`
 	PermissionDenied    string `json:"permission_denied"`
 	InvalidFormData     string `json:"invalid_form_data"`
 	InvalidStatus       string `json:"invalid_status"`
