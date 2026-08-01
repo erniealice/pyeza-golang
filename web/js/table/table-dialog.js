@@ -1,83 +1,45 @@
 /**
- * Table Dialog - Confirmation dialog
+ * Table Dialog - deprecation shim.
+ *
+ * showConfirmDialog(options) is kept only so the frozen lf.ui.table.* SDK
+ * surface (and the flat lf.TableDialog alias) stays intact. It now delegates
+ * to the app-shell dialog promise API: callback semantics are preserved, but
+ * onConfirm/onCancel fire one microtask later than the retired inline
+ * implementation did.
+ *
+ * The dialog API is resolved at call time — dialog.js exposes it only after
+ * an overlay-bearing init — and a missing API degrades to the browser's own
+ * prompt, so the confirmation stays gated on every page.
+ *
+ * Rendering invariant: no markup is built here. Every caller-supplied string
+ * reaches the DOM through the dialog API, which renders via textContent only.
+ * Label invariant: no English literal lives here; copy resolves per-call
+ * option -> <body data-lf-dialog-*> -> overlay data-default-* -> empty string,
+ * all inside the dialog API.
  */
 
 (function() {
     'use strict';
 
+    function noop() {}
+
     function showConfirmDialog(options) {
-        const {
-            title = 'Confirm Action',
-            message = 'Are you sure you want to proceed?',
-            confirmLabel = 'Confirm',
-            cancelLabel = 'Cancel',
-            variant = 'default', // 'default', 'danger', 'primary'
-            onConfirm = () => {},
-            onCancel = () => {}
-        } = options;
-
-        // Create dialog overlay
-        const overlay = document.createElement('div');
-        overlay.className = 'dialog-overlay';
-        overlay.innerHTML = `
-            <div class="dialog-container">
-                <div class="dialog-header">
-                    <h3 class="dialog-title">${title}</h3>
-                </div>
-                <div class="dialog-body">
-                    <p class="dialog-message">${message}</p>
-                </div>
-                <div class="dialog-footer">
-                    <button type="button" class="dialog-btn dialog-btn-cancel">${cancelLabel}</button>
-                    <button type="button" class="dialog-btn dialog-btn-confirm dialog-btn-${variant}">${confirmLabel}</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-
-        // Animate in
-        requestAnimationFrame(() => {
-            overlay.classList.add('visible');
+        var o = options || {};
+        var api = window.lf && window.lf.ui && window.lf.ui.Dialog;
+        var ask = (api && typeof api.confirm === 'function')
+            ? api.confirm
+            : function(opts) {
+                var answer;
+                try {
+                    answer = window.confirm((opts && opts.message) || '');
+                } catch (err) {
+                    answer = false;
+                }
+                return Promise.resolve(!!answer);
+            };
+        return ask(o).then(function(confirmed) {
+            return confirmed ? (o.onConfirm || noop)() : (o.onCancel || noop)();
         });
-
-        const closeDialog = () => {
-            overlay.classList.remove('visible');
-            setTimeout(() => {
-                overlay.remove();
-            }, 200);
-        };
-
-        // Event listeners
-        overlay.querySelector('.dialog-btn-cancel').addEventListener('click', () => {
-            closeDialog();
-            onCancel();
-        });
-
-        overlay.querySelector('.dialog-btn-confirm').addEventListener('click', () => {
-            closeDialog();
-            onConfirm();
-        });
-
-        // Close on overlay click
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                closeDialog();
-                onCancel();
-            }
-        });
-
-        // Close on escape
-        const escHandler = (e) => {
-            if (e.key === 'Escape') {
-                closeDialog();
-                onCancel();
-                document.removeEventListener('keydown', escHandler);
-            }
-        };
-        document.addEventListener('keydown', escHandler);
-
-        return { close: closeDialog };
     }
 
     // Expose module

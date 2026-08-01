@@ -105,9 +105,14 @@
                 e.preventDefault();
                 const id = deleteBtn.dataset.id;
                 const deleteUrl = deleteBtn.dataset.deleteUrl;
-                const itemName = deleteBtn.dataset.itemName || 'this item';
-                const confirmTitle = deleteBtn.dataset.confirmTitle || 'Confirm Delete';
-                const confirmMessage = deleteBtn.dataset.confirmMessage || `Are you sure you want to delete ${itemName}?`;
+                // Confirm copy resolves data-confirm-* -> <body data-lf-dialog-*>
+                // (CommonLabels) -> empty string. A missing label renders empty;
+                // no English fallback lives in this file. Same rule in every
+                // handler below.
+                const ds = (document.body && document.body.dataset) || {};
+                const confirmTitle = deleteBtn.dataset.confirmTitle || ds.lfDialogConfirmTitle || '';
+                const confirmMessage = deleteBtn.dataset.confirmMessage || '';
+                const confirmLabel = deleteBtn.dataset.confirmLabel || ds.lfDialogConfirmLabel || '';
 
                 if (!deleteUrl || !id) {
                     console.warn('Delete button missing data-delete-url or data-id');
@@ -117,7 +122,7 @@
                 const url = deleteUrl + (deleteUrl.includes('?') ? '&' : '?') + 'id=' + id;
 
                 // Use new HTMX-based dialog
-                showRowActionDialog(confirmTitle, confirmMessage, 'Delete', 'danger', url);
+                showRowActionDialog(confirmTitle, confirmMessage, confirmLabel, 'danger', url);
             }
 
             // Handle Deactivate button
@@ -127,9 +132,10 @@
                 e.preventDefault();
                 const id = deactivateBtn.dataset.id;
                 const deactivateUrl = deactivateBtn.dataset.deactivateUrl;
-                const itemName = deactivateBtn.dataset.itemName || 'this item';
-                const confirmTitle = deactivateBtn.dataset.confirmTitle || 'Confirm Deactivation';
-                const confirmMessage = deactivateBtn.dataset.confirmMessage || `Are you sure you want to deactivate ${itemName}?`;
+                const ds = (document.body && document.body.dataset) || {};
+                const confirmTitle = deactivateBtn.dataset.confirmTitle || ds.lfDialogConfirmTitle || '';
+                const confirmMessage = deactivateBtn.dataset.confirmMessage || '';
+                const confirmLabel = deactivateBtn.dataset.confirmLabel || ds.lfDialogConfirmLabel || '';
 
                 if (!deactivateUrl || !id) {
                     console.warn('Deactivate button missing data-deactivate-url or data-id');
@@ -139,7 +145,7 @@
                 const url = deactivateUrl + (deactivateUrl.includes('?') ? '&' : '?') + 'id=' + id;
 
                 // Use new HTMX-based dialog
-                showRowActionDialog(confirmTitle, confirmMessage, 'Deactivate', 'warning', url);
+                showRowActionDialog(confirmTitle, confirmMessage, confirmLabel, 'warning', url);
             }
 
             // Handle Activate button
@@ -149,9 +155,10 @@
                 e.preventDefault();
                 const id = activateBtn.dataset.id;
                 const activateUrl = activateBtn.dataset.activateUrl;
-                const itemName = activateBtn.dataset.itemName || 'this item';
-                const confirmTitle = activateBtn.dataset.confirmTitle || 'Confirm Activation';
-                const confirmMessage = activateBtn.dataset.confirmMessage || `Are you sure you want to activate ${itemName}?`;
+                const ds = (document.body && document.body.dataset) || {};
+                const confirmTitle = activateBtn.dataset.confirmTitle || ds.lfDialogConfirmTitle || '';
+                const confirmMessage = activateBtn.dataset.confirmMessage || '';
+                const confirmLabel = activateBtn.dataset.confirmLabel || ds.lfDialogConfirmLabel || '';
 
                 if (!activateUrl || !id) {
                     console.warn('Activate button missing data-activate-url or data-id');
@@ -161,7 +168,7 @@
                 const url = activateUrl + (activateUrl.includes('?') ? '&' : '?') + 'id=' + id;
 
                 // Use new HTMX-based dialog
-                showRowActionDialog(confirmTitle, confirmMessage, 'Activate', 'primary', url);
+                showRowActionDialog(confirmTitle, confirmMessage, confirmLabel, 'primary', url);
             }
 
             // Handle Undo button
@@ -171,9 +178,10 @@
                 e.preventDefault();
                 const id = undoBtn.dataset.id;
                 const undoUrl = undoBtn.dataset.activateUrl;
-                const itemName = undoBtn.dataset.itemName || 'this item';
-                const confirmTitle = undoBtn.dataset.confirmTitle || 'Revert to Draft';
-                const confirmMessage = undoBtn.dataset.confirmMessage || `Are you sure you want to revert ${itemName} to draft?`;
+                const ds = (document.body && document.body.dataset) || {};
+                const confirmTitle = undoBtn.dataset.confirmTitle || ds.lfDialogConfirmTitle || '';
+                const confirmMessage = undoBtn.dataset.confirmMessage || '';
+                const confirmLabel = undoBtn.dataset.confirmLabel || ds.lfDialogConfirmLabel || '';
 
                 if (!undoUrl || !id) {
                     console.warn('Undo button missing data-activate-url or data-id');
@@ -181,7 +189,7 @@
                 }
 
                 const url = undoUrl + (undoUrl.includes('?') ? '&' : '?') + 'id=' + id;
-                showRowActionDialog(confirmTitle, confirmMessage, 'Revert', 'warning', url);
+                showRowActionDialog(confirmTitle, confirmMessage, confirmLabel, 'warning', url);
             }
 
             // Handle Complete button
@@ -191,9 +199,10 @@
                 e.preventDefault();
                 const id = completeBtn.dataset.id;
                 const completeUrl = completeBtn.dataset.deactivateUrl;
-                const itemName = completeBtn.dataset.itemName || 'this item';
-                const confirmTitle = completeBtn.dataset.confirmTitle || 'Mark as Complete';
-                const confirmMessage = completeBtn.dataset.confirmMessage || `Are you sure you want to complete ${itemName}?`;
+                const ds = (document.body && document.body.dataset) || {};
+                const confirmTitle = completeBtn.dataset.confirmTitle || ds.lfDialogConfirmTitle || '';
+                const confirmMessage = completeBtn.dataset.confirmMessage || '';
+                const confirmLabel = completeBtn.dataset.confirmLabel || ds.lfDialogConfirmLabel || '';
 
                 if (!completeUrl || !id) {
                     console.warn('Complete button missing data-deactivate-url or data-id');
@@ -201,7 +210,7 @@
                 }
 
                 const url = completeUrl + (completeUrl.includes('?') ? '&' : '?') + 'id=' + id;
-                showRowActionDialog(confirmTitle, confirmMessage, 'Complete', 'warning', url);
+                showRowActionDialog(confirmTitle, confirmMessage, confirmLabel, 'warning', url);
             }
 
             // Handle Cancel button
@@ -211,9 +220,10 @@
                 e.preventDefault();
                 const id = cancelBtn.dataset.id;
                 const cancelUrl = cancelBtn.dataset.deactivateUrl;
-                const itemName = cancelBtn.dataset.itemName || 'this item';
-                const confirmTitle = cancelBtn.dataset.confirmTitle || 'Cancel';
-                const confirmMessage = cancelBtn.dataset.confirmMessage || `Are you sure you want to cancel ${itemName}?`;
+                const ds = (document.body && document.body.dataset) || {};
+                const confirmTitle = cancelBtn.dataset.confirmTitle || ds.lfDialogConfirmTitle || '';
+                const confirmMessage = cancelBtn.dataset.confirmMessage || '';
+                const confirmLabel = cancelBtn.dataset.confirmLabel || ds.lfDialogConfirmLabel || '';
 
                 if (!cancelUrl || !id) {
                     console.warn('Cancel button missing data-deactivate-url or data-id');
@@ -221,7 +231,7 @@
                 }
 
                 const url = cancelUrl + (cancelUrl.includes('?') ? '&' : '?') + 'id=' + id;
-                showRowActionDialog(confirmTitle, confirmMessage, 'Cancel', 'danger', url);
+                showRowActionDialog(confirmTitle, confirmMessage, confirmLabel, 'danger', url);
             }
 
             // Handle Reclassify button
@@ -231,9 +241,10 @@
                 e.preventDefault();
                 const id = reclassifyBtn.dataset.id;
                 const reclassifyUrl = reclassifyBtn.dataset.activateUrl;
-                const itemName = reclassifyBtn.dataset.itemName || 'this item';
-                const confirmTitle = reclassifyBtn.dataset.confirmTitle || 'Reclassify to Draft';
-                const confirmMessage = reclassifyBtn.dataset.confirmMessage || `Are you sure you want to reclassify ${itemName}?`;
+                const ds = (document.body && document.body.dataset) || {};
+                const confirmTitle = reclassifyBtn.dataset.confirmTitle || ds.lfDialogConfirmTitle || '';
+                const confirmMessage = reclassifyBtn.dataset.confirmMessage || '';
+                const confirmLabel = reclassifyBtn.dataset.confirmLabel || ds.lfDialogConfirmLabel || '';
 
                 if (!reclassifyUrl || !id) {
                     console.warn('Reclassify button missing data-activate-url or data-id');
@@ -241,7 +252,7 @@
                 }
 
                 const url = reclassifyUrl + (reclassifyUrl.includes('?') ? '&' : '?') + 'id=' + id;
-                showRowActionDialog(confirmTitle, confirmMessage, 'Reclassify', 'primary', url);
+                showRowActionDialog(confirmTitle, confirmMessage, confirmLabel, 'primary', url);
             }
 
             // Handle Download button (direct GET — opens in new tab or triggers download)
@@ -293,9 +304,10 @@
                 e.preventDefault();
                 const id = sendEmailBtn.dataset.id;
                 const sendEmailUrl = sendEmailBtn.dataset.sendEmailUrl;
-                const itemName = sendEmailBtn.dataset.itemName || 'this item';
-                const confirmTitle = sendEmailBtn.dataset.confirmTitle || 'Send Email';
-                const confirmMessage = sendEmailBtn.dataset.confirmMessage || 'Send invoice for ' + itemName + ' via email?';
+                const ds = (document.body && document.body.dataset) || {};
+                const confirmTitle = sendEmailBtn.dataset.confirmTitle || ds.lfDialogConfirmTitle || '';
+                const confirmMessage = sendEmailBtn.dataset.confirmMessage || '';
+                const confirmLabel = sendEmailBtn.dataset.confirmLabel || ds.lfDialogConfirmLabel || '';
 
                 if (!sendEmailUrl || !id) {
                     console.warn('Send-email button missing data-send-email-url or data-id');
@@ -305,7 +317,7 @@
                 const url = sendEmailUrl + (sendEmailUrl.includes('?') ? '&' : '?') + 'id=' + id;
 
                 // Use HTMX-based dialog (same as delete/deactivate)
-                showRowActionDialog(confirmTitle, confirmMessage, 'Send Email', 'primary', url);
+                showRowActionDialog(confirmTitle, confirmMessage, confirmLabel, 'primary', url);
             }
 
         });
@@ -324,12 +336,14 @@
             return;
         }
 
-        // Build dialog URL with query parameters
+        // Build dialog URL with query parameters. The cancel label comes from
+        // <body data-lf-dialog-*> (CommonLabels), never a literal here.
+        const ds = (document.body && document.body.dataset) || {};
         const dialogUrl = '/ui/dialog/confirm?' + new URLSearchParams({
             title: title,
             message: message,
             confirm: confirmLabel,
-            cancel: 'Cancel',
+            cancel: ds.lfDialogCancelLabel || '',
             variant: variant
         });
 
@@ -356,20 +370,33 @@
     }
 
     /**
-     * Show confirmation dialog with a callback instead of actionUrl
+     * Show confirmation dialog with a callback instead of actionUrl.
+     * Delegates to the dialog promise API, resolved at call time (dialog.js
+     * exposes it only after an overlay-bearing init). A missing API degrades
+     * to the browser's own prompt inside the resolver, so the action stays
+     * gated on every page — never auto-fired, never dropped.
      */
     function showRowActionDialogWithCallback(title, message, confirmLabel, variant, callback) {
-        if (lf.TableDialog) {
-            lf.TableDialog.showConfirmDialog({
-                title: title,
-                message: message,
-                confirmLabel: confirmLabel,
-                variant: variant,
-                onConfirm: callback
-            });
-        } else if (confirm(message)) {
-            callback();
-        }
+        var api = window.lf && window.lf.ui && window.lf.ui.Dialog;
+        var ask = (api && typeof api.confirm === 'function')
+            ? api.confirm
+            : function(opts) {
+                var answer;
+                try {
+                    answer = window.confirm((opts && opts.message) || '');
+                } catch (err) {
+                    answer = false;
+                }
+                return Promise.resolve(!!answer);
+            };
+        ask({
+            title: title,
+            message: message,
+            confirmLabel: confirmLabel,
+            variant: variant
+        }).then(function(confirmed) {
+            if (confirmed && typeof callback === 'function') callback();
+        });
     }
 
     /**

@@ -29,6 +29,11 @@ import '../web/js/components/lf-on.js';
 import '../web/js/components/focus-trap.js';
 import '../web/js/components/calendar.js';
 import '../web/js/components/dialog.js';
+// htmx:confirm bridge. Registers a document listener only — it adds no lf.ui
+// symbol, so there is nothing for index.js to re-export. Loaded after dialog.js
+// to match the shells, though the order is not load-bearing: the bridge
+// resolves lf.ui.Dialog.confirm at event time, not at load time.
+import '../web/js/components/confirm-bridge.js';
 import '../web/js/components/toast.js';
 import '../web/js/components/sheet.js';
 import '../web/js/components/form-components.js';

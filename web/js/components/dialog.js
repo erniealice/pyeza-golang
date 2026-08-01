@@ -65,6 +65,26 @@
     // be wiped by the previous dialog's timer, so confirm() clears it first.
     let _closeTimer = null;
 
+    // P5: retire-hook for the confirm() promise that currently owns the
+    // overlay. The overlay is a singleton, so every confirm() listens for
+    // dialog:confirm / dialog:cancel on the same element: two overlapping
+    // calls would both hear one click and both resolve true, firing an action
+    // the operator never confirmed. A new call therefore retires the in-flight
+    // one first, resolving it false — the retired action does not fire, and no
+    // caller is left waiting on a promise that can no longer settle.
+    let _activeConfirmRetire = null;
+
+    function retireActiveConfirm() {
+        if (typeof _activeConfirmRetire !== 'function') return;
+        const previous = _activeConfirmRetire;
+        _activeConfirmRetire = null;
+        try {
+            previous();
+        } catch (err) {
+            // already settled — nothing to retire
+        }
+    }
+
     // ========================================
     // ACTION-ERROR SURFACING
     // ========================================
@@ -133,10 +153,11 @@
         _closeTimer = setTimeout(() => {
             _closeTimer = null;
             dialog.hidden = true;
-            // Clear content after animation
+            // Clear content after animation. Node removal, never a markup
+            // string: this file hands the DOM nothing it could parse.
             const container = dialog.querySelector('[data-dialog-container]');
-            if (container) {
-                container.innerHTML = '';
+            while (container && container.firstChild) {
+                container.removeChild(container.firstChild);
             }
         }, 200);
 
@@ -222,8 +243,9 @@
      *    future caller inherits it.
      *
      * Rendering invariant: every caller-supplied string reaches the DOM through
-     * textContent. This function never assigns innerHTML and never builds
-     * markup from a template literal. A confirm message can carry record data,
+     * textContent. This function never hands the DOM a string to parse as
+     * markup and never builds markup from a template literal. A confirm
+     * message can carry record data,
      * and textContent cannot execute markup at all — a stronger guarantee than
      * any escaping discipline, and one a template-context bug cannot defeat.
      *
@@ -253,28 +275,74 @@
         }
         // No overlay on this page (the shell did not render one, or it was
         // swapped away): fall back to the native prompt rather than dropping
-        // the confirmation.
+        // the confirmation. An in-flight confirm listening on the overlay that
+        // just disappeared can never settle on its own, so retire it first.
         if (!dialog) {
+            retireActiveConfirm();
             return Promise.resolve(nativePrompt());
         }
 
         return new Promise(function(resolve) {
             var settled = false;
 
-            function onConfirmEvent() { settle(true); }
+            // The confirm button this call renders. dialog:confirm is dispatched
+            // on the singleton overlay by more than one producer — the legacy
+            // action-url branch dispatches it on success AND on both of its
+            // failure paths, and the htmx:afterRequest listener dispatches it
+            // for any request originating inside the overlay — so "an event
+            // arrived" is not evidence that this question was answered. Only
+            // the activation of the button this call rendered is. The producer
+            // stamps the originating button on the event, and the identity
+            // check below is what keeps another producer's event (including a
+            // failure one) from firing an action the operator never confirmed.
+            var ownConfirmBtn = null;
+
+            function onConfirmEvent(evt) {
+                var detail = (evt && evt.detail) || {};
+                // Fail closed on a foreign event: it means the overlay was
+                // taken over, so this question is void. Resolve false rather
+                // than ignore it — ignoring would leave the caller waiting on
+                // a promise nothing can settle any more.
+                settle(!!ownConfirmBtn && detail.origin === ownConfirmBtn);
+            }
             function onCancelEvent() { settle(false); }
 
-            function settle(value) {
-                if (settled) return;
-                settled = true;
+            function detach() {
                 try {
                     dialog.removeEventListener('dialog:confirm', onConfirmEvent);
                     dialog.removeEventListener('dialog:cancel', onCancelEvent);
                 } catch (err) {
                     // listener target already gone — nothing to detach
                 }
+            }
+
+            function settle(value) {
+                if (settled) return;
+                settled = true;
+                if (_activeConfirmRetire === retire) {
+                    _activeConfirmRetire = null;
+                }
+                detach();
                 resolve(!!value);
             }
+
+            function retire() {
+                settle(false);
+            }
+
+            // The native prompt blocks the thread, so the settled guard must be
+            // read BEFORE the prompt is raised, never as part of evaluating
+            // settle()'s argument: a promise that already carries an answer
+            // must not put a second question on screen whose reply would be
+            // discarded. A promise that does not yet carry one must still fall
+            // back to the prompt and take its answer.
+            function settleNative() {
+                if (settled) return;
+                settle(nativePrompt());
+            }
+
+            retireActiveConfirm();
+            _activeConfirmRetire = retire;
 
             try {
                 var bodyData = (document.body && document.body.dataset) || {};
@@ -288,7 +356,7 @@
 
                 var container = dialog.querySelector('[data-dialog-container]');
                 if (!container) {
-                    settle(nativePrompt());
+                    settleNative();
                     return;
                 }
 
@@ -347,6 +415,7 @@
                 confirmBtn.setAttribute('data-testid', testid + '-confirm-btn');
                 confirmBtn.textContent = confirmLabel;
                 footer.appendChild(confirmBtn);
+                ownConfirmBtn = confirmBtn;
 
                 container.appendChild(footer);
 
@@ -364,12 +433,36 @@
                 // there and are not reimplemented here.
                 openDialog();
             } catch (err) {
+                // Detach before closing. closeDialog() dispatches dialog:cancel
+                // when the lifecycle was not confirmed, and once the listeners
+                // are attached that cancel would resolve this promise as part
+                // of the degrade's own teardown — settling it before the
+                // fallback prompt has been answered and discarding the answer.
+                // Teardown must not be able to answer the question it is
+                // tearing down.
+                detach();
+                // Discard whatever this call appended before the throw. The
+                // auto-open observer re-opens the overlay whenever it sees
+                // children in a hidden dialog, and it evaluates that condition
+                // after this turn ends — so nodes left behind here resurrect
+                // the dialog this teardown just destroyed, as an overlay whose
+                // buttons dispatch to listeners that are already detached and
+                // whose pending close only hides it, leaving the background
+                // suppressed with nothing on screen to explain why.
+                try {
+                    var wreckage = dialog.querySelector('[data-dialog-container]');
+                    while (wreckage && wreckage.firstChild) {
+                        wreckage.removeChild(wreckage.firstChild);
+                    }
+                } catch (clearErr) {
+                    // container already gone — nothing to clear
+                }
                 try {
                     closeDialog();
                 } catch (closeErr) {
                     // overlay already gone — nothing to close
                 }
-                settle(nativePrompt());
+                settleNative();
             }
         });
     }
@@ -496,9 +589,16 @@
                             }));
                         });
                     } else {
-                        // No action URL - just trigger the event for callbacks
+                        // No action URL - just trigger the event for callbacks.
+                        // P5: origin identifies the button whose activation
+                        // produced this event. The overlay is a singleton, so
+                        // every producer's dialog:confirm reaches every
+                        // listener on it; a promise-based caller matches on
+                        // this identity to be sure the event is the answer to
+                        // its own question and not to somebody else's. Purely
+                        // additive — existing listeners read detail.success.
                         dialog.dispatchEvent(new CustomEvent('dialog:confirm', {
-                            detail: { success: true }
+                            detail: { success: true, origin: e.target }
                         }));
                         // Close the dialog
                         closeDialog();

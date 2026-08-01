@@ -52,6 +52,38 @@ and re-exports the frozen registry symbols:
 `lf._internal.*` is the **unstable** channel and is **deliberately NOT
 exported** — the non-export IS the contract.
 
+`Dialog` carries a third method alongside `open`/`close`:
+
+```js
+Dialog.confirm({ message, title, confirmLabel, cancelLabel, variant, testid })
+// → Promise<boolean>
+```
+
+Resolves `true` only when the confirm control is activated; `false` on cancel,
+ESC, overlay click or a programmatic close. It **never rejects** — every failure
+path degrades to the browser's own prompt inside the function, so a caller can
+`await` it without a `catch` and never silently lose an action. Every supplied
+string reaches the DOM through `textContent`. Labels resolve per-call option →
+`<body data-lf-dialog-*>` → overlay `data-default-*` → empty string; no English
+literal is substituted.
+
+`table.TableDialog.showConfirmDialog(options)` is kept as a **deprecation
+shim** over `Dialog.confirm`: the signature is unchanged and `onConfirm` /
+`onCancel` still fire exactly once, but they now run **one microtask later**
+(off the promise's `.then`) than the retired inline implementation, which
+invoked them synchronously from the button's click handler. Code that relied
+on the callback having run by the time `showConfirmDialog` returned must chain
+instead. The shim renders through `Dialog.confirm`'s `textContent`-only path —
+the old markup-string overlay is gone.
+
+`src/bootstrap.js` also pulls in `web/js/components/confirm-bridge.js`, a
+listener-only module that routes `htmx:confirm` into `Dialog.confirm`. It adds
+**no** `lf.ui` symbol — its only observable global is the one-time registration
+flag `window.__lfConfirmBridge` — so there is nothing for the barrel to
+re-export; importing the bundle simply installs the behaviour. The bridge issues
+no request of its own: it re-enters htmx via `issueRequest(true)` from the
+original element, so request construction stays entirely htmx's.
+
 Consumer usage:
 
 ```js

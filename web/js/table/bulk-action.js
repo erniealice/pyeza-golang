@@ -73,9 +73,12 @@
 
         console.log('[BulkAction] Handling action:', action, 'with endpoint:', endpoint, 'count:', count);
 
-        // Read configuration from data attributes
-        const confirmTitle = actionBtn.dataset.confirmTitle || 'Confirm Action';
-        const confirmMessage = (actionBtn.dataset.confirmMessage || `Are you sure you want to ${action} ${count} item(s)?`)
+        // Read configuration from data attributes. Confirm copy is server-set
+        // per call site; a missing value falls back inside the dialog API to
+        // the <body data-lf-dialog-*> defaults or renders empty — no English
+        // fallback lives in this file.
+        const confirmTitle = actionBtn.dataset.confirmTitle || '';
+        const confirmMessage = (actionBtn.dataset.confirmMessage || '')
             .replace(/\{\{count\}\}/g, count);
         const extraParamsJSON = actionBtn.dataset.extraParams;
 
@@ -92,12 +95,11 @@
         // Get confirm label from button text
         const confirmLabel = actionBtn.querySelector('span')?.textContent?.trim() || action;
 
-        // Show confirmation dialog using new HTMX-based dialog
+        // Show confirmation dialog through the app-shell dialog promise API
         showConfirmDialog({
             title: confirmTitle,
             message: confirmMessage,
             confirmLabel: confirmLabel,
-            cancelLabel: 'Cancel',
             variant: variant,
             onConfirm: () => {
                 console.log('[BulkAction] Confirmed, executing:', action);
@@ -107,61 +109,34 @@
     }
 
     /**
-     * Show confirmation dialog using HTMX-based dialog system
-     * @param {Object} options - Dialog options
+     * Ask for confirmation through the app-shell dialog promise API.
+     * The dialog renders client-side and issues no request of its own; the
+     * API is resolved at call time (dialog.js exposes it only after an
+     * overlay-bearing init) and a missing API degrades to the browser's own
+     * prompt inside the resolver, so the action stays gated on every page —
+     * never auto-fired, never dropped. Label defaults resolve inside the API
+     * (<body data-lf-dialog-*> then the overlay data-default-*), never here.
+     * @param {Object} options - { title, message, confirmLabel, variant, onConfirm }
      */
     function showConfirmDialog(options) {
-        const dialog = document.querySelector('[data-dialog-overlay]');
-        if (!dialog) {
-            console.error('[BulkAction] Dialog element not found');
-            // Fallback to browser confirm
-            if (confirm(options.message)) {
-                options.onConfirm();
-            }
-            return;
-        }
-
-        // Build dialog URL with query parameters
-        const dialogUrl = '/ui/dialog/confirm?' + new URLSearchParams({
-            title: options.title || 'Confirm Action',
-            message: options.message,
-            confirm: options.confirmLabel || 'Confirm',
-            cancel: options.cancelLabel || 'Cancel',
-            variant: options.variant || 'default'
-        });
-
-        // Store the onConfirm callback for later execution
-        // We use a custom event to handle this
-        const handleConfirm = function() {
-            options.onConfirm();
-            dialog.removeEventListener('dialog:confirm', handleConfirm);
-        };
-
-        dialog.addEventListener('dialog:confirm', handleConfirm, { once: true });
-
-        // Load dialog content via HTMX (don't update URL)
-        if (typeof htmx !== 'undefined') {
-            // Save current URL to restore it after HTMX updates it
-            const currentUrl = window.location.href;
-
-            htmx.ajax('GET', dialogUrl, {
-                target: '[data-dialog-container]',
-                swap: 'innerHTML',
-                pushUrl: false
-            });
-
-            // Restore URL immediately in case HTMX still updates it
-            setTimeout(() => {
-                if (window.location.href !== currentUrl) {
-                    history.replaceState(null, '', currentUrl);
+        const o = options || {};
+        const api = window.lf && window.lf.ui && window.lf.ui.Dialog;
+        const ask = (api && typeof api.confirm === 'function')
+            ? api.confirm
+            : function(opts) {
+                let answer;
+                try {
+                    answer = window.confirm((opts && opts.message) || '');
+                } catch (err) {
+                    answer = false;
                 }
-            }, 0);
-        } else {
-            console.error('[BulkAction] HTMX not available');
-            if (confirm(options.message)) {
-                options.onConfirm();
+                return Promise.resolve(!!answer);
+            };
+        ask(o).then(function(confirmed) {
+            if (confirmed && typeof o.onConfirm === 'function') {
+                o.onConfirm();
             }
-        }
+        });
     }
 
     /**

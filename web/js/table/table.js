@@ -180,49 +180,11 @@
             if (lf.TableDensity) return lf.TableDensity.setDensity(density);
         },
 
-        // Dialog - now uses global dialog.js with HTMX
+        // Dialog — delegates to the TableDialog shim over the app-shell
+        // dialog promise API (lf.ui.Dialog.confirm). Label defaults resolve
+        // inside that API, never here.
         showConfirmDialog: function(options) {
-            const dialog = document.querySelector('[data-dialog-overlay]');
-            if (!dialog) {
-                console.warn('[TableToolbar] Dialog element not found');
-                return;
-            }
-
-            // Build dialog URL with query parameters
-            const dialogUrl = '/ui/dialog/confirm?' + new URLSearchParams({
-                title: options.title || 'Confirm Action',
-                message: options.message || 'Are you sure?',
-                confirm: options.confirmLabel || 'Confirm',
-                cancel: options.cancelLabel || 'Cancel',
-                variant: options.variant || 'default'
-            });
-
-            // Store onConfirm callback if provided
-            if (options.onConfirm) {
-                const handleConfirm = function() {
-                    options.onConfirm();
-                    dialog.removeEventListener('dialog:confirm', handleConfirm);
-                };
-                dialog.addEventListener('dialog:confirm', handleConfirm, { once: true });
-            }
-
-            // Load dialog content via HTMX (don't update URL)
-            if (typeof htmx !== 'undefined') {
-                const currentUrl = window.location.href;
-
-                htmx.ajax('GET', dialogUrl, {
-                    target: '[data-dialog-container]',
-                    swap: 'innerHTML',
-                    pushUrl: false
-                });
-
-                // Restore URL immediately in case HTMX still updates it
-                setTimeout(() => {
-                    if (window.location.href !== currentUrl) {
-                        history.replaceState(null, '', currentUrl);
-                    }
-                }, 0);
-            }
+            if (lf.TableDialog) return lf.TableDialog.showConfirmDialog(options);
         },
 
         // Selection

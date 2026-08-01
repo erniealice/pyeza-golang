@@ -20,8 +20,10 @@
     10. table-pagination.js (pagination functionality)
     11. table-selection.js (bulk selection functionality)
     12. table-actions.js (row actions and navigation - uses global dialog.js)
-    13. bulk-action.js (unified bulk action handler)
-    14. table.js (main entry point - initializes all modules)
+    13. table-dialog.js (TableDialog deprecation shim over lf.ui.Dialog.confirm;
+        keeps the frozen lf.ui.table.TableDialog / flat lf.TableDialog surface live)
+    14. bulk-action.js (unified bulk action handler)
+    15. table.js (main entry point - initializes all modules)
 
     Note: Confirmation dialogs are now handled by dialog.js (loaded in app-shell)
     which serves dialog content via HTMX from /ui/dialog/confirm
@@ -40,6 +42,7 @@
 <script src="/assets/js/pyeza/table/table-pagination.js?v={{.CacheVersion}}"></script>
 <script src="/assets/js/pyeza/table/table-selection.js?v={{.CacheVersion}}"></script>
 <script src="/assets/js/pyeza/table/table-actions.js?v={{.CacheVersion}}"></script>
+<script src="/assets/js/pyeza/table/table-dialog.js?v={{.CacheVersion}}"></script>
 <script src="/assets/js/pyeza/table/bulk-action.js?v={{.CacheVersion}}"></script>
 
 <!-- Table Main Entry Point -->
