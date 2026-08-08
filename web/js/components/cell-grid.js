@@ -15,9 +15,12 @@
  *   single-flight micro-batch of ONLY the dirty cells, POSTed via htmx.ajax to
  *   the same SaveURL with a hidden save_mode=cell. Per-cell acks arrive as the
  *   HX-Trigger custom event "omcell-result" (detail {cells:[{key, ok, outcomeId,
- *   value, ratingFresh, error?}]}); a successful create renames the input's name
- *   from new.{jt}:{cr} to cells.{outcomeId} IN PLACE so the next save updates
- *   instead of re-creating. The manual Save button is retained as the a11y /
+ *   nextKey, value, ratingFresh, error?}]}); a successful create renames the
+ *   input's name from new.{jt}:{cr} to cells.{outcomeId} IN PLACE so the next
+ *   save updates instead of re-creating. If an answered clear sets
+ *   nextKey=new.{jt}:{cr}, the same live input renames from cells.{id} back to
+ *   new.{jt}:{cr} for the next SAVE. The manual Save button is retained as the
+ *   a11y /
  *   retry fallback, but in this mode it is enabled — and therefore, per
  *   cell-grid.css, visible — ONLY while a cell is in the "error" state (see
  *   needsSave). A healthy autosave grid shows no retry control; the control is
@@ -29,7 +32,7 @@
  *            signed hidden fields + save_mode=cell + dirty cells only, named
  *            cells.{outcome_id} (existing) / new.{job_task_id}:{criteria_id} (new).
  *   RESPONSE HX-Trigger event "omcell-result", detail.cells[] items
- *            { key, ok, outcomeId, value, ratingFresh, error? }.
+ *            { key, ok, outcomeId, nextKey, value, ratingFresh, error? }.
  *
  * CSP: no on*=/hx-on attributes; htmx is the vendored 1.9.10 build (window.htmx).
  *
@@ -299,23 +302,37 @@
             var key = c.key;
             var el = inputByName(form, key);
             var snapEntry = st.snapshot ? st.snapshot.get(key) : null;
+            var nextKey = c.nextKey;
             if (!el) return; // renamed away / gone — nothing to paint
 
             if (c.ok) {
                 // Handshake: a new record just got its id → rename in place so the
                 // next save UPDATES instead of re-CREATING a duplicate. MANDATORY.
-                if (c.outcomeId && key.indexOf('new.') === 0) {
-                    var newName = 'cells.' + c.outcomeId;
-                    el.setAttribute('name', newName);
-                    el.name = newName;
+                // If a clear reply asks for a nextKey, flip cells.{id} back to
+                // new.{jt}:{cr} in place so a later edit re-creates cleanly.
+                if (key.indexOf('cells.') === 0 && nextKey) {
+                    var nextName = nextKey;
+                    el.setAttribute('name', nextName);
+                    el.name = nextName;
                     if (st.pending.has(key)) {
                         var pe = st.pending.get(key);
-                        pe.name = newName;
+                        pe.name = nextName;
                         st.pending.delete(key);
-                        st.pending.set(newName, pe);
+                        st.pending.set(nextName, pe);
+                    }
+                } else if (c.outcomeId && key.indexOf('new.') === 0) {
+                    var canonicalName = 'cells.' + c.outcomeId;
+                    el.setAttribute('name', canonicalName);
+                    el.name = canonicalName;
+                    if (st.pending.has(key)) {
+                        var pe = st.pending.get(key);
+                        pe.name = canonicalName;
+                        st.pending.delete(key);
+                        st.pending.set(canonicalName, pe);
                     }
                 }
                 var canonical = (c.value == null) ? el.value : String(c.value);
+                if (nextKey) canonical = '';
                 var liveRev = el.dataset.cgRev || '0';
                 var submittedRev = snapEntry ? snapEntry.rev : liveRev;
                 el.dataset.savedValue = canonical; // new acknowledged baseline

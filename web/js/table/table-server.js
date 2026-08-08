@@ -340,7 +340,12 @@
      * @param {Object} overrides - The overrides that were just applied
      */
     function updateBrowserURL(tableCard, overrides) {
-        const browserUrl = new URL(window.location.pathname, window.location.origin);
+        const browserUrl = new URL(window.location.href);
+
+        // The browser URL may carry unrelated page state. Remove only the
+        // table state so it can be rebuilt from the current request.
+        ['page', 'size', 'cursor', 'curdir', 'search', 'sort', 'dir', 'filters', 'tz']
+            .forEach((key) => browserUrl.searchParams.delete(key));
 
         // Merge current data-attributes with overrides to get final state
         const page = overrides.page !== undefined ? overrides.page : (parseInt(tableCard.dataset.currentPage) || 1);
@@ -363,6 +368,18 @@
         // Timezone (only when non-default)
         const tz = overrides.tz !== undefined ? overrides.tz : '';
         if (tz && tz !== 'UTC') browserUrl.searchParams.set('tz', tz);
+
+        let cursor = overrides.cursor;
+        let curdir = overrides.curdir;
+        if (overrides.cursorDirection === 'next' && tableCard.dataset.nextCursor) {
+            cursor = tableCard.dataset.nextCursor;
+            curdir = 'next';
+        } else if (overrides.cursorDirection === 'prev' && tableCard.dataset.prevCursor) {
+            cursor = tableCard.dataset.prevCursor;
+            curdir = 'prev';
+        }
+        if (cursor) browserUrl.searchParams.set('cursor', cursor);
+        if (cursor && curdir) browserUrl.searchParams.set('curdir', curdir);
 
         history.replaceState(null, '', browserUrl.toString());
     }

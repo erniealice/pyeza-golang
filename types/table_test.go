@@ -1,6 +1,7 @@
 package types
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -666,5 +667,52 @@ func TestServerPagination_BuildDisplay_Cursor(t *testing.T) {
 	}
 	if sp.PrevCursorURL == "" {
 		t.Error("PrevCursorURL should be set")
+	}
+}
+
+func TestServerPaginationURLs_PreserveBaseQueryAndEncodeManagedState(t *testing.T) {
+	t.Parallel()
+
+	sp := &ServerPagination{
+		PageSize:      25,
+		SearchQuery:   "tea & cake",
+		SortColumn:    "name/title",
+		SortDirection: "desc",
+		FiltersJSON:   `{"status":"in progress & queued"}`,
+		PaginationURL: "/api/table?category=hot%20drinks&page=99&size=1&cursor=stale&curdir=prev&search=stale&sort=old&dir=asc&filters=stale",
+	}
+
+	got := sp.buildPageURL(2)
+	want := "/api/table?category=hot+drinks&dir=desc&filters=%7B%22status%22%3A%22in+progress+%26+queued%22%7D&page=2&search=tea+%26+cake&size=25&sort=name%2Ftitle"
+	if got != want {
+		t.Errorf("buildPageURL() = %q, want %q", got, want)
+	}
+	if strings.Count(got, "?") != 1 {
+		t.Errorf("buildPageURL() has %d question marks, want 1", strings.Count(got, "?"))
+	}
+}
+
+func TestServerPaginationURLs_CursorPreservesBaseQueryAndEncodesCursor(t *testing.T) {
+	t.Parallel()
+
+	sp := &ServerPagination{
+		PageSize:      10,
+		FiltersJSON:   `{"state":"ready"}`,
+		PaginationURL: "/api/table?category=featured&cursor=stale&page=7",
+	}
+
+	got := sp.buildCursorURL("a+b/c?=", "next")
+	want := "/api/table?category=featured&curdir=next&cursor=a%2Bb%2Fc%3F%3D&filters=%7B%22state%22%3A%22ready%22%7D&size=10"
+	if got != want {
+		t.Errorf("buildCursorURL() = %q, want %q", got, want)
+	}
+}
+
+func TestServerPaginationURLs_QueryFreeCompatibility(t *testing.T) {
+	t.Parallel()
+
+	sp := &ServerPagination{PageSize: 10, PaginationURL: "/api/table"}
+	if got, want := sp.buildPageURL(3), "/api/table?page=3&size=10"; got != want {
+		t.Errorf("buildPageURL() = %q, want %q", got, want)
 	}
 }

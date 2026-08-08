@@ -1,7 +1,7 @@
 // test/cell-grid.test.mjs — DOM-level tests for the W2 edit-mode client in
 // web/js/components/cell-grid.js (keyboard traversal, focusout coalescing, the
-// new.→cells.{id} rename handshake, stale-response suppression, and the manual
-// batch-Save fallback staying intact).
+// new.→cells.{id} and cells.{id}→new.{job}:{criterion} rename handshakes, stale-response
+// suppression, and the manual batch-Save fallback staying intact).
 //
 // The module is a browser IIFE (not an importable ESM), so it is loaded into a
 // tiny hand-rolled DOM via node:vm — no jsdom (pyeza ships zero runtime deps).
@@ -96,7 +96,16 @@ function makeForm(o) {
         querySelectorAll(sel) { return matchAll(sel, inputs, hiddens, saveBtn); },
         _card: null, _inputs: inputs, _saveBtn: saveBtn,
     };
-    const card = { className: 'cell-grid-card', closest() { return null; } };
+    const card = {
+        className: 'cell-grid-card',
+        querySelector(sel) {
+            if (sel === '.cell-grid-form') return form;
+            return null;
+        },
+        closest() {
+            return null;
+        },
+    };
     form._card = card;
     inputs.forEach((i) => { i._form = form; i._card = card; });
     saveBtn._form = form;
@@ -268,6 +277,39 @@ test('new-ID rename handshake: ok+new renames name in place to cells.{outcomeId}
     assert.equal(cell.name, 'cells.OID9', 'input name renamed in place — no duplicate on next save');
     assert.equal(cell.getAttribute('data-cg-state'), 'saved');
     assert.equal(cell.dataset.savedValue, 'P', 'baseline advanced to server canonical value');
+});
+
+test('clear ack: cells.id with nextKey resets to new.{jt}:{cr}, then posts that key next save', async () => {
+    boot();
+    const cell = makeInput({ name: 'cells.OID9', row: 0, col: 0, saved: 'P' });
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    // Clear a persisted row.
+    cell.value = '';
+    cell.dataset.cgRev = '1';
+    fire('focusout', cell);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 1);
+    assert.equal(AJAX_CALLS[0].values['cells.OID9'], '');
+
+    fire('omcell-result', AJAX_CALLS[0].ctx.target, {
+        detail: { cells: [{ key: 'cells.OID9', ok: true, nextKey: 'new.JT1:CR1', value: '', ratingFresh: true }] },
+    });
+    AJAX_CALLS[0].settle();
+    await Promise.resolve();
+    assert.equal(cell.name, 'new.JT1:CR1', 'cleared input flips back to CREATE key');
+    assert.equal(cell.getAttribute('data-cg-state'), 'saved');
+    assert.equal(cell.value, '', 'value is canonical empty after clear');
+    assert.equal(cell.dataset.savedValue, '', 'baseline is canonical empty after clear');
+
+    // Later edit posts the new key for recreate.
+    cell.value = 'Q';
+    fire('input', cell);
+    fire('focusout', cell);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 2);
+    assert.equal(AJAX_CALLS[1].values['new.JT1:CR1'], 'Q');
 });
 
 test('stale-response suppression: a late ack for an older revision never clobbers a newer edit', () => {

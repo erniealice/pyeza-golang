@@ -890,38 +890,58 @@ func (sp *ServerPagination) buildCursorDisplay() {
 	}
 }
 
-// buildCursorURL constructs the HTMX URL for cursor navigation
-func (sp *ServerPagination) buildCursorURL(cursor, direction string) string {
-	url := sp.PaginationURL + "?cursor=" + cursor + "&curdir=" + direction + "&size=" + itoa(sp.PageSize)
-	if sp.SearchQuery != "" {
-		url += "&search=" + sp.SearchQuery
-	}
-	if sp.SortColumn != "" {
-		url += "&sort=" + sp.SortColumn
-		dir := sp.SortDirection
-		if dir == "" {
-			dir = "asc"
-		}
-		url += "&dir=" + dir
-	}
-	return url
+var serverPaginationQueryKeys = []string{
+	"page", "size", "cursor", "curdir", "search", "sort", "dir", "filters",
 }
 
-// buildPageURL constructs the HTMX URL for a specific page
+// buildCursorURL constructs the HTMX URL for cursor navigation.
+func (sp *ServerPagination) buildCursorURL(cursor, direction string) string {
+	return sp.buildPaginationURL(url.Values{
+		"cursor": {cursor},
+		"curdir": {direction},
+		"size":   {itoa(sp.PageSize)},
+	})
+}
+
+// buildPageURL constructs the HTMX URL for a specific page.
 func (sp *ServerPagination) buildPageURL(page int) string {
-	url := sp.PaginationURL + "?page=" + itoa(page) + "&size=" + itoa(sp.PageSize)
+	return sp.buildPaginationURL(url.Values{
+		"page": {itoa(page)},
+		"size": {itoa(sp.PageSize)},
+	})
+}
+
+// buildPaginationURL preserves unrelated base-query values while replacing every
+// table-managed value with the current pagination state.
+func (sp *ServerPagination) buildPaginationURL(values url.Values) string {
+	parsed, err := url.Parse(sp.PaginationURL)
+	if err != nil {
+		return sp.PaginationURL
+	}
+
+	query := parsed.Query()
+	for _, key := range serverPaginationQueryKeys {
+		query.Del(key)
+	}
+	for key, value := range values {
+		query[key] = value
+	}
 	if sp.SearchQuery != "" {
-		url += "&search=" + sp.SearchQuery
+		query.Set("search", sp.SearchQuery)
 	}
 	if sp.SortColumn != "" {
-		url += "&sort=" + sp.SortColumn
-		dir := sp.SortDirection
-		if dir == "" {
-			dir = "asc"
+		query.Set("sort", sp.SortColumn)
+		direction := sp.SortDirection
+		if direction == "" {
+			direction = "asc"
 		}
-		url += "&dir=" + dir
+		query.Set("dir", direction)
 	}
-	return url
+	if sp.FiltersJSON != "" {
+		query.Set("filters", sp.FiltersJSON)
+	}
+	parsed.RawQuery = query.Encode()
+	return parsed.String()
 }
 
 // buildPageNumbers generates the slice of page buttons with smart windowing
