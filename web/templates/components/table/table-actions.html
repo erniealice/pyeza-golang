@@ -9,6 +9,51 @@
 {{define "table-row-actions"}}
 <div class="action-buttons">
     {{range .Actions}}
+    {{if and .HxGet .Disabled}}
+    <span class="action-btn {{.Type}} disabled"
+          aria-label="{{if .DisabledTooltip}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
+          title="{{if .DisabledTooltip}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
+          aria-disabled="true"
+          {{if .TestID}}data-testid="{{.TestID}}"{{else if $.RowID}}data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}"{{end}}>
+        {{if eq .Type "view"}}{{template "icon-eye" $}}
+        {{else if eq .Type "edit"}}{{template "icon-edit" $}}
+        {{else if eq .Type "undo"}}{{template "icon-undo" $}}
+        {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
+        {{else if eq .Type "activate"}}{{template "icon-play" $}}
+        {{else if eq .Type "delete"}}{{template "icon-trash" $}}
+        {{else if eq .Type "download"}}{{template "icon-download" $}}
+        {{else if eq .Type "mail"}}{{template "icon-mail" $}}
+        {{else if eq .Type "check"}}{{template "icon-check" $}}
+        {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+        {{else if eq .Type "manage"}}{{template "icon-shield" $}}
+        {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+        {{else if eq .Type "preview"}}{{template "icon-eye" $}}
+        {{end}}
+    </span>
+    {{else if .HxGet}}
+    <button type="button" class="action-btn {{.Type}}"
+            aria-label="{{.Label}}"
+            title="{{.Label}}"
+            data-action="{{.Action}}"
+            {{if .TestID}}data-testid="{{.TestID}}"{{else if $.RowID}}data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}"{{end}}
+            hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}} hx-push-url="false"
+            {{if .DrawerTitle}}data-lf-action="sheet-open" data-lf-sheet-title="{{.DrawerTitle}}" aria-haspopup="dialog"{{else if .OnClick}}data-lf-onclick="{{.OnClick}}"{{end}}>
+        {{if eq .Type "view"}}{{template "icon-eye" $}}
+        {{else if eq .Type "edit"}}{{template "icon-edit" $}}
+        {{else if eq .Type "undo"}}{{template "icon-undo" $}}
+        {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
+        {{else if eq .Type "activate"}}{{template "icon-play" $}}
+        {{else if eq .Type "delete"}}{{template "icon-trash" $}}
+        {{else if eq .Type "download"}}{{template "icon-download" $}}
+        {{else if eq .Type "mail"}}{{template "icon-mail" $}}
+        {{else if eq .Type "check"}}{{template "icon-check" $}}
+        {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+        {{else if eq .Type "manage"}}{{template "icon-shield" $}}
+        {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+        {{else if eq .Type "preview"}}{{template "icon-eye" $}}
+        {{end}}
+    </button>
+    {{else}}
     <button class="action-btn {{.Type}}{{if .Disabled}} disabled{{end}}"
             aria-label="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
             title="{{if .Disabled}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
@@ -37,6 +82,7 @@
         {{end}}
     </button>
     {{end}}
+    {{end}}
 </div>
 {{/* Mobile dropdown version */}}
 <div class="action-dropdown">
@@ -46,6 +92,49 @@
     </button>
     <div class="action-dropdown-menu" id="action-menu-{{.RowID}}" role="menu">
         {{range .Actions}}
+        {{if and .HxGet .Disabled}}
+        <span class="action-dropdown-item {{.Type}} disabled" role="menuitem"
+              aria-label="{{if .DisabledTooltip}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
+              title="{{if .DisabledTooltip}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"
+              aria-disabled="true"{{if .TestID}} data-testid="{{.TestID}}-mobile"{{else if $.RowID}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}-mobile"{{end}}>
+            {{if eq .Type "view"}}{{template "icon-eye" $}}
+            {{else if eq .Type "edit"}}{{template "icon-edit" $}}
+            {{else if eq .Type "undo"}}{{template "icon-undo" $}}
+            {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
+            {{else if eq .Type "activate"}}{{template "icon-play" $}}
+            {{else if eq .Type "delete"}}{{template "icon-trash" $}}
+            {{else if eq .Type "download"}}{{template "icon-download" $}}
+            {{else if eq .Type "mail"}}{{template "icon-mail" $}}
+            {{else if eq .Type "check"}}{{template "icon-check" $}}
+            {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+            {{else if eq .Type "manage"}}{{template "icon-shield" $}}
+            {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+            {{else if eq .Type "preview"}}{{template "icon-eye" $}}
+            {{end}}
+            {{.Label}}
+        </span>
+        {{else if .HxGet}}
+        <button type="button" class="action-dropdown-item {{.Type}}" role="menuitem"
+                data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}-mobile"{{else if $.RowID}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}-mobile"{{end}}
+                hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}} hx-push-url="false"
+                {{if .DrawerTitle}}data-lf-action="sheet-open" data-lf-sheet-title="{{.DrawerTitle}}" aria-haspopup="dialog"{{else if .OnClick}}data-lf-onclick="{{.OnClick}}"{{end}}>
+            {{if eq .Type "view"}}{{template "icon-eye" $}}
+            {{else if eq .Type "edit"}}{{template "icon-edit" $}}
+            {{else if eq .Type "undo"}}{{template "icon-undo" $}}
+            {{else if eq .Type "deactivate"}}{{template "icon-pause" $}}
+            {{else if eq .Type "activate"}}{{template "icon-play" $}}
+            {{else if eq .Type "delete"}}{{template "icon-trash" $}}
+            {{else if eq .Type "download"}}{{template "icon-download" $}}
+            {{else if eq .Type "mail"}}{{template "icon-mail" $}}
+            {{else if eq .Type "check"}}{{template "icon-check" $}}
+            {{else if eq .Type "clone"}}{{template "icon-copy" $}}
+            {{else if eq .Type "manage"}}{{template "icon-shield" $}}
+            {{else if eq .Type "archive"}}{{template "icon-archive" $}}
+            {{else if eq .Type "preview"}}{{template "icon-eye" $}}
+            {{end}}
+            {{.Label}}
+        </button>
+        {{else}}
         <button type="button" class="action-dropdown-item {{.Type}}{{if .Disabled}} disabled{{end}}" role="menuitem" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}-mobile"{{else if $.RowID}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.RowID}}-mobile"{{end}} {{if .Disabled}}aria-label="{{.DisabledTooltip}}"{{end}} {{if $.RowID}}data-id="{{$.RowID}}"{{end}}{{if .URL}}{{if eq .Action "edit"}} data-edit-url="{{.URL}}"{{else if eq .Action "clone"}} data-clone-url="{{.URL}}"{{else if eq .Action "delete"}} data-delete-url="{{.URL}}"{{else if eq .Action "deactivate"}} data-deactivate-url="{{.URL}}"{{else if eq .Action "activate"}} data-activate-url="{{.URL}}"{{else if eq .Action "undo"}} data-activate-url="{{.URL}}"{{else if eq .Action "download"}} data-download-url="{{.URL}}"{{else if eq .Action "send-email"}} data-send-email-url="{{.URL}}"{{end}}{{end}}{{if .DrawerTitle}} data-drawer-title="{{.DrawerTitle}}"{{end}}{{if .ItemName}} data-item-name="{{.ItemName}}"{{end}}{{if .Disabled}} aria-disabled="true"{{end}}>
             {{if eq .Type "view"}}{{template "icon-eye" $}}
             {{else if eq .Type "edit"}}{{template "icon-edit" $}}
@@ -63,6 +152,7 @@
             {{end}}
             {{.Label}}
         </button>
+        {{end}}
         {{end}}
     </div>
 </div>

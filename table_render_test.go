@@ -111,6 +111,128 @@ func TestPrimaryAction_ActionURL_Unaffected(t *testing.T) {
 	}
 }
 
+// --- Table row actions: HxGet + DrawerTitle contract -------------------------
+
+func TestTableAction_HxGetDrawerRendersNativeButton(t *testing.T) {
+	row := types.TableRow{
+		ID: "row-1",
+		Actions: []types.TableAction{
+			{
+				Type:        "edit",
+				Label:       "Edit grade",
+				Action:      "edit",
+				HxGet:       "/grades/grade-1/edit",
+				HxTarget:    "#sheetContent",
+				HxSwap:      "innerHTML",
+				DrawerTitle: "Edit grade",
+			},
+		},
+	}
+	outDesktop := renderNamed(t, "table-data-row", row)
+	outMobile := renderNamed(t, "table-row-actions", map[string]any{
+		"Actions": row.Actions,
+		"RowID":   row.ID,
+	})
+
+	desktopNeedles := []string{
+		`<button type="button" class="action-btn edit"`,
+		`aria-label="Edit grade"`,
+		`title="Edit grade"`,
+		`hx-get="/grades/grade-1/edit"`,
+		`hx-target="#sheetContent"`,
+		`hx-swap="innerHTML"`,
+		`hx-push-url="false"`,
+		`data-lf-action="sheet-open"`,
+		`data-lf-sheet-title="Edit grade"`,
+		`aria-haspopup="dialog"`,
+		`data-testid="edit-row-row-1"`,
+	}
+	for _, needle := range desktopNeedles {
+		if !strings.Contains(outDesktop, needle) {
+			t.Errorf("desktop HxGet action missing %q; got: %s", needle, outDesktop)
+		}
+	}
+	if strings.Contains(outDesktop, `data-lf-onclick=`) {
+		t.Errorf("desktop HxGet with DrawerTitle must not emit generic OnClick; got: %s", outDesktop)
+	}
+	if strings.Contains(outDesktop, "<a ") {
+		t.Errorf("desktop HxGet drawer action must not render <a>; got: %s", outDesktop)
+	}
+
+	if !strings.Contains(outMobile, `<button type="button" class="action-btn edit"`) {
+		t.Errorf("mobile HxGet action must render a native button; got: %s", outMobile)
+	}
+	if !strings.Contains(outMobile, `data-lf-action="sheet-open"`) {
+		t.Errorf("mobile HxGet with DrawerTitle must emit sheet-open attribute; got: %s", outMobile)
+	}
+	if !strings.Contains(outMobile, `aria-haspopup="dialog"`) {
+		t.Errorf("mobile HxGet with DrawerTitle must emit aria-haspopup=dialog; got: %s", outMobile)
+	}
+}
+
+func TestTableAction_DisabledHxGetDrawerIsInert(t *testing.T) {
+	row := types.TableRow{
+		ID: "row-1",
+		Actions: []types.TableAction{
+			{
+				Type:            "edit",
+				Label:           "Edit grade",
+				Action:          "edit",
+				HxGet:           "/grades/grade-1/edit",
+				DrawerTitle:     "Edit grade",
+				Disabled:        true,
+				DisabledTooltip: "Locked",
+			},
+		},
+	}
+	outDesktop := renderNamed(t, "table-data-row", row)
+	outMobile := renderNamed(t, "table-row-actions", map[string]any{
+		"Actions": row.Actions,
+		"RowID":   row.ID,
+	})
+
+	for _, out := range []string{outDesktop, outMobile} {
+		if !strings.Contains(out, `aria-disabled="true"`) {
+			t.Errorf("disabled action must be inert with aria-disabled=true; got: %s", out)
+		}
+		if strings.Contains(out, `hx-get="/grades/grade-1/edit"`) {
+			t.Errorf("disabled HxGet action must not retain hx-get; got: %s", out)
+		}
+		if strings.Contains(out, `data-lf-action="sheet-open"`) {
+			t.Errorf("disabled HxGet action must not emit sheet-open action attr; got: %s", out)
+		}
+		if strings.Contains(out, `<button class="action-btn edit`) {
+			t.Errorf("disabled HxGet desktop action must not use action-btn button; got: %s", out)
+		}
+	}
+}
+
+func TestTableAction_HxGetDrawerLegacyOnClick(t *testing.T) {
+	row := types.TableRow{
+		ID: "row-1",
+		Actions: []types.TableAction{
+			{
+				Type:    "edit",
+				Label:   "Edit grade",
+				Action:  "edit",
+				HxGet:   "/grades/grade-1/edit",
+				OnClick: "lf.Sheet.open()",
+			},
+		},
+	}
+	out := renderNamed(t, "table-data-row", row)
+
+	if !strings.Contains(out, `data-lf-onclick="lf.Sheet.open()"`) {
+		t.Errorf("empty DrawerTitle must preserve generic onclick bridge; got: %s", out)
+	}
+	if strings.Contains(out, `data-lf-action="sheet-open"`) {
+		t.Errorf("empty DrawerTitle must not emit sheet-open action attrs; got: %s", out)
+	}
+	if !strings.Contains(out, `hx-push-url="false"`) {
+		t.Errorf("legacy HxGet branch must still keep push-url false; got: %s", out)
+	}
+}
+
 // --- Typed composite cell -----------------------------------------------------
 
 // TestCompositeCell_Render_ChipsCountEye covers the full composite render:

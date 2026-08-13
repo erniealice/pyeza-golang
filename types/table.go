@@ -560,9 +560,11 @@ type TableAction struct {
 	DisabledTooltip string // Tooltip shown when hovering over disabled action
 	Overflow        bool   // If true, action collapses into the row's ⋮ overflow menu instead of rendering as an inline icon button
 	// HTMX drawer-open fields — additive; existing Href callers are unaffected.
-	// When HxGet is set the action renders as an <a> with hx-get/hx-target/hx-swap
-	// instead of (or in addition to) a plain href. Leave Href empty to avoid the
-	// hx-boost navigation path.
+	// When HxGet is set and the action is enabled, render as a native <button>
+	// with hx-get (plus optional hx-target/hx-swap) and hx-push-url="false".
+	// If DrawerTitle is non-empty, add the sheet-open bridge data-lf-action="sheet-open"
+	// and data-lf-sheet-title; otherwise preserve generic HX action behavior and
+	// optional OnClick.
 	HxGet    string // HTMX endpoint to GET into HxTarget on click
 	HxTarget string // HTMX swap target selector (e.g. "#sheetContent")
 	HxSwap   string // HTMX swap mode (e.g. "innerHTML")

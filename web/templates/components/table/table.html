@@ -285,10 +285,10 @@ JavaScript:
             {{range .Actions}}
             {{if .Overflow}}{{/* skip — rendered below in the ⋮ menu */}}{{else}}
             {{if and .HxGet (not .Disabled)}}
-            {{/* HTMX drawer-open action: no href (avoids hx-boost navigation),
-                 carries hx-get/hx-target/hx-swap to load content into the sheet
-                 portal without changing the browser URL. */}}
-            <a class="action-btn {{.Type}}" aria-label="{{.Label}}" title="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}}{{if .OnClick}} data-lf-onclick="{{.OnClick}}"{{end}}>
+            {{/* HTMX drawer-open action: native button, no href (avoids hx-boost
+                 navigation), carries hx-get/hx-target/hx-swap to load content into
+                 the sheet portal without changing the browser URL. */}}
+            <button type="button" class="action-btn {{.Type}}" aria-label="{{.Label}}" title="{{.Label}}" data-action="{{.Action}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}} hx-get="{{.HxGet}}"{{if .HxTarget}} hx-target="{{.HxTarget}}"{{end}}{{if .HxSwap}} hx-swap="{{.HxSwap}}"{{end}} hx-push-url="false"{{if .DrawerTitle}} data-lf-action="sheet-open" data-lf-sheet-title="{{.DrawerTitle}}" aria-haspopup="dialog"{{else if .OnClick}} data-lf-onclick="{{.OnClick}}"{{end}}>
                 {{if eq .Type "run"}}{{template "icon-zap" $}}{{end}}
                 {{if eq .Type "view"}}{{template "icon-eye" $}}{{end}}
                 {{if eq .Type "edit"}}{{template "icon-edit" $}}{{end}}
@@ -303,7 +303,7 @@ JavaScript:
                 {{if eq .Type "mail"}}{{template "icon-mail" $}}{{end}}
                 {{if eq .Type "check"}}{{template "icon-check" $}}{{end}}
                 {{if eq .Type "details"}}{{template "icon-arrow-right" $}}{{end}}
-            </a>
+            </button>
             {{else if and .HxGet .Disabled}}
             {{/* Disabled HTMX drawer-open action: render as span, no interaction. */}}
             <span class="action-btn {{.Type}} disabled" aria-disabled="true" aria-label="{{if .DisabledTooltip}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}" title="{{if .DisabledTooltip}}{{.DisabledTooltip}}{{else}}{{.Label}}{{end}}"{{if .TestID}} data-testid="{{.TestID}}"{{else}} data-testid="{{if .Action}}{{.Action}}{{else}}{{.Type}}{{end}}-row-{{$.ID}}"{{end}}>
