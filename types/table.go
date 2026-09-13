@@ -138,12 +138,12 @@ type ColumnGroup struct {
 //   - auto-complete.html (filter mode Options): Value, Label, Selected, Description, Disabled
 //   - TableCell Options (select-type table cells): Value, Label, Selected
 type SelectOption struct {
-	Value       string // Option value attribute
-	Label       string // Option display text
-	Selected    bool   // Whether this option is selected
-	Description string // Optional helper text — surfaced via data-description on <option>;
+	Value       string `json:"value"`       // Option value attribute
+	Label       string `json:"label"`       // Option display text
+	Selected    bool   `json:"selected"`    // Whether this option is selected
+	Description string `json:"description"` // Optional helper text — surfaced via data-description on <option>;
 	//        must be present (even if empty) because form-group.html always reads it.
-	Disabled bool // Whether this option is disabled (auto-complete only); renders
+	Disabled bool `json:"disabled"` // Whether this option is disabled (auto-complete only); renders
 	//        the `disabled` class + aria-disabled on the option entry.
 }
 

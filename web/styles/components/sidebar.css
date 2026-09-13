@@ -1058,6 +1058,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    text-align: left;
     font-family: var(--font-body);
     font-size: var(--sidebar-fs-section); /* 11px */
     font-weight: var(--font-weight-semibold);
