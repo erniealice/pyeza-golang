@@ -368,6 +368,19 @@ type CellGridCell struct {
 	// component gates the whole affordance on {{if .NarrativeURL}}.
 	NarrativeURL string
 
+	// NarrativeBaseURL is the drawer route WITHOUT its ?outcome_id query, set by
+	// the view on an EDITABLE cell that has no outcome yet. The component renders
+	// the icon dormant (hidden, no hx-get); cell-grid.js activates it from the save
+	// ack's outcomeId (hx-get = NarrativeBaseURL + "?outcome_id=…"), so the icon
+	// appears the moment a score is saved. Ignored when NarrativeURL is set.
+	NarrativeBaseURL string
+
+	// NarrativeAriaAdd / NarrativeAriaEdit are the two editable-state accessible
+	// names, so the client can flip the label when a save creates or clears the
+	// note without knowing any vertical vocabulary. Empty on read-only cells.
+	NarrativeAriaAdd  string
+	NarrativeAriaEdit string
+
 	// HasNarrative drives the icon's two visual states: filled glyph (a narrative
 	// is recorded) vs outline glyph (none yet). Presentational only — the state is
 	// ALSO carried in NarrativeAria for assistive tech (the glyph fill is invisible

@@ -98,6 +98,43 @@
     function baselineOf(el) { return el.dataset.savedValue == null ? '' : el.dataset.savedValue; }
     function isDirty(el) { return !el.disabled && el.value !== baselineOf(el); }
 
+    // Per-cell narrative icon (message glyph). The view renders it DORMANT (hidden,
+    // no hx-get, data-narrative-base) on an editable cell that has no outcome yet;
+    // the save ack's outcomeId activates it so the icon appears the moment a score
+    // is saved — no reload. ack.hasNarrative drives the filled/outline glyph and
+    // the accessible name (both verbs are pre-composed by the view as
+    // data-aria-add / data-aria-edit, so no vocabulary lives here). A clear reply
+    // (the outcome is deleted) puts the icon back to sleep. htmx must re-process
+    // the button once its hx-get exists.
+    function syncNarrativeIcon(el, c) {
+        var td = el.closest ? el.closest('td') : null;
+        var btn = td ? td.querySelector('.cell-grid-note-btn') : null;
+        if (!btn) return;
+        var base = btn.getAttribute('data-narrative-base');
+        if (c.nextKey) {
+            // Outcome deleted → nothing left to annotate.
+            if (base) {
+                btn.removeAttribute('hx-get');
+                btn.hidden = true;
+                btn.classList.toggle('cell-grid-note-btn--has', false);
+                btn.classList.toggle('cell-grid-note-btn--empty', true);
+                btn.setAttribute('data-has-narrative', 'false');
+            }
+            return;
+        }
+        if (c.outcomeId && base) {
+            btn.setAttribute('hx-get', base + '?outcome_id=' + encodeURIComponent(c.outcomeId));
+            btn.hidden = false;
+            if (window.htmx && typeof window.htmx.process === 'function') window.htmx.process(btn);
+        }
+        var has = !!c.hasNarrative;
+        btn.classList.toggle('cell-grid-note-btn--has', has);
+        btn.classList.toggle('cell-grid-note-btn--empty', !has);
+        btn.setAttribute('data-has-narrative', has ? 'true' : 'false');
+        var label = btn.getAttribute(has ? 'data-aria-edit' : 'data-aria-add');
+        if (label) btn.setAttribute('aria-label', label);
+    }
+
     function setState(el, s) {
         el.setAttribute('data-cg-state', s);
         if (s !== 'error') el.removeAttribute('aria-invalid');
@@ -105,8 +142,14 @@
     function setStatus(el, text) {
         var id = el.getAttribute('aria-describedby');
         if (!id) return;
-        var region = document.getElementById(id);
-        if (region) region.textContent = text || '';
+        var ids = id.split(/\s+/);
+        for (var i = 0; i < ids.length; i++) {
+            var region = document.getElementById(ids[i]);
+            if (region && region.classList && region.classList.contains('cell-grid-cell-status')) {
+                region.textContent = text || '';
+                return;
+            }
+        }
     }
 
     // --- manual batch: dirty-tracking + Save-button state (Layer 1) ---------
@@ -331,6 +374,7 @@
                         st.pending.set(canonicalName, pe);
                     }
                 }
+                syncNarrativeIcon(el, c);
                 var canonical = (c.value == null) ? el.value : String(c.value);
                 if (nextKey) canonical = '';
                 var liveRev = el.dataset.cgRev || '0';
@@ -591,6 +635,7 @@
     window.lf.ui.cellGrid = {
         RESULT_EVENT: RESULT_EVENT,
         _handleResult: handleResult,
+        _syncNarrativeIcon: syncNarrativeIcon,
         _queueCell: queueCell,
         _stateFor: stateFor,
         _flush: flush

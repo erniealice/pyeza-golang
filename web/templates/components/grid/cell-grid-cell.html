@@ -141,10 +141,12 @@ directly (html/template prints the pointer address, not the value).
         <span class="cell-grid-cell--empty" aria-hidden="true" title="multi_check (V2)">—</span>
         {{end}}
 
-        {{/* Narrative icon on an editable, already-recorded cell (an outcome
-             exists) — opens the drawer in add/edit mode. Suppressed on a
-             not-yet-recorded editable cell (NarrativeURL unset by the view). */}}
-        {{if $cell.NarrativeURL}}{{template "cell-grid-note-btn" $cell}}{{end}}
+        {{/* Narrative icon on an editable cell — opens the drawer in add/edit mode.
+             Recorded cell (NarrativeURL set): live. Not-yet-recorded editable cell
+             (NarrativeBaseURL set): rendered DORMANT (hidden, no hx-get) and
+             activated by cell-grid.js from the save ack's outcomeId, so the icon
+             appears as soon as a score is saved. Neither set ⇒ no icon. */}}
+        {{if or $cell.NarrativeURL $cell.NarrativeBaseURL}}{{template "cell-grid-note-btn" $cell}}{{end}}
     {{end}}
 </td>
 {{end}}
@@ -161,7 +163,10 @@ directly (html/template prints the pointer address, not the value).
 <button type="button"
         {{with .NarrativeBtnID}}id="{{.}}"{{end}}
         class="cell-grid-note-btn{{if .HasNarrative}} cell-grid-note-btn--has{{else}} cell-grid-note-btn--empty{{end}}"
-        hx-get="{{.NarrativeURL}}"
+        {{if .NarrativeURL}}hx-get="{{.NarrativeURL}}"{{else}}hidden{{end}}
+        {{with .NarrativeBaseURL}}data-narrative-base="{{.}}"{{end}}
+        {{with .NarrativeAriaAdd}}data-aria-add="{{.}}"{{end}}
+        {{with .NarrativeAriaEdit}}data-aria-edit="{{.}}"{{end}}
         hx-target="#sheetContent"
         hx-swap="innerHTML"
         hx-push-url="false"

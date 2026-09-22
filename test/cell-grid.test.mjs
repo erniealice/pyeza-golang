@@ -49,6 +49,7 @@ function makeInput(o) {
             if (sel.indexOf('cell-grid-card') >= 0) return this._card;
             if (sel.indexOf('cell-grid-input') >= 0) return this;
             if (sel.indexOf('cell-grid-form') >= 0) return this._form;
+            if (sel === 'td') return this._td || null;
             return null;
         },
         _attrs: attrs,
@@ -347,4 +348,98 @@ test('batch fallback: a non-auto (legacy) grid does NOT auto-queue on focusout',
     assert.equal(AJAX_CALLS.length, 0, 'legacy grid keeps manual batch-only behavior');
     // The exposed edit-mode API is still present for the auto grids.
     assert.equal(WIN.lf.ui.cellGrid.RESULT_EVENT, 'omcell-result');
+});
+
+function makeNoteButton(o) {
+    const attrs = Object.assign({ hidden: '1' }, o || {});
+    const classes = new Set(['cell-grid-note-btn', 'cell-grid-note-btn--empty']);
+    return {
+        hidden: true,
+        classList: {
+            toggle(c, on) { if (on) classes.add(c); else classes.delete(c); },
+            contains(c) { return classes.has(c); },
+        },
+        getAttribute(k) { return Object.prototype.hasOwnProperty.call(attrs, k) ? attrs[k] : null; },
+        setAttribute(k, v) { attrs[k] = String(v); },
+        removeAttribute(k) { delete attrs[k]; },
+        _attrs: attrs,
+    };
+}
+
+test('narrative icon: the save ack activates the dormant icon (hx-get from outcomeId, filled glyph, edit label)', () => {
+    boot();
+    const processed = [];
+    WIN.htmx.process = (el) => processed.push(el);
+    const cell = makeInput({ name: 'new.JT1:CR1', row: 0, col: 0, saved: '' });
+    const btn = makeNoteButton({
+        'data-narrative-base': '/action/outcome-matrix/T1/narrative',
+        'data-aria-add': 'Add narrative for A, B',
+        'data-aria-edit': 'Edit narrative for A, B',
+    });
+    cell._td = { querySelector: (sel) => (sel === '.cell-grid-note-btn' ? btn : null) };
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    cell.value = '4'; cell.dataset.cgRev = '1';
+    fire('focusout', cell);
+    runTimers();
+    fire('omcell-result', AJAX_CALLS[0].ctx.target, {
+        detail: { cells: [{ key: 'new.JT1:CR1', ok: true, outcomeId: 'OID9', value: '4', hasNarrative: true, ratingFresh: true }] },
+    });
+
+    assert.equal(btn.hidden, false, 'icon becomes visible once an outcome exists');
+    assert.equal(btn.getAttribute('hx-get'), '/action/outcome-matrix/T1/narrative?outcome_id=OID9');
+    assert.equal(processed[0], btn, 'htmx re-processes the button so hx-get takes effect');
+    assert.ok(btn.classList.contains('cell-grid-note-btn--has'), 'auto-filled note ⇒ filled glyph');
+    assert.equal(btn.getAttribute('data-has-narrative'), 'true');
+    assert.equal(btn.getAttribute('aria-label'), 'Edit narrative for A, B');
+});
+
+test('narrative icon: no description ⇒ outline glyph + add label; a clear ack puts the icon back to sleep', () => {
+    boot();
+    WIN.htmx.process = () => {};
+    const cell = makeInput({ name: 'new.JT1:CR1', row: 0, col: 0, saved: '' });
+    const btn = makeNoteButton({
+        'data-narrative-base': '/action/outcome-matrix/T1/narrative',
+        'data-aria-add': 'Add narrative for A, B',
+        'data-aria-edit': 'Edit narrative for A, B',
+    });
+    cell._td = { querySelector: () => btn };
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    cell.value = '7'; cell.dataset.cgRev = '1';
+    fire('focusout', cell);
+    runTimers();
+    fire('omcell-result', AJAX_CALLS[0].ctx.target, {
+        detail: { cells: [{ key: 'new.JT1:CR1', ok: true, outcomeId: 'OID9', value: '7', ratingFresh: true }] },
+    });
+    assert.equal(btn.hidden, false);
+    assert.ok(btn.classList.contains('cell-grid-note-btn--empty'));
+    assert.equal(btn.getAttribute('aria-label'), 'Add narrative for A, B');
+
+    // Clear the score → the outcome (and its note) is deleted → icon sleeps again.
+    cell.value = ''; cell.dataset.cgRev = '2';
+    fire('focusout', cell);
+    runTimers();
+    fire('omcell-result', AJAX_CALLS[AJAX_CALLS.length - 1].ctx.target, {
+        detail: { cells: [{ key: 'cells.OID9', ok: true, nextKey: 'new.JT1:CR1', value: '', ratingFresh: true }] },
+    });
+    assert.equal(btn.hidden, true);
+    assert.equal(btn.getAttribute('hx-get'), null, 'no live drawer URL for a deleted outcome');
+});
+
+test('narrative icon: a cell without an icon is untouched by acks', () => {
+    boot();
+    const cell = makeInput({ name: 'new.JT1:CR1', row: 0, col: 0, saved: '' });
+    cell._td = { querySelector: () => null };
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+    cell.value = '4'; cell.dataset.cgRev = '1';
+    fire('focusout', cell);
+    runTimers();
+    fire('omcell-result', AJAX_CALLS[0].ctx.target, {
+        detail: { cells: [{ key: 'new.JT1:CR1', ok: true, outcomeId: 'OID9', value: '4', ratingFresh: true }] },
+    });
+    assert.equal(cell.name, 'cells.OID9');
 });

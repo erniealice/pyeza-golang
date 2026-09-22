@@ -507,6 +507,23 @@
 }
 
 .cell-grid-unit {
+    flex: 0 0 auto;
+    padding-right: var(--cg-cell-pad-x);
+}
+
+.cell-grid-rating-description {
+    flex: 0 0 100%;
+    display: block;
+    min-height: 0;
+    padding: 0 var(--cg-cell-pad-x) var(--spacing-2xs);
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    line-height: var(--leading-tight);
+    text-align: left;
+    white-space: normal;
+}
+
+.cell-grid-unit {
     color: var(--text-muted);
     font-size: var(--text-xs);
 }
@@ -566,8 +583,9 @@
     position: relative;
 }
 
-.cell-grid-cell:has(> .cell-grid-note-btn) .cell-grid-input,
-.cell-grid-cell:has(> .cell-grid-note-btn) .cell-grid-cell--value {
+/* A dormant icon (hidden until a save ack activates it) reserves no slot. */
+.cell-grid-cell:has(> .cell-grid-note-btn:not([hidden])) .cell-grid-input,
+.cell-grid-cell:has(> .cell-grid-note-btn:not([hidden])) .cell-grid-cell--value {
     padding-right: calc(var(--cg-cell-pad-x) + var(--cg-note-slot));
 }
 
@@ -588,6 +606,10 @@
     vertical-align: middle;
     line-height: 0;
     transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.cell-grid-note-btn[hidden] {
+    display: none;
 }
 
 .cell-grid-note-btn svg {
