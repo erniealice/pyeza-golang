@@ -688,6 +688,7 @@ type PrimaryAction struct {
 	Href            string // Button href (for link-based actions)
 	Icon            string // Icon template name (e.g., "icon-plus")
 	ActionURL       string // HTMX action URL for form loading
+	SheetTitle      string // Optional ActionURL sheet title; empty uses Label
 	Disabled        bool   // If true, render as disabled button (no click, no HTMX)
 	DisabledTooltip string // Tooltip shown when hovering over disabled button
 	TestID          string // Optional custom data-testid attribute for the button

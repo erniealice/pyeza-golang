@@ -300,7 +300,7 @@
                 hx-target="#sheetContent"
                 hx-swap="innerHTML"
                 hx-push-url="false"
-                data-lf-action="sheet-open" data-lf-sheet-title="{{.PrimaryAction.Label}}">
+                data-lf-action="sheet-open" data-lf-sheet-title="{{if .PrimaryAction.SheetTitle}}{{.PrimaryAction.SheetTitle}}{{else}}{{.PrimaryAction.Label}}{{end}}">
             {{if eq .PrimaryAction.Icon "icon-plus"}}{{template "icon-plus" .}}{{end}}
             {{.PrimaryAction.Label}}
         </button>

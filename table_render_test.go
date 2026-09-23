@@ -106,8 +106,29 @@ func TestPrimaryAction_ActionURL_Unaffected(t *testing.T) {
 	if !strings.Contains(out, `hx-get="/action/outcome/template-settings/x"`) {
 		t.Errorf("ActionURL branch must still render the hx-get drawer button; got: %s", out)
 	}
+	if !strings.Contains(out, `data-lf-sheet-title="Manage template"`) {
+		t.Errorf("empty SheetTitle must keep the existing Label fallback; got: %s", out)
+	}
 	if strings.Contains(out, "download") || strings.Contains(out, `hx-boost="false"`) {
 		t.Errorf("ActionURL branch must not gain download/hx-boost; got: %s", out)
+	}
+}
+
+func TestPrimaryAction_ActionURL_SheetTitle(t *testing.T) {
+	cfg := types.TableConfig{
+		ID: "report-cards-grid",
+		PrimaryAction: &types.PrimaryAction{
+			Label:      "Download",
+			SheetTitle: "Download Section Grades",
+			ActionURL:  "/action/report-cards/section/sg-1/download",
+		},
+	}
+	out := renderNamed(t, "table-toolbar", cfg)
+	if !strings.Contains(out, `data-lf-sheet-title="Download Section Grades"`) {
+		t.Errorf("ActionURL primary action must use the configured sheet title; got: %s", out)
+	}
+	if !strings.Contains(out, `hx-get="/action/report-cards/section/sg-1/download"`) {
+		t.Errorf("ActionURL primary action lost its drawer URL; got: %s", out)
 	}
 }
 
