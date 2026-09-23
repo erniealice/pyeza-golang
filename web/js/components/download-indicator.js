@@ -23,18 +23,24 @@
  *      expires the cookie. A 60s timeout instead dismisses the spinner and shows
  *      an auto-dismissing warning toast.
  *
- * It also owns the DOWNLOAD FRAME (20260726): download FORMS are retargeted at
- * a persistent hidden iframe, because a top-level submit whose response carries
+ * It also owns the legacy DOWNLOAD FRAME (20260726): forms marked
+ * `data-download-form` are retargeted at a persistent hidden iframe, because a top-level submit whose response carries
  * no Content-Disposition RENDERS — replacing the operator's page with a bare
  * error body and changing the URL. See ensureFrame() for the measured case. A
  * load event in that frame is therefore a failure signal, and the server's own
  * message is surfaced as an error toast instead of the spinner running to its
  * 60s timeout.
  *
- * Progressive enhancement: the delegated listeners AUGMENT the native trigger
- * (they never preventDefault) — with JS disabled every download still works,
- * just without the indicator (and without the frame, i.e. the old page-replacing
- * error behaviour). Labels come from <body data-lf-download-*> (set by the app
+ * Drawer forms marked `data-lf-download-form` use a fetch-based path: button and
+ * in-drawer status regions follow the request lifecycle, successful blobs are
+ * saved with their response filename, and plain-text errors stay in the drawer.
+ * This marker is distinct from the legacy `data-download-form` iframe path.
+ *
+ * Progressive enhancement: unmarked triggers and legacy forms AUGMENT the
+ * native trigger — with JS disabled they still download, just without the
+ * indicator (and without the frame, i.e. the old page-replacing error
+ * behaviour). Marked drawer forms require JS for their fetch/save lifecycle.
+ * Labels come from <body data-lf-download-*> (set by the app
  * shell from CommonLabels.Download); no English is hardcoded here — a failure
  * toast shows the SERVER's text, so it needs no label of its own.
  *
@@ -59,6 +65,7 @@
     var TIMEOUT_MS = 60000;
     var WARNING_DURATION_MS = 8000;
     var ALNUM = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var activeDownloadForms = new WeakSet();
 
     // token -> { toastEl, timeoutId }
     var active = Object.create(null);
@@ -231,7 +238,7 @@
     // 403. On the grade sheet that navigation also discards unsaved cells,
     // because the grid is one batch-save <form>.
     //
-    // Submitting into a persistent same-origin iframe leaves the attachment path
+    // Legacy data-download-form submissions into a persistent same-origin iframe leave the attachment path
     // byte-identical (the browser still hands it to the download manager, and
     // Set-Cookie still lands, so the token handshake below is unaffected) while
     // an error response renders INTO THE FRAME and the page never moves.
@@ -355,6 +362,131 @@
     }
 
     // ========================================
+    // FETCH-BASED DRAWER DOWNLOAD FORMS
+    // ========================================
+
+    function downloadFilename(contentDisposition) {
+        if (!contentDisposition) return 'download';
+
+        var extended = /filename\*\s*=\s*([^;]+)/i.exec(contentDisposition);
+        if (extended) {
+            var encoded = extended[1].trim().replace(/^"(.*)"$/, '$1');
+            encoded = encoded.replace(/^[^']*'[^']*'/, '');
+            try {
+                return decodeURIComponent(encoded) || 'download';
+            } catch (e) {
+                return encoded || 'download';
+            }
+        }
+
+        var standard = /filename\s*=\s*("(?:\\.|[^"])*"|[^;]*)/i.exec(contentDisposition);
+        if (!standard) return 'download';
+        var filename = standard[1].trim();
+        if (filename.charAt(0) === '"' && filename.charAt(filename.length - 1) === '"') {
+            filename = filename.slice(1, -1).replace(/\\(["\\])/g, '$1');
+        }
+        return filename || 'download';
+    }
+
+    function downloadFormURL(form, submitter) {
+        var url = new URL(form.action || window.location.href, window.location.href);
+        var formData = new FormData(form);
+        formData.forEach(function (value, name) {
+            if (typeof File !== 'undefined' && value instanceof File) {
+                value = value.name;
+            }
+            url.searchParams.append(name, String(value));
+        });
+        if (submitter && submitter.name && !submitter.disabled) {
+            url.searchParams.append(submitter.name, submitter.value);
+        }
+        return url.toString();
+    }
+
+    function showDrawerDownloadError(region, message) {
+        if (!region) return;
+        region.textContent = message;
+        region.hidden = false;
+    }
+
+    function saveDownloadBlob(blob, filename) {
+        var objectURL = window.URL.createObjectURL(blob);
+        var link = document.createElement('a');
+        link.href = objectURL;
+        link.download = filename;
+        link.hidden = true;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(function () {
+            window.URL.revokeObjectURL(objectURL);
+        }, 1000);
+    }
+
+    function handleDownloadFormSubmit(event) {
+        var form = event.target;
+        if (!form || !form.matches || !form.matches('form[data-lf-download-form]')) return;
+
+        event.preventDefault();
+        if (activeDownloadForms.has(form)) return;
+        activeDownloadForms.add(form);
+
+        var button = event.submitter || form.querySelector('button[type="submit"]');
+        var notice = form.querySelector('[data-lf-download-notice]');
+        var errorRegion = form.querySelector('[data-lf-download-error]');
+        var fallback = form.getAttribute('data-lf-download-error-fallback') || '';
+        var originalLabel = '';
+        var wasDisabled = false;
+
+        if (errorRegion) {
+            errorRegion.textContent = '';
+            errorRegion.hidden = true;
+        }
+        if (notice) notice.hidden = false;
+        if (button) {
+            if (!button.hasAttribute('data-lf-original-label')) {
+                button.setAttribute('data-lf-original-label', button.textContent);
+            }
+            originalLabel = button.getAttribute('data-lf-original-label');
+            wasDisabled = button.disabled;
+            button.disabled = true;
+            var busyLabel = button.getAttribute('data-lf-busy-label');
+            if (busyLabel !== null) button.textContent = busyLabel;
+        }
+
+        function restoreForm() {
+            if (button) {
+                button.textContent = originalLabel;
+                button.disabled = wasDisabled;
+            }
+            if (notice) notice.hidden = true;
+            activeDownloadForms.delete(form);
+        }
+
+        var request;
+        try {
+            request = fetch(downloadFormURL(form, event.submitter), {
+                credentials: 'same-origin'
+            });
+        } catch (error) {
+            request = Promise.reject(error);
+        }
+
+        request.then(function (response) {
+            if (!response.ok) {
+                return response.text().then(function (message) {
+                    showDrawerDownloadError(errorRegion, message.trim() || fallback);
+                });
+            }
+            return response.blob().then(function (blob) {
+                saveDownloadBlob(blob, downloadFilename(response.headers.get('Content-Disposition')));
+            });
+        }).catch(function () {
+            showDrawerDownloadError(errorRegion, fallback);
+        }).then(restoreForm, restoreForm);
+    }
+
+    // ========================================
     // DELEGATED TRIGGERS (survive HTMX swaps)
     // ========================================
 
@@ -365,6 +497,10 @@
     }
 
     function initDelegation() {
+        // Report-card drawers use fetch so success and server text errors stay
+        // attached to the drawer instead of navigating the page.
+        document.addEventListener('submit', handleDownloadFormSubmit);
+
         // 1. Native download anchors (report-card row PDF, client-card toolbar PDF).
         //    Rewrite href in-place before the browser follows it — never
         //    preventDefault, so a JS failure leaves the native download intact.
@@ -429,5 +565,8 @@
         begin: begin,
         withToken: withToken,
         track: track
+    };
+    window.lf.downloadForm = {
+        handleSubmit: handleDownloadFormSubmit
     };
 })();
