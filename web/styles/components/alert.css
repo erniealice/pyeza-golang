@@ -27,6 +27,12 @@
     border: var(--border-width) solid transparent;
 }
 
+/* `display: flex` above would otherwise override the [hidden] attribute, so
+   script-toggled alerts (e.g. download notice/error regions) stayed visible. */
+.alert[hidden] {
+    display: none;
+}
+
 /* ========================================
    ALERT ICON
    ======================================== */
