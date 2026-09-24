@@ -41,7 +41,7 @@ before a range with `=` inside the loop.
     </tr>
     <tr class="cell-grid-row--l3">
         {{range .Columns}}{{range .Level2}}{{range .Level3}}
-        <th class="cell-grid-l3{{if .FrozenCol}} cell-grid-col--frozen{{end}}" scope="col">{{.Label}}</th>
+        <th class="cell-grid-l3{{if .FrozenCol}} cell-grid-col--frozen{{end}}{{with $.CriteriaWidthClass}} {{.}}{{end}}{{if $.HeadPreLine}} lf-cell-grid__crit--preline{{end}}" scope="col">{{.Label}}</th>
         {{end}}{{end}}{{end}}
     </tr>
 </thead>

@@ -29,7 +29,7 @@ dot inside cell-grid-cell then reads .Cell (CellGridCell) and .Col (CellGridLeve
         <th scope="colgroup" colspan="{{$grid.BandColSpan}}" class="cell-grid-group-band"><span class="cell-grid-group-label">{{.GroupLabel}}</span></th>
     </tr>
     {{end}}
-    <tr class="cell-grid-row" data-testid="{{.TestID}}"{{range $k, $v := .DataAttrs}} data-{{$k}}="{{$v}}"{{end}}>
+    <tr class="cell-grid-row{{with $grid.CriteriaWidthClass}} {{.}}-row{{end}}" data-testid="{{.TestID}}"{{range $k, $v := .DataAttrs}} data-{{$k}}="{{$v}}"{{end}}>
         <th scope="row"
             class="cell-grid-rowhead{{if $grid.FreezeFirstCol}} cell-grid-col--frozen{{end}}"
             data-testid="om-client-{{.ID}}">{{with .Label}}{{.}}{{else}}{{$row.ID}}{{end}}{{if .Description}}<span class="cell-grid-rowhead-desc">{{.Description}}</span>{{end}}</th>

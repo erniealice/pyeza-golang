@@ -31,6 +31,10 @@ type CellGridConfig struct {
 	ID        string
 	Caption   string // accessible caption for screen readers
 	CardClass string // extra CSS class on the outer .cell-grid-card
+	// CriteriaWidth selects an allowlisted rem width for level-3 columns.
+	CriteriaWidth string
+	// HeadPreLine renders newline characters in level-3 header labels.
+	HeadPreLine bool
 
 	// Freeze config — CSS position:sticky applied by the component template.
 	FreezeFirstCol   bool // true → client-name column gets sticky left
@@ -132,6 +136,16 @@ type CellGridConfig struct {
 	// cell-grid-card, the outer PageData.WorkspaceID is not reachable — the view
 	// handler must copy it in explicitly.
 	WorkspaceID string
+}
+
+// CriteriaWidthClass ignores unknown values so callers cannot inject CSS classes.
+func (c *CellGridConfig) CriteriaWidthClass() string {
+	switch c.CriteriaWidth {
+	case "8", "10", "12", "14", "16":
+		return "lf-cell-grid__crit--w" + c.CriteriaWidth
+	default:
+		return ""
+	}
 }
 
 // ResultEventName returns the HX-Trigger event name the AutoSave client binds

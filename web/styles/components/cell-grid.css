@@ -437,6 +437,21 @@
     vertical-align: middle;
 }
 
+.lf-cell-grid__crit--w8 { width: 8rem; min-width: 8rem; max-width: 8rem; }
+.lf-cell-grid__crit--w10 { width: 10rem; min-width: 10rem; max-width: 10rem; }
+.lf-cell-grid__crit--w12 { width: 12rem; min-width: 12rem; max-width: 12rem; }
+.lf-cell-grid__crit--w14 { width: 14rem; min-width: 14rem; max-width: 14rem; }
+.lf-cell-grid__crit--w16 { width: 16rem; min-width: 16rem; max-width: 16rem; }
+.lf-cell-grid__crit--preline,
+.cell-grid-thead th.lf-cell-grid__crit--preline { white-space: pre-line; text-align: left; }
+
+/* The body template owns rows; its leaf cells render in cell-grid-cell. */
+.cell-grid-row.lf-cell-grid__crit--w8-row > .cell-grid-cell { width: 8rem; min-width: 8rem; max-width: 8rem; }
+.cell-grid-row.lf-cell-grid__crit--w10-row > .cell-grid-cell { width: 10rem; min-width: 10rem; max-width: 10rem; }
+.cell-grid-row.lf-cell-grid__crit--w12-row > .cell-grid-cell { width: 12rem; min-width: 12rem; max-width: 12rem; }
+.cell-grid-row.lf-cell-grid__crit--w14-row > .cell-grid-cell { width: 14rem; min-width: 14rem; max-width: 14rem; }
+.cell-grid-row.lf-cell-grid__crit--w16-row > .cell-grid-cell { width: 16rem; min-width: 16rem; max-width: 16rem; }
+
 /* The input has NO border/radius/background of its own — the cell's gridlines
    are the grid, and the input is a transparent editable surface filling the
    whole cell. Hover/focus/state tints show through because the background is
