@@ -41,6 +41,18 @@ type SidebarCurrentUser struct {
 	BillingURL     string // e.g. /app/billing
 	PreferencesURL string // e.g. /app/preferences
 
+	// ShowSwitchPrincipal gates the "Switch Role" menu item (canonical:
+	// principal / switch_principal). True only when the signed-in user holds
+	// MORE THAN ONE selectable principal binding — e.g. an operator
+	// workspace_user binding plus a staff binding, or bindings across more
+	// than one workspace. Computed server-side (DBUserLoader) from the same
+	// resolver the /auth/select-workspace-role chooser uses; never set from
+	// user input.
+	ShowSwitchPrincipal bool
+	// SwitchPrincipalURL is the chooser page's URL, e.g.
+	// /auth/select-workspace-role. Empty when ShowSwitchPrincipal is false.
+	SwitchPrincipalURL string
+
 	// Logout URL — the GET endpoint that renders a "signing out…" loading
 	// page and POSTs to LogoutActionURL on load.
 	LogoutURL       string // GET /auth/logout

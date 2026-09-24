@@ -167,8 +167,8 @@
 
     {{if .Sidebar.CurrentUser.UserID}}
     {{/* Bottom-of-sidebar profile button + upward popover menu.
-         Data sourced per-request by UserLoader (apps/service-admin/internal/
-         infrastructure/input/http/user_loader.go) → SidebarConfig.CurrentUser.
+         Data sourced per-request by DBUserLoader (packages/espyna-golang/
+         consumer/http/loaders.go, wired in finalize.go) → SidebarConfig.CurrentUser.
          Labels via lyngua keys under "sidebarProfile.*" in
          packages/lyngua/translations/en/general/sidebar.json. */}}
     <div class="sidebar-profile" id="sidebarProfile" data-sidebar-profile>
@@ -189,6 +189,20 @@
                 <span class="sidebar-profile-menu-icon">{{template "icon-sliders-horizontal"}}</span>
                 <span class="sidebar-profile-menu-label">{{.T "sidebar_profile.preferences"}}</span>
             </a>
+            {{/* Multi-principal only (ShowSwitchPrincipal — DBUserLoader,
+                 packages/espyna-golang/consumer/http/loaders.go): hidden for a
+                 single-principal user. Target is the top-level, always-live
+                 /auth/select-workspace-role chooser (personal.switch_principal),
+                 which re-resolves the caller's principal cards fresh on GET —
+                 no query param or session-clearing needed. hx-boost="false":
+                 the chooser is a standalone full document (auth shell), so a
+                 boosted swap into #main-content would render it unstyled. */}}
+            {{if .Sidebar.CurrentUser.ShowSwitchPrincipal}}
+            <a href="{{.Sidebar.CurrentUser.SwitchPrincipalURL}}" class="sidebar-profile-menu-item" role="menuitem" hx-boost="false" data-testid="sidebar-profile-menu-switch-principal">
+                <span class="sidebar-profile-menu-icon">{{template "icon-switch"}}</span>
+                <span class="sidebar-profile-menu-label">{{.T "sidebar_profile.switch_principal"}}</span>
+            </a>
+            {{end}}
             <div class="sidebar-profile-menu-divider" role="separator"></div>
             <form method="POST" action="{{.Sidebar.CurrentUser.LogoutActionURL}}" class="sidebar-profile-menu-form" role="none">
                 <button type="submit" class="sidebar-profile-menu-item sidebar-profile-menu-item--danger" role="menuitem" data-testid="sidebar-profile-menu-logout">
@@ -214,9 +228,15 @@
                  loader now guarantees non-empty names; this is the second
                  belt. */}}
             <span class="sidebar-profile-avatar" aria-hidden="true">{{if .Sidebar.CurrentUser.FirstName}}{{slice .Sidebar.CurrentUser.FirstName 0 1}}{{end}}{{if .Sidebar.CurrentUser.LastName}}{{slice .Sidebar.CurrentUser.LastName 0 1}}{{end}}</span>
+            {{/* Line 1: full name (first + last). Line 2: email address — NOT
+                 last name. UserDisplay/SidebarCurrentUser guarantee a
+                 non-empty Email whenever a real name was resolved (DBUserLoader
+                 fills it from the same read as the name, or from the gate-free
+                 self-display fallback); an empty Email here means the loader
+                 itself had nothing to show (pre-session / no identity). */}}
             <span class="sidebar-profile-name">
-                <span class="sidebar-profile-name-first">{{.Sidebar.CurrentUser.FirstName}}</span>
-                <span class="sidebar-profile-name-last">{{.Sidebar.CurrentUser.LastName}}</span>
+                <span class="sidebar-profile-name-first">{{.Sidebar.CurrentUser.FirstName}}{{if and .Sidebar.CurrentUser.FirstName .Sidebar.CurrentUser.LastName}} {{end}}{{.Sidebar.CurrentUser.LastName}}</span>
+                <span class="sidebar-profile-name-last">{{.Sidebar.CurrentUser.Email}}</span>
             </span>
             <span class="sidebar-profile-chevron" aria-hidden="true">{{template "icon-chevron-up"}}</span>
         </button>
