@@ -164,6 +164,16 @@
         event.detail._sheetHandled = true;
 
         var successful = event.detail.successful;
+        // htmx 1.9 returns early for HX-Redirect / HX-Refresh / HX-Location
+        // responses, before it sets detail.successful, so a 2xx response that
+        // navigates arrives here as undefined. Derive it from the status the
+        // way htmx does (>= 400 is an error) instead of treating it as a failure.
+        if (successful === undefined) {
+            successful = xhr.status >= 200 && xhr.status < 400;
+        }
+        var navigating = !!(xhr.getResponseHeader('HX-Redirect') ||
+            xhr.getResponseHeader('HX-Location') ||
+            xhr.getResponseHeader('HX-Refresh') === 'true');
 
         if (successful) {
             // Default behavior: close drawer on success
@@ -193,7 +203,10 @@
             } catch (e) { /* ignore parse errors */ }
 
             // Refresh the table after a brief delay to let the close animation start.
-            setTimeout(function() { refreshTable(targetTableID); }, 400);
+            // A navigating response (redirect/refresh/location) already reloads the page.
+            if (!navigating) {
+                setTimeout(function() { refreshTable(targetTableID); }, 400);
+            }
         } else {
             // Soft block path: when the server signals a re-render via
             // HX-Reswap + HX-Retarget (e.g. recognize-revenue idempotency
