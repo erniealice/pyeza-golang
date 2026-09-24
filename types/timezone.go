@@ -3,6 +3,9 @@ package types
 import (
 	"context"
 	"time"
+	// Embedded zoneinfo: DefaultTimezone must resolve on minimal container
+	// images (Alpine ships no tzdata), otherwise every render falls back to UTC.
+	_ "time/tzdata"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
