@@ -72,6 +72,7 @@ directly (html/template prints the pointer address, not the value).
                    {{with $input.MaxAttr}}max="{{.}}"{{end}}
                    {{with $input.StepAttr}}step="{{.}}"{{end}}
                    data-decimals="{{$input.Decimals}}"
+                   {{if $input.ResubmitSameValue}}data-resubmit-same="true"{{end}}
                    {{if $cell.ReadOnly}}disabled aria-disabled="true"{{end}}
                    data-testid="{{$cell.TestID}}">
             {{with $input.Unit}}<span class="cell-grid-unit">{{.}}</span>{{end}}

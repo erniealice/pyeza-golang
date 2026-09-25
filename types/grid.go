@@ -256,6 +256,14 @@ type CellInputDescriptor struct {
 	// Text enforcement (Type = "text")
 	MaxLength *int   // outcome_criteria.max_text_length
 	Prompt    string // outcome_criteria.text_prompt (rendered as placeholder)
+
+	// ResubmitSameValue controls whether the cell submits an equal value on an
+	// intentional commit (Enter, or the value re-typed then blur). When true,
+	// the cell renders data-resubmit-same="true"; arrow/Tab navigation and
+	// passive blur keep the existing dirty check. Typically set for
+	// description-mode cells where the same value needs to trigger descriptor
+	// resolution (Q14, schema-proposal §5).
+	ResubmitSameValue bool
 }
 
 // MinAttr / MaxAttr / StepAttr / MaxLengthAttr return the HTML-attribute-ready

@@ -87,3 +87,39 @@ func TestCellGridRecordedNarrativeIconIsLive(t *testing.T) {
 		t.Errorf("recorded icon must not carry the hidden attribute:\n%s", out)
 	}
 }
+
+// A numeric cell with ResubmitSameValue renders data-resubmit-same="true";
+// without it, the attribute is absent.
+func TestCellGridNumericCellResubmitAttributeOnlyWhenFlagged(t *testing.T) {
+	// Unflagged cell must NOT render the attribute
+	colUnflagged := types.CellGridLevel3{
+		ColumnKey: "task-1:criterion-1",
+		CellInput: types.CellInputDescriptor{Type: "numeric", ResubmitSameValue: false},
+	}
+	out := renderNamed(t, "cell-grid-cell", map[string]any{
+		"Cell": types.CellGridCell{
+			OutcomeID: "outcome-1", Value: "4", Editable: true,
+			InputID: "om-in-1", StatusID: "om-in-1-st", TestID: "om-cell-1-criterion",
+		},
+		"Col": colUnflagged,
+	})
+	if strings.Contains(out, `data-resubmit-same="true"`) {
+		t.Errorf("unflagged numeric cell must not carry data-resubmit-same:\n%s", out)
+	}
+
+	// Flagged cell must render the attribute
+	colFlagged := types.CellGridLevel3{
+		ColumnKey: "task-1:criterion-1",
+		CellInput: types.CellInputDescriptor{Type: "numeric", ResubmitSameValue: true},
+	}
+	out = renderNamed(t, "cell-grid-cell", map[string]any{
+		"Cell": types.CellGridCell{
+			OutcomeID: "outcome-2", Value: "5", Editable: true,
+			InputID: "om-in-2", StatusID: "om-in-2-st", TestID: "om-cell-2-criterion",
+		},
+		"Col": colFlagged,
+	})
+	if !strings.Contains(out, `data-resubmit-same="true"`) {
+		t.Errorf("flagged numeric cell must carry data-resubmit-same=\"true\":\n%s", out)
+	}
+}

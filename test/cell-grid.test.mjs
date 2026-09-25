@@ -443,3 +443,211 @@ test('narrative icon: a cell without an icon is untouched by acks', () => {
     });
     assert.equal(cell.name, 'cells.OID9');
 });
+
+test('resubmit: Enter with same value on resubmit cell queues the save (intentional commit)', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '5', value: '5' });
+    cell.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    cell.dataset.cgRev = '0'; // no input event fired, but Enter is intentional
+    fire('keydown', cell, { key: 'Enter', preventDefault() {} });
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 1, 'Enter must queue even when value equals saved');
+    assert.equal(AJAX_CALLS[0].values['cells.a'], '5');
+});
+
+test('resubmit: re-typed same value + blur on resubmit cell queues the save (intentional commit)', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.b', row: 0, col: 0, saved: '3', value: '3' });
+    cell.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    // User types (same value) → input event fires
+    fire('input', cell);
+    assert.equal(cell.getAttribute('data-cg-input-occurred'), '1', 'input event marks occurrence');
+
+    // Then blur → focusout is intentional (input occurred + resubmit)
+    fire('focusout', cell);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 1, 'blur after input must queue even when value equals saved');
+    assert.equal(AJAX_CALLS[0].values['cells.b'], '3');
+});
+
+test('resubmit: ArrowUp/Down with same value on resubmit cell does NOT queue (not intentional)', () => {
+    boot();
+    const a = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '4', value: '4' });
+    const b = makeInput({ name: 'cells.b', row: 1, col: 0, saved: '5', value: '5' });
+    a.setAttribute('data-resubmit-same', 'true');
+    b.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [a, b] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    a.dataset.cgRev = '0';
+    fire('keydown', a, { key: 'ArrowDown', preventDefault() {} });
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 0, 'arrow navigation must not queue same value');
+    assert.equal(DOC.activeElement.name, 'cells.b', 'but focus did move');
+});
+
+test('resubmit: retyped same value then ArrowDown does NOT queue, even when the move fires focusout (reviewer 2026-09-25)', () => {
+    boot();
+    const a = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '4', value: '4' });
+    const b = makeInput({ name: 'cells.b', row: 1, col: 0, saved: '5', value: '5' });
+    a.setAttribute('data-resubmit-same', 'true');
+    b.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [a, b] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    fire('focusin', a);
+    a.dataset.cgRev = '0';
+    fire('input', a);                                  // user re-typed the same value
+    fire('keydown', a, { key: 'ArrowDown', preventDefault() {} });
+    fire('focusout', a);                               // real browsers fire this on the programmatic move
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 0, 'arrow exit after retyping the same value must keep the dirty check');
+});
+
+test('resubmit: type, Escape, then blur does NOT queue the restored value (Astra impl-1 #6)', () => {
+    boot();
+    const a = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '5', value: '5' });
+    a.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [a] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    fire('focusin', a);
+    a.value = '7';
+    fire('input', a);
+    fire('keydown', a, { key: 'Escape' });
+    fire('focusout', a);
+    runTimers();
+    assert.equal(a.value, '5', 'Escape restores the saved value');
+    assert.equal(AJAX_CALLS.length, 0, 'cancelled edit must not resubmit');
+});
+
+test('resubmit: retyped same value then Tab does NOT queue', () => {
+    boot();
+    const a = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '4', value: '4' });
+    a.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [a] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    fire('focusin', a);
+    fire('input', a);
+    fire('keydown', a, { key: 'Tab' });
+    fire('focusout', a);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 0, 'Tab exit keeps the dirty check');
+});
+
+test('resubmit: passive blur (no input event) on resubmit cell does NOT queue same value', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.c', row: 0, col: 0, saved: '2', value: '2' });
+    cell.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    cell.dataset.cgRev = '0'; // no input event fired
+    fire('focusout', cell);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 0, 'passive blur without input must not queue same value');
+});
+
+test('resubmit: Escape reverts and does not queue on resubmit cell', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.d', row: 0, col: 0, saved: '6', value: '7' });
+    cell.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    fire('keydown', cell, { key: 'Escape', preventDefault() {} });
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 0, 'Escape must not queue');
+    assert.equal(cell.value, '6', 'Escape must revert to saved value');
+});
+
+test('resubmit: disabled resubmit cell never queues even on Enter', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.e', row: 0, col: 0, saved: '9', value: '9', disabled: true });
+    cell.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    fire('keydown', cell, { key: 'Enter', preventDefault() {} });
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 0, 'disabled cells must never queue');
+});
+
+test('resubmit: unflagged cell with different value still queues (existing behavior)', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.f', row: 0, col: 0, saved: '8', value: '10' });
+    // No data-resubmit-same attribute
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    fire('focusout', cell);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 1, 'different value always queues');
+    assert.equal(AJAX_CALLS[0].values['cells.f'], '10');
+});
+
+test('resubmit: unflagged cell with same value does NOT queue on focusout (existing behavior)', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.g', row: 0, col: 0, saved: '7', value: '7' });
+    // No data-resubmit-same attribute
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    fire('focusout', cell);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 0, 'same value on unflagged cell must not queue (existing dirty check)');
+});
+
+test('resubmit: cell focus resets input-occurred flag', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.h', row: 0, col: 0, saved: '1', value: '1' });
+    cell.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    // Input event marks occurrence
+    fire('input', cell);
+    assert.equal(cell.getAttribute('data-cg-input-occurred'), '1');
+
+    // Focus clears it (as if starting fresh)
+    fire('focusin', cell);
+    assert.equal(cell.getAttribute('data-cg-input-occurred'), null);
+
+    // Later focusout without input does not queue
+    fire('focusout', cell);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 0, 'after focus reset, focusout without input does not queue');
+});
+
+test('resubmit: in-flight ack + newer edit semantics unchanged', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.i', row: 0, col: 0, saved: '11' });
+    cell.setAttribute('data-resubmit-same', 'true');
+    makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    // First edit: Enter with value 12 (different)
+    cell.value = '12'; cell.dataset.cgRev = '1';
+    fire('keydown', cell, { key: 'Enter', preventDefault() {} });
+    runTimers();
+    const flight = AJAX_CALLS[0];
+    assert.equal(flight.values['cells.i'], '12');
+
+    // User keeps typing while in flight → value 13, rev 2
+    fire('input', cell);
+    cell.value = '13';
+
+    // Stale ack arrives for the first request
+    fire('omcell-result', flight.ctx.target, {
+        detail: { cells: [{ key: 'cells.i', ok: true, value: '12', ratingFresh: true }] },
+    });
+    assert.equal(cell.value, '13', 'newer edit must survive the stale ack');
+    assert.equal(cell.getAttribute('data-cg-state'), 'dirty', 'cell still marked dirty for retry');
+});

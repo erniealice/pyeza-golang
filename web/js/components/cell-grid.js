@@ -97,6 +97,14 @@
     }
     function baselineOf(el) { return el.dataset.savedValue == null ? '' : el.dataset.savedValue; }
     function isDirty(el) { return !el.disabled && el.value !== baselineOf(el); }
+    function isResubmitCell(el) { return el.getAttribute('data-resubmit-same') === 'true'; }
+    function shouldQueueResubmit(el, isIntentional) {
+        // For resubmit cells: queue if value differs OR (same value + intentional commit)
+        // Intentional = Enter key pressed or user re-typed then blurred
+        if (!isResubmitCell(el) || el.disabled) return false;
+        if (isDirty(el)) return true; // different value always queues
+        return isIntentional && el.value === baselineOf(el);
+    }
 
     // Per-cell narrative icon (message glyph). The view renders it DORMANT (hidden,
     // no hx-get, data-narrative-base) on an editable cell that has no outcome yet;
@@ -257,8 +265,12 @@
         scheduleFlush(form);
     }
 
-    function queueIfDirty(form, el) {
-        if (isDirty(el)) queueCell(form, el);
+    function queueIfDirty(form, el, isIntentional) {
+        if (isDirty(el)) {
+            queueCell(form, el);
+        } else if (shouldQueueResubmit(el, isIntentional)) {
+            queueCell(form, el);
+        }
     }
 
     function scheduleFlush(form) {
@@ -453,6 +465,7 @@
 
     function revertCell(form, el) {
         el.value = baselineOf(el);
+        el.removeAttribute('data-cg-input-occurred'); // Escape cancels intent too (Q14)
         var st = stateFor(form);
         st.pending.delete(el.name);
         setState(el, 'clean');
@@ -510,36 +523,47 @@
         if (e.isComposing) return;              // IME composition — never intercept
         if (e.altKey || e.ctrlKey || e.metaKey) return;
 
+        // Keyboard exits decide intent HERE; consume the typed-flag first so the
+        // focusout that the move (or Tab) fires can't re-derive "intentional"
+        // (Q14: arrow/Tab keep the dirty check; Enter already queued once).
         switch (e.key) {
             case 'Escape':
                 revertCell(form, el);
                 return;
+            case 'Tab':
+                el.removeAttribute('data-cg-input-occurred');
+                return;                         // native focus move; focusout applies the dirty check
             case 'Enter':
                 e.preventDefault();             // lone input in a form would submit
-                queueIfDirty(form, el);
+                queueIfDirty(form, el, true);   // Enter is an intentional commit
+                el.removeAttribute('data-cg-input-occurred');
                 moveVertical(form, el, e.shiftKey ? -1 : 1);
                 return;
             case 'ArrowUp':
                 e.preventDefault();             // also suppresses number-input step
-                queueIfDirty(form, el);
+                queueIfDirty(form, el, false);  // arrow navigation is not intentional
+                el.removeAttribute('data-cg-input-occurred');
                 moveVertical(form, el, -1);
                 return;
             case 'ArrowDown':
                 e.preventDefault();
-                queueIfDirty(form, el);
+                queueIfDirty(form, el, false);  // arrow navigation is not intentional
+                el.removeAttribute('data-cg-input-occurred');
                 moveVertical(form, el, 1);
                 return;
             case 'ArrowLeft':
                 if (atCaretStart(el)) {
                     e.preventDefault();
-                    queueIfDirty(form, el);
+                    queueIfDirty(form, el, false);  // arrow navigation is not intentional
+                    el.removeAttribute('data-cg-input-occurred');
                     moveHorizontal(form, el, -1);
                 } // else: normal caret movement
                 return;
             case 'ArrowRight':
                 if (atCaretEnd(el)) {
                     e.preventDefault();
-                    queueIfDirty(form, el);
+                    queueIfDirty(form, el, false);  // arrow navigation is not intentional
+                    el.removeAttribute('data-cg-input-occurred');
                     moveHorizontal(form, el, 1);
                 }
                 return;
@@ -553,10 +577,15 @@
         window.__lfCellGridBound = true;
 
         // Any edit marks the batch form dirty (Layer 1) and, in auto mode, bumps
-        // the cell revision + tracks per-cell dirty state (Layer 2).
+        // the cell revision + tracks per-cell dirty state (Layer 2). For resubmit
+        // cells, track that an input event occurred (distinguishes intentional
+        // re-entry from passive navigation).
         lf.on('input', '.cell-grid-form .cell-grid-input', function () {
             var form = gridForm(this);
             markDirty(form);
+            if (isResubmitCell(this)) {
+                this.setAttribute('data-cg-input-occurred', '1');
+            }
             if (isAuto(form)) {
                 var rev = (parseInt(this.dataset.cgRev, 10) || 0) + 1;
                 this.dataset.cgRev = String(rev);
@@ -567,10 +596,21 @@
             markDirty(gridForm(this));
         });
 
+        // Reset input-occurred flag when focus lands (for resubmit tracking).
+        lf.on('focusin', '.cell-grid-form .cell-grid-input', function () {
+            if (isResubmitCell(this)) {
+                this.removeAttribute('data-cg-input-occurred');
+            }
+        });
+
         // Auto-save on leaving a changed cell (focusout BUBBLES; blur does not).
+        // For resubmit cells, focusout is an intentional commit only if input occurred.
         lf.on('focusout', '.cell-grid-form .cell-grid-input', function () {
             var form = gridForm(this);
-            if (isAuto(form)) queueIfDirty(form, this);
+            if (isAuto(form)) {
+                var isIntentional = isResubmitCell(this) && this.getAttribute('data-cg-input-occurred') === '1';
+                queueIfDirty(form, this, isIntentional);
+            }
         });
 
         // Keyboard grid navigation (auto mode only).
