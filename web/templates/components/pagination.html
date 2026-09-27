@@ -28,6 +28,7 @@ Data structure:
     {{/* Previous Button */}}
     <button class="pagination-btn pagination-prev"
             {{if not .HasPrev}}disabled{{end}}
+            {{if .PrevCursor}}data-prev-cursor="{{.PrevCursor}}"{{end}}
             data-page="{{if .HasPrev}}{{sub .CurrentPage 1}}{{else}}1{{end}}"
             aria-label="{{.Labels.Prev}}">
         {{template "icon-chevron-left"}}
@@ -52,6 +53,7 @@ Data structure:
     {{/* Next Button */}}
     <button class="pagination-btn pagination-next"
             {{if not .HasNext}}disabled{{end}}
+            {{if .NextCursor}}data-next-cursor="{{.NextCursor}}"{{end}}
             data-page="{{if .HasNext}}{{add .CurrentPage 1}}{{else}}{{.TotalPages}}{{end}}"
             aria-label="{{.Labels.Next}}">
         <span class="pagination-btn-text">{{.Labels.Next}}</span>
@@ -65,6 +67,7 @@ Data structure:
 <nav class="pagination pagination-simple" role="navigation" aria-label="Pagination">
     <button class="pagination-btn pagination-prev"
             {{if not .HasPrev}}disabled{{end}}
+            {{if .PrevCursor}}data-prev-cursor="{{.PrevCursor}}"{{end}}
             data-page="{{if .HasPrev}}{{sub .CurrentPage 1}}{{else}}1{{end}}">
         {{template "icon-chevron-left"}}
         {{.Labels.Prev}}
@@ -76,6 +79,7 @@ Data structure:
 
     <button class="pagination-btn pagination-next"
             {{if not .HasNext}}disabled{{end}}
+            {{if .NextCursor}}data-next-cursor="{{.NextCursor}}"{{end}}
             data-page="{{if .HasNext}}{{add .CurrentPage 1}}{{else}}{{.TotalPages}}{{end}}">
         {{.Labels.Next}}
         {{template "icon-chevron-right"}}
@@ -88,6 +92,7 @@ Data structure:
 <nav class="pagination pagination-compact" role="navigation" aria-label="Pagination">
     <button class="pagination-btn pagination-prev"
             {{if not .HasPrev}}disabled{{end}}
+            {{if .PrevCursor}}data-prev-cursor="{{.PrevCursor}}"{{end}}
             data-page="{{if .HasPrev}}{{sub .CurrentPage 1}}{{else}}1{{end}}"
             aria-label="Previous page">
         {{template "icon-chevron-left"}}
@@ -107,6 +112,7 @@ Data structure:
 
     <button class="pagination-btn pagination-next"
             {{if not .HasNext}}disabled{{end}}
+            {{if .NextCursor}}data-next-cursor="{{.NextCursor}}"{{end}}
             data-page="{{if .HasNext}}{{add .CurrentPage 1}}{{else}}{{.TotalPages}}{{end}}"
             aria-label="Next page">
         {{template "icon-chevron-right"}}
