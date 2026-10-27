@@ -15,7 +15,7 @@
  *   single-flight micro-batch of ONLY the dirty cells, POSTed via htmx.ajax to
  *   the same SaveURL with a hidden save_mode=cell. Per-cell acks arrive as the
  *   HX-Trigger custom event "omcell-result" (detail {cells:[{key, ok, outcomeId,
- *   nextKey, value, ratingFresh, error?}]}); a successful create renames the
+ *   nextKey, value, ratingFresh, rowCells?, error?}]}); a successful create renames the
  *   input's name from new.{jt}:{cr} to cells.{outcomeId} IN PLACE so the next
  *   save updates instead of re-creating. If an answered clear sets
  *   nextKey=new.{jt}:{cr}, the same live input renames from cells.{id} back to
@@ -32,7 +32,9 @@
  *            signed hidden fields + save_mode=cell + dirty cells only, named
  *            cells.{outcome_id} (existing) / new.{job_task_id}:{criteria_id} (new).
  *   RESPONSE HX-Trigger event "omcell-result", detail.cells[] items
- *            { key, ok, outcomeId, nextKey, value, ratingFresh, error? }.
+ *            { key, ok, outcomeId, nextKey, value, ratingFresh, rowCells?, error? }.
+ *            rowCells ({columnKey: value}) repaints the derived read-only
+ *            cells (td[data-col-key]) on the saved input's row.
  *
  * CSP: no on*=/hx-on attributes; htmx is the vendored 1.9.10 build (window.htmx).
  *
@@ -387,6 +389,7 @@
                     }
                 }
                 syncNarrativeIcon(el, c);
+                if (c.rowCells) paintRowCells(el, c.rowCells);
                 var canonical = (c.value == null) ? el.value : String(c.value);
                 if (nextKey) canonical = '';
                 var liveRev = el.dataset.cgRev || '0';
@@ -423,6 +426,34 @@
         if (sawStale) st.stale = true;
         updateNotice(form);
         recomputeDirty(form);
+    }
+
+    // Repaint the derived read-only cells (e.g. a roll-up Average/Rating) on
+    // the saved input's own row from the ack's rowCells {columnKey: value}.
+    // The server recomputed them after this save; "" renders the empty dash.
+    // Cells are addressed by the <td data-col-key> the template stamps on every
+    // non-editable cell, so a key with no such cell on this row is ignored.
+    function paintRowCells(el, rowCells) {
+        var tr = el.closest('tr');
+        if (!tr) return;
+        Object.keys(rowCells).forEach(function (colKey) {
+            var td = tr.querySelector('td[data-col-key="' + esc(colKey) + '"]');
+            if (!td) return;
+            var value = rowCells[colKey] == null ? '' : String(rowCells[colKey]);
+            var span = document.createElement('span');
+            if (value) {
+                span.className = 'cell-grid-cell--value';
+                if (td.dataset.valueTestid) span.setAttribute('data-testid', td.dataset.valueTestid);
+                span.textContent = value;
+                td.classList.add('cell-grid-cell--ro');
+            } else {
+                span.className = 'cell-grid-cell--empty';
+                span.setAttribute('aria-hidden', 'true');
+                span.textContent = '\u2014';
+                td.classList.remove('cell-grid-cell--ro');
+            }
+            td.replaceChildren(span);
+        });
     }
 
     function lingerSaved(el) {

@@ -29,6 +29,10 @@ href-less <a>) opening the drawer via the sheet-open trigger convention (the
 download-drawer precedent). $cell.TextValue is retained on the type for legacy
 callers but is no longer rendered here.
 
+A non-editable <td> carries data-col-key (+ data-value-testid when the cell has
+a TestID) so cell-grid.js can repaint a derived read-only cell (e.g. a roll-up
+Average/Rating) from an ack's rowCells without a reload.
+
 Pointer enforcement fields (Min/Max/Step/MaxLength) are read via the *Attr()
 methods on CellInputDescriptor — a *float64 / *int cannot be interpolated
 directly (html/template prints the pointer address, not the value).
@@ -45,7 +49,7 @@ directly (html/template prints the pointer address, not the value).
      recorded_by != "" — but the two are not the SAME signal, so this
      doesn't rely on that coincidence holding forever). */ -}}
 {{- $showRO := or $cell.ReadOnly (and (not $cell.Editable) $cell.Value) -}}
-<td class="cell-grid-cell{{if $showRO}} cell-grid-cell--ro{{end}}"{{if $showRO}} title="{{$cell.ReadOnlyTooltip}}"{{end}}>
+<td class="cell-grid-cell{{if $showRO}} cell-grid-cell--ro{{end}}"{{if $showRO}} title="{{$cell.ReadOnlyTooltip}}"{{end}}{{if not $cell.Editable}} data-col-key="{{$col.ColumnKey}}"{{with $cell.TestID}} data-value-testid="{{.}}"{{end}}{{end}}>
     {{if not $cell.Editable}}
         {{- /* Non-editable ≠ empty: a viewer without write access still sees
              the recorded value; the dash is reserved for truly empty cells. */ -}}
