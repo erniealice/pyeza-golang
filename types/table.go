@@ -207,6 +207,10 @@ type TableCell struct {
 	// When empty, the template falls back to a single-line .Value rendering.
 	DateText string // Date portion (e.g., "Jan 02, 2026")
 	TimeText string // Time portion (e.g., "3:04 PM")
+	// Badges, for "badge" type, renders several badges in one cell (in slice
+	// order) instead of the single Value/Variant badge. Nil for every existing
+	// badge cell, so the single-badge markup is unchanged.
+	Badges []BadgeData
 	// Composite fields for "composite" type — a typed count + optional per-status
 	// chip distribution + optional "eye" deep-link, rendered ENTIRELY from typed
 	// fields (never template.HTML). Nil for every non-composite cell, so string
@@ -221,6 +225,15 @@ type TableCell struct {
 	// the raw centavo integer instead of the formatted decimal, or an enum's
 	// machine code instead of its localized label).
 	CSVValue string
+}
+
+// BadgeData is one badge of a multi-badge "badge" cell (TableCell.Badges). It
+// renders with the cell's badge class (BadgeType) and its own Variant token.
+type BadgeData struct {
+	Label   string // visible badge text
+	Variant string // pyeza badge variant token (theme-aware; never a raw hex)
+	Status  string // optional machine state, rendered as data-status for tests/filters
+	TestID  string // optional data-testid on the badge span
 }
 
 // CellCSV returns the canonical CSV-export representation of a TableCell.
@@ -253,6 +266,15 @@ func CellCSV(c TableCell) string {
 			return c.DateText + " " + c.TimeText
 		}
 		return c.Value
+	case "badge":
+		if len(c.Badges) == 0 {
+			return c.Value
+		}
+		out := make([]string, 0, len(c.Badges))
+		for _, b := range c.Badges {
+			out = append(out, b.Label)
+		}
+		return joinSemi(out)
 	case "chips":
 		out := make([]string, 0, len(c.Chips))
 		for _, ch := range c.Chips {
@@ -281,7 +303,7 @@ func CellCSV(c TableCell) string {
 		// CSVValue when this matters; default to Value (often empty for html cells).
 		return c.Value
 	default:
-		// text, name, link, email, phone, badge, select, input, "" — Value is the
+		// text, name, link, email, phone, select, input, "" — Value is the
 		// human-meaningful payload in every case.
 		return c.Value
 	}

@@ -40,7 +40,7 @@
     {{$badgeClass = "type-badge"}}
     {{- end -}}
 {{end}}
-<span class="{{$badgeClass}} {{.Variant}}">{{.Value}}</span>
+{{if .Badges}}<div class="table-cell-chips"{{if .TestID}} data-testid="{{.TestID}}"{{end}}>{{range .Badges}}<span class="{{$badgeClass}} {{.Variant}}"{{if .Status}} data-status="{{.Status}}"{{end}}{{if .TestID}} data-testid="{{.TestID}}"{{end}}>{{.Label}}</span>{{end}}</div>{{else}}<span class="{{$badgeClass}} {{.Variant}}">{{.Value}}</span>{{end}}
 {{end}}
 
 {{/* LINK CELL */}}

@@ -30,6 +30,12 @@
     user-select: none;
 }
 
+/* `display: inline-flex` above would otherwise override the [hidden] attribute,
+   so script-toggled buttons (e.g. bulk-download Stop/Retry/Save) stayed visible. */
+.btn[hidden] {
+    display: none;
+}
+
 .btn:focus-visible {
     outline: var(--border-width-focus) solid var(--accent-primary);
     outline-offset: var(--border-width-focus);

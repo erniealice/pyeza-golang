@@ -2,6 +2,7 @@ package pyeza
 
 import (
 	"bytes"
+	htmltemplate "html/template"
 	"strings"
 	"testing"
 
@@ -354,5 +355,92 @@ func TestCompositeCell_Render_NoPayload_Regression(t *testing.T) {
 		if strings.Contains(out, leak) {
 			t.Errorf("non-composite cell must not contain %q; got: %s", leak, out)
 		}
+	}
+}
+
+// --- Multi-badge "badge" cell (TableCell.Badges) ---------------------------
+
+// preBadgesTemplate is the table-cell-badge definition as it stood before
+// TableCell.Badges existed. The single-badge path must render byte-identically.
+const preBadgesTemplate = `{{define "table-cell-badge"}}
+{{$badgeClass := "status-badge"}}
+{{if .BadgeType}}
+    {{- if eq .BadgeType "status" -}}
+    {{$badgeClass = "status-badge"}}
+    {{- else if eq .BadgeType "count" -}}
+    {{$badgeClass = "count-badge"}}
+    {{- else if eq .BadgeType "type" -}}
+    {{$badgeClass = "type-badge"}}
+    {{- end -}}
+{{end}}
+<span class="{{$badgeClass}} {{.Variant}}">{{.Value}}</span>
+{{end}}`
+
+// TestBadgeCell_Render_SingleUnchanged proves a badge cell without Badges
+// renders exactly as before, for every BadgeType branch.
+func TestBadgeCell_Render_SingleUnchanged(t *testing.T) {
+	old := htmltemplate.Must(htmltemplate.New("pre").Parse(preBadgesTemplate))
+	for _, cell := range []types.TableCell{
+		{Type: "badge", Value: "Active", Variant: "success"},
+		{Type: "badge", Value: "3", Variant: "info", BadgeType: "count"},
+		{Type: "badge", Value: "Service", BadgeType: "type"},
+		{Type: "badge", Value: "<b>x</b>", Variant: "warning", BadgeType: "status", TestID: "ignored-on-single"},
+	} {
+		var want bytes.Buffer
+		if err := old.ExecuteTemplate(&want, "table-cell-badge", cell); err != nil {
+			t.Fatalf("pre template: %v", err)
+		}
+		got := renderNamed(t, "table-cell-badge", cell)
+		if got != want.String() {
+			t.Errorf("single badge %q changed.\nwant: %q\ngot:  %q", cell.Value, want.String(), got)
+		}
+	}
+}
+
+// TestBadgeCell_Render_MultiBadges covers the Badges path: one span per entry
+// in slice order, each with its own variant, data-status and data-testid,
+// wrapped in the existing .table-cell-chips container; labels are escaped and
+// the CSV attribute joins the labels.
+func TestBadgeCell_Render_MultiBadges(t *testing.T) {
+	cell := types.TableCell{
+		Type:   "badge",
+		TestID: "cell-1",
+		Badges: []types.BadgeData{
+			{Label: "Phase A: Draft", Variant: "default", Status: "not_started", TestID: "cell-1-a"},
+			{Label: "Phase B: <Review>", Variant: "warning", Status: "for_review", TestID: "cell-1-b"},
+			{Label: "Phase C: Done", Variant: "success"},
+		},
+	}
+	row := types.TableRow{ID: "row-1", Cells: []types.TableCell{cell}}
+	out := renderNamed(t, "table-data-row", row)
+
+	want := `<div class="table-cell-chips" data-testid="cell-1">` +
+		`<span class="status-badge default" data-status="not_started" data-testid="cell-1-a">Phase A: Draft</span>` +
+		`<span class="status-badge warning" data-status="for_review" data-testid="cell-1-b">Phase B: &lt;Review&gt;</span>` +
+		`<span class="status-badge success">Phase C: Done</span>` +
+		`</div>`
+	if !strings.Contains(out, want) {
+		t.Errorf("multi-badge markup mismatch.\nwant substring: %s\ngot: %s", want, out)
+	}
+	if !strings.Contains(out, `data-csv="Phase A: Draft; Phase B: &lt;Review&gt;; Phase C: Done"`) {
+		t.Errorf("multi-badge CSV must join labels; got: %s", out)
+	}
+
+	count := renderNamed(t, "table-cell-badge", types.TableCell{
+		Type: "badge", BadgeType: "count", Badges: []types.BadgeData{{Label: "2", Variant: "info"}},
+	})
+	if !strings.Contains(count, `<span class="count-badge info">2</span>`) {
+		t.Errorf("Badges must honour BadgeType; got: %s", count)
+	}
+}
+
+// TestBadgeCell_CSV_JoinsBadges pins CellCSV for badge cells.
+func TestBadgeCell_CSV_JoinsBadges(t *testing.T) {
+	if got := types.CellCSV(types.TableCell{Type: "badge", Value: "Active"}); got != "Active" {
+		t.Errorf("single badge CSV = %q, want Active", got)
+	}
+	got := types.CellCSV(types.TableCell{Type: "badge", Value: "ignored", Badges: []types.BadgeData{{Label: "A"}, {Label: "B"}}})
+	if got != "A; B" {
+		t.Errorf("multi badge CSV = %q, want %q", got, "A; B")
 	}
 }
