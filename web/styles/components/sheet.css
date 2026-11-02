@@ -790,9 +790,10 @@
     }
 
     /* Footer adjustments */
+    /* Fixed to the viewport, so a margin only pushes it off the right and bottom edges. */
     .sheet-form .sheet-content .sheet-footer {
         width: 100vw;
-        margin: 1.25rem -1.25rem -1.25rem -1.25rem;
+        margin: 0;
         padding: 1rem 1.25rem;
     }
 

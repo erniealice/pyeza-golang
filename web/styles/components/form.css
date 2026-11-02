@@ -838,6 +838,13 @@
     margin-top: 0.125rem; /* 2px — guarantees a break even if flex column fails */
 }
 
+/* For options whose description is what the user is choosing, not a side note: the
+   text must be readable, so it meets WCAG AA at this size. */
+.lf-radio-readable .form-radio-description {
+    color: var(--text-secondary);
+    opacity: 1;
+}
+
 /* Disabled state: dim everything and disable pointer cursor. */
 .form-radio-option.is-disabled {
     cursor: not-allowed;

@@ -25,7 +25,8 @@
  *   cell-grid.css, visible — ONLY while a cell is in the "error" state (see
  *   needsSave). A healthy autosave grid shows no retry control; the control is
  *   never removed from the DOM, so it remains the submit path when JS is
- *   unavailable and the recovery path when a save actually fails.
+ *   unavailable and the recovery path when a save actually fails. With JS, that
+ *   recovery batch carries only the dirty and failed cells.
  *
  * Contract (locked, must match the W2 server half verbatim):
  *   REQUEST  focusout of a CHANGED cell → coalesced single-flight POST of the
@@ -148,6 +149,7 @@
     function setState(el, s) {
         el.setAttribute('data-cg-state', s);
         if (s !== 'error') el.removeAttribute('aria-invalid');
+        delete el.dataset.cgRejected;
     }
     function setStatus(el, text) {
         var id = el.getAttribute('aria-describedby');
@@ -417,6 +419,7 @@
                 // that path is settle(), not here.)
                 if (document.activeElement !== el) el.value = baselineOf(el);
                 setState(el, 'error');
+                el.dataset.cgRejected = '1';
                 setStatus(el, (c.error && String(c.error)) || msg(form, 'error', 'Not saved.'));
                 el.setAttribute('aria-invalid', 'true');
                 lingerError(form, el);
@@ -474,6 +477,8 @@
                 setState(el, 'clean');
                 setStatus(el, '');
                 updateNotice(form);
+                // That may have been the last error, so Retry can go.
+                recomputeDirty(form);
             }
         }, ERROR_LINGER_MS);
     }
@@ -659,6 +664,36 @@
             if (form) handleResult(form, e && e.detail);
         });
 
+        // Retry in autosave mode posts only what still needs saving. A posted cell
+        // at its current value re-saves, which resets that cell's server-filled text,
+        // so the rest of the grid must stay out of the batch. A rejected cell stays out
+        // too, because it was put back to its saved value; one still holding a typed
+        // value (it had focus at the rejection) is dirty and goes in. Manual-batch grids
+        // keep posting the whole form. save_mode=cell asks for the per-cell acks, so the
+        // retried cells leave their error state. With nothing to post, the notice strip
+        // says so.
+        lf.on('htmx:configRequest', '.cell-grid-form', function (e) {
+            if (!e || e.target !== this || !isAuto(this)) return;
+            var params = e.detail && e.detail.parameters;
+            if (!params) return;
+            var kept = 0;
+            cellInputs(this).forEach(function (el) {
+                if (isDirty(el) || (el.getAttribute('data-cg-state') === 'error' && !el.dataset.cgRejected)) {
+                    kept++;
+                } else {
+                    delete params[el.name];
+                }
+            });
+            if (kept === 0) {
+                e.preventDefault();
+                syncSaveButton(this);
+                var notice = document.getElementById(this.getAttribute('data-notice-id'));
+                if (notice) notice.textContent = msg(this, 'retry-nothing', 'Nothing to retry.');
+                return;
+            }
+            params.save_mode = 'cell';
+        });
+
         // Manual batch (Layer 1) submit UX — fires only for the native form
         // submit (source=form), NOT for auto-save (source=card).
         lf.on('htmx:beforeRequest', '.cell-grid-form', function (e) {
@@ -672,7 +707,10 @@
             if (e && e.target !== this) return;
             var btn = saveButton(this);
             if (btn && btn.dataset.labelSave) btn.textContent = btn.dataset.labelSave;
-            if (e && e.detail && e.detail.successful) clearDirty(this); else markDirty(this);
+            // Retry stays up while any cell is still in error, such as one rejected
+            // while this request was out; it goes when the error clears.
+            var failed = this.querySelector('.cell-grid-input[data-cg-state="error"]');
+            if (e && e.detail && e.detail.successful && !failed) clearDirty(this); else markDirty(this);
         });
 
         // beforeunload guard: warn if any auto-save cell is still pending/errored.

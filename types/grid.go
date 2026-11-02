@@ -467,4 +467,6 @@ type CellGridLabels struct {
 	RatingStale string `json:"rating_stale"` // "Saved — rating not yet recomputed."
 	UnsavedWarn string `json:"unsaved_warn"` // beforeunload guard message
 	RetryButton string `json:"retry_button"` // "Save now / Retry unsaved" (AutoSave mode)
+	// RetryNothing is the notice when Retry has only rejected cells, so nothing to post.
+	RetryNothing string `json:"retry_nothing"`
 }

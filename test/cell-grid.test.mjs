@@ -651,3 +651,73 @@ test('resubmit: in-flight ack + newer edit semantics unchanged', () => {
     assert.equal(cell.value, '13', 'newer edit must survive the stale ack');
     assert.equal(cell.getAttribute('data-cg-state'), 'dirty', 'cell still marked dirty for retry');
 });
+
+// --- Retry in autosave mode --------------------------------------------------
+function retryGrid() {
+    boot();
+    const rejected = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '5' });
+    const failed = makeInput({ name: 'cells.b', row: 1, col: 0, saved: '6' });
+    const form = makeForm({ auto: true, inputs: [rejected, failed] });
+    form.setAttribute('data-msg-retry-nothing', 'Nothing to retry here.');
+    form.dataset.cgDirty = '1';
+    ELEMENTS['g-notice'] = { textContent: '' };
+    rejected.setAttribute('data-cg-state', 'error');
+    rejected.dataset.cgRejected = '1';
+    return { form, rejected, failed };
+}
+
+test('retry: only rejected cells posts nothing and says so', () => {
+    const { form, failed } = retryGrid();
+    let prevented = false;
+    const parameters = { 'cells.a': '5', 'cells.b': '6' };
+    fire('htmx:configRequest', form, { detail: { parameters }, preventDefault() { prevented = true; } });
+    assert.equal(prevented, true);
+    assert.equal(ELEMENTS['g-notice'].textContent, 'Nothing to retry here.');
+    assert.equal(failed.getAttribute('data-cg-state'), '');
+});
+
+test('retry: a failed cell is posted without the rejected one, with no notice', () => {
+    const { form, failed } = retryGrid();
+    failed.setAttribute('data-cg-state', 'error');
+    let prevented = false;
+    const parameters = { 'cells.a': '5', 'cells.b': '6' };
+    fire('htmx:configRequest', form, { detail: { parameters }, preventDefault() { prevented = true; } });
+    assert.equal(prevented, false);
+    assert.deepEqual(Object.keys(parameters).sort(), ['cells.b', 'save_mode']);
+    assert.equal(parameters.save_mode, 'cell');
+    assert.equal(ELEMENTS['g-notice'].textContent, '');
+});
+
+test('retry: stays enabled after a successful request while a cell is in error', () => {
+    const { form, rejected } = retryGrid();
+    const btn = form._saveBtn;
+    fire('htmx:afterRequest', form, { detail: { successful: true } });
+    assert.equal(form.dataset.cgDirty, '1');
+    assert.equal(btn.disabled, false);
+
+    rejected.setAttribute('data-cg-state', 'clean');
+    delete rejected.dataset.cgRejected;
+    fire('htmx:afterRequest', form, { detail: { successful: true } });
+    assert.equal(btn.disabled, true, 'with no error left, it goes away');
+});
+
+test('reject: when the error paint clears, Retry goes with it', () => {
+    boot();
+    const cell = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '5' });
+    const form = makeForm({ auto: true, inputs: [cell] });
+    ELEMENTS['g-notice'] = { textContent: '' };
+    const btn = form._saveBtn;
+
+    cell.value = '9'; cell.dataset.cgRev = '1';
+    fire('focusout', cell);
+    runTimers();
+    fire('omcell-result', AJAX_CALLS[AJAX_CALLS.length - 1].ctx.target, {
+        detail: { cells: [{ key: 'cells.a', ok: false, error: 'Rejected' }] },
+    });
+    assert.equal(cell.getAttribute('data-cg-state'), 'error');
+    assert.equal(btn.disabled, false, 'Retry is up while the cell shows its error');
+
+    runTimers();
+    assert.equal(cell.getAttribute('data-cg-state'), 'clean');
+    assert.equal(btn.disabled, true, 'nothing left to retry');
+});

@@ -64,7 +64,8 @@ HTMX content-only swap — unlike the table component, whose equivalent is only 
           data-msg-saved="{{.Labels.CellSaved}}"
           data-msg-error="{{.Labels.CellError}}"
           data-msg-rating-stale="{{.Labels.RatingStale}}"
-          data-msg-unsaved="{{.Labels.UnsavedWarn}}"{{end}}>
+          data-msg-unsaved="{{.Labels.UnsavedWarn}}"
+          data-msg-retry-nothing="{{.Labels.RetryNothing}}"{{end}}>
         {{actionForm .SaveURL .WorkspaceID}}
         <input type="hidden" name="job_template_id" value="{{.JobTemplateID}}">
         <input type="hidden" name="scope" value="{{.Scope}}">
