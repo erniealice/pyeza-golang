@@ -116,6 +116,10 @@ function makeForm(o) {
 function matchAll(sel, inputs, hiddens, saveBtn) {
     if (sel === '.cell-grid-save') return [saveBtn];
     if (sel === 'input[type="hidden"]') return hiddens;
+    let hm;
+    if ((hm = sel.match(/^input\[type="hidden"\]\[name="(.+)"\]$/))) {
+        return hiddens.filter((h) => h.name === hm[1]);
+    }
     if (sel === '.cell-grid-input') return inputs.slice();
     let m;
     if ((m = sel.match(/^\.cell-grid-input\[name="(.+)"\]$/))) {
@@ -720,4 +724,106 @@ test('reject: when the error paint clears, Retry goes with it', () => {
     runTimers();
     assert.equal(cell.getAttribute('data-cg-state'), 'clean');
     assert.equal(btn.disabled, true, 'nothing left to retry');
+});
+
+// --- session expired: keep + re-save (20261104) ------------------------------
+
+function sessionEnv() {
+    const store = new Map();
+    WIN.location = { pathname: '/w/mmis/grade-sheet/T1', search: '?scope=s1' };
+    WIN.sessionStorage = {
+        getItem: (k) => (store.has(k) ? store.get(k) : null),
+        setItem: (k, v) => { store.set(k, String(v)); },
+        removeItem: (k) => { store.delete(k); },
+    };
+    const session = {
+        expired: false, prompts: 0,
+        isExpired() { return this.expired; },
+        markExpired() { this.expired = true; this.prompts++; },
+    };
+    WIN.lf.ui.session = session;
+    return { store, session };
+}
+function gridHiddens() {
+    return [
+        { name: 'job_template_id', value: 'JT1', getAttribute: () => 'hidden' },
+        { name: 'scope', value: 's1', getAttribute: () => 'hidden' },
+    ];
+}
+const STASH_KEY = 'lf.cg.unsaved.v1|/w/mmis/grade-sheet/T1?scope=s1||JT1|s1';
+
+test('session expired: a rejected save is kept in sessionStorage, not retried, and the pop-up re-shows on the next save', async () => {
+    boot();
+    const { store, session } = sessionEnv();
+    const a = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '1' });
+    const b = makeInput({ name: 'new.JT1:CR2', row: 1, col: 0, saved: '' });
+    const form = makeForm({ auto: true, inputs: [a, b], hiddens: gridHiddens() });
+    WIN._forms = [form];
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    a.value = '7'; a.dataset.cgRev = '1';
+    b.value = '6'; b.dataset.cgRev = '1';
+    fire('focusout', a);
+    fire('focusout', b);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 1);
+
+    // dialog.js's htmx:beforeOnLoad hook saw X-Session-Expired: 1 and flagged it.
+    session.expired = true;
+    AJAX_CALLS[0].settle();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    assert.equal(a.getAttribute('data-cg-state'), 'error');
+    const saved = JSON.parse(store.get(STASH_KEY));
+    assert.deepEqual(saved.cells, { 'cells.a': '7', 'new.JT1:CR2': '6' });
+    assert.equal(saved.v, 1);
+    assert.equal(TIMERS.filter((t) => t.live).length, 0, 'no retry flush is scheduled after expiry');
+
+    // A further edit does not hit the server; it is kept and the pop-up returns.
+    a.value = '8';
+    fire('input', a);
+    fire('focusout', a);
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 1, 'no request while the session is expired');
+    assert.equal(session.prompts, 1, 'the sign-in pop-up is requested again');
+    assert.equal(JSON.parse(store.get(STASH_KEY)).cells['cells.a'], '8');
+});
+
+test('session expired: on load the kept cells are put back, saved through the normal path, then cleared', () => {
+    boot();
+    const { store } = sessionEnv();
+    store.set(STASH_KEY, JSON.stringify({ v: 1, ts: Date.now(), owner: '', cells: { 'cells.a': '7', 'new.JT1:CR2': '6', 'cells.gone': '1' } }));
+    const a = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '1' });
+    const b = makeInput({ name: 'new.JT1:CR2', row: 1, col: 0, saved: '' });
+    const form = makeForm({ auto: true, inputs: [a, b], hiddens: gridHiddens() });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    WIN.lf.ui.cellGrid._restoreForm(form);
+    assert.equal(store.has(STASH_KEY), false, 'the kept entry is cleared once restored');
+    assert.equal(a.value, '7');
+    assert.equal(b.value, '6');
+    runTimers();
+    assert.equal(AJAX_CALLS.length, 1, 'restored cells go out as one normal auto-save batch');
+    assert.equal(AJAX_CALLS[0].values['cells.a'], '7');
+    assert.equal(AJAX_CALLS[0].values['new.JT1:CR2'], '6');
+    assert.equal(AJAX_CALLS[0].values.save_mode, 'cell');
+    assert.equal(AJAX_CALLS[0].values.job_template_id, 'JT1');
+});
+
+test('session expired: stale (>12h) or other-grid entries are not restored', () => {
+    boot();
+    const { store } = sessionEnv();
+    const old = Date.now() - 13 * 60 * 60 * 1000;
+    store.set(STASH_KEY, JSON.stringify({ v: 1, ts: old, owner: '', cells: { 'cells.a': '7' } }));
+    store.set('lf.cg.unsaved.v1|/w/mmis/grade-sheet/OTHER||JT9|s1', JSON.stringify({ v: 1, ts: Date.now(), owner: '', cells: { 'cells.a': '9' } }));
+    const a = makeInput({ name: 'cells.a', row: 0, col: 0, saved: '1' });
+    const form = makeForm({ auto: true, inputs: [a], hiddens: gridHiddens() });
+    ELEMENTS['g-notice'] = { textContent: '' };
+
+    WIN.lf.ui.cellGrid._restoreForm(form);
+    runTimers();
+    assert.equal(a.value, '1', 'stale entry ignored; other grid entry never matches this key');
+    assert.equal(AJAX_CALLS.length, 0);
+    assert.equal(store.has(STASH_KEY), false, 'stale entry is dropped');
 });

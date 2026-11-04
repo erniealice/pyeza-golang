@@ -195,6 +195,10 @@
         })
         .then(response => {
             console.log('[BulkAction] Response status:', response.status);
+            // Session expired (20261104): show the sign-in pop-up and stop.
+            if (window.lf && window.lf.ui && window.lf.ui.session && window.lf.ui.session.checkResponse(response)) {
+                throw new Error('session_expired');
+            }
             if (!response.ok) {
                 return response.text().then(text => {
                     throw new Error(text || 'Action failed');
@@ -227,6 +231,7 @@
         })
         .catch(error => {
             console.error('[BulkAction] Failed:', error);
+            if (error && error.message === 'session_expired') return; // pop-up already shown
             alert('Action failed: ' + error.message);
         });
     }

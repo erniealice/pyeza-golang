@@ -423,6 +423,8 @@
             headers: headers,
             body: body
         }).then(function(response) {
+            // Session expired (20261104): sign-in pop-up, not a silent failure.
+            if (window.lf && window.lf.ui && window.lf.ui.session && window.lf.ui.session.checkResponse(response)) return;
             if (response.ok) {
                 // Refresh table after successful action
                 const tableCard = document.querySelector('.table-card[data-refresh-url]');

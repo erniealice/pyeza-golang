@@ -146,6 +146,84 @@
         if (label) btn.setAttribute('aria-label', label);
     }
 
+    // --- session-expired keep + re-save (20261104) ---------------------------
+    // When dialog.js's lf.ui.session reports an expired session, the cells that
+    // never reached the server are written to sessionStorage (same origin, this
+    // tab only — it survives the Microsoft/Firebase sign-in round trip, which
+    // returns to this page in the same tab). On the next load of the SAME page
+    // and grid, restoreForm puts them back and queues them through the normal
+    // auto-save path, then clears the entry. Entries older than STASH_TTL_MS, or
+    // written while a different user was signed in, are discarded unread.
+    var STASH_PREFIX = 'lf.cg.unsaved.v1|';
+    var STASH_TTL_MS = 12 * 60 * 60 * 1000;
+
+    function sessionExpired() {
+        return !!(window.lf && window.lf.ui && window.lf.ui.session && window.lf.ui.session.isExpired());
+    }
+    function hiddenValue(form, name) {
+        var h = form.querySelector('input[type="hidden"][name="' + esc(name) + '"]');
+        return h ? h.value : '';
+    }
+    function stashKey(form) {
+        return STASH_PREFIX + window.location.pathname + window.location.search + '|' +
+            (form.id || '') + '|' + hiddenValue(form, 'job_template_id') + '|' + hiddenValue(form, 'scope');
+    }
+    // Opaque tag for the signed-in user (FNV-1a of the account e-mail the shell
+    // renders in the settings modal) — compared, never displayed or sent.
+    function ownerTag() {
+        var el = (typeof document.querySelector === 'function')
+            ? document.querySelector('.settings-user-email') : null;
+        var t = el ? String(el.textContent || '').trim().toLowerCase() : '';
+        if (!t) return '';
+        var h = 0x811c9dc5;
+        for (var i = 0; i < t.length; i++) {
+            h ^= t.charCodeAt(i);
+            h = Math.imul(h, 0x01000193) >>> 0;
+        }
+        return h.toString(16);
+    }
+    function stashForm(form) {
+        if (!isAuto(form)) return;
+        var cells = {};
+        var n = 0;
+        cellInputs(form).forEach(function (el) {
+            if (el.name && isDirty(el)) { cells[el.name] = el.value; n++; }
+        });
+        try {
+            if (n === 0) { window.sessionStorage.removeItem(stashKey(form)); return; }
+            window.sessionStorage.setItem(stashKey(form), JSON.stringify({
+                v: 1, ts: Date.now(), owner: ownerTag(), cells: cells
+            }));
+        } catch (e) { /* storage unavailable/full — the pop-up still guides the user */ }
+    }
+    function restoreForm(form) {
+        if (!isAuto(form)) return;
+        var key, raw;
+        try {
+            key = stashKey(form);
+            raw = window.sessionStorage.getItem(key);
+        } catch (e) { return; }
+        if (!raw) return;
+        try { window.sessionStorage.removeItem(key); } catch (e) { /* best effort */ }
+        var data;
+        try { data = JSON.parse(raw); } catch (e) { return; }
+        if (!data || data.v !== 1 || !data.cells || typeof data.ts !== 'number') return;
+        if (Date.now() - data.ts > STASH_TTL_MS) return;
+        var owner = ownerTag();
+        if (data.owner && owner && data.owner !== owner) return;
+        Object.keys(data.cells).forEach(function (name) {
+            var el = inputByName(form, name);
+            if (!el || el.disabled) return;
+            el.value = String(data.cells[name]);
+            el.dataset.cgRev = String((parseInt(el.dataset.cgRev, 10) || 0) + 1);
+            if (isDirty(el)) queueCell(form, el);
+        });
+    }
+    function stashAllForms() {
+        var forms = document.querySelectorAll('.cell-grid-form[data-cg-autosave="1"]');
+        for (var i = 0; i < forms.length; i++) stashForm(forms[i]);
+    }
+
     function setState(el, s) {
         el.setAttribute('data-cg-state', s);
         if (s !== 'error') el.removeAttribute('aria-invalid');
@@ -243,6 +321,12 @@
             }
         }
 
+        // Session-expired re-save (20261104): put back + queue any cells kept
+        // for THIS page and grid before the sign-in round trip.
+        var autoForms = root.querySelectorAll('.cell-grid-form[data-cg-autosave="1"]');
+        for (var f = 0; f < autoForms.length; f++) restoreForm(autoForms[f]);
+        if (root.matches && root.matches('.cell-grid-form[data-cg-autosave="1"]')) restoreForm(root);
+
         var buttons = root.querySelectorAll('.cell-grid-save');
         for (var i = 0; i < buttons.length; i++) {
             var btn = buttons[i];
@@ -288,6 +372,24 @@
         if (st.inFlight) return;            // single-flight; re-flushed on completion
         if (st.pending.size === 0) return;
         if (!window.htmx || typeof window.htmx.ajax !== 'function') return; // no transport
+        if (sessionExpired()) {
+            // A save now would only be rejected again: keep the typed values,
+            // mark them unsaved, and bring the sign-in pop-up back.
+            st.pending.forEach(function (entry, name) {
+                var el = inputByName(form, name);
+                if (el) {
+                    setState(el, 'error');
+                    setStatus(el, msg(form, 'error', 'Not saved.'));
+                    el.setAttribute('aria-invalid', 'true');
+                }
+            });
+            st.pending = new Map();
+            stashForm(form);
+            updateNotice(form);
+            recomputeDirty(form);
+            window.lf.ui.session.markExpired();
+            return;
+        }
 
         // Immutable snapshot; new edits accumulate into the next batch.
         var snapshot = st.pending;
@@ -331,6 +433,12 @@
             st.snapshot = null;
             updateNotice(form);
             recomputeDirty(form);
+            if (sessionExpired()) {
+                // Session gone: keep everything unsaved for the re-save after
+                // sign-in; never retry into the same rejection.
+                stashForm(form);
+                return;
+            }
             if (st.pending.size > 0) scheduleFlush(form);
         };
 
@@ -715,6 +823,9 @@
 
         // beforeunload guard: warn if any auto-save cell is still pending/errored.
         window.addEventListener('beforeunload', function (e) {
+            // Session expired: unsaved cells are already kept in sessionStorage
+            // and re-saved after sign-in, so leaving for sign-in is safe.
+            if (sessionExpired()) { stashAllForms(); return; }
             var forms = document.querySelectorAll('.cell-grid-form[data-cg-autosave="1"]');
             for (var i = 0; i < forms.length; i++) {
                 var unsaved = forms[i].querySelector(
@@ -729,6 +840,9 @@
                 }
             }
         });
+
+        // dialog.js lf.ui.session fires this before the sign-in pop-up opens.
+        document.addEventListener('lf:session-expired', stashAllForms);
 
         document.addEventListener('DOMContentLoaded', function () { initGrids(document); });
         document.addEventListener('htmx:afterSwap', function (e) { initGrids(e.target || document); });
@@ -747,6 +861,9 @@
         _syncNarrativeIcon: syncNarrativeIcon,
         _queueCell: queueCell,
         _stateFor: stateFor,
-        _flush: flush
+        _flush: flush,
+        _stashForm: stashForm,
+        _restoreForm: restoreForm,
+        _stashKey: stashKey
     };
 })();

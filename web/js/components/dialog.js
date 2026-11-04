@@ -545,6 +545,15 @@
                             // Always close dialog after server response
                             closeDialog();
 
+                            // Session expired (20261104): pop up sign-in
+                            // instead of treating the bounce as a result.
+                            if (window.lf.ui && window.lf.ui.session && window.lf.ui.session.checkResponse(response)) {
+                                dialog.dispatchEvent(new CustomEvent('dialog:confirm', {
+                                    detail: { url: actionUrl, success: false, status: response.status, sessionExpired: true }
+                                }));
+                                return;
+                            }
+
                             if (response.ok) {
                                 // Refresh table if refresh URL is available
                                 // HTMX ajax target must be a CSS selector string, not a DOM element.
@@ -721,6 +730,146 @@
     document.addEventListener('htmx:afterSwap', function(e) {
         if (e.target.hasAttribute('data-dialog-overlay')) {
             init();
+        }
+    });
+
+    // ========================================
+    // SESSION EXPIRED (20261104)
+    // ========================================
+    //
+    // lf.ui.session: a mutation the server rejects because the page's session credentials no
+    // longer match (the workspace CSRF middleware answers 403 with
+    // X-Session-Expired: 1), or one bounced to the sign-in page because the
+    // session is gone (HX-Redirect / a followed redirect to /auth/login), can
+    // never succeed by retrying. It turns any such response into ONE
+    // pop-up on the shared dialog: "Sign in" goes to
+    // /auth/login?return_to=<this page>, so the user comes back here afterwards.
+    //
+    // Listeners: document 'lf:session-expired' fires once per detection, BEFORE
+    // the pop-up opens, so components holding unsaved input (cell-grid.js) can
+    // keep it for re-saving after sign-in.
+    //
+    // Labels come from the overlay's data-session-expired-* attributes
+    // (common.json#dialog); the cancel button uses the dialog's default cancel
+    // label. English fallbacks apply only when a shell renders no labels.
+
+    var SESSION_EXPIRED_HEADER = 'X-Session-Expired';
+    var LOGIN_PATH = '/auth/login';
+    var _sessionExpired = false;
+    var _sessionPromptOpen = false;
+
+    function isLoginURL(u) {
+        if (!u) return false;
+        try {
+            var parsed = new URL(u, window.location.origin);
+            return parsed.origin === window.location.origin &&
+                parsed.pathname.indexOf(LOGIN_PATH) === 0;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    // signals(getHeader, finalUrl, redirected) — the single detection rule
+    // shared by XHR (htmx) and fetch() callers.
+    function signalsSessionExpired(getHeader, finalUrl, redirected) {
+        var h = null;
+        try { h = getHeader(SESSION_EXPIRED_HEADER); } catch (err) { h = null; }
+        if (h === '1') return true;
+        var hx = null;
+        try { hx = getHeader('HX-Redirect'); } catch (err) { hx = null; }
+        if (hx && isLoginURL(hx)) return true;
+        return !!(redirected && isLoginURL(finalUrl));
+    }
+
+    function sessionLoginURL() {
+        var here = window.location.pathname + window.location.search;
+        // The server only honours /w/ return paths; don't send anything else.
+        if (here.indexOf('/w/') !== 0) return LOGIN_PATH;
+        return LOGIN_PATH + '?return_to=' + encodeURIComponent(here);
+    }
+
+    function sessionLabel(overlay, attr, fallback) {
+        var v = overlay ? overlay.getAttribute(attr) : '';
+        return v || fallback;
+    }
+
+    function promptSignIn() {
+        if (_sessionPromptOpen) return;
+        _sessionPromptOpen = true;
+        var overlay = document.querySelector('[data-dialog-overlay]');
+        var dlg = window.lf && window.lf.ui && window.lf.ui.Dialog;
+        var go = function() { window.location.assign(sessionLoginURL()); };
+        if (!dlg || typeof dlg.confirm !== 'function') {
+            _sessionPromptOpen = false;
+            go();
+            return;
+        }
+        dlg.confirm({
+            title: sessionLabel(overlay, 'data-session-expired-title', 'Your session has expired'),
+            message: sessionLabel(overlay, 'data-session-expired-body',
+                'Sign in again to keep working. Entries that were not saved are kept on this page and will be saved after you sign in.'),
+            confirmLabel: sessionLabel(overlay, 'data-session-expired-sign-in', 'Sign in'),
+            variant: 'primary',
+            testid: 'session-expired'
+        }).then(function(ok) {
+            _sessionPromptOpen = false;
+            if (ok) go();
+        });
+    }
+
+    // markExpired records the expiry, lets components keep unsaved input, and
+    // shows the pop-up (again, if it was dismissed and another save failed).
+    function markExpired() {
+        _sessionExpired = true;
+        try {
+            document.dispatchEvent(new CustomEvent('lf:session-expired'));
+        } catch (err) {
+            // listeners must never block the pop-up
+        }
+        promptSignIn();
+    }
+
+    window.lf = window.lf || {};
+    window.lf.ui = window.lf.ui || {};
+    window.lf.ui.session = {
+        isExpired: function() { return _sessionExpired; },
+        markExpired: markExpired,
+        loginURL: sessionLoginURL,
+        // checkXhr / checkResponse return true (and handle the expiry) when the
+        // response means "session expired"; callers then stop processing it.
+        checkXhr: function(xhr) {
+            if (!xhr) return false;
+            if (!signalsSessionExpired(function(n) { return xhr.getResponseHeader(n); },
+                    xhr.responseURL, !!xhr.responseURL && isLoginURL(xhr.responseURL))) {
+                return false;
+            }
+            markExpired();
+            return true;
+        },
+        checkResponse: function(response) {
+            if (!response || !response.headers) return false;
+            if (!signalsSessionExpired(function(n) { return response.headers.get(n); },
+                    response.url, response.redirected)) {
+                return false;
+            }
+            markExpired();
+            return true;
+        }
+    };
+
+    // Every htmx MUTATION (cell-grid auto-save, Retry, Confirm/Submit/Return
+    // dialogs, drawer forms) passes through here. Cancelling beforeOnLoad stops
+    // htmx from following an HX-Redirect to the sign-in page (which would drop
+    // unsaved input) and from swapping an error body; htmx still settles the
+    // request (afterRequest + the htmx.ajax promise), so callers clean up.
+    // GET navigations keep htmx's normal redirect behaviour.
+    document.addEventListener('htmx:beforeOnLoad', function(evt) {
+        var d = evt && evt.detail;
+        if (!d || !d.xhr) return;
+        var verb = (d.requestConfig && d.requestConfig.verb) || '';
+        if (String(verb).toUpperCase() === 'GET') return;
+        if (window.lf.ui.session.checkXhr(d.xhr)) {
+            evt.preventDefault();
         }
     });
 })();

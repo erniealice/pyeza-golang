@@ -641,6 +641,14 @@ type DialogLabels struct {
 	// per-action title of its own. An empty value renders no heading at all
 	// (and no dangling aria-labelledby), never an English placeholder.
 	ConfirmTitle string `json:"confirm_title"`
+	// SessionExpiredTitle / SessionExpiredBody / SessionExpiredSignIn are the
+	// session-expired pop-up (dialog.js lf.session, 20261104) shown when an
+	// /action/* save is rejected with X-Session-Expired. Surfaced as
+	// data-session-expired-* on the dialog overlay. The cancel button reuses
+	// CommonLabels.Buttons.Cancel.
+	SessionExpiredTitle  string `json:"session_expired_title"`
+	SessionExpiredBody   string `json:"session_expired_body"`
+	SessionExpiredSignIn string `json:"session_expired_sign_in"`
 }
 
 // A11yLabels holds tier-invariant accessibility strings shared across every
