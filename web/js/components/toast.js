@@ -276,7 +276,10 @@
                 link: detail.link,
                 dismissible: detail.dismissible,
                 id: detail.id,
-                class: detail.class
+                class: detail.class,
+                // data-testid hook for tests; only a plain [a-z0-9-] token passes.
+                testid: (typeof detail.testid === 'string' && /^[a-z0-9-]{1,64}$/.test(detail.testid))
+                    ? detail.testid : undefined
             };
         }
         return null;

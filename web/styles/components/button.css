@@ -620,6 +620,17 @@
     border-color: var(--border);
 }
 
+.btn-action:disabled,
+.btn.btn-action:disabled,
+.btn-action[aria-disabled="true"],
+.btn.btn-action[aria-disabled="true"] {
+    background: var(--border);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 .btn-action svg {
     width: 0.875rem; /* 14px */
     height: 0.875rem;

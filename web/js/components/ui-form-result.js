@@ -45,8 +45,52 @@ window.lf.ui = window.lf.ui || {};
  *                                        'style' toggles el.style.display (block→none).
  *                                        Default 'classList'.
  * @param {number} [opts.hideDelay]      Auto-hide delay in ms. Default 5000.
+ * @param {string} [opts.connectionError] Opt-in text shown when the browser got no usable
+ *                                        response (network failure, status 0, or a 5xx
+ *                                        without an HX-Error-Message), so the outcome is
+ *                                        unknown. When set, that banner does NOT auto-hide:
+ *                                        it stays until the next request or the swap.
+ *                                        Without it, failures behave exactly as before.
+ *
+ * Success detection: htmx 1.9.10 leaves event.detail.successful undefined on
+ * HX-Location responses, so an undefined value with an HX-Location header falls
+ * back to the HTTP status (2xx = success), unless the session expired. Every
+ * other undefined (e.g. the 200 + HX-Redirect to /auth/login that dialog.js
+ * cancels) stays a failure, as before. An explicit true/false is honoured.
  */
 window.lf.ui.handleFormResult = function(event, opts) {
+    function sessionExpiredSignal(xhr) {
+        var s = window.lf.ui.session;
+        if (s && typeof s.isExpired === 'function' && s.isExpired()) return true;
+        if (xhr.getResponseHeader('X-Session-Expired') === '1') return true;
+        var redirect = xhr.getResponseHeader('HX-Redirect');
+        if (!redirect) return false;
+        try {
+            return new URL(redirect, window.location.origin).pathname.indexOf('/auth/login') === 0;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    // headerText reads a response header as UTF-8 text. XHR exposes header
+    // bytes as Latin-1 code points, so a Go handler's raw UTF-8 label (an em
+    // dash) arrives as mojibake. Re-decode those bytes as UTF-8; an ASCII value
+    // is unchanged, and a value that is not valid UTF-8 is returned as is.
+    function headerText(xhr, name) {
+        var v = xhr ? xhr.getResponseHeader(name) : null;
+        if (!v || !/[\u0080-\u00ff]/.test(v) || /[^\u0000-\u00ff]/.test(v) ||
+                typeof TextDecoder !== 'function') {
+            return v;
+        }
+        try {
+            var bytes = new Uint8Array(v.length);
+            for (var i = 0; i < v.length; i++) bytes[i] = v.charCodeAt(i);
+            return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+        } catch (err) {
+            return v;
+        }
+    }
+
     opts = opts || {};
     var el = document.getElementById(opts.resultId);
     if (!el) return;
@@ -67,20 +111,42 @@ window.lf.ui.handleFormResult = function(event, opts) {
         el.style.display = 'block';
     }
 
-    if (event.detail.successful) {
+    var status = xhr ? xhr.status : 0;
+    // htmx leaves `successful` undefined on an HX-Location response; only then
+    // does a 2xx count as success. A session-expiry response (200 + HX-Redirect
+    // to the sign-in page, cancelled by dialog.js) is never a success.
+    var hxLocation = xhr ? xhr.getResponseHeader('HX-Location') : null;
+    var ok = event.detail.successful === true ||
+        (event.detail.successful === undefined && !!hxLocation &&
+            status >= 200 && status < 300 && !sessionExpiredSignal(xhr));
+    var errHeader = headerText(xhr, errorHeader);
+    var noAnswer = !xhr || status === 0 || (status >= 500 && !errHeader);
+
+    // A newer request supersedes any pending auto-hide from an earlier one.
+    if (el._lfFormResultTimer) {
+        clearTimeout(el._lfFormResultTimer);
+        el._lfFormResultTimer = null;
+    }
+
+    if (ok) {
         el.className = 'form-result form-result--success';
         if (successSource === 'header') {
-            el.textContent = xhr.getResponseHeader(successHeader) || '';
+            el.textContent = headerText(xhr, successHeader) || '';
         } else {
             el.textContent = el.dataset.successMessage || successFallback;
         }
+    } else if (!ok && opts.connectionError && noAnswer) {
+        // Outcome unknown: keep the message visible (no auto-hide).
+        el.className = 'form-result form-result--error';
+        el.textContent = opts.connectionError;
+        return;
     } else {
-        var msg = xhr.getResponseHeader(errorHeader) || el.dataset.errorMessage || errorFallback;
+        var msg = errHeader || el.dataset.errorMessage || errorFallback;
         el.className = 'form-result form-result--error';
         el.textContent = msg;
     }
 
-    setTimeout(function() {
+    el._lfFormResultTimer = setTimeout(function() {
         if (hideMode === 'style') {
             el.style.display = 'none';
         } else {

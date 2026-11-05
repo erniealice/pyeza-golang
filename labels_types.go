@@ -534,6 +534,9 @@ type ErrorLabels struct {
 	InvalidTargetStatus string `json:"invalid_target_status"`
 	IDRequired          string `json:"id_required"`
 	NoIDsProvided       string `json:"no_ids_provided"`
+	// ConnectionProblem is shown when the browser got no usable response
+	// (network failure or gateway error), so the request's outcome is unknown.
+	ConnectionProblem string `json:"connection_problem"`
 }
 
 type DropdownLabels struct {

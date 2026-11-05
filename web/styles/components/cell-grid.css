@@ -348,6 +348,11 @@
     line-height: var(--leading-tight);
 }
 
+/* In-flight transition button (lf-hx-on keeps it disabled until the swap). */
+.cell-grid-headactions .status-form__btn[aria-busy="true"] {
+    cursor: progress;
+}
+
 /* Same for an inline input riding along (the return-reason field): shrink it to
    the header scale and let it give up width first. */
 .cell-grid-headactions .status-form__input {

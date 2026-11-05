@@ -154,8 +154,134 @@ lf.hxOn = function(htmxEvent, selector, handler, options) {
                 successHeader: this.dataset.successHeader,
                 successFallback: this.dataset.successFallback,
                 errorFallback: this.dataset.errorFallback,
+                connectionError: this.dataset.connectionError,
                 hideMode: this.dataset.hideMode
             });
         }
+        lockThroughNavigation(this, e);
     });
+
+    // In-flight guard: htmx clears hx-disabled-elt targets right after the
+    // response, BEFORE the follow-up HX-Location / HX-Redirect / HX-Refresh: true
+    // navigation swaps the page, leaving a window for a double click. Re-lock
+    // the same targets until the swap replaces them.
+    //
+    // Never locks when the response means "session expired" (dialog.js cancels
+    // that HX-Redirect to the sign-in page, so no navigation follows), and
+    // releases on dialog.js's 'lf:session-expired'. Released early on a send
+    // error / response error / timeout of the locked form's own requests or of
+    // the HX-Location follow-up GET (other requests, e.g. a cell auto-save,
+    // never release it), or after 30 s.
+    var LOCK_MS = 30000;
+    var LOGIN_PATH = '/auth/login';
+    var locks = []; // { form, targets, navPath, timer }
+
+    function resolveDisabledTargets(form) {
+        var holder = form.closest('[hx-disabled-elt]');
+        var spec = holder ? (holder.getAttribute('hx-disabled-elt') || '').trim() : '';
+        if (!spec) return [];
+        try {
+            if (spec === 'this') return [holder];
+            if (spec.indexOf('closest ') === 0) {
+                var c = form.closest(spec.slice(8).trim());
+                return c ? [c] : [];
+            }
+            if (spec.indexOf('find ') === 0) {
+                return Array.prototype.slice.call(form.querySelectorAll(spec.slice(5).trim()));
+            }
+            return Array.prototype.slice.call(document.querySelectorAll(spec));
+        } catch (err) {
+            return [];
+        }
+    }
+
+    function pathOf(u) {
+        if (!u) return '';
+        try {
+            var parsed = new URL(u, window.location.origin);
+            return parsed.origin === window.location.origin ? parsed.pathname : '';
+        } catch (err) {
+            return '';
+        }
+    }
+
+    function isLoginURL(u) {
+        return pathOf(u).indexOf(LOGIN_PATH) === 0;
+    }
+
+    function sessionExpired(xhr) {
+        var s = window.lf && window.lf.ui && window.lf.ui.session;
+        if (s && typeof s.isExpired === 'function' && s.isExpired()) return true;
+        if (xhr.getResponseHeader('X-Session-Expired') === '1') return true;
+        return isLoginURL(xhr.getResponseHeader('HX-Redirect'));
+    }
+
+    // hxLocationPath returns the path of an HX-Location value (plain path or
+    // the JSON {"path": …} form).
+    function hxLocationPath(v) {
+        if (!v) return '';
+        if (v.indexOf('{') === 0) {
+            try { v = (JSON.parse(v) || {}).path || ''; } catch (err) { return ''; }
+        }
+        return pathOf(v);
+    }
+
+    function releaseEntry(entry) {
+        if (entry.timer) { clearTimeout(entry.timer); entry.timer = null; }
+        entry.targets.forEach(function(b) {
+            if (b.isConnected) {
+                b.disabled = false;
+                b.removeAttribute('aria-busy');
+            }
+        });
+        var i = locks.indexOf(entry);
+        if (i !== -1) locks.splice(i, 1);
+    }
+
+    function releaseAll() {
+        locks.slice().forEach(releaseEntry);
+    }
+
+    function lockThroughNavigation(form, e) {
+        var xhr = e.detail && e.detail.xhr;
+        if (!xhr || typeof xhr.getResponseHeader !== 'function') return;
+        if (sessionExpired(xhr)) return;
+        var location = xhr.getResponseHeader('HX-Location');
+        var navigates = !!location ||
+            !!xhr.getResponseHeader('HX-Redirect') ||
+            xhr.getResponseHeader('HX-Refresh') === 'true';
+        if (!navigates) return;
+        var targets = resolveDisabledTargets(form);
+        if (!targets.length) return;
+        locks.filter(function(x) { return x.form === form; }).forEach(releaseEntry);
+        targets.forEach(function(b) {
+            b.disabled = true;
+            b.setAttribute('aria-busy', 'true');
+        });
+        var entry = { form: form, targets: targets, navPath: hxLocationPath(location), timer: null };
+        entry.timer = setTimeout(function() { releaseEntry(entry); }, LOCK_MS);
+        locks.push(entry);
+    }
+
+    function requestPath(d) {
+        if (!d) return '';
+        var p = (d.pathInfo && d.pathInfo.requestPath) ||
+            (d.requestConfig && d.requestConfig.path) || '';
+        return pathOf(p);
+    }
+
+    function onRequestFailed(evt) {
+        var t = evt.target;
+        var path = requestPath(evt.detail);
+        locks.slice().forEach(function(entry) {
+            var own = t && t.nodeType === 1 && (t === entry.form || entry.form.contains(t));
+            var followUp = !!entry.navPath && path === entry.navPath;
+            if (own || followUp) releaseEntry(entry);
+        });
+    }
+
+    ['htmx:sendError', 'htmx:responseError', 'htmx:timeout'].forEach(function(name) {
+        document.addEventListener(name, onRequestFailed);
+    });
+    document.addEventListener('lf:session-expired', releaseAll);
 })();
